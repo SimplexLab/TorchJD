@@ -121,6 +121,7 @@ exclude_lines = [
     "pragma: not covered",
     "@overload",
 ]
+comment = false
 
 [tool.ruff]
 line-length = 100
@@ -165,6 +166,3 @@ quote-style = "double"
 [tool.ty.src]
 include = ["src", "tests"]
 exclude = ["src/torchjd/aggregation/_nash_mtl.py"]
-
-[tool.coverage.report]
-comment = false
