@@ -6,10 +6,6 @@ from torch import Tensor
 from torchjd._linalg import PSDMatrix, PSDTensor
 
 
-def untested_function() -> None:
-    print("hello world")
-
-
 def flatten(gramian: PSDTensor) -> PSDMatrix:
     """
     Flattens a generalized Gramian into a square matrix. The first half of the dimensions are
