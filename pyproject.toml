@@ -165,3 +165,6 @@ quote-style = "double"
 [tool.ty.src]
 include = ["src", "tests"]
 exclude = ["src/torchjd/aggregation/_nash_mtl.py"]
+
+[tool.coverage]
+comment = false
