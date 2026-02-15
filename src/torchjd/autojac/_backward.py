@@ -2,7 +2,7 @@ from collections.abc import Iterable, Sequence
 
 from torch import Tensor
 
-from ._transform import AccumulateJac, Diagonalize, Init, Jac, OrderedSet
+from ._transform import AccumulateJac, Diagonalize, Init, Jac, OrderedSet, Transform
 from ._utils import as_checked_ordered_set, check_optional_positive_chunk_size, get_leaf_tensors
 
 
@@ -107,19 +107,41 @@ def backward(
     else:
         inputs_ = OrderedSet(inputs)
 
-    if jac_tensors is None:
-        # Transform that creates gradient outputs containing only ones.
-        init = Init(tensors_)
-        # Transform that turns the gradients into Jacobians.
-        diag = Diagonalize(tensors_)
-        jac_tensors_dict = (diag << init)({})
-    else:
-        jac_tensors_ = as_checked_ordered_set(jac_tensors, "jac_tensors")
-        jac_tensors_dict = dict(zip(tensors_, jac_tensors_, strict=True))
+    jac_tensors_dict = _create_jac_tensors_dict(tensors_, jac_tensors)
+    transform = _create_transform(tensors_, inputs_, parallel_chunk_size, retain_graph)
+    transform(jac_tensors_dict)
 
+
+def _create_jac_tensors_dict(
+    tensors: OrderedSet[Tensor],
+    opt_jac_tensors: Sequence[Tensor] | Tensor | None,
+) -> dict[Tensor, Tensor]:
+    """
+    Creates a dictionary mapping tensors to their corresponding Jacobians.
+
+    :param tensors: The tensors to differentiate.
+    :param opt_jac_tensors: The initial Jacobians to backpropagate. If ``None``, defaults to
+        identity.
+    """
+    if opt_jac_tensors is None:
+        # Transform that creates gradient outputs containing only ones.
+        init = Init(tensors)
+        # Transform that turns the gradients into Jacobians.
+        diag = Diagonalize(tensors)
+        return (diag << init)({})
+    jac_tensors = [opt_jac_tensors] if isinstance(opt_jac_tensors, Tensor) else opt_jac_tensors
+    return dict(zip(tensors, jac_tensors, strict=True))
+
+
+def _create_transform(
+    tensors: OrderedSet[Tensor],
+    inputs: OrderedSet[Tensor],
+    parallel_chunk_size: int | None,
+    retain_graph: bool,
+) -> Transform:
+    """Creates the backward transform that computes and accumulates Jacobians."""
     # Transform that computes the required Jacobians.
-    jac = Jac(tensors_, inputs_, parallel_chunk_size, retain_graph)
+    jac = Jac(tensors, inputs, parallel_chunk_size, retain_graph)
     # Transform that accumulates the result in the .jac field of the inputs.
     accumulate = AccumulateJac()
-
-    (accumulate << jac)(jac_tensors_dict)
+    return accumulate << jac
