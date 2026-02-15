@@ -116,9 +116,6 @@ full = [
 [tool.pytest.ini_options]
 xfail_strict = true
 
-[tool.coverage]
-comment = false
-
 [tool.coverage.report]
 exclude_lines = [
     "pragma: not covered",
