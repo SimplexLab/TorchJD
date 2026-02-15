@@ -61,8 +61,8 @@ SOFTWARE.
 [project.urls]
 Homepage = "https://torchjd.org/"
 Documentation = "https://torchjd.org/"
-Source = "https://github.com/SimplexLab/torchjd"
-Changelog = "https://github.com/SimplexLab/torchjd/blob/main/CHANGELOG.md"
+Source = "https://github.com/SimplexLab/TorchJD"
+Changelog = "https://github.com/SimplexLab/TorchJD/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 check = [

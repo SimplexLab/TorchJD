@@ -49,27 +49,27 @@ jobs:
         env:
           TORCHJD_VERSION: ${{ steps.deploy_folder.outputs.TORCHJD_VERSION }}
 
-      - name: Deploy to DEPLOY_DIR of SimplexLab/torchjd-site
+      - name: Deploy to DEPLOY_DIR of SimplexLab/TorchJD-site
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.PROD_DOCUMENTATION_DEPLOY_KEY }}
           publish_dir: docs/build/dirhtml
           destination_dir: ${{ steps.deploy_folder.outputs.DEPLOY_DIR }}
-          external_repository: SimplexLab/torchjd-site
+          external_repository: SimplexLab/TorchJD-site
           publish_branch: main
 
       - name: Kill ssh-agent
         # See: https://github.com/peaceiris/actions-gh-pages/issues/909
         run: killall ssh-agent
 
-      - name: Deploy to stable of SimplexLab/torchjd-site
+      - name: Deploy to stable of SimplexLab/TorchJD-site
         if: startsWith(github.ref, 'refs/tags/')
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.PROD_DOCUMENTATION_DEPLOY_KEY }}
           publish_dir: docs/build/dirhtml
           destination_dir: stable
-          external_repository: SimplexLab/torchjd-site
+          external_repository: SimplexLab/TorchJD-site
           publish_branch: main
 
       - name: Add documentation link to summary

@@ -34,6 +34,6 @@ descent can be leveraged to enhance optimization.
 .. note::
     At the time of writing, there seems to be an incompatibility between ``torch.vmap`` and
     ``torch.nn.RNN`` when running on CUDA (see `this issue
-    <https://github.com/SimplexLab/torchjd/issues/220>`_ for more info), so we advise to set the
+    <https://github.com/SimplexLab/TorchJD/issues/220>`_ for more info), so we advise to set the
     ``parallel_chunk_size`` to ``1`` to avoid using ``torch.vmap``. To improve performance, you can
     check whether ``parallel_chunk_size=None`` (maximal parallelization) works on your side.
