@@ -14,20 +14,16 @@ def backward(
     parallel_chunk_size: int | None = None,
 ) -> None:
     r"""
-    Computes the Jacobians of ``tensors`` with respect to ``inputs``, potentially pre-multiplied by
-    ``jac_tensors``, and accumulates the results in the ``.jac`` fields of the ``inputs``.
-
-    Mathematically, if ``jac_tensors`` is provided, this function computes the matrix product
-    :math:`J_{init} \cdot J`, where :math:`J` is the Jacobian of ``tensors`` w.r.t ``inputs``, and
-    :math:`J_{init}` is the concatenation of ``jac_tensors``. If ``jac_tensors`` is ``None``, it
-    assumes an Identity matrix, resulting in the full Jacobian.
+    Computes the Jacobians of ``tensors`` with respect to ``inputs``, left-multiplied by
+    ``jac_tensors`` (or identity if ``jac_tensors`` is ``None``), and accumulates the results in the
+    ``.jac`` fields of the ``inputs``.
 
     :param tensors: The tensor or tensors to differentiate. Should be non-empty.
-    :param jac_tensors: The initial Jacobian to backpropagate. If provided, it must have the same
-        length and structure as ``tensors``. Each tensor in ``jac_tensors`` must match the shape of
-        the corresponding tensor in ``tensors``, with an extra leading dimension representing the
-        number of rows of the resulting Jacobian. If ``None``, defaults to the Identity matrix,
-        resulting in the standard Jacobian of ``tensors``.
+    :param jac_tensors: The initial Jacobians to backpropagate. If provided, it must have the same
+        structure as ``tensors`` and each tensor in ``jac_tensors`` must match the shape of the
+        corresponding tensor in ``tensors``, with an extra leading dimension representing the
+        number of rows of the resulting Jacobian (e.g. the number of losses). If ``None``, defaults
+        to the identity matrix. In this case, the standard Jacobian of ``tensors`` is computed.
     :param inputs: The tensors with respect to which the Jacobians must be computed. These must have
         their ``requires_grad`` flag set to ``True``. If not provided, defaults to the leaf tensors
         that were used to compute the ``tensors`` parameter.
@@ -42,7 +38,7 @@ def backward(
     .. admonition::
         Example
 
-        The following code snippet showcases a simple usage of ``backward``.
+        This example shows a simple usage of ``backward``.
 
             >>> import torch
             >>>
@@ -65,8 +61,8 @@ def backward(
     .. admonition::
         Example
 
-        This is the same example as before, except that we specify the ``jac_tensors`` that correspond
-        to the default `None`
+        This is the same example as before, except that we explicitly specify the identity
+        ``jac_tensors`` (which is equivalent to using the default `None`).
 
             >>> import torch
             >>>
@@ -86,25 +82,8 @@ def backward(
             tensor([[-1.,  1.],
                     [ 2.,  4.]])
 
-    .. admonition::
-        Example
-
-        If ``jac_tensors`` is made of matrices whose first dimension is 1, then this function is
-        equivalent to the call ``autograd.grad(y, grad_tensors=weights)`` up to a reshape of the
-        output.
-
-            >>> import torch
-            >>>
-            >>> from torchjd.autojac import backward
-            >>>
-            >>> param = torch.tensor([1., 2.], requires_grad=True)
-            >>> y = torch.stack([param[0] ** 2, param[1] ** 3])
-            >>>
-            >>> weights = torch.tensor([[0.5, 1.0]])
-            >>> backward(y, jac_tensors=weights)
-            >>>
-            >>> param.jac
-            tensor([[ 1., 12.]])
+        Instead of using the identity ``jac_tensors``, you can backpropagate some Jacobians obtained
+        by a call to :func:`torchjd.autojac.jac` on a later part of the computation graph.
 
     .. warning::
         To differentiate in parallel, ``backward`` relies on ``torch.vmap``, which has some
