@@ -154,6 +154,7 @@ ignore = [
     "RUF010",  # Use explicit conversion flag
     "RUF012",  # Mutable default value for class attribute (a bit tedious to fix)
     "RET504",  # Unnecessary assignment return statement
+    "COM812",  # Trailing comma missing (conflicts with formatter, see https://github.com/astral-sh/ruff/issues/9216)
 ]
 
 [tool.ruff.lint.isort]
