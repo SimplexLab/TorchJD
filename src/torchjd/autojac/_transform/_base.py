@@ -22,8 +22,6 @@ TensorDict: TypeAlias = dict[Tensor, Tensor]
 class RequirementError(ValueError):
     """Inappropriate set of inputs keys."""
 
-    pass
-
 
 class Transform(ABC):
     """
@@ -41,7 +39,7 @@ class Transform(ABC):
         return type(self).__name__
 
     @abstractmethod
-    def __call__(self, input: TensorDict) -> TensorDict:
+    def __call__(self, input: TensorDict, /) -> TensorDict:
         """Applies the transform to the input."""
 
     @abstractmethod
@@ -76,7 +74,7 @@ class Composition(Transform):
     def __str__(self) -> str:
         return str(self.outer) + " ∘ " + str(self.inner)
 
-    def __call__(self, input: TensorDict) -> TensorDict:
+    def __call__(self, input: TensorDict, /) -> TensorDict:
         intermediate = self.inner(input)
         return self.outer(intermediate)
 
@@ -107,7 +105,7 @@ class Conjunction(Transform):
                 strings.append(s)
         return "(" + " | ".join(strings) + ")"
 
-    def __call__(self, tensor_dict: TensorDict) -> TensorDict:
+    def __call__(self, tensor_dict: TensorDict, /) -> TensorDict:
         union: TensorDict = {}
         for transform in self.transforms:
             union |= transform(tensor_dict)

@@ -62,7 +62,10 @@ def test_n_selected_check(n_selected: int, expectation: ExceptionContext):
     ],
 )
 def test_matrix_shape_check(
-    n_byzantine: int, n_selected: int, n_rows: int, expectation: ExceptionContext
+    n_byzantine: int,
+    n_selected: int,
+    n_rows: int,
+    expectation: ExceptionContext,
 ):
     aggregator = Krum(n_byzantine=n_byzantine, n_selected=n_selected)
     matrix = ones_([n_rows, 5])

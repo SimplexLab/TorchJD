@@ -1,4 +1,5 @@
 import random as rand
+import warnings
 from contextlib import nullcontext
 
 import torch
@@ -6,6 +7,12 @@ from pytest import RaisesExc, fixture, mark
 from settings import DEVICE
 from torch import Tensor
 from utils.architectures import ModuleFactory
+
+# Because of a SyntaxWarning raised when compiling highspy, we have to filter SyntaxWarning here.
+# It seems that the standard ways of ignoring warnings in pytest do not work, because the problem
+# is already triggered in the conftest.py itself. This line could be removed when
+# https://github.com/ERGO-Code/HiGHS/issues/2777 is fixed and the fix is released.
+warnings.filterwarnings("ignore", category=SyntaxWarning)
 
 from torchjd.aggregation import Aggregator, Weighting
 
@@ -46,11 +53,11 @@ def pytest_make_parametrize_id(config, val, argname):
     MAX_SIZE = 40
     optional_string = None  # Returning None means using pytest's way of making the string
 
-    if isinstance(val, (Aggregator, ModuleFactory, Weighting)):
+    if isinstance(val, Aggregator | ModuleFactory | Weighting):
         optional_string = str(val)
     elif isinstance(val, Tensor):
         optional_string = "T" + str(list(val.shape))  # T to indicate that it's a tensor
-    elif isinstance(val, (tuple, list, set)) and len(val) < 20:
+    elif isinstance(val, tuple | list | set) and len(val) < 20:
         optional_string = str(val)
     elif isinstance(val, RaisesExc):
         optional_string = " or ".join([f"{exc.__name__}" for exc in val.expected_exceptions])

@@ -3,14 +3,64 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). This changelog does not include internal
-changes that do not affect the user.
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). This
+changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
 ### Added
 
-- Added `__all__` in the `__init__.py` of packages. This should prevent PyLance from triggering warnings when importing from `torchjd`.
+- Added the function `torchjd.autojac.jac`. It's the same as `torchjd.autojac.backward` except that
+  it returns the Jacobians as a tuple instead of storing them in the `.jac` fields of the inputs.
+  Its interface is analog to that of `torch.autograd.grad`.
+- Added a `scale_mode` parameter to `AlignedMTL` and `AlignedMTLWeighting`, allowing to choose
+  between `"min"`, `"median"`, and `"rmse"` scaling.
+- Added an attribute `gramian_weighting` to all aggregators that use a gramian-based `Weighting`.
+  Usage is still the same, `aggregator.gramian_weighting` is just an alias for the (quite confusing)
+  `aggregator.weighting.weighting` field.
+
+### Changed
+
+- **BREAKING**: Removed from `backward` and `mtl_backward` the responsibility to aggregate the
+  Jacobian. Now, these functions compute and populate the `.jac` fields of the parameters, and a new
+  function `torchjd.autojac.jac_to_grad` should then be called to aggregate those `.jac` fields into
+  `.grad` fields.
+  This means that users now have more control on what they do with the Jacobians (they can easily
+  aggregate them group by group or even param by param if they want), but it now requires an extra
+  line of code to do the Jacobian descent step. To update, please change:
+  ```python
+  backward(losses, aggregator)
+  ```
+  to
+  ```python
+  backward(losses)
+  jac_to_grad(model.parameters(), aggregator)
+  ```
+  and
+  ```python
+  mtl_backward(losses, features, aggregator)
+  ```
+  to
+  ```python
+  mtl_backward(losses, features)
+  jac_to_grad(shared_module.parameters(), aggregator)
+  ```
+
+- Removed an unnecessary memory duplication. This should significantly improve the memory efficiency
+  of `autojac`.
+- Removed an unnecessary internal cloning of gradient. This should slightly improve the memory
+  efficiency of `autojac`.
+- Increased the lower bounds of the torch (from 2.0.0 to 2.3.0) and numpy (from 1.21.0
+  to 1.21.2) dependencies to reflect what really works with torchjd. We now also run torchjd's tests
+  with the dependency lower-bounds specified in `pyproject.toml`, so we should now always accurately
+  reflect the actual lower-bounds.
+
+## [0.8.1] - 2026-01-07
+
+### Added
+
+- Added `__all__` in the `__init__.py` of packages. This should prevent PyLance from triggering
+  warnings when importing from `torchjd`.
 
 ## [0.8.0] - 2025-11-13
 
@@ -56,9 +106,9 @@ changes that do not affect the user.
 ### Changed
 
 - **BREAKING**: Changed the dependencies of `CAGrad` and `NashMTL` to be optional when installing
-  TorchJD. Users of these aggregators will have to use `pip install torchjd[cagrad]`, `pip install
-  torchjd[nash_mtl]` or `pip install torchjd[full]` to install TorchJD alongside those dependencies.
-  This should make TorchJD more lightweight.
+  TorchJD. Users of these aggregators will have to use `pip install "torchjd[cagrad]"`, `pip install
+  "torchjd[nash_mtl]"` or `pip install "torchjd[full]"` to install TorchJD alongside those
+  dependencies. This should make TorchJD more lightweight.
 - **BREAKING**: Made the aggregator modules and the `autojac` package protected. The aggregators
   must now always be imported via their package (e.g.
   `from torchjd.aggregation.upgrad import UPGrad` must be changed to
@@ -253,7 +303,7 @@ Informed Neural Networks](https://arxiv.org/pdf/2408.11104).
   - `Aggregator` base class to aggregate Jacobian matrices.
   - `AlignedMTL` from [Independent Component
       Alignment for Multi-Task Learning](
-      https://openaccess.thecvf.com/content/CVPR2023/papers/Senushkin_Independent_Component_Alignment_for_Multi-Task_Learning_CVPR_2023_paper.pdf>).
+      https://openaccess.thecvf.com/content/CVPR2023/papers/Senushkin_Independent_Component_Alignment_for_Multi-Task_Learning_CVPR_2023_paper.pdf).
   - `CAGrad` from [Conflict-Averse Gradient Descent for Multi-task
       Learning](https://arxiv.org/pdf/2110.14048.pdf).
   - `Constant` to aggregate with constant weights.

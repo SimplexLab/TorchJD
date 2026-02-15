@@ -39,7 +39,7 @@ J_Krum = tensor(
         [75.0, -666.0, 23],  # adversarial row
         [1.0, 2.0, 3.0],
         [2.0, 0.0, 1.0],
-    ]
+    ],
 )
 J_TrimmedMean = tensor(
     [
@@ -47,7 +47,7 @@ J_TrimmedMean = tensor(
         [1.0, -1e11],
         [-1e10, 1e10],
         [2.0, 2.0],
-    ]
+    ],
 )
 
 AGGREGATOR_PARAMETRIZATIONS = [
@@ -101,7 +101,7 @@ try:
             J_base,
             tensor([0.0542, 0.7061, 0.7061]),
             marks=mark.filterwarnings("ignore::UserWarning"),
-        )
+        ),
     )
 
 except ImportError:

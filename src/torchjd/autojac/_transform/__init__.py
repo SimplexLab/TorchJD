@@ -1,5 +1,4 @@
-from ._accumulate import Accumulate
-from ._aggregate import Aggregate
+from ._accumulate import AccumulateGrad, AccumulateJac
 from ._base import Composition, Conjunction, RequirementError, Transform
 from ._diagonalize import Diagonalize
 from ._grad import Grad
@@ -10,8 +9,8 @@ from ._select import Select
 from ._stack import Stack
 
 __all__ = [
-    "Accumulate",
-    "Aggregate",
+    "AccumulateGrad",
+    "AccumulateJac",
     "Composition",
     "Conjunction",
     "Diagonalize",

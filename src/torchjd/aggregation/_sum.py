@@ -1,8 +1,10 @@
 import torch
 from torch import Tensor
 
+from torchjd._linalg import Matrix
+
 from ._aggregator_bases import WeightedAggregator
-from ._weighting_bases import Matrix, Weighting
+from ._weighting_bases import Weighting
 
 
 class Sum(WeightedAggregator):
@@ -21,7 +23,7 @@ class SumWeighting(Weighting[Matrix]):
     :math:`\begin{bmatrix} 1 & \dots & 1 \end{bmatrix}^T \in \mathbb{R}^m`.
     """
 
-    def forward(self, matrix: Tensor) -> Tensor:
+    def forward(self, matrix: Tensor, /) -> Tensor:
         device = matrix.device
         dtype = matrix.dtype
         weights = torch.ones(matrix.shape[0], device=device, dtype=dtype)

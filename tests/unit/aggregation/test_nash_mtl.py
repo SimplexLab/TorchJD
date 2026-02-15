@@ -55,7 +55,7 @@ def test_nash_mtl_reset():
     aggregator.reset()
     results = [aggregator(matrix) for matrix in matrices]
 
-    for result, expected in zip(results, expecteds):
+    for result, expected in zip(results, expecteds, strict=True):
         assert_close(result, expected)
 
 

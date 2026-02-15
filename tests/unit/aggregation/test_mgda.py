@@ -3,9 +3,9 @@ from torch import Tensor
 from torch.testing import assert_close
 from utils.tensors import ones_, randn_
 
+from torchjd._linalg import compute_gramian
 from torchjd.aggregation import MGDA
 from torchjd.aggregation._mgda import MGDAWeighting
-from torchjd.aggregation._utils.gramian import compute_gramian
 
 from ._asserts import (
     assert_expected_structure,

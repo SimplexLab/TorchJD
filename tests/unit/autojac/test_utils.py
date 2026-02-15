@@ -152,7 +152,7 @@ def test_get_leaf_tensors_deep(depth: int):
 
     one = tensor_(1.0, requires_grad=True)
     sum_ = tensor_(0.0, requires_grad=False)
-    for i in range(depth):
+    for _ in range(depth):
         sum_ = sum_ + one
 
     leaves = get_leaf_tensors(tensors=[sum_], excluded=set())

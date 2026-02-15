@@ -1,3 +1,6 @@
+# Profiling results
+traces/
+
 # uv
 uv.lock
 

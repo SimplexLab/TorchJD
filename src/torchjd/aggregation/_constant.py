@@ -1,8 +1,10 @@
 from torch import Tensor
 
+from torchjd._linalg import Matrix
+
 from ._aggregator_bases import WeightedAggregator
 from ._utils.str import vector_to_str
-from ._weighting_bases import Matrix, Weighting
+from ._weighting_bases import Weighting
 
 
 class Constant(WeightedAggregator):
@@ -37,13 +39,13 @@ class ConstantWeighting(Weighting[Matrix]):
         if weights.dim() != 1:
             raise ValueError(
                 "Parameter `weights` should be a 1-dimensional tensor. Found `weights.shape = "
-                f"{weights.shape}`."
+                f"{weights.shape}`.",
             )
 
         super().__init__()
         self.weights = weights
 
-    def forward(self, matrix: Tensor) -> Tensor:
+    def forward(self, matrix: Tensor, /) -> Tensor:
         self._check_matrix_shape(matrix)
         return self.weights
 
@@ -51,5 +53,5 @@ class ConstantWeighting(Weighting[Matrix]):
         if matrix.shape[0] != len(self.weights):
             raise ValueError(
                 f"Parameter `matrix` should have {len(self.weights)} rows (the number of specified "
-                f"weights). Found `matrix` with {matrix.shape[0]} rows."
+                f"weights). Found `matrix` with {matrix.shape[0]} rows.",
             )

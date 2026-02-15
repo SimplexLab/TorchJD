@@ -2,8 +2,9 @@ from abc import ABC, abstractmethod
 
 from torch import Tensor, nn
 
-from ._utils.gramian import compute_gramian
-from ._weighting_bases import Matrix, PSDMatrix, Weighting
+from torchjd._linalg import Matrix, PSDMatrix, compute_gramian, is_matrix
+
+from ._weighting_bases import Weighting
 
 
 class Aggregator(nn.Module, ABC):
@@ -17,20 +18,19 @@ class Aggregator(nn.Module, ABC):
 
     @staticmethod
     def _check_is_matrix(matrix: Tensor) -> None:
-        if len(matrix.shape) != 2:
+        if not is_matrix(matrix):
             raise ValueError(
                 "Parameter `matrix` should be a tensor of dimension 2. Found `matrix.shape = "
-                f"{matrix.shape}`."
+                f"{matrix.shape}`.",
             )
 
     @abstractmethod
-    def forward(self, matrix: Tensor) -> Tensor:
+    def forward(self, matrix: Matrix) -> Tensor:
         """Computes the aggregation from the input matrix."""
 
-    # Override to make type hints and documentation more specific
     def __call__(self, matrix: Tensor) -> Tensor:
         """Computes the aggregation from the input matrix and applies all registered hooks."""
-
+        Aggregator._check_is_matrix(matrix)
         return super().__call__(matrix)
 
     def __repr__(self) -> str:
@@ -53,7 +53,7 @@ class WeightedAggregator(Aggregator):
         self.weighting = weighting
 
     @staticmethod
-    def combine(matrix: Tensor, weights: Tensor) -> Tensor:
+    def combine(matrix: Matrix, weights: Tensor) -> Tensor:
         """
         Aggregates a matrix by making a linear combination of its rows, using the provided vector of
         weights.
@@ -62,8 +62,7 @@ class WeightedAggregator(Aggregator):
         vector = weights @ matrix
         return vector
 
-    def forward(self, matrix: Tensor) -> Tensor:
-        self._check_is_matrix(matrix)
+    def forward(self, matrix: Matrix) -> Tensor:
         weights = self.weighting(matrix)
         vector = self.combine(matrix, weights)
         return vector
@@ -74,8 +73,10 @@ class GramianWeightedAggregator(WeightedAggregator):
     WeightedAggregator that computes the gramian of the input jacobian matrix before applying a
     Weighting to it.
 
-    :param weighting: The object responsible for extracting the vector of weights from the gramian.
+    :param gramian_weighting: The object responsible for extracting the vector of weights from the
+        gramian.
     """
 
-    def __init__(self, weighting: Weighting[PSDMatrix]):
-        super().__init__(weighting << compute_gramian)
+    def __init__(self, gramian_weighting: Weighting[PSDMatrix]):
+        super().__init__(gramian_weighting << compute_gramian)
+        self.gramian_weighting = gramian_weighting

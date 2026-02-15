@@ -41,8 +41,8 @@ first ``Linear`` layer, thereby reducing memory usage and computation time.
     for x, y in zip(X, Y):
         y_hat = model(x).squeeze(dim=1)  # shape: [16]
         losses = loss_fn(y_hat, y)  # shape: [16]
-        optimizer.zero_grad()
         gramian = engine.compute_gramian(losses)
         weights = weighting(gramian)
         losses.backward(weights)
         optimizer.step()
+        optimizer.zero_grad()

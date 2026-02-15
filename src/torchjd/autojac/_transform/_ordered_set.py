@@ -20,10 +20,10 @@ class OrderedSet(MutableSet[_T]):
         for element in elements:
             self.discard(element)
 
-    def add(self, element: _T) -> None:
+    def add(self, value: _T) -> None:
         """Adds the specified element to the OrderedSet."""
 
-        self.ordered_dict[element] = None
+        self.ordered_dict[value] = None
 
     def __add__(self, other: OrderedSet[_T]) -> OrderedSet[_T]:
         """Creates a new OrderedSet with the elements of self followed by the elements of other."""
@@ -40,5 +40,5 @@ class OrderedSet(MutableSet[_T]):
     def __len__(self) -> int:
         return len(self.ordered_dict)
 
-    def __contains__(self, element: object) -> bool:
-        return element in self.ordered_dict
+    def __contains__(self, x: object) -> bool:
+        return x in self.ordered_dict

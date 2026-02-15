@@ -15,7 +15,7 @@ class FakeGradientsTransform(Transform):
     def __init__(self, keys: Iterable[Tensor]):
         self.keys = set(keys)
 
-    def __call__(self, input: TensorDict) -> TensorDict:
+    def __call__(self, input: TensorDict, /) -> TensorDict:
         return {key: torch.ones_like(key) for key in self.keys}
 
     def check_keys(self, input_keys: set[Tensor]) -> set[Tensor]:

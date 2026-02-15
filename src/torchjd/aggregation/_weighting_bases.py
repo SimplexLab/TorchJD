@@ -2,18 +2,18 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Annotated, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from torch import Tensor, nn
 
-_T = TypeVar("_T", contravariant=True)
-_FnInputT = TypeVar("_FnInputT")
-_FnOutputT = TypeVar("_FnOutputT")
-Matrix = Annotated[Tensor, "ndim=2"]
-PSDMatrix = Annotated[Matrix, "Positive semi-definite"]
+from torchjd._linalg import PSDTensor, is_psd_tensor
+
+_T = TypeVar("_T", contravariant=True, bound=Tensor)
+_FnInputT = TypeVar("_FnInputT", bound=Tensor)
+_FnOutputT = TypeVar("_FnOutputT", bound=Tensor)
 
 
-class Weighting(Generic[_T], nn.Module, ABC):
+class Weighting(nn.Module, ABC, Generic[_T]):
     r"""
     Abstract base class for all weighting methods. It has the role of extracting a vector of weights
     of dimension :math:`m` from some statistic of a matrix of dimension :math:`m \times n`,
@@ -24,13 +24,14 @@ class Weighting(Generic[_T], nn.Module, ABC):
         super().__init__()
 
     @abstractmethod
-    def forward(self, stat: _T) -> Tensor:
+    def forward(self, stat: _T, /) -> Tensor:
         """Computes the vector of weights from the input stat."""
 
-    # Override to make type hints and documentation more specific
-    def __call__(self, stat: _T) -> Tensor:
+    def __call__(self, stat: Tensor) -> Tensor:
         """Computes the vector of weights from the input stat and applies all registered hooks."""
 
+        # The value of _T (e.g. PSDMatrix) is not public, so we need the user-facing type hint of
+        # stat to be Tensor.
         return super().__call__(stat)
 
     def _compose(self, fn: Callable[[_FnInputT], _T]) -> Weighting[_FnInputT]:
@@ -50,7 +51,7 @@ class _Composition(Weighting[_T]):
         self.fn = fn
         self.weighting = weighting
 
-    def forward(self, stat: _T) -> Tensor:
+    def forward(self, stat: _T, /) -> Tensor:
         return self.weighting(self.fn(stat))
 
 
@@ -66,14 +67,14 @@ class GeneralizedWeighting(nn.Module, ABC):
         super().__init__()
 
     @abstractmethod
-    def forward(self, generalized_gramian: Tensor) -> Tensor:
+    def forward(self, generalized_gramian: PSDTensor) -> Tensor:
         """Computes the vector of weights from the input generalized Gramian."""
 
-    # Override to make type hints and documentation more specific
     def __call__(self, generalized_gramian: Tensor) -> Tensor:
         """
         Computes the tensor of weights from the input generalized Gramian and applies all registered
         hooks.
         """
 
+        assert is_psd_tensor(generalized_gramian)
         return super().__call__(generalized_gramian)

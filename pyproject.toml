@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "torchjd"
-version = "0.8.0"
+version = "0.8.1"
 description = "Library for Jacobian Descent with PyTorch."
 readme = "README.md"
 authors = [
@@ -13,9 +13,9 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "torch>=2.0.0",
+    "torch>=2.3.0",  # Problems before 2.4.0, especially with autogram.
     "quadprog>=0.1.9, != 0.1.10",  # Doesn't work before 0.1.9, 0.1.10 is yanked
-    "numpy>=1.21.0",  # Does not work before 1.21
+    "numpy>=1.21.2",  # Does not work before 1.21. No python 3.10 wheel before 1.21.2.
     "qpsolvers>=1.0.1",  # Does not work before 1.0.1
 ]
 classifiers = [
@@ -66,7 +66,8 @@ Changelog = "https://github.com/SimplexLab/torchjd/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 check = [
-    "mypy>=1.16.0",
+    "ruff>=0.14.14",
+    "ty>=0.0.14",
     "pre-commit>=2.9.2",  # isort doesn't work before 2.9.2
 ]
 
@@ -83,13 +84,20 @@ test = [
     "pytest>=7.3",  # Before version 7.3, not all tests are run
     "pytest-cov>=6.0.0",  # Recent version to avoid problems, could be relaxed
     "lightning>=2.0.9",  # No OptimizerLRScheduler public type before 2.0.9
-    "torchvision>=0.22.1"  # Recent version to avoid problems, could be relaxed
+    "torchvision>=0.18.0"
 ]
 
 plot = [
-    "plotly>=5.19.0",  # Recent version to avoid problems, could be relaxed
+    "plotly[kaleido]>=5.19.0",  # Recent version to avoid problems, could be relaxed
     "dash>=2.16.0",  # Recent version to avoid problems, could be relaxed
-    "kaleido==0.2.1",  # Only works with locked version
+    "matplotlib>=3.10.0",  # Recent version to avoid problems, could be relaxed
+]
+# Dependency group allowing to easily resolve version of the core dependencies to the lower bound.
+lower_bounds = [
+    "torch==2.3.0",
+    "numpy==1.21.2",
+    "quadprog==0.1.9",
+    "qpsolvers==1.0.1",
 ]
 
 [project.optional-dependencies]
@@ -107,3 +115,53 @@ full = [
 
 [tool.pytest.ini_options]
 xfail_strict = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: not covered",
+    "@overload",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle Error
+    "F",    # Pyflakes
+    "W",    # pycodestyle Warning
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "FIX",  # flake8-fixme
+    "TID",  # flake8-tidy-imports
+    "SIM",  # flake8-simplify
+    "RET",  # flake8-return
+    "PYI",  # flake8-pyi
+    "PIE",  # flake8-pie
+    "COM",  # flake8-commas
+    "PERF", # Perflint
+    "FURB", # refurb
+    "RUF",  # Ruff-specific rules
+]
+
+ignore = [
+    "E501",    # line-too-long (handled by the formatter)
+    "E402",    # module-import-not-at-top-of-file
+    "RUF022",  # __all__ not sorted
+    "RUF010",  # Use explicit conversion flag
+    "RUF012",  # Mutable default value for class attribute (a bit tedious to fix)
+    "RET504",  # Unnecessary assignment return statement
+]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.ty.src]
+include = ["src", "tests"]
+exclude = ["src/torchjd/aggregation/_nash_mtl.py"]

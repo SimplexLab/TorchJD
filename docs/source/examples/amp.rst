@@ -12,7 +12,7 @@ case, the losses) should preferably be scaled with a `GradScaler
 following example shows the resulting code for a multi-task learning use-case.
 
 .. code-block:: python
-    :emphasize-lines: 2, 17, 27, 34, 36-38
+    :emphasize-lines: 2, 17, 27, 34-35, 37-38
 
     import torch
     from torch.amp import GradScaler
@@ -20,7 +20,7 @@ following example shows the resulting code for a multi-task learning use-case.
     from torch.optim import SGD
 
     from torchjd.aggregation import UPGrad
-    from torchjd.autojac import mtl_backward
+    from torchjd.autojac import mtl_backward, jac_to_grad
 
     shared_module = Sequential(Linear(10, 5), ReLU(), Linear(5, 3), ReLU())
     task1_module = Linear(3, 1)
@@ -48,10 +48,11 @@ following example shows the resulting code for a multi-task learning use-case.
             loss2 = loss_fn(output2, target2)
 
         scaled_losses = scaler.scale([loss1, loss2])
-        optimizer.zero_grad()
-        mtl_backward(losses=scaled_losses, features=features, aggregator=aggregator)
+        mtl_backward(losses=scaled_losses, features=features)
+        jac_to_grad(shared_module.parameters(), aggregator)
         scaler.step(optimizer)
         scaler.update()
+        optimizer.zero_grad()
 
 .. hint::
     Within the ``torch.autocast`` context, some operations may be done in ``float16`` type. For

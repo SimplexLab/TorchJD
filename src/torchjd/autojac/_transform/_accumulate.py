@@ -1,44 +1,39 @@
 from torch import Tensor
 
+from torchjd.autojac._accumulation import accumulate_grads, accumulate_jacs
+
 from ._base import TensorDict, Transform
 
 
-class Accumulate(Transform):
+class AccumulateGrad(Transform):
     """
     Transform from Gradients to {} that accumulates gradients with respect to keys into their
     ``grad`` field.
+
+    The Gradients are not cloned and may be modified in-place by subsequent accumulations, so they
+    should not be used elsewhere.
     """
 
-    def __call__(self, gradients: TensorDict) -> TensorDict:
-        for key in gradients.keys():
-            _check_expects_grad(key)
-            if hasattr(key, "grad") and key.grad is not None:
-                key.grad += gradients[key]
-            else:
-                # We clone the value because we do not want subsequent accumulations to also affect
-                # this value (in case it is still used outside). We do not detach from the
-                # computation graph because the value can have grad_fn that we want to keep track of
-                # (in case it was obtained via create_graph=True and a differentiable aggregator).
-                key.grad = gradients[key].clone()
-
+    def __call__(self, gradients: TensorDict, /) -> TensorDict:
+        accumulate_grads(gradients.keys(), gradients.values())
         return {}
 
     def check_keys(self, input_keys: set[Tensor]) -> set[Tensor]:
         return set()
 
 
-def _check_expects_grad(tensor: Tensor) -> None:
-    if not _expects_grad(tensor):
-        raise ValueError(
-            "Cannot populate the .grad field of a Tensor that does not satisfy:"
-            "`tensor.requires_grad and (tensor.is_leaf or tensor.retains_grad)`."
-        )
-
-
-def _expects_grad(tensor: Tensor) -> bool:
+class AccumulateJac(Transform):
     """
-    Determines whether a Tensor expects its .grad attribute to be populated.
-    See https://pytorch.org/docs/stable/generated/torch.Tensor.is_leaf for more information.
+    Transform from Jacobians to {} that accumulates jacobians with respect to keys into their
+    ``jac`` field.
+
+    The Jacobians are not cloned and may be modified in-place by subsequent accumulations, so they
+    should not be used elsewhere.
     """
 
-    return tensor.requires_grad and (tensor.is_leaf or tensor.retains_grad)
+    def __call__(self, jacobians: TensorDict, /) -> TensorDict:
+        accumulate_jacs(jacobians.keys(), jacobians.values())
+        return {}
+
+    def check_keys(self, input_keys: set[Tensor]) -> set[Tensor]:
+        return set()

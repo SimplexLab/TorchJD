@@ -2,16 +2,23 @@ from collections.abc import Iterable, Sequence
 
 from torch import Tensor
 
-from torchjd.aggregation import Aggregator
-
-from ._transform import Accumulate, Aggregate, Grad, Init, Jac, OrderedSet, Select, Stack, Transform
+from ._transform import (
+    AccumulateGrad,
+    AccumulateJac,
+    Grad,
+    Init,
+    Jac,
+    OrderedSet,
+    Select,
+    Stack,
+    Transform,
+)
 from ._utils import as_checked_ordered_set, check_optional_positive_chunk_size, get_leaf_tensors
 
 
 def mtl_backward(
     losses: Sequence[Tensor],
     features: Sequence[Tensor] | Tensor,
-    aggregator: Aggregator,
     tasks_params: Sequence[Iterable[Tensor]] | None = None,
     shared_params: Iterable[Tensor] | None = None,
     retain_graph: bool = False,
@@ -23,21 +30,18 @@ def mtl_backward(
 
     This function computes the gradient of each task-specific loss with respect to its task-specific
     parameters and accumulates it in their ``.grad`` fields. Then, it computes the Jacobian of all
-    losses with respect to the shared parameters, aggregates it and accumulates the result in their
-    ``.grad`` fields.
+    losses with respect to the shared parameters and accumulates it in their ``.jac`` fields.
 
-    :param losses: The task losses. The Jacobian matrix will have one row per loss.
+    :param losses: The task losses. The Jacobians will have one row per loss.
     :param features: The last shared representation used for all tasks, as given by the feature
         extractor. Should be non-empty.
-    :param aggregator: Aggregator used to reduce the Jacobian into a vector.
     :param tasks_params: The parameters of each task-specific head. Their ``requires_grad`` flags
         must be set to ``True``. If not provided, the parameters considered for each task will
         default to the leaf tensors that are in the computation graph of its loss, but that were not
         used to compute the ``features``.
-    :param shared_params: The parameters of the shared feature extractor. The Jacobian matrix will
-        have one column for each value in these tensors. Their ``requires_grad`` flags must be set
-        to ``True``. If not provided, defaults to the leaf tensors that are in the computation graph
-        of the ``features``.
+    :param shared_params: The parameters of the shared feature extractor. Their ``requires_grad``
+        flags must be set to ``True``. If not provided, defaults to the leaf tensors that are in the
+        computation graph of the ``features``.
     :param retain_graph: If ``False``, the graph used to compute the grad will be freed. Defaults to
         ``False``.
     :param parallel_chunk_size: The number of scalars to differentiate simultaneously in the
@@ -95,7 +99,6 @@ def mtl_backward(
     backward_transform = _create_transform(
         losses=losses_,
         features=features_,
-        aggregator=aggregator,
         tasks_params=tasks_params_,
         shared_params=shared_params_,
         retain_graph=retain_graph,
@@ -108,7 +111,6 @@ def mtl_backward(
 def _create_transform(
     losses: OrderedSet[Tensor],
     features: OrderedSet[Tensor],
-    aggregator: Aggregator,
     tasks_params: list[OrderedSet[Tensor]],
     shared_params: OrderedSet[Tensor],
     retain_graph: bool,
@@ -130,7 +132,7 @@ def _create_transform(
             OrderedSet([loss]),
             retain_graph,
         )
-        for task_params, loss in zip(tasks_params, losses)
+        for task_params, loss in zip(tasks_params, losses, strict=True)
     ]
 
     # Transform that stacks the gradients of the losses w.r.t. the shared representations into a
@@ -140,13 +142,10 @@ def _create_transform(
     # Transform that computes the Jacobians of the losses w.r.t. the shared parameters.
     jac = Jac(features, shared_params, parallel_chunk_size, retain_graph)
 
-    # Transform that aggregates the Jacobians.
-    aggregate = Aggregate(aggregator, shared_params)
+    # Transform that accumulates the result in the .jac field of the shared parameters.
+    accumulate = AccumulateJac()
 
-    # Transform that accumulates the result in the .grad field of the shared parameters.
-    accumulate = Accumulate()
-
-    return accumulate << aggregate << jac << stack
+    return accumulate << jac << stack
 
 
 def _create_task_transform(
@@ -167,7 +166,7 @@ def _create_task_transform(
 
     # Transform that accumulates the gradients w.r.t. the task-specific parameters into their
     # .grad fields.
-    accumulate = Accumulate() << Select(task_params)
+    accumulate = AccumulateGrad() << Select(task_params)
 
     # Transform that backpropagates the gradients of the losses w.r.t. the features.
     backpropagate = Select(features)
@@ -184,7 +183,10 @@ def _check_losses_are_scalar(losses: Iterable[Tensor]) -> None:
             raise ValueError("`losses` should contain only scalars.")
 
 
-def _check_no_overlap(shared_params: Iterable[Tensor], tasks_params: Sequence[Iterable[Tensor]]):
+def _check_no_overlap(
+    shared_params: Iterable[Tensor],
+    tasks_params: Sequence[Iterable[Tensor]],
+) -> None:
     task_param_set = {param for task_params in tasks_params for param in task_params}
     shared_param_set = set(shared_params)
     intersection = task_param_set.intersection(shared_param_set)

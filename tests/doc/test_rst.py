@@ -4,6 +4,8 @@ of the documentation. When there are multiple examples within a single `.rst` fi
 functions here to test them.
 """
 
+from typing import no_type_check
+
 from pytest import mark
 
 
@@ -14,7 +16,7 @@ def test_amp():
     from torch.optim import SGD
 
     from torchjd.aggregation import UPGrad
-    from torchjd.autojac import mtl_backward
+    from torchjd.autojac import jac_to_grad, mtl_backward
 
     shared_module = Sequential(Linear(10, 5), ReLU(), Linear(5, 3), ReLU())
     task1_module = Linear(3, 1)
@@ -33,7 +35,7 @@ def test_amp():
     task1_targets = torch.randn(8, 16, 1)  # 8 batches of 16 targets for the first task
     task2_targets = torch.randn(8, 16, 1)  # 8 batches of 16 targets for the second task
 
-    for input, target1, target2 in zip(inputs, task1_targets, task2_targets):
+    for input, target1, target2 in zip(inputs, task1_targets, task2_targets, strict=False):
         with torch.autocast(device_type="cpu", dtype=torch.float16):
             features = shared_module(input)
             output1 = task1_module(features)
@@ -42,10 +44,11 @@ def test_amp():
             loss2 = loss_fn(output2, target2)
 
         scaled_losses = scaler.scale([loss1, loss2])
-        optimizer.zero_grad()
-        mtl_backward(losses=scaled_losses, features=features, aggregator=aggregator)
+        mtl_backward(losses=scaled_losses, features=features)
+        jac_to_grad(shared_module.parameters(), aggregator)
         scaler.step(optimizer)
         scaler.update()
+        optimizer.zero_grad()
 
 
 def test_basic_usage():
@@ -55,6 +58,7 @@ def test_basic_usage():
 
     from torchjd import autojac
     from torchjd.aggregation import UPGrad
+    from torchjd.autojac import jac_to_grad
 
     model = Sequential(Linear(10, 5), ReLU(), Linear(5, 2))
     optimizer = SGD(model.parameters(), lr=0.1)
@@ -69,9 +73,10 @@ def test_basic_usage():
     loss1 = loss_fn(output[:, 0], target1)
     loss2 = loss_fn(output[:, 1], target2)
 
-    optimizer.zero_grad()
-    autojac.backward([loss1, loss2], aggregator)
+    autojac.backward([loss1, loss2])
+    jac_to_grad(model.parameters(), aggregator)
     optimizer.step()
+    optimizer.zero_grad()
 
 
 def test_iwmtl():
@@ -100,7 +105,7 @@ def test_iwmtl():
     task1_targets = torch.randn(8, 16)  # 8 batches of 16 targets for the first task
     task2_targets = torch.randn(8, 16)  # 8 batches of 16 targets for the second task
 
-    for input, target1, target2 in zip(inputs, task1_targets, task2_targets):
+    for input, target1, target2 in zip(inputs, task1_targets, task2_targets, strict=False):
         features = shared_module(input)  # shape: [16, 3]
         out1 = task1_module(features).squeeze(1)  # shape: [16]
         out2 = task2_module(features).squeeze(1)  # shape: [16]
@@ -114,10 +119,10 @@ def test_iwmtl():
         # Obtain the weights that lead to no conflict between reweighted gradients
         weights = weighting(gramian)  # shape: [16, 2]
 
-        optimizer.zero_grad()
         # Do the standard backward pass, but weighted using the obtained weights
         losses.backward(weights)
         optimizer.step()
+        optimizer.zero_grad()
 
 
 def test_iwrm():
@@ -135,12 +140,12 @@ def test_iwrm():
         params = model.parameters()
         optimizer = SGD(params, lr=0.1)
 
-        for x, y in zip(X, Y):
+        for x, y in zip(X, Y, strict=False):
             y_hat = model(x).squeeze(dim=1)  # shape: [16]
             loss = loss_fn(y_hat, y)  # shape: [] (scalar)
-            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            optimizer.zero_grad()
 
     def test_autojac():
         import torch
@@ -148,7 +153,7 @@ def test_iwrm():
         from torch.optim import SGD
 
         from torchjd.aggregation import UPGrad
-        from torchjd.autojac import backward
+        from torchjd.autojac import backward, jac_to_grad
 
         X = torch.randn(8, 16, 10)
         Y = torch.randn(8, 16)
@@ -160,12 +165,13 @@ def test_iwrm():
         optimizer = SGD(params, lr=0.1)
         aggregator = UPGrad()
 
-        for x, y in zip(X, Y):
+        for x, y in zip(X, Y, strict=False):
             y_hat = model(x).squeeze(dim=1)  # shape: [16]
             losses = loss_fn(y_hat, y)  # shape: [16]
-            optimizer.zero_grad()
-            backward(losses, aggregator)
+            backward(losses)
+            jac_to_grad(model.parameters(), aggregator)
             optimizer.step()
+            optimizer.zero_grad()
 
     def test_autogram():
         import torch
@@ -186,14 +192,14 @@ def test_iwrm():
         weighting = UPGradWeighting()
         engine = Engine(model, batch_dim=0)
 
-        for x, y in zip(X, Y):
+        for x, y in zip(X, Y, strict=False):
             y_hat = model(x).squeeze(dim=1)  # shape: [16]
             losses = loss_fn(y_hat, y)  # shape: [16]
-            optimizer.zero_grad()
             gramian = engine.compute_gramian(losses)  # shape: [16, 16]
             weights = weighting(gramian)  # shape: [16]
             losses.backward(weights)
             optimizer.step()
+            optimizer.zero_grad()
 
     test_autograd()
     test_autojac()
@@ -201,8 +207,11 @@ def test_iwrm():
 
 
 @mark.filterwarnings(
-    "ignore::DeprecationWarning", "ignore::lightning.fabric.utilities.warnings.PossibleUserWarning"
+    "ignore::DeprecationWarning",
+    "ignore::FutureWarning",
+    "ignore::lightning.fabric.utilities.warnings.PossibleUserWarning",
 )
+@no_type_check  # Typing is annoying with Lightning, which would make the example too hard to read.
 def test_lightning_integration():
     # Extra ----------------------------------------------------------------------------------------
     import logging
@@ -219,7 +228,7 @@ def test_lightning_integration():
     from torch.utils.data import DataLoader, TensorDataset
 
     from torchjd.aggregation import UPGrad
-    from torchjd.autojac import mtl_backward
+    from torchjd.autojac import jac_to_grad, mtl_backward
 
     class Model(LightningModule):
         def __init__(self):
@@ -240,9 +249,11 @@ def test_lightning_integration():
             loss2 = mse_loss(output2, target2)
 
             opt = self.optimizers()
-            opt.zero_grad()
-            mtl_backward(losses=[loss1, loss2], features=features, aggregator=UPGrad())
+
+            mtl_backward(losses=[loss1, loss2], features=features)
+            jac_to_grad(self.feature_extractor.parameters(), UPGrad())
             opt.step()
+            opt.zero_grad()
 
         def configure_optimizers(self) -> OptimizerLRScheduler:
             optimizer = Adam(self.parameters(), lr=1e-3)
@@ -274,7 +285,7 @@ def test_monitoring():
     from torch.optim import SGD
 
     from torchjd.aggregation import UPGrad
-    from torchjd.autojac import mtl_backward
+    from torchjd.autojac import jac_to_grad, mtl_backward
 
     def print_weights(_, __, weights: torch.Tensor) -> None:
         """Prints the extracted weights."""
@@ -300,23 +311,24 @@ def test_monitoring():
     optimizer = SGD(params, lr=0.1)
     aggregator = UPGrad()
 
-    aggregator.weighting.weighting.register_forward_hook(print_weights)
+    aggregator.gramian_weighting.register_forward_hook(print_weights)
     aggregator.register_forward_hook(print_gd_similarity)
 
     inputs = torch.randn(8, 16, 10)  # 8 batches of 16 random input vectors of length 10
     task1_targets = torch.randn(8, 16, 1)  # 8 batches of 16 targets for the first task
     task2_targets = torch.randn(8, 16, 1)  # 8 batches of 16 targets for the second task
 
-    for input, target1, target2 in zip(inputs, task1_targets, task2_targets):
+    for input, target1, target2 in zip(inputs, task1_targets, task2_targets, strict=False):
         features = shared_module(input)
         output1 = task1_module(features)
         output2 = task2_module(features)
         loss1 = loss_fn(output1, target1)
         loss2 = loss_fn(output2, target2)
 
-        optimizer.zero_grad()
-        mtl_backward(losses=[loss1, loss2], features=features, aggregator=aggregator)
+        mtl_backward(losses=[loss1, loss2], features=features)
+        jac_to_grad(shared_module.parameters(), aggregator)
         optimizer.step()
+        optimizer.zero_grad()
 
 
 def test_mtl():
@@ -325,7 +337,7 @@ def test_mtl():
     from torch.optim import SGD
 
     from torchjd.aggregation import UPGrad
-    from torchjd.autojac import mtl_backward
+    from torchjd.autojac import jac_to_grad, mtl_backward
 
     shared_module = Sequential(Linear(10, 5), ReLU(), Linear(5, 3), ReLU())
     task1_module = Linear(3, 1)
@@ -344,16 +356,17 @@ def test_mtl():
     task1_targets = torch.randn(8, 16, 1)  # 8 batches of 16 targets for the first task
     task2_targets = torch.randn(8, 16, 1)  # 8 batches of 16 targets for the second task
 
-    for input, target1, target2 in zip(inputs, task1_targets, task2_targets):
+    for input, target1, target2 in zip(inputs, task1_targets, task2_targets, strict=False):
         features = shared_module(input)
         output1 = task1_module(features)
         output2 = task2_module(features)
         loss1 = loss_fn(output1, target1)
         loss2 = loss_fn(output2, target2)
 
-        optimizer.zero_grad()
-        mtl_backward(losses=[loss1, loss2], features=features, aggregator=aggregator)
+        mtl_backward(losses=[loss1, loss2], features=features)
+        jac_to_grad(shared_module.parameters(), aggregator)
         optimizer.step()
+        optimizer.zero_grad()
 
 
 def test_partial_jd():
@@ -379,14 +392,14 @@ def test_partial_jd():
     params = model.parameters()
     optimizer = SGD(params, lr=0.1)
 
-    for x, y in zip(X, Y):
+    for x, y in zip(X, Y, strict=False):
         y_hat = model(x).squeeze(dim=1)  # shape: [16]
         losses = loss_fn(y_hat, y)  # shape: [16]
-        optimizer.zero_grad()
         gramian = engine.compute_gramian(losses)
         weights = weighting(gramian)
         losses.backward(weights)
         optimizer.step()
+        optimizer.zero_grad()
 
 
 def test_rnn():
@@ -395,7 +408,7 @@ def test_rnn():
     from torch.optim import SGD
 
     from torchjd.aggregation import UPGrad
-    from torchjd.autojac import backward
+    from torchjd.autojac import backward, jac_to_grad
 
     rnn = RNN(input_size=10, hidden_size=20, num_layers=2)
     optimizer = SGD(rnn.parameters(), lr=0.1)
@@ -404,10 +417,11 @@ def test_rnn():
     inputs = torch.randn(8, 5, 3, 10)  # 8 batches of 3 sequences of length 5 and of dim 10.
     targets = torch.randn(8, 5, 3, 20)  # 8 batches of 3 sequences of length 5 and of dim 20.
 
-    for input, target in zip(inputs, targets):
+    for input, target in zip(inputs, targets, strict=False):
         output, _ = rnn(input)  # output is of shape [5, 3, 20].
         losses = ((output - target) ** 2).mean(dim=[1, 2])  # 1 loss per sequence element.
 
-        optimizer.zero_grad()
-        backward(losses, aggregator, parallel_chunk_size=1)
+        backward(losses, parallel_chunk_size=1)
+        jac_to_grad(rnn.parameters(), aggregator)
         optimizer.step()
+        optimizer.zero_grad()

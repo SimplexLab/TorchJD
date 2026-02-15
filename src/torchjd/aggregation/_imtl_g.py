@@ -1,9 +1,11 @@
 import torch
 from torch import Tensor
 
+from torchjd._linalg import PSDMatrix
+
 from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
-from ._weighting_bases import PSDMatrix, Weighting
+from ._weighting_bases import Weighting
 
 
 class IMTLG(GramianWeightedAggregator):
@@ -27,14 +29,11 @@ class IMTLGWeighting(Weighting[PSDMatrix]):
     :class:`~torchjd.aggregation.IMTLG`.
     """
 
-    def forward(self, gramian: Tensor) -> Tensor:
+    def forward(self, gramian: PSDMatrix, /) -> Tensor:
         d = torch.sqrt(torch.diagonal(gramian))
         v = torch.linalg.pinv(gramian) @ d
         v_sum = v.sum()
 
-        if v_sum.abs() < 1e-12:
-            weights = torch.zeros_like(v)
-        else:
-            weights = v / v_sum
+        weights = torch.zeros_like(v) if v_sum.abs() < 1e-12 else v / v_sum
 
         return weights

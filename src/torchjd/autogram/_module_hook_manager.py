@@ -141,7 +141,7 @@ class Hook:
             *rg_outputs,
         )
 
-        for idx, output in zip(rg_output_indices, autograd_fn_rg_outputs):
+        for idx, output in zip(rg_output_indices, autograd_fn_rg_outputs, strict=True):
             flat_outputs[idx] = output
 
         return tree_unflatten(flat_outputs, output_spec)
@@ -173,7 +173,7 @@ class AutogramNode(torch.autograd.Function):
         ctx,
         inputs: tuple,
         _,
-    ):
+    ) -> None:  # type: ignore[reportIncompatibleMethodOverride]
         ctx.gramian_accumulation_phase = inputs[0]
         ctx.gramian_computer = inputs[1]
         ctx.args = inputs[2]

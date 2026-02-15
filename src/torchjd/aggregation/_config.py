@@ -28,6 +28,8 @@
 import torch
 from torch import Tensor
 
+from torchjd._linalg import Matrix
+
 from ._aggregator_bases import Aggregator
 from ._sum import SumWeighting
 from ._utils.non_differentiable import raise_non_differentiable_error
@@ -56,7 +58,7 @@ class ConFIG(Aggregator):
         # This prevents computing gradients that can be very wrong.
         self.register_full_backward_pre_hook(raise_non_differentiable_error)
 
-    def forward(self, matrix: Tensor) -> Tensor:
+    def forward(self, matrix: Matrix) -> Tensor:
         weights = self.weighting(matrix)
         units = torch.nan_to_num((matrix / (matrix.norm(dim=1)).unsqueeze(1)), 0.0)
         best_direction = torch.linalg.pinv(units) @ weights

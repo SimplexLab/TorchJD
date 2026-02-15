@@ -1,12 +1,14 @@
-from typing import Literal
+from typing import Literal, TypeAlias
 
 import numpy as np
 import torch
 from qpsolvers import solve_qp
 from torch import Tensor
 
+SUPPORTED_SOLVER: TypeAlias = Literal["quadprog"]
 
-def project_weights(U: Tensor, G: Tensor, solver: Literal["quadprog"]) -> Tensor:
+
+def project_weights(U: Tensor, G: Tensor, solver: SUPPORTED_SOLVER) -> Tensor:
     """
     Computes the tensor of weights corresponding to the projection of the vectors in `U` onto the
     rows of a matrix whose Gramian is provided.
@@ -25,7 +27,7 @@ def project_weights(U: Tensor, G: Tensor, solver: Literal["quadprog"]) -> Tensor
     return torch.as_tensor(W, device=G.device, dtype=G.dtype)
 
 
-def _project_weight_vector(u: np.ndarray, G: np.ndarray, solver: Literal["quadprog"]) -> np.ndarray:
+def _project_weight_vector(u: np.ndarray, G: np.ndarray, solver: SUPPORTED_SOLVER) -> np.ndarray:
     r"""
     Computes the weights `w` of the projection of `J^T u` onto the dual cone of the rows of `J`,
     given `G = J J^T` and `u`. In other words, this computes the `w` that satisfies

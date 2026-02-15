@@ -3,10 +3,10 @@ from torch import Tensor
 from torch.testing import assert_close
 from utils.tensors import ones_, randn_
 
+from torchjd._linalg import compute_gramian
 from torchjd.aggregation import PCGrad
 from torchjd.aggregation._pcgrad import PCGradWeighting
 from torchjd.aggregation._upgrad import UPGradWeighting
-from torchjd.aggregation._utils.gramian import compute_gramian
 
 from ._asserts import assert_expected_structure, assert_non_differentiable
 from ._inputs import scaled_matrices, typical_matrices
@@ -52,7 +52,10 @@ def test_equivalence_upgrad_sum_two_rows(shape: tuple[int, int]):
 
     pc_grad_weighting = PCGradWeighting()
     upgrad_sum_weighting = UPGradWeighting(
-        ones_((2,)), norm_eps=0.0, reg_eps=0.0, solver="quadprog"
+        ones_((2,)),
+        norm_eps=0.0,
+        reg_eps=0.0,
+        solver="quadprog",
     )
 
     result = pc_grad_weighting(gramian)

@@ -2,8 +2,10 @@ import torch
 from torch import Tensor
 from torch.nn import functional as F
 
+from torchjd._linalg import Matrix
+
 from ._aggregator_bases import WeightedAggregator
-from ._weighting_bases import Matrix, Weighting
+from ._weighting_bases import Weighting
 
 
 class Random(WeightedAggregator):
@@ -24,7 +26,7 @@ class RandomWeighting(Weighting[Matrix]):
     at each call.
     """
 
-    def forward(self, matrix: Tensor) -> Tensor:
+    def forward(self, matrix: Tensor, /) -> Tensor:
         random_vector = torch.randn(matrix.shape[0], device=matrix.device, dtype=matrix.dtype)
         weights = F.softmax(random_vector, dim=-1)
         return weights

@@ -1,8 +1,7 @@
 from collections.abc import Callable
 from warnings import warn as _warn
 
-from .autojac import backward as _backward
-from .autojac import mtl_backward as _mtl_backward
+from .autojac import backward as _backward, mtl_backward as _mtl_backward
 
 _deprecated_items: dict[str, tuple[str, Callable]] = {
     "backward": ("autojac", _backward),

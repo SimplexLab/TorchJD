@@ -31,8 +31,7 @@ class MatrixSampler(ABC):
 
     def __str__(self) -> str:
         return (
-            f"{self.__class__.__name__.replace('MatrixSampler', '')}"
-            f"({self.m}x{self.n}r{self.rank})"
+            f"{self.__class__.__name__.replace('MatrixSampler', '')}({self.m}x{self.n}r{self.rank})"
         )
 
 
@@ -60,7 +59,7 @@ class StrongSampler(MatrixSampler):
 
     def _check_params(self, m: int, n: int, rank: int) -> None:
         super()._check_params(m, n, rank)
-        assert 1 < m
+        assert m > 1
         assert 0 < rank <= min(m - 1, n)
 
     def __call__(self, rng: torch.Generator | None = None) -> Tensor:
@@ -95,7 +94,7 @@ class StrictlyWeakSampler(MatrixSampler):
 
     def _check_params(self, m: int, n: int, rank: int) -> None:
         super()._check_params(m, n, rank)
-        assert 1 < m
+        assert m > 1
         assert 0 < rank <= min(m - 1, n)
 
     def __call__(self, rng: torch.Generator | None = None) -> Tensor:
@@ -127,7 +126,7 @@ class NonWeakSampler(MatrixSampler):
 
     def _check_params(self, m: int, n: int, rank: int) -> None:
         super()._check_params(m, n, rank)
-        assert 0 < rank
+        assert rank > 0
 
     def __call__(self, rng: torch.Generator | None = None) -> Tensor:
         u = torch.abs(randn_([self.m], generator=rng))

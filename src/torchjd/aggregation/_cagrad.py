@@ -1,7 +1,9 @@
 from typing import cast
 
+from torchjd._linalg import PSDMatrix
+
 from ._utils.check_dependencies import check_dependencies_are_installed
-from ._weighting_bases import PSDMatrix, Weighting
+from ._weighting_bases import Weighting
 
 check_dependencies_are_installed(["cvxpy", "clarabel"])
 
@@ -10,8 +12,9 @@ import numpy as np
 import torch
 from torch import Tensor
 
+from torchjd._linalg import normalize
+
 from ._aggregator_bases import GramianWeightedAggregator
-from ._utils.gramian import normalize
 from ._utils.non_differentiable import raise_non_differentiable_error
 
 
@@ -28,7 +31,7 @@ class CAGrad(GramianWeightedAggregator):
         This aggregator is not installed by default. When not installed, trying to import it should
         result in the following error:
         ``ImportError: cannot import name 'CAGrad' from 'torchjd.aggregation'``.
-        To install it, use ``pip install torchjd[cagrad]``.
+        To install it, use ``pip install "torchjd[cagrad]"``.
     """
 
     def __init__(self, c: float, norm_eps: float = 0.0001):
@@ -73,7 +76,7 @@ class CAGradWeighting(Weighting[PSDMatrix]):
         self.c = c
         self.norm_eps = norm_eps
 
-    def forward(self, gramian: Tensor) -> Tensor:
+    def forward(self, gramian: PSDMatrix, /) -> Tensor:
         U, S, _ = torch.svd(normalize(gramian, self.norm_eps))
 
         reduced_matrix = U @ S.sqrt().diag()

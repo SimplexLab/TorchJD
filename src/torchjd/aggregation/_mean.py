@@ -1,8 +1,10 @@
 import torch
 from torch import Tensor
 
+from torchjd._linalg import Matrix
+
 from ._aggregator_bases import WeightedAggregator
-from ._weighting_bases import Matrix, Weighting
+from ._weighting_bases import Weighting
 
 
 class Mean(WeightedAggregator):
@@ -22,7 +24,7 @@ class MeanWeighting(Weighting[Matrix]):
     \mathbb{R}^m`.
     """
 
-    def forward(self, matrix: Tensor) -> Tensor:
+    def forward(self, matrix: Tensor, /) -> Tensor:
         device = matrix.device
         dtype = matrix.dtype
         m = matrix.shape[0]

@@ -17,7 +17,7 @@ class FakeTransform(Transform):
     def __str__(self):
         return "T"
 
-    def __call__(self, input: TensorDict) -> TensorDict:
+    def __call__(self, input: TensorDict, /) -> TensorDict:
         # Ignore the input, create a dictionary with the right keys as an output.
         output_dict = {key: empty_(0) for key in self._output_keys}
         return output_dict

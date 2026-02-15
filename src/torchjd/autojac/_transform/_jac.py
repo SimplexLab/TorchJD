@@ -42,7 +42,7 @@ class Jac(Differentiate):
         super().__init__(outputs, inputs, retain_graph, create_graph)
         self.chunk_size = chunk_size
 
-    def _differentiate(self, jac_outputs: Sequence[Tensor]) -> tuple[Tensor, ...]:
+    def _differentiate(self, jac_outputs: Sequence[Tensor], /) -> tuple[Tensor, ...]:
         """
         Computes the jacobian of each output with respect to each input, and applies the linear
         transformations represented by the jac_outputs to the results.
@@ -57,14 +57,14 @@ class Jac(Differentiate):
         """
 
         if len(self.inputs) == 0:
-            return tuple()
+            return ()
 
         if len(self.outputs) == 0:
             return tuple(
                 [
-                    torch.empty((0,) + input.shape, device=input.device, dtype=input.dtype)
+                    torch.empty((0, *input.shape), device=input.device, dtype=input.dtype)
                     for input in self.inputs
-                ]
+                ],
             )
 
         # If the jac_outputs are correct, this value should be the same for all jac_outputs.
@@ -91,12 +91,18 @@ class Jac(Differentiate):
         jacs_chunks.append(_get_jacs_chunk(jac_outputs_chunk, get_vjp_last))
 
         n_inputs = len(self.inputs)
-        jacs = tuple(torch.cat([chunks[i] for chunks in jacs_chunks]) for i in range(n_inputs))
+        if len(jacs_chunks) == 1:
+            # Avoid using cat to avoid doubling memory usage, if it's not needed
+            jacs = jacs_chunks[0]
+        else:
+            jacs = tuple(torch.cat([chunks[i] for chunks in jacs_chunks]) for i in range(n_inputs))
+
         return jacs
 
 
 def _get_jacs_chunk(
-    jac_outputs_chunk: list[Tensor], get_vjp: Callable[[Sequence[Tensor]], tuple[Tensor, ...]]
+    jac_outputs_chunk: list[Tensor],
+    get_vjp: Callable[[Sequence[Tensor]], tuple[Tensor, ...]],
 ) -> tuple[Tensor, ...]:
     """
     Computes the jacobian matrix chunk corresponding to the provided get_vjp function, either by
@@ -110,5 +116,4 @@ def _get_jacs_chunk(
         grad_outputs = [tensor.squeeze(0) for tensor in jac_outputs_chunk]
         gradients = get_vjp(grad_outputs)
         return tuple(gradient.unsqueeze(0) for gradient in gradients)
-    else:
-        return torch.vmap(get_vjp, chunk_size=chunk_size)(jac_outputs_chunk)
+    return torch.vmap(get_vjp, chunk_size=chunk_size)(jac_outputs_chunk)

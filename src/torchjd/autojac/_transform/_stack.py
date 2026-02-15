@@ -23,7 +23,7 @@ class Stack(Transform):
     def __init__(self, transforms: Sequence[Transform]):
         self.transforms = transforms
 
-    def __call__(self, input: TensorDict) -> TensorDict:
+    def __call__(self, input: TensorDict, /) -> TensorDict:
         results = [transform(input) for transform in self.transforms]
         result = _stack(results)
         return result

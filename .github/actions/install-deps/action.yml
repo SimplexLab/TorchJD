@@ -16,6 +16,10 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Create virtual environment
+      shell: bash
+      run: uv venv
+
     - name: Install dependencies (options=[${{ inputs.options }}], groups=[${{ inputs.groups }}])
       shell: bash
       run: |

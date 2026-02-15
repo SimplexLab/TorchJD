@@ -4,10 +4,12 @@ import torch
 from torch import Tensor, nn, vmap
 from torch.autograd.graph import get_gradient_edge
 
+from torchjd._linalg import PSDMatrix
+
 from ._edge_registry import EdgeRegistry
 from ._gramian_accumulator import GramianAccumulator
 from ._gramian_computer import GramianComputer, JacobianBasedGramianComputerWithCrossTerms
-from ._gramian_utils import movedim_gramian, reshape_gramian
+from ._gramian_utils import movedim, reshape
 from ._jacobian_computer import (
     AutogradJacobianComputer,
     FunctionalJacobianComputer,
@@ -77,7 +79,7 @@ class Engine:
         Train a model using Gramian-based Jacobian descent.
 
         .. code-block:: python
-            :emphasize-lines: 5-6, 15-16, 18-19, 26-28
+            :emphasize-lines: 5-6, 15-16, 18-19, 26-29
 
             import torch
             from torch.nn import Linear, MSELoss, ReLU, Sequential
@@ -103,11 +105,11 @@ class Engine:
                 output = model(input).squeeze(dim=1)  # shape: [16]
                 losses = criterion(output, target)  # shape: [16]
 
-                optimizer.zero_grad()
                 gramian = engine.compute_gramian(losses)  # shape: [16, 16]
                 weights = weighting(gramian)  # shape: [16]
                 losses.backward(weights)
                 optimizer.step()
+                optimizer.zero_grad()
 
         This is equivalent to just calling ``torchjd.autojac.backward(losses, UPGrad())``. However,
         since the Jacobian never has to be entirely in memory, it is often much more
@@ -220,7 +222,7 @@ class Engine:
                     f" are {_MODULES_INCOMPATIBLE_WITH_BATCHED} (and their subclasses). The "
                     f"recommended fix is to replace incompatible layers by something else (e.g. "
                     f"BatchNorm by InstanceNorm). If you really can't and performance is not a "
-                    f"priority, you may also just set `batch_dim=None` when creating the engine."
+                    f"priority, you may also just set `batch_dim=None` when creating the engine.",
                 )
             if isinstance(module, _TRACK_RUNNING_STATS_MODULE_TYPES) and module.track_running_stats:
                 raise ValueError(
@@ -229,9 +231,10 @@ class Engine:
                     f" to performing in-place operations on tensors and having side-effects during "
                     f"the forward pass. Try setting `track_running_stats` to `False`. If you really"
                     f" can't and performance is not a priority, you may also just set "
-                    f"`batch_dim=None` when creating the engine."
+                    f"`batch_dim=None` when creating the engine.",
                 )
 
+    # Currently, the type PSDMatrix is hidden from users, so Tensor is correct.
     def compute_gramian(self, output: Tensor) -> Tensor:
         r"""
         Computes the Gramian of the Jacobian of ``output`` with respect to the direct parameters of
@@ -275,7 +278,7 @@ class Engine:
             target_shape = []
 
         if has_non_batch_dim:
-            target_shape = [-1] + target_shape
+            target_shape = [-1, *target_shape]
 
         reshaped_output = ordered_output.reshape(target_shape)
         # There are four different cases for the shape of reshaped_output:
@@ -296,16 +299,16 @@ class Engine:
             for gramian_computer in self._gramian_computers.values():
                 gramian_computer.reset()
 
-        unordered_gramian = reshape_gramian(square_gramian, ordered_shape)
+        unordered_gramian = reshape(square_gramian, ordered_shape)
 
         if self._batch_dim is not None:
-            gramian = movedim_gramian(unordered_gramian, [-1], [self._batch_dim])
+            gramian = movedim(unordered_gramian, [-1], [self._batch_dim])
         else:
             gramian = unordered_gramian
 
         return gramian
 
-    def _compute_square_gramian(self, output: Tensor, has_non_batch_dim: bool) -> Tensor:
+    def _compute_square_gramian(self, output: Tensor, has_non_batch_dim: bool) -> PSDMatrix:
         leaf_targets = list(self._target_edges.get_leaf_edges({get_gradient_edge(output)}))
 
         def differentiation(_grad_output: Tensor) -> tuple[Tensor, ...]:
@@ -330,6 +333,6 @@ class Engine:
 
         # If the gramian were None, then leaf_targets would be empty, so autograd.grad would
         # have failed. So gramian is necessarily a valid Tensor here.
-        gramian = cast(Tensor, self._gramian_accumulator.gramian)
+        gramian = cast(PSDMatrix, self._gramian_accumulator.gramian)
 
         return gramian

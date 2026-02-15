@@ -22,7 +22,10 @@ def assert_expected_structure(aggregator: Aggregator, matrix: Tensor) -> None:
 
 
 def assert_non_conflicting(
-    aggregator: Aggregator, matrix: Tensor, atol: float = 4e-04, rtol: float = 4e-04
+    aggregator: Aggregator,
+    matrix: Tensor,
+    atol: float = 4e-04,
+    rtol: float = 4e-04,
 ) -> None:
     """Tests empirically that a given `Aggregator` satisfies the non-conflicting property."""
 
@@ -81,7 +84,9 @@ def assert_linear_under_scaling(
 
 
 def assert_strongly_stationary(
-    aggregator: Aggregator, matrix: Tensor, threshold: float = 5e-03
+    aggregator: Aggregator,
+    matrix: Tensor,
+    threshold: float = 5e-03,
 ) -> None:
     """
     Tests empirically that a given `Aggregator` is strongly stationary.

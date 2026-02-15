@@ -4,6 +4,7 @@ import torch
 from settings import DEVICE, DTYPE
 from torch import nn
 from torch.utils._pytree import PyTree, tree_map
+
 from utils.architectures import get_in_out_shapes
 from utils.contexts import fork_rng
 
@@ -37,6 +38,6 @@ def make_inputs_and_targets(model: nn.Module, batch_size: int) -> tuple[PyTree, 
 
 def _make_tensors(batch_size: int, tensor_shapes: PyTree) -> PyTree:
     def is_leaf(s):
-        return isinstance(s, tuple) and all([isinstance(e, int) for e in s])
+        return isinstance(s, tuple) and all(isinstance(e, int) for e in s)
 
-    return tree_map(lambda s: randn_((batch_size,) + s), tensor_shapes, is_leaf=is_leaf)
+    return tree_map(lambda s: randn_((batch_size, *s)), tensor_shapes, is_leaf=is_leaf)

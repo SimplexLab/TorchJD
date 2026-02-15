@@ -6,14 +6,14 @@ element of the output sequences. If the gradients of these losses are likely to 
 descent can be leveraged to enhance optimization.
 
 .. code-block:: python
-    :emphasize-lines: 5-6, 10, 17, 20
+    :emphasize-lines: 5-6, 10, 17, 19-20
 
     import torch
     from torch.nn import RNN
     from torch.optim import SGD
 
     from torchjd.aggregation import UPGrad
-    from torchjd.autojac import backward
+    from torchjd.autojac import backward, jac_to_grad
 
     rnn = RNN(input_size=10, hidden_size=20, num_layers=2)
     optimizer = SGD(rnn.parameters(), lr=0.1)
@@ -26,9 +26,10 @@ descent can be leveraged to enhance optimization.
         output, _ = rnn(input)  # output is of shape [5, 3, 20].
         losses = ((output - target) ** 2).mean(dim=[1, 2])  # 1 loss per sequence element.
 
-        optimizer.zero_grad()
-        backward(losses, aggregator, parallel_chunk_size=1)
+        backward(losses, parallel_chunk_size=1)
+        jac_to_grad(rnn.parameters(), aggregator)
         optimizer.step()
+        optimizer.zero_grad()
 
 .. note::
     At the time of writing, there seems to be an incompatibility between ``torch.vmap`` and

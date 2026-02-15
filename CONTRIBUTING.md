@@ -7,7 +7,8 @@ with maintainers before implementing major changes.
 
 To work with TorchJD, we suggest you to use [uv](https://docs.astral.sh/uv/). While this is not
 mandatory, we only provide installation steps with this tool. You can install it by following their
-[installation documentation](https://docs.astral.sh/uv/getting-started/installation/).
+[installation documentation](https://docs.astral.sh/uv/getting-started/installation/). We also
+suggest to use VSCode with the `Python`, `ty` and `ruff` extensions (without `Pylance`).
 
 1) Pre-requisites: Use `uv` to install a Python version compatible with TorchJD and to pin it to the
   `torchjd` folder. From the root of the `torchjd` repo, run:
@@ -111,11 +112,12 @@ uv run pre-commit install
      uv run make clean
      ```
 
-## Running `mypy`
+## Type checking
 
-From the root of the repo, run:
+We use [ty](https://docs.astral.sh/ty/) for type-checking. If you're on VSCode, we recommend using
+the `ty` extension. You can also run it from the root of the repo with:
 ```bash
-uv run mypy src/torchjd
+uv run ty check
 ```
 
 ## Development guidelines

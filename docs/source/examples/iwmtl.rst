@@ -10,7 +10,7 @@ this Gramian to reweight the gradients and resolve conflict entirely.
 The following example shows how to do that.
 
 .. code-block:: python
-    :emphasize-lines: 5-6, 18-20, 31-32, 34-35, 37-38, 41-42
+    :emphasize-lines: 5-6, 18-20, 31-32, 34-35, 37-38, 40-41
 
     import torch
     from torch.nn import Linear, MSELoss, ReLU, Sequential
@@ -51,10 +51,10 @@ The following example shows how to do that.
         # Obtain the weights that lead to no conflict between reweighted gradients
         weights = weighting(gramian)  # shape: [16, 2]
 
-        optimizer.zero_grad()
         # Do the standard backward pass, but weighted using the obtained weights
         losses.backward(weights)
         optimizer.step()
+        optimizer.zero_grad()
 
 .. note::
     In this example, the tensor of losses is a matrix rather than a vector. The gramian is thus a

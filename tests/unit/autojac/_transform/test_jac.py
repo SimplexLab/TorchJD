@@ -106,10 +106,16 @@ def test_retain_graph():
     input = {y: eye_(2)}
 
     jac_retain_graph = Jac(
-        outputs=OrderedSet([y]), inputs=OrderedSet([a1, a2]), chunk_size=None, retain_graph=True
+        outputs=OrderedSet([y]),
+        inputs=OrderedSet([a1, a2]),
+        chunk_size=None,
+        retain_graph=True,
     )
     jac_discard_graph = Jac(
-        outputs=OrderedSet([y]), inputs=OrderedSet([a1, a2]), chunk_size=None, retain_graph=False
+        outputs=OrderedSet([y]),
+        inputs=OrderedSet([a1, a2]),
+        chunk_size=None,
+        retain_graph=False,
     )
 
     jac_retain_graph(input)
@@ -140,10 +146,16 @@ def test_two_levels():
     input = {z: eye_(2)}
 
     outer_jac = Jac(
-        outputs=OrderedSet([y]), inputs=OrderedSet([a1, a2]), chunk_size=None, retain_graph=True
+        outputs=OrderedSet([y]),
+        inputs=OrderedSet([a1, a2]),
+        chunk_size=None,
+        retain_graph=True,
     )
     inner_jac = Jac(
-        outputs=OrderedSet([z]), inputs=OrderedSet([y]), chunk_size=None, retain_graph=True
+        outputs=OrderedSet([z]),
+        inputs=OrderedSet([y]),
+        chunk_size=None,
+        retain_graph=True,
     )
     composed_jac = outer_jac << inner_jac
     jac = Jac(outputs=OrderedSet([z]), inputs=OrderedSet([a1, a2]), chunk_size=None)
@@ -236,7 +248,10 @@ def test_composition_of_jacs_is_jac():
     input = {z1: tensor_([1.0, 0.0]), z2: tensor_([0.0, 1.0])}
 
     outer_jac = Jac(
-        outputs=OrderedSet([y1, y2]), inputs=OrderedSet([a]), chunk_size=None, retain_graph=True
+        outputs=OrderedSet([y1, y2]),
+        inputs=OrderedSet([a]),
+        chunk_size=None,
+        retain_graph=True,
     )
     inner_jac = Jac(
         outputs=OrderedSet([z1, z2]),
@@ -291,7 +306,10 @@ def test_create_graph():
     input = {y: eye_(2)}
 
     jac = Jac(
-        outputs=OrderedSet([y]), inputs=OrderedSet([a1, a2]), chunk_size=None, create_graph=True
+        outputs=OrderedSet([y]),
+        inputs=OrderedSet([a1, a2]),
+        chunk_size=None,
+        create_graph=True,
     )
 
     jacobians = jac(input)

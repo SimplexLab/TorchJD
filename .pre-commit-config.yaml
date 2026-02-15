@@ -9,32 +9,12 @@ repos:
     -   id: check-docstring-first  # Check a common error of defining a docstring after code.
     -   id: check-merge-conflict  # Check for files that contain merge conflict strings.
 
--   repo: https://github.com/PyCQA/flake8
-    rev: 7.3.0
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.1
     hooks:
-    -   id: flake8  # Check style and syntax. Does not modify code, issues have to be solved manually.
-        args: [
-            '--ignore=E501,E203,W503,E402',  # Ignore line length problems, space after colon problems, line break occurring before a binary operator problems, module level import not at top of file problems.
-        ]
-
--   repo: https://github.com/pycqa/isort
-    rev: 6.1.0
-    hooks:
-    -   id: isort  # Sort imports.
-        args: [
-            --multi-line=3,
-            --line-length=100,
-            --trailing-comma,
-            --force-grid-wrap=0,
-            --use-parentheses,
-            --ensure-newline-before-comments,
-        ]
-
--   repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 25.9.0
-    hooks:
-    -   id: black  # Format code.
-        args: [--line-length=100]
+      - id: ruff-check
+        args: [ --fix, --ignore, FIX ]  # Allow committing with TODOs. Only CI checks should prevent merging with TODOs.
+      - id: ruff-format
 
 ci:
     autoupdate_commit_msg: 'chore: Update pre-commit hooks'

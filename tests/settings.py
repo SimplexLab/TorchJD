@@ -13,7 +13,7 @@ except KeyError:
 if _device_str not in _POSSIBLE_TEST_DEVICES:
     raise ValueError(
         f"Invalid value of environment variable PYTEST_TORCH_DEVICE: {_device_str}.\n"
-        f"Possible values: {_POSSIBLE_TEST_DEVICES}."
+        f"Possible values: {_POSSIBLE_TEST_DEVICES}.",
     )
 
 if _device_str == "cuda:0" and not torch.cuda.is_available():
@@ -29,7 +29,7 @@ except KeyError:
 if _dtype_str not in _POSSIBLE_TEST_DTYPES:
     raise ValueError(
         f"Invalid value of environment variable PYTEST_TORCH_DTYPE: {_dtype_str}.\n"
-        f"Possible values: {_POSSIBLE_TEST_DTYPES}."
+        f"Possible values: {_POSSIBLE_TEST_DTYPES}.",
     )
 
 DTYPE = getattr(torch, _dtype_str)  # "float32" => torch.float32

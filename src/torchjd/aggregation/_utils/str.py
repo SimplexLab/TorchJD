@@ -7,5 +7,5 @@ def vector_to_str(vector: Tensor) -> str:
     `1.23, 1., ...`.
     """
 
-    weights_str = ", ".join(["{:.2f}".format(value).rstrip("0") for value in vector])
+    weights_str = ", ".join([f"{value:.2f}".rstrip("0") for value in vector])
     return weights_str

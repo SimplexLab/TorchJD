@@ -7,8 +7,8 @@ import numpy as np
 import torch
 from dash import Dash, Input, Output, callback, dcc, html
 from plotly.graph_objs import Figure
-from plots._utils import Plotter, angle_to_coord, coord_to_angle
 
+from plots._utils import Plotter, angle_to_coord, coord_to_angle
 from torchjd.aggregation import (
     IMTLG,
     MGDA,
@@ -39,7 +39,7 @@ def main() -> None:
             [0.0, 1.0],
             [1.0, -1.0],
             [1.0, 0.0],
-        ]
+        ],
     )
 
     aggregators = [
@@ -90,11 +90,11 @@ def main() -> None:
     gradient_slider_inputs = []
     for i in range(len(matrix)):
         initial_gradient = matrix[i]
-        div = make_gradient_div(i, initial_gradient)
+        div, angle_input, r_input = make_gradient_div(i, initial_gradient)
         gradient_divs.append(div)
 
-        gradient_slider_inputs.append(Input(div.children[1], "value"))
-        gradient_slider_inputs.append(Input(div.children[2], "value"))
+        gradient_slider_inputs.append(Input(angle_input, "value"))
+        gradient_slider_inputs.append(Input(r_input, "value"))
 
     aggregator_strings = [str(aggregator) for aggregator in aggregators]
     checklist = dcc.Checklist(aggregator_strings, [], id="aggregator-checklist")
@@ -147,32 +147,40 @@ def main() -> None:
     app.run(debug=False, port=1222)
 
 
-def make_gradient_div(i: int, initial_gradient: torch.Tensor) -> html.Div:
+def make_gradient_div(
+    i: int,
+    initial_gradient: torch.Tensor,
+) -> tuple[html.Div, dcc.Input, dcc.Input]:
     x = initial_gradient[0].item()
     y = initial_gradient[1].item()
     angle, r = coord_to_angle(x, y)
+
+    angle_input = dcc.Input(
+        id=f"g{i + 1}-angle-range",
+        type="range",
+        value=angle,
+        min=0,
+        max=2 * np.pi,
+        style={"width": "250px"},
+    )
+
+    r_input = dcc.Input(
+        id=f"g{i + 1}-r-range",
+        type="range",
+        value=r,
+        min=MIN_LENGTH,
+        max=MAX_LENGTH,
+        style={"width": "250px"},
+    )
+
     div = html.Div(
         [
             html.P(f"g{i + 1}", style={"display": "inline-block", "margin-right": 20}),
-            dcc.Input(
-                id=f"g{i + 1}-angle-range",
-                type="range",
-                value=angle,
-                min=0,
-                max=2 * np.pi,
-                style={"width": "250px"},
-            ),
-            dcc.Input(
-                id=f"g{i + 1}-r-range",
-                type="range",
-                value=r,
-                min=MIN_LENGTH,
-                max=MAX_LENGTH,
-                style={"width": "250px"},
-            ),
+            angle_input,
+            r_input,
         ],
     )
-    return div
+    return div, angle_input, r_input
 
 
 def open_browser() -> None:

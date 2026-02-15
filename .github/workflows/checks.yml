@@ -1,0 +1,132 @@
+name: Checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '41 16 * * *'  # Every day at 16:41 UTC (to avoid high load at exact hour values).
+
+env:
+  UV_NO_SYNC: 1
+
+jobs:
+  tests:
+    # Default config: py3.14, ubuntu-latest, float32, full options.
+    # The idea is to make each of those params vary one by one, to limit the number of tests to run.
+    name: Tests (py${{ matrix.python-version || '3.14' }}, ${{ matrix.os || 'ubuntu-latest' }}, ${{ matrix.dtype || 'float32' }}, ${{ matrix.options || 'full' }}${{ matrix.extra_groups && format(', {0}', matrix.extra_groups) || '' }})
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Python version variations
+          - python-version: '3.10'
+          - python-version: '3.11'
+          - python-version: '3.12'
+          - python-version: '3.13'
+          - python-version: '3.14'  # To actually run the default config
+          # OS variations
+          - os: macOS-latest
+          - os: windows-latest
+          # dtype variations
+          - dtype: float64
+          # Installation options variations
+          - options: 'none'
+          # Lower-bounds of all dependencies and Python version.
+          - python-version: '3.10.0'
+            extra_groups: 'lower_bounds'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.python-version || '3.14' }}
+
+      - uses: ./.github/actions/install-deps
+        with:
+          options: ${{ matrix.options || 'full' }}
+          groups: test ${{ matrix.extra_groups }}
+
+      - name: Run tests
+        run: uv run pytest -W error tests/unit tests/doc --cov=src --cov-report=xml
+        env:
+          PYTEST_TORCH_DTYPE: ${{ matrix.dtype || 'float32' }}
+
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  build-doc:
+    name: Build documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: '3.14'
+
+      - uses: ./.github/actions/install-deps
+        with:
+          groups: doc
+
+      - name: Build Documentation
+        working-directory: docs
+        run: uv run make dirhtml
+
+  check-links:
+    name: Link correctness
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # This will restore the cache for the current commit if it exists, or the most recent lychee
+      # cache otherwise (including those saved for the main branch). It will also save the cache for
+      # the current commit if none existed for it, and only if the link check succeeded. We don't
+      # want to save a cache when the action failed, because the reason for failure might be
+      # temporary (rate limiting, network issue, etc.), and we always want to retry those links
+      # everytime this action is run.
+      - name: Restore lychee cache
+        uses: actions/cache@v4
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose --no-progress --cache --max-cache-age 1d "." --exclude-path "docs/source/_templates/page.html"
+          fail: true
+        env:
+          # This reduces false positives due to rate limits
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  code-quality:
+    name: Code quality (ty and ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: '3.14'
+
+      - uses: ./.github/actions/install-deps
+        with:
+          groups: check test plot
+
+      - name: Run ty
+        run: uv run ty check --output-format=github
+
+      - name: Run ruff
+        run: uv run ruff check --output-format=github

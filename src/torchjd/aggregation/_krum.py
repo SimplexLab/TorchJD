@@ -2,8 +2,10 @@ import torch
 from torch import Tensor
 from torch.nn import functional as F
 
+from torchjd._linalg import PSDMatrix
+
 from ._aggregator_bases import GramianWeightedAggregator
-from ._weighting_bases import PSDMatrix, Weighting
+from ._weighting_bases import Weighting
 
 
 class Krum(GramianWeightedAggregator):
@@ -47,19 +49,19 @@ class KrumWeighting(Weighting[PSDMatrix]):
         if n_byzantine < 0:
             raise ValueError(
                 "Parameter `n_byzantine` should be a non-negative integer. Found `n_byzantine = "
-                f"{n_byzantine}`."
+                f"{n_byzantine}`.",
             )
 
         if n_selected < 1:
             raise ValueError(
                 "Parameter `n_selected` should be a positive integer. Found `n_selected = "
-                f"{n_selected}`."
+                f"{n_selected}`.",
             )
 
         self.n_byzantine = n_byzantine
         self.n_selected = n_selected
 
-    def forward(self, gramian: Tensor) -> Tensor:
+    def forward(self, gramian: PSDMatrix, /) -> Tensor:
         self._check_matrix_shape(gramian)
         gradient_norms_squared = torch.diagonal(gramian)
         distances_squared = (
@@ -78,16 +80,16 @@ class KrumWeighting(Weighting[PSDMatrix]):
 
         return weights
 
-    def _check_matrix_shape(self, gramian: Tensor) -> None:
+    def _check_matrix_shape(self, gramian: PSDMatrix) -> None:
         min_rows = self.n_byzantine + 3
         if gramian.shape[0] < min_rows:
             raise ValueError(
                 f"Parameter `gramian` should have at least {min_rows} rows (n_byzantine + 3). Found"
-                f" `gramian` with {gramian.shape[0]} rows."
+                f" `gramian` with {gramian.shape[0]} rows.",
             )
 
         if gramian.shape[0] < self.n_selected:
             raise ValueError(
                 f"Parameter `gramian` should have at least {self.n_selected} rows (n_selected). "
-                f"Found `gramian` with {gramian.shape[0]} rows."
+                f"Found `gramian` with {gramian.shape[0]} rows.",
             )

@@ -2,28 +2,23 @@ from collections.abc import Iterable, Sequence
 
 from torch import Tensor
 
-from torchjd.aggregation import Aggregator
-
-from ._transform import Accumulate, Aggregate, Diagonalize, Init, Jac, OrderedSet, Transform
+from ._transform import AccumulateJac, Diagonalize, Init, Jac, OrderedSet, Transform
 from ._utils import as_checked_ordered_set, check_optional_positive_chunk_size, get_leaf_tensors
 
 
 def backward(
     tensors: Sequence[Tensor] | Tensor,
-    aggregator: Aggregator,
     inputs: Iterable[Tensor] | None = None,
     retain_graph: bool = False,
     parallel_chunk_size: int | None = None,
 ) -> None:
     r"""
-    Computes the Jacobian of all values in ``tensors`` with respect to all ``inputs``. Computes its
-    aggregation by the provided ``aggregator`` and accumulates it in the ``.grad`` fields of the
-    ``inputs``.
+    Computes the Jacobians of all values in ``tensors`` with respect to all ``inputs`` and
+    accumulates them in the ``.jac`` fields of the ``inputs``.
 
-    :param tensors: The tensor or tensors to differentiate. Should be non-empty. The Jacobian
-        matrices will have one row for each value of each of these tensors.
-    :param aggregator: Aggregator used to reduce the Jacobian into a vector.
-    :param inputs: The tensors with respect to which the Jacobian must be computed. These must have
+    :param tensors: The tensor or tensors to differentiate. Should be non-empty. The Jacobians will
+        have one row for each value of each of these tensors.
+    :param inputs: The tensors with respect to which the Jacobians must be computed. These must have
         their ``requires_grad`` flag set to ``True``. If not provided, defaults to the leaf tensors
         that were used to compute the ``tensors`` parameter.
     :param retain_graph: If ``False``, the graph used to compute the grad will be freed. Defaults to
@@ -41,7 +36,6 @@ def backward(
 
             >>> import torch
             >>>
-            >>> from torchjd.aggregation import UPGrad
             >>> from torchjd.autojac import backward
             >>>
             >>> param = torch.tensor([1., 2.], requires_grad=True)
@@ -49,12 +43,13 @@ def backward(
             >>> y1 = torch.tensor([-1., 1.]) @ param
             >>> y2 = (param ** 2).sum()
             >>>
-            >>> backward([y1, y2], UPGrad())
+            >>> backward([y1, y2])
             >>>
-            >>> param.grad
-            tensor([0.5000, 2.5000])
+            >>> param.jac
+            tensor([[-1.,  1.],
+                    [ 2.,  4.]])
 
-        The ``.grad`` field of ``param`` now contains the aggregation of the Jacobian of
+        The ``.jac`` field of ``param`` now contains the Jacobian of
         :math:`\begin{bmatrix}y_1 \\ y_2\end{bmatrix}` with respect to ``param``.
 
     .. warning::
@@ -80,7 +75,6 @@ def backward(
 
     backward_transform = _create_transform(
         tensors=tensors_,
-        aggregator=aggregator,
         inputs=inputs_,
         retain_graph=retain_graph,
         parallel_chunk_size=parallel_chunk_size,
@@ -91,12 +85,11 @@ def backward(
 
 def _create_transform(
     tensors: OrderedSet[Tensor],
-    aggregator: Aggregator,
     inputs: OrderedSet[Tensor],
     retain_graph: bool,
     parallel_chunk_size: int | None,
 ) -> Transform:
-    """Creates the Jacobian descent backward transform."""
+    """Creates the backward transform."""
 
     # Transform that creates gradient outputs containing only ones.
     init = Init(tensors)
@@ -107,10 +100,7 @@ def _create_transform(
     # Transform that computes the required Jacobians.
     jac = Jac(tensors, inputs, parallel_chunk_size, retain_graph)
 
-    # Transform that aggregates the Jacobians.
-    aggregate = Aggregate(aggregator, inputs)
+    # Transform that accumulates the result in the .jac field of the inputs.
+    accumulate = AccumulateJac()
 
-    # Transform that accumulates the result in the .grad field of the inputs.
-    accumulate = Accumulate()
-
-    return accumulate << aggregate << jac << diag << init
+    return accumulate << jac << diag << init

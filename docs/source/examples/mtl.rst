@@ -19,14 +19,14 @@ vectors of dimension 10, and their corresponding scalar labels for both tasks.
 
 
 .. code-block:: python
-    :emphasize-lines: 5-6, 19, 33
+    :emphasize-lines: 5-6, 19, 32-33
 
     import torch
     from torch.nn import Linear, MSELoss, ReLU, Sequential
     from torch.optim import SGD
 
     from torchjd.aggregation import UPGrad
-    from torchjd.autojac import mtl_backward
+    from torchjd.autojac import mtl_backward, jac_to_grad
 
     shared_module = Sequential(Linear(10, 5), ReLU(), Linear(5, 3), ReLU())
     task1_module = Linear(3, 1)
@@ -52,9 +52,10 @@ vectors of dimension 10, and their corresponding scalar labels for both tasks.
         loss1 = loss_fn(output1, target1)
         loss2 = loss_fn(output2, target2)
 
-        optimizer.zero_grad()
-        mtl_backward(losses=[loss1, loss2], features=features, aggregator=aggregator)
+        mtl_backward(losses=[loss1, loss2], features=features)
+        jac_to_grad(shared_module.parameters(), aggregator)
         optimizer.step()
+        optimizer.zero_grad()
 
 .. note::
     In this example, the Jacobian is only with respect to the shared parameters. The task-specific

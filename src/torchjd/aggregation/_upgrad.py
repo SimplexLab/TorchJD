@@ -1,15 +1,14 @@
-from typing import Literal
-
 import torch
 from torch import Tensor
 
+from torchjd._linalg import PSDMatrix, normalize, regularize
+
 from ._aggregator_bases import GramianWeightedAggregator
 from ._mean import MeanWeighting
-from ._utils.dual_cone import project_weights
-from ._utils.gramian import normalize, regularize
+from ._utils.dual_cone import SUPPORTED_SOLVER, project_weights
 from ._utils.non_differentiable import raise_non_differentiable_error
 from ._utils.pref_vector import pref_vector_to_str_suffix, pref_vector_to_weighting
-from ._weighting_bases import PSDMatrix, Weighting
+from ._weighting_bases import Weighting
 
 
 class UPGrad(GramianWeightedAggregator):
@@ -34,15 +33,15 @@ class UPGrad(GramianWeightedAggregator):
         pref_vector: Tensor | None = None,
         norm_eps: float = 0.0001,
         reg_eps: float = 0.0001,
-        solver: Literal["quadprog"] = "quadprog",
+        solver: SUPPORTED_SOLVER = "quadprog",
     ):
         self._pref_vector = pref_vector
         self._norm_eps = norm_eps
         self._reg_eps = reg_eps
-        self._solver = solver
+        self._solver: SUPPORTED_SOLVER = solver
 
         super().__init__(
-            UPGradWeighting(pref_vector, norm_eps=norm_eps, reg_eps=reg_eps, solver=solver)
+            UPGradWeighting(pref_vector, norm_eps=norm_eps, reg_eps=reg_eps, solver=solver),
         )
 
         # This prevents considering the computed weights as constant w.r.t. the matrix.
@@ -78,16 +77,16 @@ class UPGradWeighting(Weighting[PSDMatrix]):
         pref_vector: Tensor | None = None,
         norm_eps: float = 0.0001,
         reg_eps: float = 0.0001,
-        solver: Literal["quadprog"] = "quadprog",
+        solver: SUPPORTED_SOLVER = "quadprog",
     ):
         super().__init__()
         self._pref_vector = pref_vector
         self.weighting = pref_vector_to_weighting(pref_vector, default=MeanWeighting())
         self.norm_eps = norm_eps
         self.reg_eps = reg_eps
-        self.solver = solver
+        self.solver: SUPPORTED_SOLVER = solver
 
-    def forward(self, gramian: Tensor) -> Tensor:
+    def forward(self, gramian: PSDMatrix, /) -> Tensor:
         U = torch.diag(self.weighting(gramian))
         G = regularize(normalize(gramian, self.norm_eps), self.reg_eps)
         W = project_weights(U, G, self.solver)

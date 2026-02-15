@@ -23,7 +23,7 @@ they have a negative inner product).
     from torch.optim import SGD
 
     from torchjd.aggregation import UPGrad
-    from torchjd.autojac import mtl_backward
+    from torchjd.autojac import mtl_backward, jac_to_grad
 
     def print_weights(_, __, weights: torch.Tensor) -> None:
         """Prints the extracted weights."""
@@ -49,7 +49,7 @@ they have a negative inner product).
     optimizer = SGD(params, lr=0.1)
     aggregator = UPGrad()
 
-    aggregator.weighting.weighting.register_forward_hook(print_weights)
+    aggregator.gramian_weighting.register_forward_hook(print_weights)
     aggregator.register_forward_hook(print_gd_similarity)
 
     inputs = torch.randn(8, 16, 10)  # 8 batches of 16 random input vectors of length 10
@@ -63,6 +63,7 @@ they have a negative inner product).
         loss1 = loss_fn(output1, target1)
         loss2 = loss_fn(output2, target2)
 
-        optimizer.zero_grad()
-        mtl_backward(losses=[loss1, loss2], features=features, aggregator=aggregator)
+        mtl_backward(losses=[loss1, loss2], features=features)
+        jac_to_grad(shared_module.parameters(), aggregator)
         optimizer.step()
+        optimizer.zero_grad()

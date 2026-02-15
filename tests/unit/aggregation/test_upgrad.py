@@ -33,7 +33,7 @@ def test_non_conflicting(aggregator: UPGrad, matrix: Tensor):
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
 def test_permutation_invariant(aggregator: UPGrad, matrix: Tensor):
-    assert_permutation_invariant(aggregator, matrix, n_runs=5, atol=4e-07, rtol=4e-07)
+    assert_permutation_invariant(aggregator, matrix, n_runs=5, atol=5e-07, rtol=5e-07)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)

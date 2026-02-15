@@ -64,11 +64,11 @@ batch of data. When minimizing per-instance losses (IWRM), we use either autojac
             for x, y in zip(X, Y):
                 y_hat = model(x).squeeze(dim=1)  # shape: [16]
                 loss = loss_fn(y_hat, y)  # shape: [] (scalar)
-                optimizer.zero_grad()
                 loss.backward()
 
 
                 optimizer.step()
+                optimizer.zero_grad()
 
         In this baseline example, the update may negatively affect the loss of some elements of the
         batch.
@@ -76,14 +76,14 @@ batch of data. When minimizing per-instance losses (IWRM), we use either autojac
     .. tab-item:: autojac
 
         .. code-block:: python
-            :emphasize-lines: 5-6, 12, 16, 21, 23
+            :emphasize-lines: 5-6, 12, 16, 21-23
 
             import torch
             from torch.nn import Linear, MSELoss, ReLU, Sequential
             from torch.optim import SGD
 
             from torchjd.aggregation import UPGrad
-            from torchjd.autojac import backward
+            from torchjd.autojac import backward, jac_to_grad
 
             X = torch.randn(8, 16, 10)
             Y = torch.randn(8, 16)
@@ -99,11 +99,11 @@ batch of data. When minimizing per-instance losses (IWRM), we use either autojac
             for x, y in zip(X, Y):
                 y_hat = model(x).squeeze(dim=1)  # shape: [16]
                 losses = loss_fn(y_hat, y)  # shape: [16]
-                optimizer.zero_grad()
-                backward(losses, aggregator)
-
+                backward(losses)
+                jac_to_grad(model.parameters(), aggregator)
 
                 optimizer.step()
+                optimizer.zero_grad()
 
         Here, we compute the Jacobian of the per-sample losses with respect to the model parameters
         and use it to update the model such that no loss from the batch is (locally) increased.
@@ -111,7 +111,7 @@ batch of data. When minimizing per-instance losses (IWRM), we use either autojac
     .. tab-item:: autogram (recommended)
 
         .. code-block:: python
-            :emphasize-lines: 5-6, 12, 16-17, 21, 23-25
+            :emphasize-lines: 5-6, 12, 16-17, 21-24
 
             import torch
             from torch.nn import Linear, MSELoss, ReLU, Sequential
@@ -134,11 +134,11 @@ batch of data. When minimizing per-instance losses (IWRM), we use either autojac
             for x, y in zip(X, Y):
                 y_hat = model(x).squeeze(dim=1)  # shape: [16]
                 losses = loss_fn(y_hat, y)  # shape: [16]
-                optimizer.zero_grad()
                 gramian = engine.compute_gramian(losses)  # shape: [16, 16]
                 weights = weighting(gramian)  # shape: [16]
                 losses.backward(weights)
                 optimizer.step()
+                optimizer.zero_grad()
 
         Here, the per-sample gradients are never fully stored in memory, leading to large
         improvements in memory usage and speed compared to autojac, in most practical cases. The

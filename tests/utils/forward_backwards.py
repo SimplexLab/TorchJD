@@ -5,12 +5,14 @@ from torch import Tensor, nn, vmap
 from torch.nn.functional import mse_loss
 from torch.utils._pytree import PyTree, tree_flatten, tree_map
 from torch.utils.hooks import RemovableHandle
-from utils.architectures import get_in_out_shapes
-from utils.contexts import fork_rng
 
+from torchjd._linalg import PSDTensor
 from torchjd.aggregation import Aggregator, Weighting
 from torchjd.autogram import Engine
 from torchjd.autojac import backward
+from torchjd.autojac._jac_to_grad import jac_to_grad
+from utils.architectures import get_in_out_shapes
+from utils.contexts import fork_rng
 
 
 def autograd_forward_backward(
@@ -29,7 +31,8 @@ def autojac_forward_backward(
     aggregator: Aggregator,
 ) -> None:
     losses = forward_pass(model, inputs, loss_fn, reduce_to_vector)
-    backward(losses, aggregator=aggregator)
+    backward(losses)
+    jac_to_grad(list(model.parameters()), aggregator)
 
 
 def autograd_gramian_forward_backward(
@@ -108,13 +111,14 @@ def reshape_raw_losses(raw_losses: Tensor) -> Tensor:
 
     if raw_losses.ndim == 1:
         return raw_losses.unsqueeze(1)
-    else:
-        return raw_losses.flatten(start_dim=1)
+    return raw_losses.flatten(start_dim=1)
 
 
 def compute_gramian_with_autograd(
-    output: Tensor, params: list[nn.Parameter], retain_graph: bool = False
-) -> Tensor:
+    output: Tensor,
+    params: list[nn.Parameter],
+    retain_graph: bool = False,
+) -> PSDTensor:
     """
     Computes the Gramian of the Jacobian of the outputs with respect to the params using vmapped
     calls to the autograd engine.
@@ -137,14 +141,6 @@ def compute_gramian_with_autograd(
     gramian = sum([jacobian @ jacobian.T for jacobian in jacobian_matrices])
 
     return gramian
-
-
-def compute_gramian(matrix: Tensor) -> Tensor:
-    """Contracts the last dimension of matrix to make it into a Gramian."""
-
-    indices = list(range(matrix.ndim))
-    transposed_matrix = matrix.movedim(indices, indices[::-1])
-    return torch.tensordot(matrix, transposed_matrix, dims=([-1], [0]))
 
 
 class CloneParams:
@@ -203,7 +199,7 @@ class CloneParams:
         for module in self.model.modules():
             self._restore_original_params(module)
 
-        return False  # don’t suppress exceptions
+        return False  # don't suppress exceptions
 
     def _restore_original_params(self, module: nn.Module):
         original_params = self._module_to_original_params.pop(module, {})

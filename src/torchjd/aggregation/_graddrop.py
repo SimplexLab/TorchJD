@@ -3,6 +3,8 @@ from collections.abc import Callable
 import torch
 from torch import Tensor
 
+from torchjd._linalg import Matrix
+
 from ._aggregator_bases import Aggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
 
@@ -28,7 +30,7 @@ class GradDrop(Aggregator):
         if leak is not None and leak.dim() != 1:
             raise ValueError(
                 "Parameter `leak` should be a 1-dimensional tensor. Found `leak.shape = "
-                f"{leak.shape}`."
+                f"{leak.shape}`.",
             )
 
         super().__init__()
@@ -38,8 +40,7 @@ class GradDrop(Aggregator):
         # This prevents computing gradients that can be very wrong.
         self.register_full_backward_pre_hook(raise_non_differentiable_error)
 
-    def forward(self, matrix: Tensor) -> Tensor:
-        self._check_is_matrix(matrix)
+    def forward(self, matrix: Matrix) -> Tensor:
         self._check_matrix_has_enough_rows(matrix)
 
         if matrix.shape[0] == 0 or matrix.shape[1] == 0:
@@ -63,7 +64,7 @@ class GradDrop(Aggregator):
         if self.leak is not None and n_rows != len(self.leak):
             raise ValueError(
                 f"Parameter `matrix` should be a matrix of exactly {len(self.leak)} rows (i.e. the "
-                f"number of leak scalars). Found `matrix` of shape `{matrix.shape}`."
+                f"number of leak scalars). Found `matrix` of shape `{matrix.shape}`.",
             )
 
     def __repr__(self) -> str:
@@ -73,5 +74,5 @@ class GradDrop(Aggregator):
         if self.leak is None:
             leak_str = ""
         else:
-            leak_str = f"([{', '.join(['{:.2f}'.format(l_).rstrip('0') for l_ in self.leak])}])"
+            leak_str = f"([{', '.join([f'{l_:.2f}'.rstrip('0') for l_ in self.leak])}])"
         return f"GradDrop{leak_str}"
