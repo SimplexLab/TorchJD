@@ -191,7 +191,4 @@ def _create_transform(
     parallel_chunk_size: int | None,
     retain_graph: bool,
 ) -> Transform:
-    """Creates the jac transform that computes Jacobians."""
-    # Transform that computes the required Jacobians.
-    jac = Jac(outputs, inputs, parallel_chunk_size, retain_graph)
-    return jac
+    return Jac(outputs, inputs, parallel_chunk_size, retain_graph)
