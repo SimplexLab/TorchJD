@@ -1,14 +1,15 @@
 import torch
 from pytest import mark, raises
 from utils.asserts import assert_has_jac, assert_has_no_jac, assert_jac_close
-from utils.tensors import randn_, tensor_
+from utils.tensors import eye_, randn_, tensor_
 
 from torchjd.autojac import backward
-from torchjd.autojac._backward import _create_transform
+from torchjd.autojac._backward import _create_jac_tensors_dict, _create_transform
 from torchjd.autojac._transform import OrderedSet
 
 
-def test_check_create_transform():
+@mark.parametrize("default_jac_tensors", [True, False])
+def test_check_create_transform(default_jac_tensors: bool):
     """Tests that _create_transform creates a valid Transform."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -17,6 +18,14 @@ def test_check_create_transform():
     y1 = tensor_([-1.0, 1.0]) @ a1 + a2.sum()
     y2 = (a1**2).sum() + a2.norm()
 
+    optional_jac_tensors = (
+        None if default_jac_tensors else [tensor_([1.0, 0.0]), tensor_([0.0, 1.0])]
+    )
+
+    jac_tensors = _create_jac_tensors_dict(
+        tensors=OrderedSet([y1, y2]),
+        opt_jac_tensors=optional_jac_tensors,
+    )
     transform = _create_transform(
         tensors=OrderedSet([y1, y2]),
         inputs=OrderedSet([a1, a2]),
@@ -24,7 +33,7 @@ def test_check_create_transform():
         parallel_chunk_size=None,
     )
 
-    output_keys = transform.check_keys(set())
+    output_keys = transform.check_keys(set(jac_tensors.keys()))
     assert output_keys == set()
 
 
@@ -69,6 +78,116 @@ def test_value_is_correct(
     )
 
     assert_jac_close(input, J)
+
+
+@mark.parametrize("rows", [1, 2, 5])
+def test_jac_tensors_value_is_correct(rows: int):
+    """
+    Tests that backward correctly computes the product of jac_tensors and the Jacobian.
+    result = jac_tensors @ Jacobian(tensors, inputs).
+    """
+    input_size = 4
+    output_size = 3
+
+    J_model = randn_((output_size, input_size))
+
+    input = randn_([input_size], requires_grad=True)
+    tensor = J_model @ input
+
+    J_init = randn_((rows, output_size))
+
+    backward(
+        tensor,
+        jac_tensors=J_init,
+        inputs=[input],
+    )
+
+    expected_jac = J_init @ J_model
+    assert_jac_close(input, expected_jac)
+
+
+@mark.parametrize("rows", [1, 3])
+def test_jac_tensors_multiple_components(rows: int):
+    """
+    Tests that jac_tensors works correctly when tensors is a list of multiple tensors. The
+    jac_tensors must match the structure of tensors.
+    """
+    input_len = 2
+    input = randn_([input_len], requires_grad=True)
+
+    y1 = input * 2
+    y2 = torch.cat([input, input[:1]])
+
+    J1 = randn_((rows, 2))
+    J2 = randn_((rows, 3))
+
+    backward([y1, y2], jac_tensors=[J1, J2], inputs=[input])
+
+    jac_y1 = eye_(2) * 2
+
+    jac_y2 = tensor_([[1.0, 0.0], [0.0, 1.0], [1.0, 0.0]])
+
+    expected = J1 @ jac_y1 + J2 @ jac_y2
+
+    assert_jac_close(input, expected)
+
+
+def test_jac_tensors_length_mismatch():
+    """Tests that backward raises a ValueError early if len(jac_tensors) != len(tensors)."""
+    x = tensor_([1.0, 2.0], requires_grad=True)
+    y1 = x * 2
+    y2 = x * 3
+
+    J1 = randn_((2, 2))
+
+    with raises(
+        ValueError,
+        match=r"`jac_tensors` should have the same length as `tensors`\. \(got 1 and 2\)",
+    ):
+        backward([y1, y2], jac_tensors=[J1], inputs=[x])
+
+
+def test_jac_tensors_shape_mismatch():
+    """
+    Tests that backward raises a ValueError early if the shape of a tensor in jac_tensors is
+    incompatible with the corresponding tensor.
+    """
+    x = tensor_([1.0, 2.0], requires_grad=True)
+    y = x * 2
+
+    J_bad = randn_((3, 5))
+
+    with raises(
+        ValueError,
+        match=r"Shape mismatch: `jac_tensors\[0\]` has shape .* but `tensors\[0\]` has shape .*\.",
+    ):
+        backward(y, jac_tensors=J_bad, inputs=[x])
+
+
+@mark.parametrize(
+    "rows_y1, rows_y2",
+    [
+        (3, 5),
+        (1, 2),
+    ],
+)
+def test_jac_tensors_inconsistent_first_dimension(rows_y1: int, rows_y2: int):
+    """
+    Tests that backward raises a ValueError early when the provided jac_tensors have inconsistent
+    first dimensions.
+    """
+    x = tensor_([1.0, 2.0], requires_grad=True)
+
+    y1 = x * 2
+    y2 = x.sum()
+
+    j1 = randn_((rows_y1, 2))
+    j2 = randn_((rows_y2,))
+
+    with raises(
+        ValueError, match=r"All Jacobians in `jac_tensors` should have the same number of rows\."
+    ):
+        backward([y1, y2], jac_tensors=[j1, j2], inputs=[x])
 
 
 def test_empty_inputs():
