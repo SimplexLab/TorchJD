@@ -30,9 +30,10 @@ def backward(
         parameter of `torch.autograd.backward`. If provided, it must have the same structure as
         ``tensors`` and each tensor in ``jac_tensors`` must match the shape of the corresponding
         tensor in ``tensors``, with an extra leading dimension representing the number of rows of
-        the resulting Jacobian (e.g. the number of losses). If ``None``, defaults to the identity
-        matrix. In this case, the standard Jacobian of ``tensors`` is computed, with one row for
-        each value in the ``tensors``.
+        the resulting Jacobian (e.g. the number of losses). All tensors in ``jac_tensors`` must
+        have the same first dimension. If ``None``, defaults to the identity matrix. In this case,
+        the standard Jacobian of ``tensors`` is computed, with one row for each value in the
+        ``tensors``.
     :param inputs: The tensors with respect to which the Jacobians must be computed. These must have
         their ``requires_grad`` flag set to ``True``. If not provided, defaults to the leaf tensors
         that were used to compute the ``tensors`` parameter.
@@ -70,8 +71,8 @@ def backward(
     .. admonition::
         Example
 
-        This is the same example as before, except that we explicitly specify the identity
-        ``jac_tensors`` (which is equivalent to using the default `None`).
+        This is the same example as before, except that we explicitly specify ``jac_tensors`` as
+        the rows of the identity matrix (which is equivalent to using the default ``None``).
 
             >>> import torch
             >>>
