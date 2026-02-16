@@ -35,7 +35,8 @@ def jac(
         ``outputs`` and each tensor in ``jac_outputs`` must match the shape of the corresponding
         tensor in ``outputs``, with an extra leading dimension representing the number of rows of
         the resulting Jacobian (e.g. the number of losses). If ``None``, defaults to the identity
-        matrix. In this case, the standard Jacobian of ``outputs`` is computed.
+        matrix. In this case, the standard Jacobian of ``outputs`` is computed, with one row for
+        each value in the ``outputs``.
     :param retain_graph: If ``False``, the graph used to compute the grad will be freed. Defaults to
         ``False``.
     :param parallel_chunk_size: The number of scalars to differentiate simultaneously in the
