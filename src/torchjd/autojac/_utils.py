@@ -32,6 +32,22 @@ def as_checked_ordered_set(
     return OrderedSet(tensors)
 
 
+def check_consistent_first_dimension(
+    jacobians: Sequence[Tensor],
+    variable_name: str,
+) -> None:
+    """
+    Checks that all Jacobians have the same first dimension (number of rows).
+
+    :param jacobians: Sequence of Jacobian tensors to validate.
+    :param variable_name: Name of the variable to include in the error message.
+    """
+    if len(jacobians) > 0 and not all(
+        jacobian.shape[0] == jacobians[0].shape[0] for jacobian in jacobians[1:]
+    ):
+        raise ValueError(f"All Jacobians in `{variable_name}` should have the same number of rows.")
+
+
 def get_leaf_tensors(tensors: Iterable[Tensor], excluded: Iterable[Tensor]) -> OrderedSet[Tensor]:
     """
     Gets the leaves of the autograd graph of all specified ``tensors``.

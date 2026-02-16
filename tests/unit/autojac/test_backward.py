@@ -167,7 +167,8 @@ def test_jac_tensors_shape_mismatch():
 )
 def test_jac_tensors_inconsistent_first_dimension(rows_y1: int, rows_y2: int):
     """
-    Tests that backward fails if the provided jac_tensors is inconsistent across the sequence.
+    Tests that backward raises a ValueError early when the provided jac_tensors have inconsistent
+    first dimensions.
     """
     x = tensor_([1.0, 2.0], requires_grad=True)
 
@@ -177,7 +178,9 @@ def test_jac_tensors_inconsistent_first_dimension(rows_y1: int, rows_y2: int):
     j1 = randn_((rows_y1, 2))
     j2 = randn_((rows_y2,))
 
-    with raises((ValueError, RuntimeError)):
+    with raises(
+        ValueError, match=r"All Jacobians in `jac_tensors` should have the same number of rows\."
+    ):
         backward([y1, y2], jac_tensors=[j1, j2], inputs=[x])
 
 
