@@ -138,14 +138,17 @@ def test_jac_outputs_multiple_components(rows: int):
 
 
 def test_jac_outputs_length_mismatch():
-    """Tests that jac raises an error if len(jac_outputs) != len(outputs)."""
+    """Tests that jac raises a ValueError early if len(jac_outputs) != len(outputs)."""
     x = tensor_([1.0, 2.0], requires_grad=True)
     y1 = x * 2
     y2 = x * 3
 
     J1 = randn_((2, 2))
 
-    with raises(ValueError):
+    with raises(
+        ValueError,
+        match=r"`jac_outputs` should have the same length as `outputs`\. \(got 1 and 2\)",
+    ):
         jac([y1, y2], inputs=[x], jac_outputs=[J1])
 
 

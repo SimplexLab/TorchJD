@@ -10,6 +10,7 @@ from torchjd.autojac._transform._ordered_set import OrderedSet
 from torchjd.autojac._utils import (
     as_checked_ordered_set,
     check_consistent_first_dimension,
+    check_matching_length,
     check_optional_positive_chunk_size,
     get_leaf_tensors,
 )
@@ -183,6 +184,7 @@ def _create_jac_outputs_dict(
         diag = Diagonalize(outputs)
         return (diag << init)({})
     jac_outputs = [opt_jac_outputs] if isinstance(opt_jac_outputs, Tensor) else opt_jac_outputs
+    check_matching_length(jac_outputs, outputs, "jac_outputs", "outputs")
     check_consistent_first_dimension(jac_outputs, "jac_outputs")
     return dict(zip(outputs, jac_outputs, strict=True))
 

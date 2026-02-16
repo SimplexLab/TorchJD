@@ -133,14 +133,17 @@ def test_jac_tensors_multiple_components(rows: int):
 
 
 def test_jac_tensors_length_mismatch():
-    """Tests that backward raises an error if len(jac_tensors) != len(tensors)."""
+    """Tests that backward raises a ValueError early if len(jac_tensors) != len(tensors)."""
     x = tensor_([1.0, 2.0], requires_grad=True)
     y1 = x * 2
     y2 = x * 3
 
     J1 = randn_((2, 2))
 
-    with raises(ValueError):
+    with raises(
+        ValueError,
+        match=r"`jac_tensors` should have the same length as `tensors`\. \(got 1 and 2\)",
+    ):
         backward([y1, y2], jac_tensors=[J1], inputs=[x])
 
 

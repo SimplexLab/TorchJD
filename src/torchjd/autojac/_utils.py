@@ -1,5 +1,5 @@
 from collections import deque
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Sequence, Sized
 from typing import cast
 
 from torch import Tensor
@@ -30,6 +30,27 @@ def as_checked_ordered_set(
         raise ValueError(f"`{variable_name}` should contain unique elements.")
 
     return OrderedSet(tensors)
+
+
+def check_matching_length(
+    seq1: Sized,
+    seq2: Sized,
+    variable_name1: str,
+    variable_name2: str,
+) -> None:
+    """
+    Checks that two sequences have the same length.
+
+    :param seq1: First sequence to validate.
+    :param seq2: Second sequence to validate.
+    :param variable_name1: Name of the first variable to include in the error message.
+    :param variable_name2: Name of the second variable to include in the error message.
+    """
+    if len(seq1) != len(seq2):
+        raise ValueError(
+            f"`{variable_name1}` should have the same length as `{variable_name2}`. "
+            f"(got {len(seq1)} and {len(seq2)})",
+        )
 
 
 def check_consistent_first_dimension(
