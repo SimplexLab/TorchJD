@@ -170,9 +170,6 @@ def test_non_positive_chunk_size_fails(chunk_size: int):
     a1 = tensor_([1.0, 2.0], requires_grad=True)
     a2 = tensor_([3.0, 4.0], requires_grad=True)
 
-    y1 = tensor_([-1.0, 1.0]) @ a1 + a2.sum()
-    y2 = (a1**2).sum() + a2.norm()
-
     with raises(ValueError):
         jac([y1, y2], parallel_chunk_size=chunk_size)
 
