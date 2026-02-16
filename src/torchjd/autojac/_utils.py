@@ -53,6 +53,31 @@ def check_matching_length(
         )
 
 
+def check_matching_shapes(
+    jacobians: Iterable[Tensor],
+    tensors: Iterable[Tensor],
+    jacobian_variable_name: str,
+    tensor_variable_name: str,
+) -> None:
+    """
+    Checks that the shape of each Jacobian (excluding first dimension) matches the corresponding
+    tensor shape.
+
+    :param jacobians: Sequence of Jacobian tensors to validate.
+    :param tensors: Sequence of tensors whose shapes should match.
+    :param jacobian_variable_name: Name of the Jacobian variable for error messages.
+    :param tensor_variable_name: Name of the tensor variable for error messages.
+    """
+    for i, (jacobian, tensor) in enumerate(zip(jacobians, tensors, strict=True)):
+        if jacobian.shape[1:] != tensor.shape:
+            raise ValueError(
+                f"Shape mismatch: `{jacobian_variable_name}[{i}]` has shape {tuple(jacobian.shape)} "
+                f"but `{tensor_variable_name}[{i}]` has shape {tuple(tensor.shape)}. "
+                f"The shape of `{jacobian_variable_name}[{i}]` (excluding the first dimension) "
+                f"should match the shape of `{tensor_variable_name}[{i}]`.",
+            )
+
+
 def check_consistent_first_dimension(
     jacobians: Sequence[Tensor],
     variable_name: str,

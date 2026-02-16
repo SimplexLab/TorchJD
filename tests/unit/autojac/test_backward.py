@@ -149,15 +149,18 @@ def test_jac_tensors_length_mismatch():
 
 def test_jac_tensors_shape_mismatch():
     """
-    Tests that backward raises an error if the shape of a tensor in jac_tensors is incompatible with
-    the corresponding tensor.
+    Tests that backward raises a ValueError early if the shape of a tensor in jac_tensors is
+    incompatible with the corresponding tensor.
     """
     x = tensor_([1.0, 2.0], requires_grad=True)
     y = x * 2
 
     J_bad = randn_((3, 5))
 
-    with raises((ValueError, RuntimeError)):
+    with raises(
+        ValueError,
+        match=r"Shape mismatch: `jac_tensors\[0\]` has shape .* but `tensors\[0\]` has shape .*\.",
+    ):
         backward(y, jac_tensors=J_bad, inputs=[x])
 
 

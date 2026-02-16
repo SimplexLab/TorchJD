@@ -154,15 +154,18 @@ def test_jac_outputs_length_mismatch():
 
 def test_jac_outputs_shape_mismatch():
     """
-    Tests that jac raises an error if the shape of a tensor in jac_outputs is incompatible with
-    the corresponding output tensor.
+    Tests that jac raises a ValueError early if the shape of a tensor in jac_outputs is
+    incompatible with the corresponding output tensor.
     """
     x = tensor_([1.0, 2.0], requires_grad=True)
     y = x * 2
 
     J_bad = randn_((3, 5))
 
-    with raises((ValueError, RuntimeError)):
+    with raises(
+        ValueError,
+        match=r"Shape mismatch: `jac_outputs\[0\]` has shape .* but `outputs\[0\]` has shape .*\.",
+    ):
         jac(y, inputs=[x], jac_outputs=J_bad)
 
 
