@@ -2,7 +2,6 @@ from collections.abc import Iterable, Sequence
 
 from torch import Tensor
 
-from torchjd.autojac._transform._base import Transform
 from torchjd.autojac._transform._diagonalize import Diagonalize
 from torchjd.autojac._transform._init import Init
 from torchjd.autojac._transform._jac import Jac
@@ -158,7 +157,7 @@ def jac(
         inputs_ = OrderedSet(inputs_with_repetition)
 
     jac_outputs_dict = _create_jac_outputs_dict(outputs_, jac_outputs)
-    transform = _create_transform(outputs_, inputs_, parallel_chunk_size, retain_graph)
+    transform = Jac(outputs_, inputs_, parallel_chunk_size, retain_graph)
     result = transform(jac_outputs_dict)
     return tuple(result[input] for input in inputs_with_repetition)
 
@@ -182,15 +181,3 @@ def _create_jac_outputs_dict(
         return (diag << init)({})
     jac_outputs = [opt_jac_outputs] if isinstance(opt_jac_outputs, Tensor) else opt_jac_outputs
     return dict(zip(outputs, jac_outputs, strict=True))
-
-
-def _create_transform(
-    outputs: OrderedSet[Tensor],
-    inputs: OrderedSet[Tensor],
-    parallel_chunk_size: int | None,
-    retain_graph: bool,
-) -> Transform:
-    """Creates the jac transform that computes Jacobians."""
-    # Transform that computes the required Jacobians.
-    jac = Jac(outputs, inputs, parallel_chunk_size, retain_graph)
-    return jac
