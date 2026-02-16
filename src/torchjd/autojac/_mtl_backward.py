@@ -65,8 +65,8 @@ def mtl_backward(
         To differentiate in parallel, ``mtl_backward`` relies on ``torch.vmap``, which has some
         limitations: `it does not work on the output of compiled functions
         <https://github.com/pytorch/pytorch/issues/138422>`_, `when some tensors have
-        <https://github.com/TorchJD/torchjd/issues/184>`_ ``retains_grad=True`` or `when using an
-        RNN on CUDA <https://github.com/TorchJD/torchjd/issues/220>`_, for instance. If you
+        <https://github.com/SimplexLab/TorchJD/issues/184>`_ ``retains_grad=True`` or `when using an
+        RNN on CUDA <https://github.com/SimplexLab/TorchJD/issues/220>`_, for instance. If you
         experience issues with ``backward`` try to use ``parallel_chunk_size=1`` to avoid relying on
         ``torch.vmap``.
     """

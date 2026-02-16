@@ -54,7 +54,7 @@ of the batch and per task, in the context of multi-task learning. We call this
 :doc:`Instance-Wise Risk Multi-Task Learning <examples/iwmtl>` (IWMTL).
 
 TorchJD is open-source, under MIT License. The source code is available on
-`GitHub <https://github.com/TorchJD/torchjd>`_.
+`GitHub <https://github.com/SimplexLab/TorchJD>`_.
 
 .. toctree::
     :caption: Getting Started
