@@ -96,7 +96,7 @@ def linkcode_resolve(domain: str, info: dict[str, str]) -> str | None:
     line_str = _get_line_str(obj)
     version_str = _get_version_str()
 
-    link = f"https://github.com/TorchJD/torchjd/blob/{version_str}/{file_name}{line_str}"
+    link = f"https://github.com/SimplexLab/TorchJD/blob/{version_str}/{file_name}{line_str}"
     return link
 
 

@@ -79,7 +79,7 @@ def _get_descendant_accumulate_grads(
 
     # This implementation more or less follows what is advised in
     # https://discuss.pytorch.org/t/autograd-graph-traversal/213658 and what was suggested in
-    # https://github.com/TorchJD/torchjd/issues/216.
+    # https://github.com/SimplexLab/TorchJD/issues/216.
     while nodes_to_traverse:
         node = nodes_to_traverse.popleft()  # Breadth-first
 
