@@ -17,7 +17,7 @@ from ._utils import as_checked_ordered_set, check_optional_positive_chunk_size, 
 
 
 def mtl_backward(
-    losses: Sequence[Tensor],
+    tensors: Sequence[Tensor],
     features: Sequence[Tensor] | Tensor,
     tasks_params: Sequence[Iterable[Tensor]] | None = None,
     shared_params: Iterable[Tensor] | None = None,
@@ -32,13 +32,13 @@ def mtl_backward(
     parameters and accumulates it in their ``.grad`` fields. Then, it computes the Jacobian of all
     losses with respect to the shared parameters and accumulates it in their ``.jac`` fields.
 
-    :param losses: The task losses. The Jacobians will have one row per loss.
+    :param tensors: The task losses. The Jacobians will have one row per loss.
     :param features: The last shared representation used for all tasks, as given by the feature
         extractor. Should be non-empty.
     :param tasks_params: The parameters of each task-specific head. Their ``requires_grad`` flags
         must be set to ``True``. If not provided, the parameters considered for each task will
-        default to the leaf tensors that are in the computation graph of its loss, but that were not
-        used to compute the ``features``.
+        default to the leaf tensors that are in the computation graph of its tensor, but that were
+        not used to compute the ``features``.
     :param shared_params: The parameters of the shared feature extractor. Their ``requires_grad``
         flags must be set to ``True``. If not provided, defaults to the leaf tensors that are in the
         computation graph of the ``features``.
@@ -73,7 +73,7 @@ def mtl_backward(
 
     check_optional_positive_chunk_size(parallel_chunk_size)
 
-    losses_ = as_checked_ordered_set(losses, "losses")
+    tensors_ = as_checked_ordered_set(tensors, "tensors")
     features_ = as_checked_ordered_set(features, "features")
 
     if shared_params is None:
@@ -81,7 +81,7 @@ def mtl_backward(
     else:
         shared_params_ = OrderedSet(shared_params)
     if tasks_params is None:
-        tasks_params_ = [get_leaf_tensors(tensors=[loss], excluded=features_) for loss in losses_]
+        tasks_params_ = [get_leaf_tensors(tensors=[t], excluded=features_) for t in tensors_]
     else:
         tasks_params_ = [OrderedSet(task_params) for task_params in tasks_params]
 
@@ -89,15 +89,15 @@ def mtl_backward(
         raise ValueError("`features` cannot be empty.")
 
     _check_no_overlap(shared_params_, tasks_params_)
-    _check_losses_are_scalar(losses_)
+    _check_losses_are_scalar(tensors_)
 
-    if len(losses_) == 0:
-        raise ValueError("`losses` cannot be empty")
-    if len(losses_) != len(tasks_params_):
-        raise ValueError("`losses` and `tasks_params` should have the same size.")
+    if len(tensors_) == 0:
+        raise ValueError("`tensors` cannot be empty")
+    if len(tensors_) != len(tasks_params_):
+        raise ValueError("`tensors` and `tasks_params` should have the same size.")
 
     backward_transform = _create_transform(
-        losses=losses_,
+        losses=tensors_,
         features=features_,
         tasks_params=tasks_params_,
         shared_params=shared_params_,
@@ -180,7 +180,7 @@ def _create_task_transform(
 def _check_losses_are_scalar(losses: Iterable[Tensor]) -> None:
     for loss in losses:
         if loss.ndim > 0:
-            raise ValueError("`losses` should contain only scalars.")
+            raise ValueError("`tensors` should contain only scalars.")
 
 
 def _check_no_overlap(

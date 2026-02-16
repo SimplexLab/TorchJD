@@ -48,7 +48,7 @@ following example shows the resulting code for a multi-task learning use-case.
             loss2 = loss_fn(output2, target2)
 
         scaled_losses = scaler.scale([loss1, loss2])
-        mtl_backward(losses=scaled_losses, features=features)
+        mtl_backward(tensors=scaled_losses, features=features)
         jac_to_grad(shared_module.parameters(), aggregator)
         scaler.step(optimizer)
         scaler.update()
