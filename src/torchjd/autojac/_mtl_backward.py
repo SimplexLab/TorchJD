@@ -40,6 +40,10 @@ def mtl_backward(
     Jacobian of all tensors with respect to the shared parameters and accumulates it in their
     ``.jac`` fields. These Jacobians have one row per task.
 
+    If the ``tensors`` are non-scalar, ``mtl_backward`` requires some ``grad_tensors`` to multiply
+    with the ``tensors``. This allows to compose ``mtl_backward`` with some other function computing
+    the gradients with respect to the tensors (chain rule).
+
     :param tensors: The task-specific tensors. If these are scalar (e.g. the losses produced by
         every task), no ``grad_tensors`` are needed. If these are non-scalar tensors, providing some
         ``grad_tensors`` is necessary.
@@ -102,20 +106,14 @@ def mtl_backward(
     if len(features_) == 0:
         raise ValueError("`features` cannot be empty.")
 
-    _check_no_overlap(shared_params_, tasks_params_)
-    if grad_tensors is None:
-        _check_tensors_are_scalar(tensors_)
-        grad_tensors_dict = Init(tensors_)({})
-    else:
-        check_matching_length(grad_tensors, tensors_, "grad_tensors", "tensors")
-        check_matching_grad_shapes(grad_tensors, tensors_, "grad_tensors", "tensors")
-        grad_tensors_dict = dict(zip(tensors_, grad_tensors, strict=True))
-
     if len(tensors_) == 0:
         raise ValueError("`tensors` cannot be empty")
     if len(tensors_) != len(tasks_params_):
         raise ValueError("`tensors` and `tasks_params` should have the same size.")
 
+    _check_no_overlap(shared_params_, tasks_params_)
+
+    grad_tensors_dict = _create_grad_tensors_dict(tensors_, grad_tensors)
     backward_transform = _create_transform(
         tensors=tensors_,
         features=features_,
@@ -126,6 +124,21 @@ def mtl_backward(
     )
 
     backward_transform(grad_tensors_dict)
+
+
+def _create_grad_tensors_dict(
+    tensors: OrderedSet[Tensor],
+    opt_grad_tensors: Sequence[Tensor] | Tensor | None,
+) -> dict[Tensor, Tensor]:
+    if opt_grad_tensors is None:
+        _check_tensors_are_scalar(tensors)
+        grad_tensors_dict = Init(tensors)({})
+    else:
+        check_matching_length(opt_grad_tensors, tensors, "grad_tensors", "tensors")
+        check_matching_grad_shapes(opt_grad_tensors, tensors, "grad_tensors", "tensors")
+        grad_tensors_dict = dict(zip(tensors, opt_grad_tensors, strict=True))
+
+    return grad_tensors_dict
 
 
 def _create_transform(
@@ -143,8 +156,8 @@ def _create_transform(
     """
 
     # Task-specific transforms. Each of them computes and accumulates the gradient of the task's
-    # loss w.r.t. the task's specific parameters, and computes and backpropagates the gradient of
-    # the losses w.r.t. the shared representations.
+    # tensor w.r.t. the task's specific parameters, and computes and backpropagates the gradient of
+    # the tensor w.r.t. the shared representations.
     task_transforms = [
         _create_task_transform(
             features,
@@ -155,11 +168,11 @@ def _create_transform(
         for task_params, t in zip(tasks_params, tensors, strict=True)
     ]
 
-    # Transform that stacks the gradients of the losses w.r.t. the shared representations into a
+    # Transform that stacks the gradients of the tensors w.r.t. the shared representations into a
     # Jacobian.
     stack = Stack(task_transforms)
 
-    # Transform that computes the Jacobians of the losses w.r.t. the shared parameters.
+    # Transform that computes the Jacobians of the tensors w.r.t. the shared parameters.
     jac = Jac(features, shared_params, parallel_chunk_size, retain_graph)
 
     # Transform that accumulates the result in the .jac field of the shared parameters.
@@ -171,29 +184,26 @@ def _create_transform(
 def _create_task_transform(
     features: OrderedSet[Tensor],
     task_params: OrderedSet[Tensor],
-    loss: OrderedSet[Tensor],  # contains a single scalar loss
+    tensor: OrderedSet[Tensor],  # contains a single tensor
     retain_graph: bool,
 ) -> Transform:
     # Tensors with respect to which we compute the gradients.
     to_differentiate = task_params + features
 
-    # Transform that initializes the gradient output to 1.
-    init = Init(loss)
-
-    # Transform that computes the gradients of the loss w.r.t. the task-specific parameters and
+    # Transform that computes the gradients of the tensor w.r.t. the task-specific parameters and
     # the features.
-    grad = Grad(loss, to_differentiate, retain_graph)
+    grad = Grad(tensor, to_differentiate, retain_graph)
 
     # Transform that accumulates the gradients w.r.t. the task-specific parameters into their
     # .grad fields.
     accumulate = AccumulateGrad() << Select(task_params)
 
-    # Transform that backpropagates the gradients of the losses w.r.t. the features.
+    # Transform that backpropagates the gradients of the tensor w.r.t. the features.
     backpropagate = Select(features)
 
-    # Transform that accumulates the gradient of the losses w.r.t. the task-specific parameters into
-    # their .grad fields and backpropagates the gradient of the losses w.r.t. to the features.
-    backward_task = (backpropagate | accumulate) << grad << init
+    # Transform that accumulates the gradient of the tensor w.r.t. the task-specific parameters into
+    # their .grad fields and backpropagates the gradient of the tensor w.r.t. to the features.
+    backward_task = (backpropagate | accumulate) << grad << Select(tensor)
     return backward_task
 
 

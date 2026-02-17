@@ -10,14 +10,15 @@ from utils.asserts import (
     assert_has_no_jac,
     assert_jac_close,
 )
-from utils.tensors import arange_, rand_, randn_, tensor_
+from utils.tensors import arange_, ones_, rand_, randn_, tensor_
 
 from torchjd.autojac import mtl_backward
-from torchjd.autojac._mtl_backward import _create_transform
+from torchjd.autojac._mtl_backward import _create_grad_tensors_dict, _create_transform
 from torchjd.autojac._transform import OrderedSet
 
 
-def test_check_create_transform():
+@mark.parametrize("default_grad_tensors", [True, False])
+def test_check_create_transform(default_grad_tensors: bool):
     """Tests that _create_transform creates a valid Transform."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -29,8 +30,13 @@ def test_check_create_transform():
     y1 = f1 * p1[0] + f2 * p1[1]
     y2 = f1 * p2[0] + f2 * p2[1]
 
+    optional_grad_tensors = None if default_grad_tensors else [tensor_(1.0)] * 2
+
+    tensors = OrderedSet([y1, y2])
+    grad_tensors_dict = _create_grad_tensors_dict(tensors, optional_grad_tensors)
+
     transform = _create_transform(
-        tensors=OrderedSet([y1, y2]),
+        tensors=tensors,
         features=OrderedSet([f1, f2]),
         tasks_params=[OrderedSet([p1]), OrderedSet([p2])],
         shared_params=OrderedSet([p0]),
@@ -38,7 +44,7 @@ def test_check_create_transform():
         parallel_chunk_size=None,
     )
 
-    output_keys = transform.check_keys(set())
+    output_keys = transform.check_keys(set(grad_tensors_dict.keys()))
     assert output_keys == set()
 
 
@@ -681,3 +687,89 @@ def test_repeated_task_params():
     assert_jac_close(p0, J0)
     assert_grad_close(p1, g1)
     assert_grad_close(p2, g2)
+
+
+def test_grad_tensors_value_is_correct():
+    """
+    Tests that backward correctly computes the element-wise product of grad_tensors and the tensors.
+    """
+
+    p0 = randn_(3, requires_grad=True)
+    p1 = randn_(2, requires_grad=True)
+    p2 = randn_(2, requires_grad=True)
+    p3 = randn_(4, requires_grad=True)
+
+    J = randn_(2, 3)
+    f = J @ p0  # shape: [2]
+    y1 = p1 @ f  # shape: []
+    y2 = p2 * f  # shape: [2]
+    y3 = torch.outer(p3, f)  # shape: [4, 2]
+
+    grad_y1 = torch.randn_like(y1)
+    grad_y2 = torch.randn_like(y2)
+    grad_y3 = torch.randn_like(y3)
+
+    mtl_backward(
+        tensors=[y1, y2, y3],
+        features=f,
+        grad_tensors=[grad_y1, grad_y2, grad_y3],
+        tasks_params=None,
+        shared_params=None,
+        parallel_chunk_size=None,
+    )
+
+    assert_grad_close(p1, grad_y1 * f)
+    assert_grad_close(p2, grad_y2 * f)
+    assert_grad_close(p3, grad_y3 @ f)
+
+    expected_jacobian = torch.stack([grad_y1 * p1, grad_y2 * p2, grad_y3.T @ p3]) @ J
+    assert_jac_close(p0, expected_jacobian)
+
+
+def test_grad_tensors_length_mismatch():
+    """Tests that mtl_backward raises a ValueError early if len(grad_tensors) != len(tensors)."""
+
+    p0 = randn_(3, requires_grad=True)
+    p1 = randn_(2, requires_grad=True)
+    p2 = randn_(2, requires_grad=True)
+
+    J = randn_(2, 3)
+    f = J @ p0
+    y1 = p1 @ f
+    y2 = p2 @ f
+
+    with raises(
+        ValueError,
+        match=r"`grad_tensors` should have the same length as `tensors`\. \(got 1 and 2\)",
+    ):
+        mtl_backward(
+            tensors=[y1, y2],
+            features=f,
+            grad_tensors=[torch.ones_like(y1)],
+        )
+
+
+def test_grad_tensors_shape_mismatch():
+    """
+    Tests that mtl_backward raises a ValueError early if the shape of a tensor in grad_tensors is
+    incompatible with the corresponding tensor.
+    """
+
+    p0 = randn_(3, requires_grad=True)
+    p1 = randn_(2, requires_grad=True)
+    p2 = randn_(2, requires_grad=True)
+
+    J = randn_(2, 3)
+    f = J @ p0
+    y1 = p1 @ f  # scalar, shape ()
+    y2 = p2 @ f  # scalar, shape ()
+
+    with raises(
+        ValueError,
+        match=r"Shape mismatch: `grad_tensors\[0\]` has shape .* but `tensors\[0\]` has shape .*\.",
+    ):
+        mtl_backward(
+            tensors=[y1, y2],
+            features=f,
+            grad_tensors=[ones_(2), torch.ones_like(y2)],  # shape (2,) != shape () of y1
+        )
