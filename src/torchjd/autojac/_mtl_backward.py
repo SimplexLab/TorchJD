@@ -40,8 +40,8 @@ def mtl_backward(
     Jacobian of all tensors with respect to the shared parameters and accumulates it in their
     ``.jac`` fields. These Jacobians have one row per task.
 
-    If the ``tensors`` are non-scalar, ``mtl_backward`` requires some ``grad_tensors`` to multiply
-    with the ``tensors``. This allows to compose ``mtl_backward`` with some other function computing
+    If the ``tensors`` are non-scalar, ``mtl_backward`` requires some initial gradients in ``grad_tensors``.
+    This allows to compose ``mtl_backward`` with some other function computing
     the gradients with respect to the tensors (chain rule).
 
     :param tensors: The task-specific tensors. If these are scalar (e.g. the losses produced by
