@@ -50,7 +50,7 @@ def mtl_backward(
     :param features: The last shared representation used for all tasks, as given by the feature
         extractor. Should be non-empty.
     :param grad_tensors: The initial gradients to backpropagate, analog to the ``grad_tensors``
-        parameter of ``torch.autograd.backward``. If any of the ``tensors`` is non-scalar,
+        parameter of :func:`torch.autograd.backward`. If any of the ``tensors`` is non-scalar,
         ``grad_tensors`` must be provided, with the same length and shapes as ``tensors``.
         Otherwise, this parameter is not needed and will default to scalars of 1.
     :param tasks_params: The parameters of each task-specific head. Their ``requires_grad`` flags

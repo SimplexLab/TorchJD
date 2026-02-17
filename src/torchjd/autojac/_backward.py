@@ -26,9 +26,9 @@ def backward(
     ``.jac`` fields of the ``inputs``.
 
     :param tensors: The tensor or tensors to differentiate. Should be non-empty.
-    :param jac_tensors: The initial Jacobians to backpropagate, analog to the `grad_tensors`
-        parameter of `torch.autograd.backward`. If provided, it must have the same structure as
-        ``tensors`` and each tensor in ``jac_tensors`` must match the shape of the corresponding
+    :param jac_tensors: The initial Jacobians to backpropagate, analog to the ``grad_tensors``
+        parameter of :func:`torch.autograd.backward`. If provided, it must have the same structure
+        as ``tensors`` and each tensor in ``jac_tensors`` must match the shape of the corresponding
         tensor in ``tensors``, with an extra leading dimension representing the number of rows of
         the resulting Jacobian (e.g. the number of losses). All tensors in ``jac_tensors`` must
         have the same first dimension. If ``None``, defaults to the identity matrix. In this case,
