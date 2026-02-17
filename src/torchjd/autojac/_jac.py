@@ -35,7 +35,7 @@ def jac(
         their ``requires_grad`` flag set to ``True``. If not provided, defaults to the leaf tensors
         that were used to compute the ``outputs`` parameter.
     :param jac_outputs: The initial Jacobians to backpropagate, analog to the ``grad_outputs``
-        parameter of ``torch.autograd.grad``. If provided, it must have the same structure as
+        parameter of :func:`torch.autograd.grad`. If provided, it must have the same structure as
         ``outputs`` and each tensor in ``jac_outputs`` must match the shape of the corresponding
         tensor in ``outputs``, with an extra leading dimension representing the number of rows of
         the resulting Jacobian (e.g. the number of losses). If ``None``, defaults to the identity
