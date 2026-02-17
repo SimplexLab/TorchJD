@@ -30,7 +30,7 @@ def test_check_create_transform():
     y2 = f1 * p2[0] + f2 * p2[1]
 
     transform = _create_transform(
-        losses=OrderedSet([y1, y2]),
+        tensors=OrderedSet([y1, y2]),
         features=OrderedSet([f1, f2]),
         tasks_params=[OrderedSet([p1]), OrderedSet([p2])],
         shared_params=OrderedSet([p0]),

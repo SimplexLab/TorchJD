@@ -6,8 +6,8 @@ from ._transform import AccumulateJac, Diagonalize, Init, Jac, OrderedSet, Trans
 from ._utils import (
     as_checked_ordered_set,
     check_consistent_first_dimension,
+    check_matching_jac_shapes,
     check_matching_length,
-    check_matching_shapes,
     check_optional_positive_chunk_size,
     get_leaf_tensors,
 )
@@ -140,7 +140,7 @@ def _create_jac_tensors_dict(
         return (diag << init)({})
     jac_tensors = [opt_jac_tensors] if isinstance(opt_jac_tensors, Tensor) else opt_jac_tensors
     check_matching_length(jac_tensors, tensors, "jac_tensors", "tensors")
-    check_matching_shapes(jac_tensors, tensors, "jac_tensors", "tensors")
+    check_matching_jac_shapes(jac_tensors, tensors, "jac_tensors", "tensors")
     check_consistent_first_dimension(jac_tensors, "jac_tensors")
     return dict(zip(tensors, jac_tensors, strict=True))
 

@@ -13,12 +13,19 @@ from ._transform import (
     Stack,
     Transform,
 )
-from ._utils import as_checked_ordered_set, check_optional_positive_chunk_size, get_leaf_tensors
+from ._utils import (
+    as_checked_ordered_set,
+    check_matching_grad_shapes,
+    check_matching_length,
+    check_optional_positive_chunk_size,
+    get_leaf_tensors,
+)
 
 
 def mtl_backward(
     tensors: Sequence[Tensor],
     features: Sequence[Tensor] | Tensor,
+    grad_tensors: Sequence[Tensor] | None = None,
     tasks_params: Sequence[Iterable[Tensor]] | None = None,
     shared_params: Iterable[Tensor] | None = None,
     retain_graph: bool = False,
@@ -28,13 +35,20 @@ def mtl_backward(
     In the context of Multi-Task Learning (MTL), we often have a shared feature extractor followed
     by several task-specific heads. A loss can then be computed for each task.
 
-    This function computes the gradient of each task-specific loss with respect to its task-specific
-    parameters and accumulates it in their ``.grad`` fields. Then, it computes the Jacobian of all
-    losses with respect to the shared parameters and accumulates it in their ``.jac`` fields.
+    This function computes the gradient of each task-specific tensor with respect to its
+    task-specific parameters and accumulates it in their ``.grad`` fields. It also computes the
+    Jacobian of all tensors with respect to the shared parameters and accumulates it in their
+    ``.jac`` fields. These Jacobians have one row per task.
 
-    :param tensors: The task losses. The Jacobians will have one row per loss.
+    :param tensors: The task-specific tensors. If these are scalar (e.g. the losses produced by
+        every task), no ``grad_tensors`` are needed. If these are non-scalar tensors, providing some
+        ``grad_tensors`` is necessary.
     :param features: The last shared representation used for all tasks, as given by the feature
         extractor. Should be non-empty.
+    :param grad_tensors: The initial gradients to backpropagate, analog to the ``grad_tensors``
+        parameter of ``torch.autograd.backward``. If any tensor is non-scalar, ``grad_tensors`` must
+        be provided, with the same length and shapes as ``tensors``. Otherwise, this parameter is
+        not needed and will default to scalars of 1.
     :param tasks_params: The parameters of each task-specific head. Their ``requires_grad`` flags
         must be set to ``True``. If not provided, the parameters considered for each task will
         default to the leaf tensors that are in the computation graph of its tensor, but that were
@@ -89,7 +103,13 @@ def mtl_backward(
         raise ValueError("`features` cannot be empty.")
 
     _check_no_overlap(shared_params_, tasks_params_)
-    _check_losses_are_scalar(tensors_)
+    if grad_tensors is None:
+        _check_tensors_are_scalar(tensors_)
+        grad_tensors_dict = Init(tensors_)({})
+    else:
+        check_matching_length(grad_tensors, tensors_, "grad_tensors", "tensors")
+        check_matching_grad_shapes(grad_tensors, tensors_, "grad_tensors", "tensors")
+        grad_tensors_dict = dict(zip(tensors_, grad_tensors, strict=True))
 
     if len(tensors_) == 0:
         raise ValueError("`tensors` cannot be empty")
@@ -97,7 +117,7 @@ def mtl_backward(
         raise ValueError("`tensors` and `tasks_params` should have the same size.")
 
     backward_transform = _create_transform(
-        losses=tensors_,
+        tensors=tensors_,
         features=features_,
         tasks_params=tasks_params_,
         shared_params=shared_params_,
@@ -105,11 +125,11 @@ def mtl_backward(
         parallel_chunk_size=parallel_chunk_size,
     )
 
-    backward_transform({})
+    backward_transform(grad_tensors_dict)
 
 
 def _create_transform(
-    losses: OrderedSet[Tensor],
+    tensors: OrderedSet[Tensor],
     features: OrderedSet[Tensor],
     tasks_params: list[OrderedSet[Tensor]],
     shared_params: OrderedSet[Tensor],
@@ -129,10 +149,10 @@ def _create_transform(
         _create_task_transform(
             features,
             task_params,
-            OrderedSet([loss]),
+            OrderedSet([t]),
             retain_graph,
         )
-        for task_params, loss in zip(tasks_params, losses, strict=True)
+        for task_params, t in zip(tasks_params, tensors, strict=True)
     ]
 
     # Transform that stacks the gradients of the losses w.r.t. the shared representations into a
@@ -177,10 +197,12 @@ def _create_task_transform(
     return backward_task
 
 
-def _check_losses_are_scalar(losses: Iterable[Tensor]) -> None:
-    for loss in losses:
-        if loss.ndim > 0:
-            raise ValueError("`tensors` should contain only scalars.")
+def _check_tensors_are_scalar(tensors: Iterable[Tensor]) -> None:
+    for t in tensors:
+        if t.ndim > 0:
+            raise ValueError(
+                "When `tensors` are non-scalar, the `grad_outputs` parameter must be provided."
+            )
 
 
 def _check_no_overlap(
