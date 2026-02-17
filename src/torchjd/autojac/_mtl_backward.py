@@ -128,7 +128,7 @@ def mtl_backward(
 
 def _create_grad_tensors_dict(
     tensors: OrderedSet[Tensor],
-    opt_grad_tensors: Sequence[Tensor] | Tensor | None,
+    opt_grad_tensors: Sequence[Tensor] | None,
 ) -> dict[Tensor, Tensor]:
     if opt_grad_tensors is None:
         _check_tensors_are_scalar(tensors)
