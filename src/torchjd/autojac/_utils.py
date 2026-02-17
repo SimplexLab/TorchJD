@@ -53,7 +53,7 @@ def check_matching_length(
         )
 
 
-def check_matching_shapes(
+def check_matching_jac_shapes(
     jacobians: Iterable[Tensor],
     tensors: Iterable[Tensor],
     jacobian_variable_name: str,
@@ -75,6 +75,30 @@ def check_matching_shapes(
                 f"but `{tensor_variable_name}[{i}]` has shape {tuple(tensor.shape)}. "
                 f"The shape of `{jacobian_variable_name}[{i}]` (excluding the first dimension) "
                 f"should match the shape of `{tensor_variable_name}[{i}]`.",
+            )
+
+
+def check_matching_grad_shapes(
+    gradients: Iterable[Tensor],
+    tensors: Iterable[Tensor],
+    gradient_variable_name: str,
+    tensor_variable_name: str,
+) -> None:
+    """
+    Checks that the shape of each gradient matches the corresponding tensor shape.
+
+    :param gradients: Sequence of gradient tensors to validate.
+    :param tensors: Sequence of tensors whose shapes should match.
+    :param gradient_variable_name: Name of the gradient variable for error messages.
+    :param tensor_variable_name: Name of the tensor variable for error messages.
+    """
+    for i, (gradient, tensor) in enumerate(zip(gradients, tensors, strict=True)):
+        if gradient.shape != tensor.shape:
+            raise ValueError(
+                f"Shape mismatch: `{gradient_variable_name}[{i}]` has shape {tuple(gradient.shape)} "
+                f"but `{tensor_variable_name}[{i}]` has shape {tuple(tensor.shape)}. "
+                f"The shape of `{gradient_variable_name}[{i}]` should match the shape of "
+                f"`{tensor_variable_name}[{i}]`.",
             )
 
 

@@ -16,6 +16,9 @@ changelog does not include internal changes that do not affect the user.
 - Added a `jac_tensors` parameter to `backward`, allowing to pre-multiply the Jacobian computation
   by initial Jacobians. This enables multi-step chain rule computations and is analogous to the
   `grad_tensors` parameter in `torch.autograd.backward`.
+- Added a `grad_tensors` parameter to `mtl_backward`, allowing to use non-scalar `losses` (now
+  renamed to `tensors`). This is analogous to the `grad_tensors` parameter of
+  `torch.autograd.backward`. When using `scalar` losses, the usage does not change.
 - Added a `jac_outputs` parameter to `jac`, allowing to pre-multiply the Jacobian computation by
   initial Jacobians. This is analogous to the `grad_outputs` parameter in `torch.autograd.grad`.
 - Added a `scale_mode` parameter to `AlignedMTL` and `AlignedMTLWeighting`, allowing to choose
@@ -50,6 +53,7 @@ changelog does not include internal changes that do not affect the user.
   mtl_backward(losses, features)
   jac_to_grad(shared_module.parameters(), aggregator)
   ```
+- **BREAKING**: Renamed the `losses` parameter of `mtl_backward` to `tensors`.
 
 - Removed an unnecessary memory duplication. This should significantly improve the memory efficiency
   of `autojac`.

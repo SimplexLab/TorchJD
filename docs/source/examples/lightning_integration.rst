@@ -43,7 +43,7 @@ The following code example demonstrates a basic multi-task learning setup using 
             loss2 = mse_loss(output2, target2)
 
             opt = self.optimizers()
-            mtl_backward(losses=[loss1, loss2], features=features)
+            mtl_backward(tensors=[loss1, loss2], features=features)
             jac_to_grad(self.feature_extractor.parameters(), UPGrad())
             opt.step()
             opt.zero_grad()

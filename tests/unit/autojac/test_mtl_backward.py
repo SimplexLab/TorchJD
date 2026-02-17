@@ -10,14 +10,15 @@ from utils.asserts import (
     assert_has_no_jac,
     assert_jac_close,
 )
-from utils.tensors import arange_, rand_, randn_, tensor_
+from utils.tensors import arange_, ones_, rand_, randn_, tensor_
 
 from torchjd.autojac import mtl_backward
-from torchjd.autojac._mtl_backward import _create_transform
+from torchjd.autojac._mtl_backward import _create_grad_tensors_dict, _create_transform
 from torchjd.autojac._transform import OrderedSet
 
 
-def test_check_create_transform():
+@mark.parametrize("default_grad_tensors", [True, False])
+def test_check_create_transform(default_grad_tensors: bool):
     """Tests that _create_transform creates a valid Transform."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -29,8 +30,13 @@ def test_check_create_transform():
     y1 = f1 * p1[0] + f2 * p1[1]
     y2 = f1 * p2[0] + f2 * p2[1]
 
+    optional_grad_tensors = None if default_grad_tensors else [tensor_(1.0)] * 2
+
+    tensors = OrderedSet([y1, y2])
+    grad_tensors_dict = _create_grad_tensors_dict(tensors, optional_grad_tensors)
+
     transform = _create_transform(
-        losses=OrderedSet([y1, y2]),
+        tensors=tensors,
         features=OrderedSet([f1, f2]),
         tasks_params=[OrderedSet([p1]), OrderedSet([p2])],
         shared_params=OrderedSet([p0]),
@@ -38,7 +44,7 @@ def test_check_create_transform():
         parallel_chunk_size=None,
     )
 
-    output_keys = transform.check_keys(set())
+    output_keys = transform.check_keys(set(grad_tensors_dict.keys()))
     assert output_keys == set()
 
 
@@ -54,7 +60,7 @@ def test_shape_is_correct():
     y1 = f1 * p1[0] + f2 * p1[1]
     y2 = f1 * p2[0] + f2 * p2[1]
 
-    mtl_backward(losses=[y1, y2], features=[f1, f2])
+    mtl_backward(tensors=[y1, y2], features=[f1, f2])
 
     assert_has_jac(p0)
     for p in [p1, p2]:
@@ -95,7 +101,7 @@ def test_value_is_correct(
     tasks_params = [[p1], [p2], [p3]] if manually_specify_tasks_params else None
 
     mtl_backward(
-        losses=[y1, y2, y3],
+        tensors=[y1, y2, y3],
         features=f,
         tasks_params=tasks_params,
         shared_params=shared_params,
@@ -119,7 +125,7 @@ def test_empty_tasks_fails():
     f2 = (p0**2).sum() + p0.norm()
 
     with raises(ValueError):
-        mtl_backward(losses=[], features=[f1, f2])
+        mtl_backward(tensors=[], features=[f1, f2])
 
 
 def test_single_task():
@@ -132,7 +138,7 @@ def test_single_task():
     f2 = (p0**2).sum() + p0.norm()
     y1 = f1 * p1[0] + f2 * p1[1]
 
-    mtl_backward(losses=[y1], features=[f1, f2])
+    mtl_backward(tensors=[y1], features=[f1, f2])
 
     assert_has_jac(p0)
     assert_has_grad(p1)
@@ -155,14 +161,14 @@ def test_incoherent_task_number_fails():
 
     with raises(ValueError):
         mtl_backward(
-            losses=[y1, y2],
+            tensors=[y1, y2],
             features=[f1, f2],
             tasks_params=[[p1]],  # Wrong
             shared_params=[p0],
         )
     with raises(ValueError):
         mtl_backward(
-            losses=[y1],  # Wrong
+            tensors=[y1],  # Wrong
             features=[f1, f2],
             tasks_params=[[p1], [p2]],
             shared_params=[p0],
@@ -182,7 +188,7 @@ def test_empty_params():
     y2 = f1 * p2[0] + f2 * p2[1]
 
     mtl_backward(
-        losses=[y1, y2],
+        tensors=[y1, y2],
         features=[f1, f2],
         tasks_params=[[], []],
         shared_params=[],
@@ -208,7 +214,7 @@ def test_multiple_params_per_task():
     y1 = f1 * p1_a + (f2 * p1_b).sum() + (f1 * p1_c).sum()
     y2 = f1 * p2_a * (f2 * p2_b).sum()
 
-    mtl_backward(losses=[y1, y2], features=[f1, f2])
+    mtl_backward(tensors=[y1, y2], features=[f1, f2])
 
     assert_has_jac(p0)
     for p in [p1_a, p1_b, p1_c, p2_a, p2_b]:
@@ -240,7 +246,7 @@ def test_various_shared_params(shared_params_shapes: list[tuple[int]]):
     y2 = torch.stack([f.sum() ** 2 for f in features]).sum()
 
     mtl_backward(
-        losses=[y1, y2],
+        tensors=[y1, y2],
         features=features,
         tasks_params=[[p1], [p2]],  # Enforce differentiation w.r.t. params that haven't been used
         shared_params=shared_params,
@@ -268,7 +274,7 @@ def test_partial_params():
     y2 = f1 * p2[0] + f2 * p2[1]
 
     mtl_backward(
-        losses=[y1, y2],
+        tensors=[y1, y2],
         features=[f1, f2],
         tasks_params=[[p1], []],
         shared_params=[p0],
@@ -292,7 +298,7 @@ def test_empty_features_fails():
     y2 = f1 * p2[0] + f2 * p2[1]
 
     with raises(ValueError):
-        mtl_backward(losses=[y1, y2], features=[])
+        mtl_backward(tensors=[y1, y2], features=[])
 
 
 @mark.parametrize(
@@ -316,7 +322,7 @@ def test_various_single_features(shape: tuple[int, ...]):
     y1 = (f * p1[0]).sum() + (f * p1[1]).sum()
     y2 = (f * p2[0]).sum() * (f * p2[1]).sum()
 
-    mtl_backward(losses=[y1, y2], features=f)
+    mtl_backward(tensors=[y1, y2], features=f)
 
     assert_has_jac(p0)
     for p in [p1, p2]:
@@ -348,7 +354,7 @@ def test_various_feature_lists(shapes: list[tuple[int]]):
     y1 = sum([(f * p).sum() for f, p in zip(features, p1, strict=True)])
     y2 = (features[0] * p2).sum()
 
-    mtl_backward(losses=[y1, y2], features=features)
+    mtl_backward(tensors=[y1, y2], features=features)
 
     assert_has_jac(p0)
     for p in [p1, p2]:
@@ -368,7 +374,7 @@ def test_non_scalar_loss_fails():
     y2 = f1 * p2[0] + f2 * p2[1]
 
     with raises(ValueError):
-        mtl_backward(losses=[y1, y2], features=[f1, f2])
+        mtl_backward(tensors=[y1, y2], features=[f1, f2])
 
 
 @mark.parametrize("chunk_size", [None, 1, 2, 4])
@@ -385,7 +391,7 @@ def test_various_valid_chunk_sizes(chunk_size):
     y2 = f1 * p2[0] + f2 * p2[1]
 
     mtl_backward(
-        losses=[y1, y2],
+        tensors=[y1, y2],
         features=[f1, f2],
         parallel_chunk_size=chunk_size,
     )
@@ -410,7 +416,7 @@ def test_non_positive_chunk_size_fails(chunk_size: int):
 
     with raises(ValueError):
         mtl_backward(
-            losses=[y1, y2],
+            tensors=[y1, y2],
             features=[f1, f2],
             parallel_chunk_size=chunk_size,
         )
@@ -434,7 +440,7 @@ def test_shared_param_retaining_grad_fails():
 
     # mtl_backward itself doesn't raise the error, but it fills a.grad with a BatchedTensor
     mtl_backward(
-        losses=[y1, y2],
+        tensors=[y1, y2],
         features=[f],
         tasks_params=[[p1], [p2]],
         shared_params=[a, p0],
@@ -463,7 +469,7 @@ def test_shared_activation_retaining_grad_fails():
 
     # mtl_backward itself doesn't raise the error, but it fills a.grad with a BatchedTensor
     mtl_backward(
-        losses=[y1, y2],
+        tensors=[y1, y2],
         features=[f],
         tasks_params=[[p1], [p2]],
         shared_params=[p0],
@@ -486,7 +492,7 @@ def test_tasks_params_overlap():
     y1 = f * p1 * p12
     y2 = f * p2 * p12
 
-    mtl_backward(losses=[y1, y2], features=[f])
+    mtl_backward(tensors=[y1, y2], features=[f])
 
     assert_grad_close(p2, f * p12)
     assert_grad_close(p1, f * p12)
@@ -506,7 +512,7 @@ def test_tasks_params_are_the_same():
     y1 = f * p1
     y2 = f + p1
 
-    mtl_backward(losses=[y1, y2], features=[f])
+    mtl_backward(tensors=[y1, y2], features=[f])
 
     assert_grad_close(p1, f + 1)
 
@@ -528,7 +534,7 @@ def test_task_params_is_subset_of_other_task_params():
     y1 = f * p1
     y2 = y1 * p2
 
-    mtl_backward(losses=[y1, y2], features=[f], retain_graph=True)
+    mtl_backward(tensors=[y1, y2], features=[f], retain_graph=True)
 
     assert_grad_close(p2, y1)
     assert_grad_close(p1, p2 * f + f)
@@ -553,7 +559,7 @@ def test_shared_params_overlapping_with_tasks_params_fails():
 
     with raises(ValueError):
         mtl_backward(
-            losses=[y1, y2],
+            tensors=[y1, y2],
             features=[f],
             tasks_params=[[p1], [p0, p2]],  # Problem: p0 is also shared
             shared_params=[p0],
@@ -576,7 +582,7 @@ def test_default_shared_params_overlapping_with_default_tasks_params_fails():
 
     with raises(ValueError):
         mtl_backward(
-            losses=[y1, y2],
+            tensors=[y1, y2],
             features=[f],
         )
 
@@ -601,7 +607,7 @@ def test_repeated_losses():
 
     with raises(ValueError):
         losses = [y1, y1, y2]
-        mtl_backward(losses=losses, features=[f1, f2], retain_graph=True)
+        mtl_backward(tensors=losses, features=[f1, f2], retain_graph=True)
 
 
 def test_repeated_features():
@@ -624,7 +630,7 @@ def test_repeated_features():
 
     with raises(ValueError):
         features = [f1, f1, f2]
-        mtl_backward(losses=[y1, y2], features=features)
+        mtl_backward(tensors=[y1, y2], features=features)
 
 
 def test_repeated_shared_params():
@@ -648,7 +654,7 @@ def test_repeated_shared_params():
     g2 = grad([y2], [p2], retain_graph=True)[0]
 
     shared_params = [p0, p0]
-    mtl_backward(losses=[y1, y2], features=[f1, f2], shared_params=shared_params)
+    mtl_backward(tensors=[y1, y2], features=[f1, f2], shared_params=shared_params)
 
     assert_jac_close(p0, J0)
     assert_grad_close(p1, g1)
@@ -676,8 +682,92 @@ def test_repeated_task_params():
     g2 = grad([y2], [p2], retain_graph=True)[0]
 
     tasks_params = [[p1, p1], [p2]]
-    mtl_backward(losses=[y1, y2], features=[f1, f2], tasks_params=tasks_params)
+    mtl_backward(tensors=[y1, y2], features=[f1, f2], tasks_params=tasks_params)
 
     assert_jac_close(p0, J0)
     assert_grad_close(p1, g1)
     assert_grad_close(p2, g2)
+
+
+def test_grad_tensors_value_is_correct():
+    """
+    Tests that mtl_ackward correctly computes the element-wise product of grad_tensors and the
+    tensors.
+    """
+
+    p0 = randn_(3, requires_grad=True)
+    p1 = randn_(2, requires_grad=True)
+    p2 = randn_(2, requires_grad=True)
+    p3 = randn_(4, requires_grad=True)
+
+    J = randn_(2, 3)
+    f = J @ p0  # shape: [2]
+    y1 = p1 @ f  # shape: []
+    y2 = p2 * f  # shape: [2]
+    y3 = torch.outer(p3, f)  # shape: [4, 2]
+
+    grad_y1 = torch.randn_like(y1)
+    grad_y2 = torch.randn_like(y2)
+    grad_y3 = torch.randn_like(y3)
+
+    mtl_backward(
+        tensors=[y1, y2, y3],
+        features=f,
+        grad_tensors=[grad_y1, grad_y2, grad_y3],
+    )
+
+    assert_grad_close(p1, grad_y1 * f)
+    assert_grad_close(p2, grad_y2 * f)
+    assert_grad_close(p3, grad_y3 @ f)
+
+    expected_jacobian = torch.stack([grad_y1 * p1, grad_y2 * p2, grad_y3.T @ p3]) @ J
+    assert_jac_close(p0, expected_jacobian)
+
+
+def test_grad_tensors_length_mismatch():
+    """Tests that mtl_backward raises a ValueError early if len(grad_tensors) != len(tensors)."""
+
+    p0 = randn_(3, requires_grad=True)
+    p1 = randn_(2, requires_grad=True)
+    p2 = randn_(2, requires_grad=True)
+
+    J = randn_(2, 3)
+    f = J @ p0
+    y1 = p1 @ f
+    y2 = p2 @ f
+
+    with raises(
+        ValueError,
+        match=r"`grad_tensors` should have the same length as `tensors`\. \(got 1 and 2\)",
+    ):
+        mtl_backward(
+            tensors=[y1, y2],
+            features=f,
+            grad_tensors=[torch.ones_like(y1)],
+        )
+
+
+def test_grad_tensors_shape_mismatch():
+    """
+    Tests that mtl_backward raises a ValueError early if the shape of a tensor in grad_tensors is
+    incompatible with the corresponding tensor.
+    """
+
+    p0 = randn_(3, requires_grad=True)
+    p1 = randn_(2, requires_grad=True)
+    p2 = randn_(2, requires_grad=True)
+
+    J = randn_(2, 3)
+    f = J @ p0
+    y1 = p1 @ f  # scalar, shape ()
+    y2 = p2 @ f  # scalar, shape ()
+
+    with raises(
+        ValueError,
+        match=r"Shape mismatch: `grad_tensors\[0\]` has shape .* but `tensors\[0\]` has shape .*\.",
+    ):
+        mtl_backward(
+            tensors=[y1, y2],
+            features=f,
+            grad_tensors=[ones_(2), torch.ones_like(y2)],  # shape (2,) != shape () of y1
+        )
