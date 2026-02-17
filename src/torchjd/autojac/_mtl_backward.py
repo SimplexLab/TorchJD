@@ -211,7 +211,7 @@ def _check_tensors_are_scalar(tensors: Iterable[Tensor]) -> None:
     for t in tensors:
         if t.ndim > 0:
             raise ValueError(
-                "When `tensors` are non-scalar, the `grad_outputs` parameter must be provided."
+                "When `tensors` are non-scalar, the `grad_tensors` parameter must be provided."
             )
 
 
