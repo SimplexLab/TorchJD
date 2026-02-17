@@ -109,7 +109,7 @@ def backward(
     tensors_ = as_checked_ordered_set(tensors, "tensors")
 
     if len(tensors_) == 0:
-        raise ValueError("`tensors` cannot be empty")
+        raise ValueError("`tensors` cannot be empty.")
 
     if inputs is None:
         inputs_ = get_leaf_tensors(tensors=tensors_, excluded=set())

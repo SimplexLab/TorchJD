@@ -152,7 +152,7 @@ def jac(
 
     outputs_ = as_checked_ordered_set(outputs, "outputs")
     if len(outputs_) == 0:
-        raise ValueError("`outputs` cannot be empty")
+        raise ValueError("`outputs` cannot be empty.")
 
     if inputs is None:
         inputs_ = get_leaf_tensors(tensors=outputs_, excluded=set())

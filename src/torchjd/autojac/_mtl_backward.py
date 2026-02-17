@@ -107,7 +107,7 @@ def mtl_backward(
         raise ValueError("`features` cannot be empty.")
 
     if len(tensors_) == 0:
-        raise ValueError("`tensors` cannot be empty")
+        raise ValueError("`tensors` cannot be empty.")
     if len(tensors_) != len(tasks_params_):
         raise ValueError("`tensors` and `tasks_params` should have the same size.")
 
