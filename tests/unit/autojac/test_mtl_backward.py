@@ -713,9 +713,6 @@ def test_grad_tensors_value_is_correct():
         tensors=[y1, y2, y3],
         features=f,
         grad_tensors=[grad_y1, grad_y2, grad_y3],
-        tasks_params=None,
-        shared_params=None,
-        parallel_chunk_size=None,
     )
 
     assert_grad_close(p1, grad_y1 * f)
