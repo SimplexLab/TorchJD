@@ -310,7 +310,7 @@ def test_input_retaining_grad_fails():
 
     # backward itself doesn't raise the error, but it fills b.grad with a BatchedTensor
     # (and it also fills b.jac with the correct Jacobian)
-    backward(tensors=y, inputs=[b])
+    backward(y, inputs=[b])
 
     with raises(RuntimeError):
         # Using such a BatchedTensor should result in an error
@@ -329,7 +329,7 @@ def test_non_input_retaining_grad_fails():
     y = 3 * b
 
     # backward itself doesn't raise the error, but it fills b.grad with a BatchedTensor
-    backward(tensors=y, inputs=[a])
+    backward(y, inputs=[a])
 
     with raises(RuntimeError):
         # Using such a BatchedTensor should result in an error
