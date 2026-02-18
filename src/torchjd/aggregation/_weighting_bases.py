@@ -67,7 +67,7 @@ class GeneralizedWeighting(nn.Module, ABC):
         super().__init__()
 
     @abstractmethod
-    def forward(self, generalized_gramian: PSDTensor) -> Tensor:
+    def forward(self, generalized_gramian: PSDTensor, /) -> Tensor:
         """Computes the vector of weights from the input generalized Gramian."""
 
     def __call__(self, generalized_gramian: Tensor, /) -> Tensor:
