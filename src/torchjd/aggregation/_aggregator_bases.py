@@ -25,10 +25,10 @@ class Aggregator(nn.Module, ABC):
             )
 
     @abstractmethod
-    def forward(self, matrix: Matrix) -> Tensor:
+    def forward(self, matrix: Matrix, /) -> Tensor:
         """Computes the aggregation from the input matrix."""
 
-    def __call__(self, matrix: Tensor) -> Tensor:
+    def __call__(self, matrix: Tensor, /) -> Tensor:
         """Computes the aggregation from the input matrix and applies all registered hooks."""
         Aggregator._check_is_matrix(matrix)
         return super().__call__(matrix)
@@ -62,7 +62,7 @@ class WeightedAggregator(Aggregator):
         vector = weights @ matrix
         return vector
 
-    def forward(self, matrix: Matrix) -> Tensor:
+    def forward(self, matrix: Matrix, /) -> Tensor:
         weights = self.weighting(matrix)
         vector = self.combine(matrix, weights)
         return vector

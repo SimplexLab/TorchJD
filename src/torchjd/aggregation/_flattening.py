@@ -24,7 +24,7 @@ class Flattening(GeneralizedWeighting):
         super().__init__()
         self.weighting = weighting
 
-    def forward(self, generalized_gramian: PSDTensor) -> Tensor:
+    def forward(self, generalized_gramian: PSDTensor, /) -> Tensor:
         k = generalized_gramian.ndim // 2
         shape = generalized_gramian.shape[:k]
         square_gramian = flatten(generalized_gramian)

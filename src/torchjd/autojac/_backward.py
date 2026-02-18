@@ -15,6 +15,8 @@ from ._utils import (
 
 def backward(
     tensors: Sequence[Tensor] | Tensor,
+    /,
+    *,
     jac_tensors: Sequence[Tensor] | Tensor | None = None,
     inputs: Iterable[Tensor] | None = None,
     retain_graph: bool = False,
