@@ -309,7 +309,7 @@ def test_input_retaining_grad_fails():
 
     # jac itself doesn't raise the error, but it fills b.grad with a BatchedTensor (and it also
     # returns the correct Jacobian)
-    jac(outputs=y, inputs=[b])
+    jac(y, inputs=[b])
 
     with raises(RuntimeError):
         # Using such a BatchedTensor should result in an error
@@ -328,7 +328,7 @@ def test_non_input_retaining_grad_fails():
     y = 3 * b
 
     # jac itself doesn't raise the error, but it fills b.grad with a BatchedTensor
-    jac(outputs=y, inputs=[a])
+    jac(y, inputs=[a])
 
     with raises(RuntimeError):
         # Using such a BatchedTensor should result in an error

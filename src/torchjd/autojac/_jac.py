@@ -19,8 +19,10 @@ from torchjd.autojac._utils import (
 
 def jac(
     outputs: Sequence[Tensor] | Tensor,
+    /,
     inputs: Iterable[Tensor] | None = None,
     jac_outputs: Sequence[Tensor] | Tensor | None = None,
+    *,
     retain_graph: bool = False,
     parallel_chunk_size: int | None = None,
 ) -> tuple[Tensor, ...]:
