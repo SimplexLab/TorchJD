@@ -53,12 +53,21 @@ changelog does not include internal changes that do not affect the user.
   mtl_backward(losses, features)
   jac_to_grad(shared_module.parameters(), aggregator)
   ```
-- **BREAKING**: Made some parameters of the public interface of `torchjd` positional-only or keyword-only:
-  - `backward`: The `tensors` parameter is now positional-only. Suggested change: `backward(tensors=losses)` => `backward(losses)`. All other parameters are now keyword-only.
-  - `mtl_backward`: The `tensors` parameter (previously named `losses`) is now positional-only. Suggested change: `mtl_backward(losses=losses, features=features)` => `mtl_backward(losses, features=features)`. The `features` parameter remains usable as positional or keyword. All other parameters are now keyword-only.
-  - `Aggregator.__call__`: The `matrix` parameter is now positonal-only. Suggested change: `aggregator(matrix=matrix)` => `aggregator(matrix)`.
-  - `Weighting.__call__`: The `stat` parameter is now positional-only. Suggested change: `weighting(stat=gramian)` => `weighting(gramian)`.
-  - `GeneralizedWeighting.__call__`: The `generalized_gramian` parameter is now positional-only. Suggested change: `generalized_weighting(generalized_gramian=generalized_gramian)` => `generalized_weighting(generalized_gramian)`.
+- **BREAKING**: Made some parameters of the public interface of `torchjd` positional-only or
+  keyword-only:
+  - `backward`: The `tensors` parameter is now positional-only. Suggested change:
+    `backward(tensors=losses)` => `backward(losses)`. All other parameters are now keyword-only.
+  - `mtl_backward`: The `tensors` parameter (previously named `losses`) is now positional-only.
+    Suggested change: `mtl_backward(losses=losses, features=features)` =>
+    `mtl_backward(losses, features=features)`. The `features` parameter remains usable as positional
+    or keyword. All other parameters are now keyword-only.
+  - `Aggregator.__call__`: The `matrix` parameter is now positonal-only. Suggested change:
+    `aggregator(matrix=matrix)` => `aggregator(matrix)`.
+  - `Weighting.__call__`: The `stat` parameter is now positional-only. Suggested change:
+    `weighting(stat=gramian)` => `weighting(gramian)`.
+  - `GeneralizedWeighting.__call__`: The `generalized_gramian` parameter is now positional-only.
+    Suggested change: `generalized_weighting(generalized_gramian=generalized_gramian)` =>
+    `generalized_weighting(generalized_gramian)`.
 - Removed an unnecessary memory duplication. This should significantly improve the memory efficiency
   of `autojac`.
 - Removed an unnecessary internal cloning of gradient. This should slightly improve the memory
