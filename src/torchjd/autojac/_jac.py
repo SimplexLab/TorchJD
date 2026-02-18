@@ -19,7 +19,6 @@ from torchjd.autojac._utils import (
 
 def jac(
     outputs: Sequence[Tensor] | Tensor,
-    /,
     inputs: Iterable[Tensor] | None = None,
     *,
     jac_outputs: Sequence[Tensor] | Tensor | None = None,
