@@ -212,7 +212,7 @@ implementation of a mathematical aggregator.
 ### Deprecation
 
 To deprecate some public functionality, make it raise a `DeprecationWarning`. A test should also be
-added in `tests/units/test_deprecations.py`, ensuring that this warning is issued.
+added in `tests/unit/test_deprecations.py`, ensuring that this warning is issued.
 
 ## Release
 
@@ -224,8 +224,7 @@ To release a new `torchjd` version, you have to:
 - Make sure that all tests, including those on cuda, pass (for this, you need access to a machine
   that has a cuda-enabled GPU).
 - Make sure that all important changes since the last release have been reported in the
-  `[Unreleased]`.
-  section at the top of the changelog.
+  `[Unreleased]` section at the top of the changelog.
 - Add a `[X.Y.Z] - yyyy-mm-dd` header in the changelog just below the `[Unreleased]` header.
 - Change the version in `pyproject.toml`.
 - Make a pull request with those changes and merge it.
