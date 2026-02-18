@@ -43,7 +43,7 @@ class Transform(ABC):
         """Applies the transform to the input."""
 
     @abstractmethod
-    def check_keys(self, input_keys: set[Tensor]) -> set[Tensor]:
+    def check_keys(self, input_keys: set[Tensor], /) -> set[Tensor]:
         """
         Checks that the provided input_keys satisfy the transform's requirements and returns the
         corresponding output keys for recursion.
@@ -78,7 +78,7 @@ class Composition(Transform):
         intermediate = self.inner(input)
         return self.outer(intermediate)
 
-    def check_keys(self, input_keys: set[Tensor]) -> set[Tensor]:
+    def check_keys(self, input_keys: set[Tensor], /) -> set[Tensor]:
         intermediate_keys = self.inner.check_keys(input_keys)
         output_keys = self.outer.check_keys(intermediate_keys)
         return output_keys
@@ -111,7 +111,7 @@ class Conjunction(Transform):
             union |= transform(tensor_dict)
         return union
 
-    def check_keys(self, input_keys: set[Tensor]) -> set[Tensor]:
+    def check_keys(self, input_keys: set[Tensor], /) -> set[Tensor]:
         output_keys_list = [key for t in self.transforms for key in t.check_keys(input_keys)]
         output_keys = set(output_keys_list)
 
