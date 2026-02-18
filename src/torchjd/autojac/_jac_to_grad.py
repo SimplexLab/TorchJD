@@ -11,7 +11,9 @@ from ._utils import check_consistent_first_dimension
 
 def jac_to_grad(
     tensors: Iterable[Tensor],
+    /,
     aggregator: Aggregator,
+    *,
     retain_jac: bool = False,
 ) -> None:
     r"""
