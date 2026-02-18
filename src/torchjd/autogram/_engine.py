@@ -235,7 +235,7 @@ class Engine:
                 )
 
     # Currently, the type PSDMatrix is hidden from users, so Tensor is correct.
-    def compute_gramian(self, output: Tensor) -> Tensor:
+    def compute_gramian(self, output: Tensor, /) -> Tensor:
         r"""
         Computes the Gramian of the Jacobian of ``output`` with respect to the direct parameters of
         all ``modules``.
