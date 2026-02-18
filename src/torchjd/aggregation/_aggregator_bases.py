@@ -25,7 +25,7 @@ class Aggregator(nn.Module, ABC):
             )
 
     @abstractmethod
-    def forward(self, matrix: Matrix) -> Tensor:
+    def forward(self, matrix: Matrix, /) -> Tensor:
         """Computes the aggregation from the input matrix."""
 
     def __call__(self, matrix: Tensor, /) -> Tensor:
@@ -62,7 +62,7 @@ class WeightedAggregator(Aggregator):
         vector = weights @ matrix
         return vector
 
-    def forward(self, matrix: Matrix) -> Tensor:
+    def forward(self, matrix: Matrix, /) -> Tensor:
         weights = self.weighting(matrix)
         vector = self.combine(matrix, weights)
         return vector
