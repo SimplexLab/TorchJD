@@ -11,25 +11,27 @@ mandatory, we only provide installation steps with this tool. You can install it
 suggest to use VSCode with the `Python`, `ty` and `ruff` extensions (without `Pylance`).
 
 1) Pre-requisites: Use `uv` to install a Python version compatible with TorchJD and to pin it to the
-  `torchjd` folder. From the root of the `torchjd` repo, run:
+  `TorchJD` folder. From the root of the `TorchJD` repo, run:
    ```bash
    uv python install 3.14.0
    uv python pin 3.14.0
    ```
 
-2) Create a virtual environment and install the project in it. From the root of `torchjd`, run:
+2) Create a virtual environment and install the project in it. From the root of `TorchJD`, run:
    ```bash
    uv venv
    CC=gcc uv pip install --python-version=3.14 -e '.[full]' --group check --group doc --group test --group plot
    ```
    If you want to install PyTorch with a different CUDA version (this could be required depending on
-   your GPU), you'll need to specify and extra index. For instance, for CUDA 12.6, run:
+   your GPU), you'll need to specify an extra index. For instance, for CUDA 12.6, run:
       ```bash
    uv venv
    CC=gcc uv pip install --python-version=3.14 -e '.[full]' --group check --group doc --group test --group plot --index-strategy unsafe-best-match --extra-index-url https://download.pytorch.org/whl/cu126
    ```
 
-   We also advise using `UV_NO_SYNC=1` to prevent `uv` from syncing all the time. This is because by
+3) Set environment variables:
+
+   We need to use `UV_NO_SYNC=1` to prevent `uv` from syncing all the time. This is because by
    default, it tries to resolve libraries compatible with the whole range of Python versions
    supported by TorchJD, but in reality, we just need an installation compatible with the currently
    used Python version. That's also why we specify `--python-version=3.14` when running
@@ -40,7 +42,14 @@ suggest to use VSCode with the `Python`, `ty` and `ruff` extensions (without `Py
    and start a new terminal. The alternative is to use the `--no-sync` flag whenever you run a pip
    command that would normally sync (like `uv run`).
 
-3) Install pre-commit:
+   Lastly, to run some scripts from the `tests` folder, you'll have to add the `TorchJD/tests`
+   folder to your `PYTHONPATH`. For that, you should add the following line to your `.bashrc`:
+   ```bash
+   export PYTHONPATH="$PYTHONPATH:<path_to_TorchJD>/tests"
+   ```
+   where `<path_to_TorchJD>` is the absolute path to your `TorchJD` repo.
+
+4) Install pre-commit:
    ```bash
    uv run pre-commit install
    ```
@@ -52,36 +61,38 @@ suggest to use VSCode with the `Python`, `ty` and `ruff` extensions (without `Py
 > [here](https://pypi.org/project/ecos/#files)).
 
 > [!TIP]
-> The Python version that you should specify in your IDE is `<path-to-torchjd>/.venv/bin/python`.
+> The Python version that you should specify in your IDE is `<path-to-TorchJD>/.venv/bin/python`.
 
 > [!TIP]
 > In the following commands, you can get rid of the `uv run` prefix if you activate the `venv`
-> created by `uv`, using `source .venv/bin/activate` from the root of `torchjd`. This will, however,
+> created by `uv`, using `source .venv/bin/activate` from the root of `TorchJD`. This will, however,
 > only work in the current terminal until it is closed.
 
 
-## Clean reinstallation
+### Clean reinstallation
 
 If you want to update all dependencies or just reinstall from scratch, run the following command
-from the root of `torchjd`:
+from the root of `TorchJD`:
 ```bash
 rm -rf .venv
-rm uv.lock
+rm -f uv.lock
 uv venv
 CC=gcc uv pip install --python-version=3.14 -e '.[full]' --group check --group doc --group test --group plot
 uv run pre-commit install
 ```
 
-## Running tests
+## Checks
+
+### Running tests
    - To verify that your installation was successful, and that unit tests pass, run:
      ```bash
      uv run pytest tests/unit
      ```
 
    - To also run the unit tests that are marked as slow, add the `--runslow` flag:
-    ```bash
-    uv run pytest tests/unit --runslow
-    ```
+     ```bash
+     uv run pytest tests/unit --runslow
+     ```
 
    - If you have access to a cuda-enabled GPU, you should also check that the unit tests pass on it:
      ```bash
@@ -100,7 +111,11 @@ uv run pre-commit install
     uv run pytest tests/unit tests/doc --cov=src
     ```
 
-## Building the documentation locally
+    > [!TIP]
+    > The code coverage value reported locally is lower than the value that our CI obtains, because
+    > the CI runs the tests in several different environments.
+
+### Building the documentation locally
    - From the `docs` folder, run:
      ```bash
      uv run make html
@@ -112,7 +127,7 @@ uv run pre-commit install
      uv run make clean
      ```
 
-## Type checking
+### Type checking
 
 We use [ty](https://docs.astral.sh/ty/) for type-checking. If you're on VSCode, we recommend using
 the `ty` extension. You can also run it from the root of the repo with:
@@ -139,10 +154,10 @@ should create it.
 
 We ask contributors to implement the unit tests necessary to check the correctness of their
 implementations. Besides, whenever usage examples are provided, we require the example's code to be
-tested in `tests/doc`. We require a very high code coverage for newly introduced sources (~95-100%).
-To ensure that the tensors generated during the tests are on the right device, you have to use the
-partial functions defined in `tests/utils/tensors.py` to instantiate tensors. For instance, instead
-of
+tested in `tests/doc`. We aim for 100% code coverage, but we greatly appreciate any PR, even with
+insufficient code coverage. To ensure that the tensors generated during the tests are on the right
+device and dtype, you have to use the partial functions defined in `tests/utils/tensors.py` to
+instantiate tensors. For instance, instead of
 ```python
 import torch
 a = torch.ones(3, 4)
@@ -153,21 +168,23 @@ from utils.tensors import ones_
 a = ones_(3, 4)
 ```
 
-This will automatically call `torch.ones` with `device=DEVICE`.
+This will automatically call `torch.ones` with `device=DEVICE`. This way, your test will
+automatically be run on cuda when running it with the `PYTEST_TORCH_DEVICE=cuda:0` environment
+variable, and will automatically be run on `float64` with `PYTEST_TORCH_DTYPE=float64`.
 If the function you need does not exist yet as a partial function in `tensors.py`, add it.
 Lastly, when you create a model or a random generator, you have to move them manually to the right
-device (the `DEVICE` defined in `device.py`).
+device (the `DEVICE` defined in `settings.py`).
 ```python
 import torch
 from torch.nn import Linear
-from device import DEVICE
+from settings import DEVICE
 
 model = Linear(3, 4).to(device=DEVICE)
 rng = torch.Generator(device=DEVICE)
 ```
 You may also use a `ModuleFactory` to make the modules on `DEVICE` automatically.
 
-### Coding
+### Coding style
 
 We try to keep the quality of the codebase as high as possible. Even if this slows down development
 in the short term, it helps a lot in the long term. To make the code easy to understand and to
@@ -177,7 +194,7 @@ of the library when adding new sources. Also, please make sure that new modules 
 `__init__.py` file of the package they are located into. This makes them easier to import for the
 user.
 
-## Adding a new aggregator
+### Adding a new aggregator
 
 Mathematically, an aggregator is a mapping $\mathcal A: \mathbb R^{m \times n} \to \mathbb R^n$. In
 the context of Jacobian descent, it is used to reduce a Jacobian matrix into a vector that can be
@@ -192,7 +209,7 @@ implementation of a mathematical aggregator.
 > Before working on the implementation of a new aggregator, please contact us via an issue or a
 > discussion: in many cases, we have already thought about it, or even started an implementation.
 
-## Deprecation
+### Deprecation
 
 To deprecate some public functionality, make it raise a `DeprecationWarning`. A test should also be
 added in `tests/units/test_deprecations.py`, ensuring that this warning is issued.
@@ -202,10 +219,12 @@ added in `tests/units/test_deprecations.py`, ensuring that this warning is issue
 *This section is addressed to maintainers.*
 
 To release a new `torchjd` version, you have to:
+- If the release introduces changes to the interface, make sure that `README.md` reflects those
+  changes.
 - Make sure that all tests, including those on cuda, pass (for this, you need access to a machine
   that has a cuda-enabled GPU).
 - Make sure that all important changes since the last release have been reported in the
-  `[Unreleased]`
+  `[Unreleased]`.
   section at the top of the changelog.
 - Add a `[X.Y.Z] - yyyy-mm-dd` header in the changelog just below the `[Unreleased]` header.
 - Change the version in `pyproject.toml`.
