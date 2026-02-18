@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 
 from torch import Tensor
 
@@ -13,13 +13,12 @@ from torchjd.autojac._utils import (
     check_matching_jac_shapes,
     check_matching_length,
     check_optional_positive_chunk_size,
-    get_leaf_tensors,
 )
 
 
 def jac(
     outputs: Sequence[Tensor] | Tensor,
-    inputs: Iterable[Tensor] | None = None,
+    inputs: Sequence[Tensor] | Tensor,
     *,
     jac_outputs: Sequence[Tensor] | Tensor | None = None,
     retain_graph: bool = False,
@@ -32,9 +31,8 @@ def jac(
     ``[m] + t.shape``.
 
     :param outputs: The tensor or tensors to differentiate. Should be non-empty.
-    :param inputs: The tensors with respect to which the Jacobian must be computed. These must have
-        their ``requires_grad`` flag set to ``True``. If not provided, defaults to the leaf tensors
-        that were used to compute the ``outputs`` parameter.
+    :param inputs: The tensor or tensors with respect to which the Jacobian must be computed. These
+        must have their ``requires_grad`` flag set to ``True``.
     :param jac_outputs: The initial Jacobians to backpropagate, analog to the ``grad_outputs``
         parameter of :func:`torch.autograd.grad`. If provided, it must have the same structure as
         ``outputs`` and each tensor in ``jac_outputs`` must match the shape of the corresponding
@@ -69,7 +67,7 @@ def jac(
             >>> y1 = torch.tensor([-1., 1.]) @ param
             >>> y2 = (param ** 2).sum()
             >>>
-            >>> jacobians = jac([y1, y2], [param])
+            >>> jacobians = jac([y1, y2], param)
             >>>
             >>> jacobians
             (tensor([[-1., 1.],
@@ -131,13 +129,13 @@ def jac(
             >>> jac_h = jac([y1, y2], [h])[0]  # Shape: [2, 2]
             >>>
             >>> # Step 2: Use chain rule to compute d[y1,y2]/dx = (d[y1,y2]/dh) @ (dh/dx)
-            >>> jac_x = jac(h, [x], jac_outputs=jac_h)[0]
+            >>> jac_x = jac(h, x, jac_outputs=jac_h)[0]
             >>>
             >>> jac_x
             tensor([[ 2.,  4.],
                     [ 2., -4.]])
 
-        This two-step computation is equivalent to directly computing ``jac([y1, y2], [x])``.
+        This two-step computation is equivalent to directly computing ``jac([y1, y2], x)``.
 
     .. warning::
         To differentiate in parallel, ``jac`` relies on ``torch.vmap``, which has some
@@ -155,12 +153,9 @@ def jac(
     if len(outputs_) == 0:
         raise ValueError("`outputs` cannot be empty.")
 
-    if inputs is None:
-        inputs_ = get_leaf_tensors(tensors=outputs_, excluded=set())
-        inputs_with_repetition = list(inputs_)
-    else:
-        inputs_with_repetition = list(inputs)  # Create a list to avoid emptying generator
-        inputs_ = OrderedSet(inputs_with_repetition)
+    # Preserve repetitions to duplicate jacobians at the return statement
+    inputs_with_repetition = (inputs,) if isinstance(inputs, Tensor) else inputs
+    inputs_ = OrderedSet(inputs_with_repetition)
 
     jac_outputs_dict = _create_jac_outputs_dict(outputs_, jac_outputs)
     transform = _create_transform(outputs_, inputs_, parallel_chunk_size, retain_graph)
