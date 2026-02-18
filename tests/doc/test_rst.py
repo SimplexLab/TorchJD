@@ -44,7 +44,7 @@ def test_amp():
             loss2 = loss_fn(output2, target2)
 
         scaled_losses = scaler.scale([loss1, loss2])
-        mtl_backward(tensors=scaled_losses, features=features)
+        mtl_backward(scaled_losses, features=features)
         jac_to_grad(shared_module.parameters(), aggregator)
         scaler.step(optimizer)
         scaler.update()
@@ -250,7 +250,7 @@ def test_lightning_integration():
 
             opt = self.optimizers()
 
-            mtl_backward(tensors=[loss1, loss2], features=features)
+            mtl_backward([loss1, loss2], features=features)
             jac_to_grad(self.feature_extractor.parameters(), UPGrad())
             opt.step()
             opt.zero_grad()
@@ -325,7 +325,7 @@ def test_monitoring():
         loss1 = loss_fn(output1, target1)
         loss2 = loss_fn(output2, target2)
 
-        mtl_backward(tensors=[loss1, loss2], features=features)
+        mtl_backward([loss1, loss2], features=features)
         jac_to_grad(shared_module.parameters(), aggregator)
         optimizer.step()
         optimizer.zero_grad()
@@ -363,7 +363,7 @@ def test_mtl():
         loss1 = loss_fn(output1, target1)
         loss2 = loss_fn(output2, target2)
 
-        mtl_backward(tensors=[loss1, loss2], features=features)
+        mtl_backward([loss1, loss2], features=features)
         jac_to_grad(shared_module.parameters(), aggregator)
         optimizer.step()
         optimizer.zero_grad()
