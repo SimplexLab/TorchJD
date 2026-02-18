@@ -17,12 +17,12 @@ class FakeTransform(Transform):
     def __str__(self):
         return "T"
 
-    def __call__(self, input: TensorDict, /) -> TensorDict:
+    def __call__(self, _input: TensorDict, /) -> TensorDict:
         # Ignore the input, create a dictionary with the right keys as an output.
         output_dict = {key: empty_(0) for key in self._output_keys}
         return output_dict
 
-    def check_keys(self, input_keys: set[Tensor]) -> set[Tensor]:
+    def check_keys(self, input_keys: set[Tensor], /) -> set[Tensor]:
         # Arbitrary requirement for testing purposes.
         if not input_keys == self._required_keys:
             raise RequirementError()

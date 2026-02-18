@@ -19,7 +19,7 @@ class Select(Transform):
         output = {key: tensor_dict[key] for key in self.keys}
         return type(tensor_dict)(output)
 
-    def check_keys(self, input_keys: set[Tensor]) -> set[Tensor]:
+    def check_keys(self, input_keys: set[Tensor], /) -> set[Tensor]:
         keys = set(self.keys)
         if not keys.issubset(input_keys):
             raise RequirementError(

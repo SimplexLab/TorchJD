@@ -101,7 +101,7 @@ class Hook:
 
     def __call__(
         self,
-        module: nn.Module,
+        _module: nn.Module,
         args: tuple[PyTree, ...],
         kwargs: dict[str, PyTree],
         outputs: PyTree,
@@ -157,11 +157,11 @@ class AutogramNode(torch.autograd.Function):
 
     @staticmethod
     def forward(
-        gramian_accumulation_phase: BoolRef,
-        gramian_computer: GramianComputer,
-        args: tuple[PyTree, ...],
-        kwargs: dict[str, PyTree],
-        gramian_accumulator: GramianAccumulator,
+        _gramian_accumulation_phase: BoolRef,
+        _gramian_computer: GramianComputer,
+        _args: tuple[PyTree, ...],
+        _kwargs: dict[str, PyTree],
+        _gramian_accumulator: GramianAccumulator,
         *rg_tensors: Tensor,
     ) -> tuple[Tensor, ...]:
         return tuple(t.detach() for t in rg_tensors)

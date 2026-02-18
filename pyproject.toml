@@ -133,6 +133,7 @@ select = [
     "W",    # pycodestyle Warning
     "I",    # isort
     "UP",   # pyupgrade
+    "ARG",  # flake8-unused-arguments
     "B",    # flake8-bugbear
     "C4",   # flake8-comprehensions
     "FIX",  # flake8-fixme
@@ -156,6 +157,10 @@ ignore = [
     "RET504",  # Unnecessary assignment return statement
     "COM812",  # Trailing comma missing (conflicts with formatter, see https://github.com/astral-sh/ruff/issues/9216)
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"**/conftest.py" = ["ARG"]  # Can't change argument names in the functions pytest expects
+"tests/doc/test_rst.py" = ["ARG"]  # For the lightning example
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
