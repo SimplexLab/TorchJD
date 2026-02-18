@@ -301,11 +301,13 @@ def test_compute_gramian_various_output_shapes(
     assert_close(autogram_gramian, expected_gramian, rtol=1e-4, atol=1e-5)
 
 
-def _non_empty_subsets(elements: set) -> list[set]:
+def _non_empty_subsets(S: set) -> list[list]:
     """
-    Generates the list of subsets of the given set, excluding the empty set.
+    Generates the list of subsets of the given set, excluding the empty set. The sets are returned
+    in the form of sorted lists so that the order is always the same, to make the parametrization of
+    the test reproducible.
     """
-    return [set(c) for r in range(1, len(elements) + 1) for c in combinations(elements, r)]
+    return [sorted(set(c)) for r in range(1, len(S) + 1) for c in combinations(S, r)]
 
 
 @mark.parametrize("gramian_module_names", _non_empty_subsets({"fc0", "fc1", "fc2", "fc3", "fc4"}))

@@ -64,7 +64,9 @@ def pytest_make_parametrize_id(config, val, argname):
     elif isinstance(val, nullcontext):
         optional_string = "does_not_raise()"
 
-    if isinstance(optional_string, str) and len(optional_string) > MAX_SIZE:
-        optional_string = optional_string[: MAX_SIZE - 3] + "+++"  # Can't use dots with pytest
+    if isinstance(optional_string, str):
+        optional_string = optional_string.replace("\n", " ")
+        if len(optional_string) > MAX_SIZE:
+            optional_string = optional_string[: MAX_SIZE - 3] + "+++"  # Can't use dots with pytest
 
     return optional_string
