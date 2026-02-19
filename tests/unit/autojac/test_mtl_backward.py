@@ -378,7 +378,7 @@ def test_non_scalar_loss_fails() -> None:
 
 
 @mark.parametrize("chunk_size", [None, 1, 2, 4])
-def test_various_valid_chunk_sizes(chunk_size) -> None:
+def test_various_valid_chunk_sizes(chunk_size: int | None) -> None:
     """Tests that mtl_backward works for various valid values of parallel_chunk_size."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)

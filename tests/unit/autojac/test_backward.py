@@ -268,7 +268,7 @@ def test_multiple_tensors() -> None:
 
 
 @mark.parametrize("chunk_size", [None, 1, 2, 4])
-def test_various_valid_chunk_sizes(chunk_size) -> None:
+def test_various_valid_chunk_sizes(chunk_size: int | None) -> None:
     """Tests that backward works for various valid values of parallel_chunk_size."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
