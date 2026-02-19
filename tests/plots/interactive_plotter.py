@@ -120,7 +120,7 @@ def main() -> None:
         *gradient_slider_inputs,
         prevent_initial_call=True,
     )
-    def update_gradient_coordinate(*values) -> Figure:
+    def update_gradient_coordinate(*values: str) -> Figure:
         values_ = [float(value) for value in values]
 
         for j in range(len(values_) // 2):
