@@ -456,7 +456,7 @@ class InterModuleParamReuse(ShapedModule):
             super().__init__()
             self.matrix = matrix
 
-        def forward(self, input: Tensor):
+        def forward(self, input: Tensor) -> Tensor:
             return input @ self.matrix
 
     def __init__(self) -> None:
