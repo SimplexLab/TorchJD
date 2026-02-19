@@ -5,6 +5,7 @@ from typing import cast
 import torch
 from torch import Tensor, nn
 from torch.nn import Parameter
+from torch.overrides import is_tensor_like
 from torch.utils._pytree import PyTree, tree_flatten, tree_map, tree_map_only
 
 from torchjd._linalg import Matrix
@@ -83,8 +84,8 @@ class FunctionalJacobianComputer(JacobianComputer):
         /,
     ) -> Matrix:
         grad_outputs_in_dims = (0,) * len(grad_outputs)
-        args_in_dims = tree_map(lambda t: 0 if isinstance(t, Tensor) else None, args)
-        kwargs_in_dims = tree_map(lambda t: 0 if isinstance(t, Tensor) else None, kwargs)
+        args_in_dims = tree_map(lambda t: 0 if is_tensor_like(t) else None, args)
+        kwargs_in_dims = tree_map(lambda t: 0 if is_tensor_like(t) else None, kwargs)
         in_dims = (grad_outputs_in_dims, args_in_dims, kwargs_in_dims)
         vmapped_vjp = torch.vmap(self._call_on_one_instance, in_dims=in_dims)
 
@@ -114,7 +115,7 @@ class FunctionalJacobianComputer(JacobianComputer):
             ]
             output = torch.func.functional_call(self.module, all_state, args_j, kwargs_j)
             flat_outputs = tree_flatten(output)[0]
-            rg_outputs = tuple(t for t in flat_outputs if isinstance(t, Tensor) and t.requires_grad)
+            rg_outputs = tuple(t for t in flat_outputs if is_tensor_like(t) and t.requires_grad)
             return rg_outputs
 
         vjp_func = torch.func.vjp(functional_model_call, self.rg_params)[1]
