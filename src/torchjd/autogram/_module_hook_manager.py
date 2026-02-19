@@ -1,5 +1,5 @@
 import weakref
-from typing import cast
+from typing import Any, cast
 
 import torch
 from torch import Tensor, nn
@@ -170,7 +170,7 @@ class AutogramNode(torch.autograd.Function):
     # tuple[BoolRef, GramianComputer, tuple[PyTree, ...], dict[str, PyTree], GramianAccumulator, *tuple[Tensor, ...]]
     @staticmethod
     def setup_context(
-        ctx,
+        ctx: Any,
         inputs: tuple,
         _,
     ) -> None:  # type: ignore[reportIncompatibleMethodOverride]
@@ -182,7 +182,7 @@ class AutogramNode(torch.autograd.Function):
         ctx.rg_outputs = inputs[5:]
 
     @staticmethod
-    def backward(ctx, *grad_outputs: Tensor) -> tuple:
+    def backward(ctx: Any, *grad_outputs: Tensor) -> tuple:
         # For python > 3.10: -> tuple[None, None, None, None, None, *tuple[Tensor, ...]]
 
         if ctx.gramian_accumulation_phase:
