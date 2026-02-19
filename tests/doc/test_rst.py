@@ -238,7 +238,7 @@ def test_lightning_integration() -> None:
             self.task2_head = Linear(3, 1)
             self.automatic_optimization = False
 
-        def training_step(self, batch, batch_idx) -> None:
+        def training_step(self, batch, batch_idx) -> None:  # noqa: ANN001
             input, target1, target2 = batch
 
             features = self.feature_extractor(input)
