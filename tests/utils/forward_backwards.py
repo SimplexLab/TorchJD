@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from types import TracebackType
 
 import torch
 from torch import Tensor, nn, vmap
@@ -192,7 +193,12 @@ class CloneParams:
 
         return self.clones
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool:
         """Remove hooks and restore parameters."""
         for handle in self._handles:
             handle.remove()
