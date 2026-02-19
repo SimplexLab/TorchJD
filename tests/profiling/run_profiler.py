@@ -3,7 +3,9 @@ from collections.abc import Callable
 
 import torch
 from settings import DEVICE
+from torch import Tensor, nn
 from torch.profiler import ProfilerActivity, profile
+from torch.utils._pytree import PyTree
 from utils.architectures import (
     AlexNet,
     Cifar10Model,
@@ -105,7 +107,9 @@ def _save_and_print_trace(
 
 
 def profile_autojac(factory: ModuleFactory, batch_size: int) -> None:
-    def forward_backward_fn(model, inputs, loss_fn) -> None:
+    def forward_backward_fn(
+        model: nn.Module, inputs: PyTree, loss_fn: Callable[[PyTree], list[Tensor]]
+    ) -> None:
         aggregator = UPGrad()
         autojac_forward_backward(model, inputs, loss_fn, aggregator)
 
@@ -113,7 +117,9 @@ def profile_autojac(factory: ModuleFactory, batch_size: int) -> None:
 
 
 def profile_autogram(factory: ModuleFactory, batch_size: int) -> None:
-    def forward_backward_fn(model, inputs, loss_fn) -> None:
+    def forward_backward_fn(
+        model: nn.Module, inputs: PyTree, loss_fn: Callable[[PyTree], list[Tensor]]
+    ) -> None:
         engine = Engine(model, batch_dim=0)
         weighting = UPGradWeighting()
         autogram_forward_backward(model, inputs, loss_fn, engine, weighting)
