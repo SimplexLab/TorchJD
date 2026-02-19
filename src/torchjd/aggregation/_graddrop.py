@@ -40,7 +40,7 @@ class GradDrop(Aggregator):
         # This prevents computing gradients that can be very wrong.
         self.register_full_backward_pre_hook(raise_non_differentiable_error)
 
-    def forward(self, matrix: Matrix) -> Tensor:
+    def forward(self, matrix: Matrix, /) -> Tensor:
         self._check_matrix_has_enough_rows(matrix)
 
         if matrix.shape[0] == 0 or matrix.shape[1] == 0:

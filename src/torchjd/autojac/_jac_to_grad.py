@@ -11,7 +11,9 @@ from ._utils import check_consistent_first_dimension
 
 def jac_to_grad(
     tensors: Iterable[Tensor],
+    /,
     aggregator: Aggregator,
+    *,
     retain_jac: bool = False,
 ) -> None:
     r"""
@@ -75,7 +77,7 @@ def jac_to_grad(
 
     jacobian_matrix = _unite_jacobians(jacobians)
     gradient_vector = aggregator(jacobian_matrix)
-    gradients = _disunite_gradient(gradient_vector, jacobians, tensors_)
+    gradients = _disunite_gradient(gradient_vector, tensors_)
     accumulate_grads(tensors_, gradients)
 
 
@@ -87,7 +89,6 @@ def _unite_jacobians(jacobians: list[Tensor]) -> Tensor:
 
 def _disunite_gradient(
     gradient_vector: Tensor,
-    jacobians: list[Tensor],
     tensors: list[TensorWithJac],
 ) -> list[Tensor]:
     gradient_vectors = gradient_vector.split([t.numel() for t in tensors])

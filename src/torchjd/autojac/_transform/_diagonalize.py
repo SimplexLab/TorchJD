@@ -69,7 +69,7 @@ class Diagonalize(Transform):
         }
         return diagonalized_tensors
 
-    def check_keys(self, input_keys: set[Tensor]) -> set[Tensor]:
+    def check_keys(self, input_keys: set[Tensor], /) -> set[Tensor]:
         if not set(self.key_order) == input_keys:
             raise RequirementError(
                 f"The input_keys must match the key_order. Found input_keys {input_keys} and"

@@ -24,7 +24,7 @@ class TrimmedMean(Aggregator):
             )
         self.trim_number = trim_number
 
-    def forward(self, matrix: Tensor) -> Tensor:
+    def forward(self, matrix: Tensor, /) -> Tensor:
         self._check_matrix_has_enough_rows(matrix)
 
         n_rows = matrix.shape[0]

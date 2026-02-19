@@ -24,7 +24,9 @@ from ._utils import (
 
 def mtl_backward(
     tensors: Sequence[Tensor],
+    /,
     features: Sequence[Tensor] | Tensor,
+    *,
     grad_tensors: Sequence[Tensor] | None = None,
     tasks_params: Sequence[Iterable[Tensor]] | None = None,
     shared_params: Iterable[Tensor] | None = None,
