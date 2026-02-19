@@ -24,7 +24,7 @@ class MemoryFrame:
     device_id: int  # -1 for CPU, 0+ for CUDA devices
 
     @staticmethod
-    def from_event(event: dict):
+    def from_event(event: dict) -> "MemoryFrame":
         args = event["args"]
         return MemoryFrame(
             timestamp=event["ts"],
