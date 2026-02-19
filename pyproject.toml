@@ -134,6 +134,7 @@ select = [
     "I",    # isort
     "UP",   # pyupgrade
     "ARG",  # flake8-unused-arguments
+    "ANN",  # flake-8-annotations
     "B",    # flake8-bugbear
     "C4",   # flake8-comprehensions
     "FIX",  # flake8-fixme
