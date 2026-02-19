@@ -4,6 +4,7 @@ from typing import cast
 import torch
 from torch import Tensor, nn
 from torch.autograd.graph import get_gradient_edge
+from torch.overrides import is_tensor_like
 from torch.utils._pytree import PyTree, tree_flatten, tree_unflatten
 from torch.utils.hooks import RemovableHandle as TorchRemovableHandle
 
@@ -114,7 +115,7 @@ class Hook:
         rg_outputs = list[Tensor]()
         rg_output_indices = list[int]()
         for idx, output in enumerate(flat_outputs):
-            if isinstance(output, Tensor) and output.requires_grad:
+            if is_tensor_like(output) and output.requires_grad:
                 rg_outputs.append(output)
                 rg_output_indices.append(idx)
 
