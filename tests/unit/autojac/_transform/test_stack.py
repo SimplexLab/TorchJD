@@ -12,7 +12,7 @@ from torchjd.autojac._transform._base import TensorDict
 class FakeGradientsTransform(Transform):
     """Transform that produces gradients filled with ones, for testing purposes."""
 
-    def __init__(self, keys: Iterable[Tensor]):
+    def __init__(self, keys: Iterable[Tensor]) -> None:
         self.keys = set(keys)
 
     def __call__(self, _input: TensorDict, /) -> TensorDict:

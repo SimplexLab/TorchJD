@@ -183,7 +183,7 @@ class Engine:
         self,
         *modules: nn.Module,
         batch_dim: int | None,
-    ):
+    ) -> None:
         self._gramian_accumulator = GramianAccumulator()
         self._target_edges = EdgeRegistry()
         self._batch_dim = batch_dim

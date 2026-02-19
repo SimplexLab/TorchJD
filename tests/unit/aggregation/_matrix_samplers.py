@@ -9,7 +9,7 @@ from utils.tensors import randint_, randn_, randperm_, zeros_
 class MatrixSampler(ABC):
     """Abstract base class for sampling matrices of a given shape, rank."""
 
-    def __init__(self, m: int, n: int, rank: int):
+    def __init__(self, m: int, n: int, rank: int) -> None:
         self._check_params(m, n, rank)
         self.m = m
         self.n = n

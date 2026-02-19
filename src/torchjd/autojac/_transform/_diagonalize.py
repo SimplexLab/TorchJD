@@ -51,7 +51,7 @@ class Diagonalize(Transform):
         Jacobians.
     """
 
-    def __init__(self, key_order: OrderedSet[Tensor]):
+    def __init__(self, key_order: OrderedSet[Tensor]) -> None:
         self.key_order = key_order
         self.indices: list[tuple[int, int]] = []
         begin = 0

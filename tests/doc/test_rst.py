@@ -231,7 +231,7 @@ def test_lightning_integration():
     from torchjd.autojac import jac_to_grad, mtl_backward
 
     class Model(LightningModule):
-        def __init__(self):
+        def __init__(self) -> None:
             super().__init__()
             self.feature_extractor = Sequential(Linear(10, 5), ReLU(), Linear(5, 3), ReLU())
             self.task1_head = Linear(3, 1)

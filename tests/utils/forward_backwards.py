@@ -162,7 +162,7 @@ class CloneParams:
     algorithm rather than a module-based algorithm.
     """
 
-    def __init__(self, model: nn.Module):
+    def __init__(self, model: nn.Module) -> None:
         self.model = model
         self.clones = list[nn.Parameter]()
         self._module_to_original_params = dict[nn.Module, dict[str, nn.Parameter]]()

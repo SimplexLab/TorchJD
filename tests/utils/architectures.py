@@ -14,7 +14,7 @@ _T = TypeVar("_T", bound=nn.Module)
 
 
 class ModuleFactory(Generic[_T]):
-    def __init__(self, architecture: type[_T], *args, **kwargs):
+    def __init__(self, architecture: type[_T], *args, **kwargs) -> None:
         self.architecture: type[_T] = architecture
         self.args = args
         self.kwargs = kwargs
@@ -63,7 +63,7 @@ class OverlyNested(ShapedModule):
     INPUT_SHAPES = (9,)
     OUTPUT_SHAPES = (14,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.seq = nn.Sequential(
             nn.Sequential(
@@ -95,7 +95,7 @@ class MultiInputSingleOutput(ShapedModule):
     INPUT_SHAPES = ((50,), (50,))
     OUTPUT_SHAPES = (60,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.matrix1 = nn.Parameter(torch.randn(50, 60))
         self.matrix2 = nn.Parameter(torch.randn(50, 60))
@@ -112,7 +112,7 @@ class MultiInputMultiOutput(ShapedModule):
     INPUT_SHAPES = ((50,), (50,))
     OUTPUT_SHAPES = ((60,), (70,))
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.matrix1_1 = nn.Parameter(torch.randn(50, 60))
         self.matrix2_1 = nn.Parameter(torch.randn(50, 60))
@@ -136,7 +136,7 @@ class SingleInputPyTreeOutput(ShapedModule):
         "third": ([((90,),)],),
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.matrix1 = nn.Parameter(torch.randn(50, 50))
         self.matrix2 = nn.Parameter(torch.randn(50, 60))
@@ -161,7 +161,7 @@ class PyTreeInputSingleOutput(ShapedModule):
     }
     OUTPUT_SHAPES = (350,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.matrix1 = nn.Parameter(torch.randn(10, 50))
         self.matrix2 = nn.Parameter(torch.randn(20, 60))
@@ -203,7 +203,7 @@ class PyTreeInputPyTreeOutput(ShapedModule):
         "third": ([((90,),)],),
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.matrix1 = nn.Parameter(torch.randn(10, 50))
         self.matrix2 = nn.Parameter(torch.randn(20, 60))
@@ -231,7 +231,7 @@ class SimpleBranched(ShapedModule):
     INPUT_SHAPES = (9,)
     OUTPUT_SHAPES = (16,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.relu = nn.ReLU()
         self.fc0 = nn.Linear(9, 13)
@@ -257,7 +257,7 @@ class MISOBranched(ShapedModule):
     INPUT_SHAPES = (50,)
     OUTPUT_SHAPES = MultiInputSingleOutput.OUTPUT_SHAPES
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.miso = MultiInputSingleOutput()
 
@@ -274,7 +274,7 @@ class MIMOBranched(ShapedModule):
     INPUT_SHAPES = (50,)
     OUTPUT_SHAPES = (130,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.mimo = MultiInputMultiOutput()
 
@@ -291,7 +291,7 @@ class SIPOBranched(ShapedModule):
     INPUT_SHAPES = (50,)
     OUTPUT_SHAPES = (350,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.sipo = SingleInputPyTreeOutput()
 
@@ -314,7 +314,7 @@ class PISOBranched(ShapedModule):
     INPUT_SHAPES = (86,)
     OUTPUT_SHAPES = (350,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.piso = PyTreeInputSingleOutput()
 
@@ -342,7 +342,7 @@ class PIPOBranched(ShapedModule):
     INPUT_SHAPES = (86,)
     OUTPUT_SHAPES = (350,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.pipo = PyTreeInputPyTreeOutput()
 
@@ -379,7 +379,7 @@ class WithNoTensorOutput(ShapedModule):
     OUTPUT_SHAPES = (10,)
 
     class _NoneOutput(nn.Module):
-        def __init__(self, shape: tuple[int, ...]):
+        def __init__(self, shape: tuple[int, ...]) -> None:
             super().__init__()
             self.matrix = nn.Parameter(torch.randn(shape))
 
@@ -387,7 +387,7 @@ class WithNoTensorOutput(ShapedModule):
             pass
 
     class _NonePyTreeOutput(nn.Module):
-        def __init__(self, shape: tuple[int, ...]):
+        def __init__(self, shape: tuple[int, ...]) -> None:
             super().__init__()
             self.matrix = nn.Parameter(torch.randn(shape))
 
@@ -395,7 +395,7 @@ class WithNoTensorOutput(ShapedModule):
             return {"one": [None, ()], "two": None}
 
     class _EmptyTupleOutput(nn.Module):
-        def __init__(self, shape: tuple[int, ...]):
+        def __init__(self, shape: tuple[int, ...]) -> None:
             super().__init__()
             self.matrix = nn.Parameter(torch.randn(shape))
 
@@ -403,14 +403,14 @@ class WithNoTensorOutput(ShapedModule):
             return ()
 
     class _EmptyPytreeOutput(nn.Module):
-        def __init__(self, shape: tuple[int, ...]):
+        def __init__(self, shape: tuple[int, ...]) -> None:
             super().__init__()
             self.matrix = nn.Parameter(torch.randn(shape))
 
         def forward(self, _: PyTree) -> PyTree:
             return {"one": [(), ()], "two": [[], []]}
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.none_output = self._NoneOutput((27, 10))
         self.none_pytree_output = self._NonePyTreeOutput((27, 10))
@@ -432,7 +432,7 @@ class IntraModuleParamReuse(ShapedModule):
     INPUT_SHAPES = (50,)
     OUTPUT_SHAPES = (10,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.matrix = nn.Parameter(torch.randn(50, 10))
 
@@ -452,14 +452,14 @@ class InterModuleParamReuse(ShapedModule):
         that this parameter can be used in other modules too.
         """
 
-        def __init__(self, matrix: nn.Parameter):
+        def __init__(self, matrix: nn.Parameter) -> None:
             super().__init__()
             self.matrix = matrix
 
         def forward(self, input: Tensor):
             return input @ self.matrix
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         matrix = nn.Parameter(torch.randn(50, 10))
         self.module1 = self._MatMulModule(matrix)
@@ -475,7 +475,7 @@ class ModuleReuse(ShapedModule):
     INPUT_SHAPES = (50,)
     OUTPUT_SHAPES = (10,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.module = nn.Linear(50, 10)
 
@@ -489,7 +489,7 @@ class SomeUnusedParam(ShapedModule):
     INPUT_SHAPES = (50,)
     OUTPUT_SHAPES = (10,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.unused_param = nn.Parameter(torch.randn(50, 10))
         self.matrix = nn.Parameter(torch.randn(50, 10))
@@ -507,7 +507,7 @@ class SomeFrozenParam(ShapedModule):
     INPUT_SHAPES = (50,)
     OUTPUT_SHAPES = (10,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.frozen_param = nn.Parameter(torch.randn(50, 10), requires_grad=False)
         self.matrix = nn.Parameter(torch.randn(50, 10))
@@ -524,7 +524,7 @@ class WithSomeFrozenModule(ShapedModule):
     INPUT_SHAPES = (50,)
     OUTPUT_SHAPES = (10,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.non_frozen = nn.Linear(50, 10)
         self.all_frozen = nn.Linear(50, 10)
@@ -553,7 +553,7 @@ class RequiresGradOfSchrodinger(ShapedModule):
         INPUT_SHAPES = (50,)
         OUTPUT_SHAPES = (10,)
 
-        def __init__(self):
+        def __init__(self) -> None:
             super().__init__()
             self.frozen_param = nn.Parameter(torch.randn(50, 10), requires_grad=False)
             self.non_frozen_param = nn.Parameter(torch.randn(50, 10))
@@ -561,7 +561,7 @@ class RequiresGradOfSchrodinger(ShapedModule):
         def forward(self, input: Tensor) -> Tensor:
             return input @ self.frozen_param
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.weird_module = self.SomeFrozenParamAndUnusedTrainableParam()
         self.normal_module = nn.Linear(10, 3)
@@ -579,7 +579,7 @@ class MultiOutputWithFrozenBranch(ShapedModule):
     INPUT_SHAPES = (50,)
     OUTPUT_SHAPES = ((10,), (10,))
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.frozen_param = nn.Parameter(torch.randn(50, 10), requires_grad=False)
         self.matrix = nn.Parameter(torch.randn(50, 10))
@@ -597,14 +597,14 @@ class WithBuffered(ShapedModule):
     class _Buffered(nn.Module):
         buffer: Tensor
 
-        def __init__(self):
+        def __init__(self) -> None:
             super().__init__()
             self.register_buffer("buffer", torch.tensor(1.5))
 
         def forward(self, input: Tensor) -> Tensor:
             return input * self.buffer
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.module_with_buffer = self._Buffered()
         self.linear = nn.Linear(27, 10)
@@ -619,7 +619,7 @@ class Randomness(ShapedModule):
     INPUT_SHAPES = (9,)
     OUTPUT_SHAPES = (10,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.matrix = nn.Parameter(torch.randn(9, 10))
 
@@ -635,7 +635,7 @@ class WithSideEffect(ShapedModule):
     INPUT_SHAPES = (9,)
     OUTPUT_SHAPES = (10,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.matrix = nn.Parameter(torch.randn(9, 10))
         self.register_buffer("buffer", torch.zeros((9,)))
@@ -654,7 +654,7 @@ class SomeUnusedOutput(ShapedModule):
     INPUT_SHAPES = (9,)
     OUTPUT_SHAPES = (10,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.linear1 = nn.Linear(9, 12)
         self.linear2 = nn.Linear(9, 10)
@@ -671,7 +671,7 @@ class Ndim0Output(ShapedModule):
     INPUT_SHAPES = (5,)
     OUTPUT_SHAPES = ()
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.linear = nn.Linear(5, 1)
 
@@ -685,7 +685,7 @@ class Ndim1Output(ShapedModule):
     INPUT_SHAPES = (5,)
     OUTPUT_SHAPES = (3,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.linear = nn.Linear(5, 3)
 
@@ -699,7 +699,7 @@ class Ndim2Output(ShapedModule):
     INPUT_SHAPES = (5,)
     OUTPUT_SHAPES = (2, 3)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.linear1 = nn.Linear(5, 3)
         self.linear2 = nn.Linear(5, 3)
@@ -714,7 +714,7 @@ class Ndim3Output(ShapedModule):
     INPUT_SHAPES = (6,)
     OUTPUT_SHAPES = (2, 3, 4)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.tensor = nn.Parameter(torch.randn(6, 2, 3, 4))
 
@@ -728,7 +728,7 @@ class Ndim4Output(ShapedModule):
     INPUT_SHAPES = (6,)
     OUTPUT_SHAPES = (2, 3, 4, 5)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.tensor = nn.Parameter(torch.randn(6, 2, 3, 4, 5))
 
@@ -742,7 +742,7 @@ class WithRNN(ShapedModule):
     INPUT_SHAPES = (20, 8)  # Size 20, dim input_size (8)
     OUTPUT_SHAPES = (20, 5)  # Size 20, dim hidden_size (5)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.rnn = nn.RNN(input_size=8, hidden_size=5, batch_first=True)
 
@@ -757,7 +757,7 @@ class WithDropout(ShapedModule):
     INPUT_SHAPES = (3, 6, 6)
     OUTPUT_SHAPES = (3, 4, 4)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.conv2d = nn.Conv2d(in_channels=3, out_channels=3, kernel_size=3)
         self.dropout = nn.Dropout2d(p=0.5)
@@ -775,7 +775,7 @@ class ModelUsingSubmoduleParamsDirectly(ShapedModule):
     INPUT_SHAPES = (2,)
     OUTPUT_SHAPES = (3,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.linear = nn.Linear(2, 3)
 
@@ -791,7 +791,7 @@ class ModelAlsoUsingSubmoduleParamsDirectly(ShapedModule):
     INPUT_SHAPES = (2,)
     OUTPUT_SHAPES = (3,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.linear = nn.Linear(2, 3)
 
@@ -800,7 +800,7 @@ class ModelAlsoUsingSubmoduleParamsDirectly(ShapedModule):
 
 
 class _WithStringArg(nn.Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.matrix = nn.Parameter(torch.randn(2, 3))
 
@@ -816,7 +816,7 @@ class WithModuleWithStringArg(ShapedModule):
     INPUT_SHAPES = (2,)
     OUTPUT_SHAPES = (3,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.with_string_arg = _WithStringArg()
 
@@ -830,7 +830,7 @@ class WithModuleWithStringKwarg(ShapedModule):
     INPUT_SHAPES = (2,)
     OUTPUT_SHAPES = (3,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.with_string_arg = _WithStringArg()
 
@@ -839,7 +839,7 @@ class WithModuleWithStringKwarg(ShapedModule):
 
 
 class _WithHybridPyTreeArg(nn.Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.m0 = nn.Parameter(torch.randn(3, 3))
         self.m1 = nn.Parameter(torch.randn(4, 3))
@@ -869,7 +869,7 @@ class WithModuleWithHybridPyTreeArg(ShapedModule):
     INPUT_SHAPES = (10,)
     OUTPUT_SHAPES = (3,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.linear = nn.Linear(10, 18)
         self.with_string_arg = _WithHybridPyTreeArg()
@@ -898,7 +898,7 @@ class WithModuleWithHybridPyTreeKwarg(ShapedModule):
     INPUT_SHAPES = (10,)
     OUTPUT_SHAPES = (3,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.linear = nn.Linear(10, 18)
         self.with_string_arg = _WithHybridPyTreeArg()
@@ -925,14 +925,14 @@ class WithModuleWithStringOutput(ShapedModule):
     OUTPUT_SHAPES = (3,)
 
     class WithStringOutput(nn.Module):
-        def __init__(self):
+        def __init__(self) -> None:
             super().__init__()
             self.matrix = nn.Parameter(torch.randn(2, 3))
 
         def forward(self, input: Tensor) -> tuple[str, Tensor]:
             return "test", input @ self.matrix
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.with_string_output = self.WithStringOutput()
 
@@ -947,7 +947,7 @@ class WithMultiHeadAttention(ShapedModule):
     INPUT_SHAPES = ((20, 8), (10, 9), (10, 11))
     OUTPUT_SHAPES = (20, 8)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.mha = nn.MultiheadAttention(
             embed_dim=8,
@@ -970,7 +970,7 @@ class WithTransformer(ShapedModule):
     INPUT_SHAPES = ((10, 8), (20, 8))
     OUTPUT_SHAPES = (20, 8)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.transformer = nn.Transformer(
             d_model=8,
@@ -993,7 +993,7 @@ class WithTransformerLarge(ShapedModule):
     INPUT_SHAPES = ((10, 512), (20, 512))
     OUTPUT_SHAPES = (20, 512)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.transformer = nn.Transformer(
             batch_first=True,
@@ -1014,7 +1014,7 @@ class FreeParam(ShapedModule):
     INPUT_SHAPES = (15,)
     OUTPUT_SHAPES = (80,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.matrix = nn.Parameter(torch.randn(15, 16))  # Free parameter
         self.relu = nn.ReLU()
@@ -1041,7 +1041,7 @@ class NoFreeParam(ShapedModule):
     INPUT_SHAPES = (15,)
     OUTPUT_SHAPES = (80,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.linear0 = nn.Linear(15, 16, bias=False)
         self.relu = nn.ReLU()
@@ -1071,7 +1071,7 @@ class Cifar10Model(ShapedModule):
         INPUT_SHAPES = (3, 32, 32)
         OUTPUT_SHAPES = (1024,)
 
-        def __init__(self):
+        def __init__(self) -> None:
             super().__init__()
             layers = [
                 nn.Conv2d(3, 32, 3),
@@ -1092,7 +1092,7 @@ class Cifar10Model(ShapedModule):
         INPUT_SHAPES = (1024,)
         OUTPUT_SHAPES = (10,)
 
-        def __init__(self):
+        def __init__(self) -> None:
             super().__init__()
             layers = [
                 nn.Linear(1024, 128),
@@ -1107,7 +1107,7 @@ class Cifar10Model(ShapedModule):
     INPUT_SHAPES = Body.INPUT_SHAPES
     OUTPUT_SHAPES = Head.OUTPUT_SHAPES
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.body = self.Body()
         self.head = self.Head()
@@ -1128,7 +1128,7 @@ class AlexNet(ShapedModule):
     INPUT_SHAPES = (3, 224, 224)
     OUTPUT_SHAPES = (1000,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.alexnet = torchvision.models.alexnet()
 
@@ -1145,7 +1145,7 @@ class InstanceNormResNet18(ShapedModule):
     INPUT_SHAPES = (3, 224, 224)
     OUTPUT_SHAPES = (1000,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.resnet18 = torchvision.models.resnet18(
             norm_layer=partial(nn.InstanceNorm2d, track_running_stats=False, affine=True),
@@ -1161,7 +1161,7 @@ class GroupNormMobileNetV3Small(ShapedModule):
     INPUT_SHAPES = (3, 224, 224)
     OUTPUT_SHAPES = (1000,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.mobile_net = torchvision.models.mobilenet_v3_small(
             norm_layer=partial(nn.GroupNorm, 2, affine=True),
@@ -1177,7 +1177,7 @@ class SqueezeNet(ShapedModule):
     INPUT_SHAPES = (3, 224, 224)
     OUTPUT_SHAPES = (1000,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.squeezenet = torchvision.models.squeezenet1_0()
 
@@ -1191,7 +1191,7 @@ class InstanceNormMobileNetV2(ShapedModule):
     INPUT_SHAPES = (3, 224, 224)
     OUTPUT_SHAPES = (1000,)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.mobilenet = torchvision.models.mobilenet_v2(
             norm_layer=partial(nn.InstanceNorm2d, track_running_stats=False, affine=True),

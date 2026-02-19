@@ -10,7 +10,7 @@ class FakeTransform(Transform):
     Fake ``Transform`` to test `check_keys` when composing and conjuncting.
     """
 
-    def __init__(self, required_keys: set[Tensor], output_keys: set[Tensor]):
+    def __init__(self, required_keys: set[Tensor], output_keys: set[Tensor]) -> None:
         self._required_keys = required_keys
         self._output_keys = output_keys
 

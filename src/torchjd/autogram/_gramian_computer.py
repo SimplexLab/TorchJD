@@ -29,7 +29,7 @@ class GramianComputer(ABC):
 
 
 class JacobianBasedGramianComputer(GramianComputer, ABC):
-    def __init__(self, jacobian_computer: JacobianComputer):
+    def __init__(self, jacobian_computer: JacobianComputer) -> None:
         self.jacobian_computer = jacobian_computer
 
 
@@ -39,7 +39,7 @@ class JacobianBasedGramianComputerWithCrossTerms(JacobianBasedGramianComputer):
     the gramian.
     """
 
-    def __init__(self, jacobian_computer: JacobianComputer):
+    def __init__(self, jacobian_computer: JacobianComputer) -> None:
         super().__init__(jacobian_computer)
         self.remaining_counter = 0
         self.summed_jacobian: Matrix | None = None

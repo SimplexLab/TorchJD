@@ -26,7 +26,7 @@ class GradDrop(Aggregator):
         through. Defaults to None, which means no leak.
     """
 
-    def __init__(self, f: Callable = _identity, leak: Tensor | None = None):
+    def __init__(self, f: Callable = _identity, leak: Tensor | None = None) -> None:
         if leak is not None and leak.dim() != 1:
             raise ValueError(
                 "Parameter `leak` should be a 1-dimensional tensor. Found `leak.shape = "

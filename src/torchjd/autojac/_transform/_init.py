@@ -13,7 +13,7 @@ class Init(Transform):
     :param values: Tensors for which Gradients must be returned.
     """
 
-    def __init__(self, values: AbstractSet[Tensor]):
+    def __init__(self, values: AbstractSet[Tensor]) -> None:
         self.values = values
 
     def __call__(self, _input: TensorDict, /) -> TensorDict:

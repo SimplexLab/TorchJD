@@ -33,7 +33,7 @@ class ModuleHookManager:
         self,
         target_edges: EdgeRegistry,
         gramian_accumulator: GramianAccumulator,
-    ):
+    ) -> None:
         self._target_edges = target_edges
         self._gramian_accumulator = gramian_accumulator
         self.gramian_accumulation_phase = BoolRef(False)
@@ -79,7 +79,7 @@ class ModuleHookManager:
 class BoolRef:
     """Class wrapping a boolean value, acting as a reference to this boolean value."""
 
-    def __init__(self, value: bool):
+    def __init__(self, value: bool) -> None:
         self.value = value
 
     def __bool__(self) -> bool:
@@ -93,7 +93,7 @@ class Hook:
         target_edges: EdgeRegistry,
         gramian_accumulator: GramianAccumulator,
         gramian_computer: GramianComputer,
-    ):
+    ) -> None:
         self.gramian_accumulation_phase = gramian_accumulation_phase
         self.target_edges = target_edges
         self.gramian_accumulator = gramian_accumulator

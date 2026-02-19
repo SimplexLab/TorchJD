@@ -50,7 +50,7 @@ class ConFIG(Aggregator):
         <https://github.com/tum-pbs/ConFIG/tree/main/conflictfree>`_.
     """
 
-    def __init__(self, pref_vector: Tensor | None = None):
+    def __init__(self, pref_vector: Tensor | None = None) -> None:
         super().__init__()
         self.weighting = pref_vector_to_weighting(pref_vector, default=SumWeighting())
         self._pref_vector = pref_vector

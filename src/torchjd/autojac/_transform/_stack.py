@@ -20,7 +20,7 @@ class Stack(Transform):
         to those dicts.
     """
 
-    def __init__(self, transforms: Sequence[Transform]):
+    def __init__(self, transforms: Sequence[Transform]) -> None:
         self.transforms = transforms
 
     def __call__(self, input: TensorDict, /) -> TensorDict:
