@@ -1,5 +1,6 @@
 import gc
 import time
+from collections.abc import Callable
 
 import torch
 from settings import DEVICE
@@ -125,7 +126,13 @@ def noop() -> None:
     pass
 
 
-def time_call(fn, init_fn=noop, pre_fn=noop, post_fn=noop, n_runs: int = 10) -> Tensor:
+def time_call(
+    fn: Callable[[], None],
+    init_fn: Callable[[], None] = noop,
+    pre_fn: Callable[[], None] = noop,
+    post_fn: Callable[[], None] = noop,
+    n_runs: int = 10,
+) -> Tensor:
     init_fn()
 
     times = []
