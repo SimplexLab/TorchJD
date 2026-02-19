@@ -103,7 +103,7 @@ def test_jacs_are_freed(retain_jac: bool) -> None:
     check(t2)
 
 
-def test_noncontiguous_jac():
+def test_noncontiguous_jac() -> None:
     """Tests that jac_to_grad works when the .jac field is non-contiguous."""
 
     aggregator = UPGrad()
