@@ -92,7 +92,7 @@ def _disunite_gradient(
     tensors: list[TensorWithJac],
 ) -> list[Tensor]:
     gradient_vectors = gradient_vector.split([t.numel() for t in tensors])
-    gradients = [g.view(t.shape) for g, t in zip(gradient_vectors, tensors, strict=True)]
+    gradients = [g.reshape(t.shape) for g, t in zip(gradient_vectors, tensors, strict=True)]
     return gradients
 
 
