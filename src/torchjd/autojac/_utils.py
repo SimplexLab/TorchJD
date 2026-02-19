@@ -4,6 +4,7 @@ from typing import cast
 
 from torch import Tensor
 from torch.autograd.graph import Node
+from torch.overrides import is_tensor_like
 
 from ._transform import OrderedSet
 
@@ -20,8 +21,8 @@ def as_checked_ordered_set(
     tensors: Sequence[Tensor] | Tensor,
     variable_name: str,
 ) -> OrderedSet[Tensor]:
-    if isinstance(tensors, Tensor):
-        tensors = [tensors]
+    if is_tensor_like(tensors):
+        tensors = (cast(Tensor, tensors),)
 
     original_length = len(tensors)
     output = OrderedSet(tensors)
