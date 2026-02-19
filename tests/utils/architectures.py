@@ -36,7 +36,7 @@ class ShapedModule(nn.Module):
     INPUT_SHAPES: PyTree  # meant to be overridden
     OUTPUT_SHAPES: PyTree  # meant to be overridden
 
-    def __init_subclass__(cls):
+    def __init_subclass__(cls) -> None:
         super().__init_subclass__()
         if getattr(cls, "INPUT_SHAPES", None) is None:
             raise TypeError(f"{cls.__name__} must define INPUT_SHAPES")
