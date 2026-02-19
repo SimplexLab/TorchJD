@@ -157,11 +157,15 @@ ignore = [
     "RUF012",  # Mutable default value for class attribute (a bit tedious to fix)
     "RET504",  # Unnecessary assignment return statement
     "COM812",  # Trailing comma missing (conflicts with formatter, see https://github.com/astral-sh/ruff/issues/9216)
+    "ANN401",  # Prevent annotating as Any (we rarely do that, and when we do it's hard to find an alternative)
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "**/conftest.py" = ["ARG"]  # Can't change argument names in the functions pytest expects
 "tests/doc/test_rst.py" = ["ARG"]  # For the lightning example
+
+[tool.ruff.lint.flake8-annotations]
+suppress-dummy-args = true
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
