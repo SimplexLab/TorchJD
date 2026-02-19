@@ -112,7 +112,7 @@ def plot_memory_timelines(experiment: str, folders: list[str]) -> None:
     print("Plot saved successfully!")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Plot memory timeline from profiling traces.")
     parser.add_argument(
         "experiment",
