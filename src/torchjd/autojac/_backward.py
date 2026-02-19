@@ -1,6 +1,8 @@
 from collections.abc import Iterable, Sequence
+from typing import cast
 
 from torch import Tensor
+from torch.overrides import is_tensor_like
 
 from ._transform import AccumulateJac, Diagonalize, Init, Jac, OrderedSet, Transform
 from ._utils import (
@@ -140,7 +142,9 @@ def _create_jac_tensors_dict(
         # Transform that turns the gradients into Jacobians.
         diag = Diagonalize(tensors)
         return (diag << init)({})
-    jac_tensors = [opt_jac_tensors] if isinstance(opt_jac_tensors, Tensor) else opt_jac_tensors
+    jac_tensors = cast(
+        Sequence[Tensor], (opt_jac_tensors,) if is_tensor_like(opt_jac_tensors) else opt_jac_tensors
+    )
     check_matching_length(jac_tensors, tensors, "jac_tensors", "tensors")
     check_matching_jac_shapes(jac_tensors, tensors, "jac_tensors", "tensors")
     check_consistent_first_dimension(jac_tensors, "jac_tensors")
