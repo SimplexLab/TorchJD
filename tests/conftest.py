@@ -30,16 +30,16 @@ def fix_randomness() -> None:
         torch.use_deterministic_algorithms(True)
 
 
-def pytest_addoption(parser):
+def pytest_addoption(parser) -> None:
     parser.addoption("--runslow", action="store_true", default=False, help="run slow tests")
 
 
-def pytest_configure(config):
+def pytest_configure(config) -> None:
     config.addinivalue_line("markers", "slow: mark test as slow to run")
     config.addinivalue_line("markers", "xfail_if_cuda: mark test as xfail if running on cuda")
 
 
-def pytest_collection_modifyitems(config, items):
+def pytest_collection_modifyitems(config, items) -> None:
     skip_slow = mark.skip(reason="Slow test. Use --runslow to run it.")
     xfail_cuda = mark.xfail(reason=f"Test expected to fail on {DEVICE}")
     for item in items:

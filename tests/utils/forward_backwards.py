@@ -201,7 +201,7 @@ class CloneParams:
 
         return False  # don't suppress exceptions
 
-    def _restore_original_params(self, module: nn.Module):
+    def _restore_original_params(self, module: nn.Module) -> None:
         original_params = self._module_to_original_params.pop(module, {})
         for name, param in original_params.items():
             self._set_module_param(module, name, param)

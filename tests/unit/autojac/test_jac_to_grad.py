@@ -7,7 +7,7 @@ from torchjd.autojac._jac_to_grad import jac_to_grad
 
 
 @mark.parametrize("aggregator", [Mean(), UPGrad(), PCGrad()])
-def test_various_aggregators(aggregator: Aggregator):
+def test_various_aggregators(aggregator: Aggregator) -> None:
     """Tests that jac_to_grad works for various aggregators."""
 
     t1 = tensor_(1.0, requires_grad=True)
@@ -25,7 +25,7 @@ def test_various_aggregators(aggregator: Aggregator):
     assert_grad_close(t2, g2)
 
 
-def test_single_tensor():
+def test_single_tensor() -> None:
     """Tests that jac_to_grad works when a single tensor is provided."""
 
     aggregator = UPGrad()
@@ -39,7 +39,7 @@ def test_single_tensor():
     assert_grad_close(t, g)
 
 
-def test_no_jac_field():
+def test_no_jac_field() -> None:
     """Tests that jac_to_grad fails when a tensor does not have a jac field."""
 
     aggregator = UPGrad()
@@ -52,7 +52,7 @@ def test_no_jac_field():
         jac_to_grad([t1, t2], aggregator)
 
 
-def test_no_requires_grad():
+def test_no_requires_grad() -> None:
     """Tests that jac_to_grad fails when a tensor does not require grad."""
 
     aggregator = UPGrad()
@@ -66,7 +66,7 @@ def test_no_requires_grad():
         jac_to_grad([t1, t2], aggregator)
 
 
-def test_row_mismatch():
+def test_row_mismatch() -> None:
     """Tests that jac_to_grad fails when the number of rows of the .jac is not constant."""
 
     aggregator = UPGrad()
@@ -79,14 +79,14 @@ def test_row_mismatch():
         jac_to_grad([t1, t2], aggregator)
 
 
-def test_no_tensors():
+def test_no_tensors() -> None:
     """Tests that jac_to_grad correctly does nothing when an empty list of tensors is provided."""
 
     jac_to_grad([], aggregator=UPGrad())
 
 
 @mark.parametrize("retain_jac", [True, False])
-def test_jacs_are_freed(retain_jac: bool):
+def test_jacs_are_freed(retain_jac: bool) -> None:
     """Tests that jac_to_grad frees the jac fields if an only if retain_jac is False."""
 
     aggregator = UPGrad()

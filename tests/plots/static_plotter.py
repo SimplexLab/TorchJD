@@ -32,7 +32,7 @@ def main(
     mean=False,
     dual_proj=False,
     mgda=False,
-):
+) -> None:
     angle1 = 2.6
     angle2 = 0.3277
     norm1 = 0.9

@@ -6,7 +6,7 @@ from utils.tensors import ones_, tensor_, zeros_
 from torchjd.autojac._transform import AccumulateGrad, AccumulateJac
 
 
-def test_single_grad_accumulation():
+def test_single_grad_accumulation() -> None:
     """
     Tests that the AccumulateGrad transform correctly accumulates gradients in .grad fields when run
     once.
@@ -27,7 +27,7 @@ def test_single_grad_accumulation():
 
 
 @mark.parametrize("iterations", [1, 2, 4, 10, 13])
-def test_multiple_grad_accumulations(iterations: int):
+def test_multiple_grad_accumulations(iterations: int) -> None:
     """
     Tests that the AccumulateGrad transform correctly accumulates gradients in .grad fields when run
     `iterations` times.
@@ -47,7 +47,7 @@ def test_multiple_grad_accumulations(iterations: int):
         assert_grad_close(key, iterations * value)
 
 
-def test_accumulate_grad_fails_when_no_requires_grad():
+def test_accumulate_grad_fails_when_no_requires_grad() -> None:
     """
     Tests that the AccumulateGrad transform raises an error when it tries to populate a .grad of a
     tensor that does not require grad.
@@ -63,7 +63,7 @@ def test_accumulate_grad_fails_when_no_requires_grad():
         accumulate(input)
 
 
-def test_accumulate_grad_fails_when_no_leaf_and_no_retains_grad():
+def test_accumulate_grad_fails_when_no_leaf_and_no_retains_grad() -> None:
     """
     Tests that the AccumulateGrad transform raises an error when it tries to populate a .grad of a
     tensor that is not a leaf and that does not retain grad.
@@ -79,7 +79,7 @@ def test_accumulate_grad_fails_when_no_leaf_and_no_retains_grad():
         accumulate(input)
 
 
-def test_accumulate_grad_check_keys():
+def test_accumulate_grad_check_keys() -> None:
     """Tests that the `check_keys` method works correctly for AccumulateGrad."""
 
     key = tensor_([1.0], requires_grad=True)
@@ -89,7 +89,7 @@ def test_accumulate_grad_check_keys():
     assert output_keys == set()
 
 
-def test_single_jac_accumulation():
+def test_single_jac_accumulation() -> None:
     """
     Tests that the AccumulateJac transform correctly accumulates jacobians in .jac fields when run
     once.
@@ -110,7 +110,7 @@ def test_single_jac_accumulation():
 
 
 @mark.parametrize("iterations", [1, 2, 4, 10, 13])
-def test_multiple_jac_accumulations(iterations: int):
+def test_multiple_jac_accumulations(iterations: int) -> None:
     """
     Tests that the AccumulateJac transform correctly accumulates jacobians in .jac fields when run
     `iterations` times.
@@ -131,7 +131,7 @@ def test_multiple_jac_accumulations(iterations: int):
         assert_jac_close(key, iterations * value)
 
 
-def test_accumulate_jac_fails_when_no_requires_grad():
+def test_accumulate_jac_fails_when_no_requires_grad() -> None:
     """
     Tests that the AccumulateJac transform raises an error when it tries to populate a .jac of a
     tensor that does not require grad.
@@ -147,7 +147,7 @@ def test_accumulate_jac_fails_when_no_requires_grad():
         accumulate(input)
 
 
-def test_accumulate_jac_fails_when_no_leaf_and_no_retains_grad():
+def test_accumulate_jac_fails_when_no_leaf_and_no_retains_grad() -> None:
     """
     Tests that the AccumulateJac transform raises an error when it tries to populate a .jac of a
     tensor that is not a leaf and that does not retain grad.
@@ -163,7 +163,7 @@ def test_accumulate_jac_fails_when_no_leaf_and_no_retains_grad():
         accumulate(input)
 
 
-def test_accumulate_jac_fails_when_shape_mismatch():
+def test_accumulate_jac_fails_when_shape_mismatch() -> None:
     """
     Tests that the AccumulateJac transform raises an error when the jacobian shape does not match
     the parameter shape (ignoring the first dimension).
@@ -179,7 +179,7 @@ def test_accumulate_jac_fails_when_shape_mismatch():
         accumulate(input)
 
 
-def test_accumulate_jac_check_keys():
+def test_accumulate_jac_check_keys() -> None:
     """Tests that the `check_keys` method works correctly for AccumulateJac."""
 
     key = tensor_([1.0], requires_grad=True)

@@ -9,7 +9,7 @@ from torchjd.autojac._transform import OrderedSet
 
 
 @mark.parametrize("default_jac_outputs", [True, False])
-def test_check_create_transform(default_jac_outputs: bool):
+def test_check_create_transform(default_jac_outputs: bool) -> None:
     """Tests that _create_transform creates a valid Transform."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -37,7 +37,7 @@ def test_check_create_transform(default_jac_outputs: bool):
     assert output_keys == {a1, a2}
 
 
-def test_jac():
+def test_jac() -> None:
     """Tests that jac works."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -65,7 +65,7 @@ def test_value_is_correct(
     chunk_size: int | None,
     outputs_is_list: bool,
     inputs_is_list: bool,
-):
+) -> None:
     """
     Tests that the jacobians returned by jac are correct in a simple example of matrix-vector
     product.
@@ -85,7 +85,7 @@ def test_value_is_correct(
 
 
 @mark.parametrize("rows", [1, 2, 5])
-def test_jac_outputs_value_is_correct(rows: int):
+def test_jac_outputs_value_is_correct(rows: int) -> None:
     """
     Tests that jac correctly computes the product of jac_outputs and the Jacobian.
     result = jac_outputs @ Jacobian(outputs, inputs).
@@ -111,7 +111,7 @@ def test_jac_outputs_value_is_correct(rows: int):
 
 
 @mark.parametrize("rows", [1, 3])
-def test_jac_outputs_multiple_components(rows: int):
+def test_jac_outputs_multiple_components(rows: int) -> None:
     """
     Tests that jac_outputs works correctly when outputs is a list of multiple tensors. The
     jac_outputs must match the structure of outputs.
@@ -136,7 +136,7 @@ def test_jac_outputs_multiple_components(rows: int):
     assert_close(jacobians[0], expected)
 
 
-def test_jac_outputs_length_mismatch():
+def test_jac_outputs_length_mismatch() -> None:
     """Tests that jac raises a ValueError early if len(jac_outputs) != len(outputs)."""
     x = tensor_([1.0, 2.0], requires_grad=True)
     y1 = x * 2
@@ -151,7 +151,7 @@ def test_jac_outputs_length_mismatch():
         jac([y1, y2], x, jac_outputs=[J1])
 
 
-def test_jac_outputs_shape_mismatch():
+def test_jac_outputs_shape_mismatch() -> None:
     """
     Tests that jac raises a ValueError early if the shape of a tensor in jac_outputs is
     incompatible with the corresponding output tensor.
@@ -175,7 +175,7 @@ def test_jac_outputs_shape_mismatch():
         (1, 2),
     ],
 )
-def test_jac_outputs_inconsistent_first_dimension(rows_y1: int, rows_y2: int):
+def test_jac_outputs_inconsistent_first_dimension(rows_y1: int, rows_y2: int) -> None:
     """
     Tests that jac raises a ValueError early when the provided jac_outputs have inconsistent first
     dimensions.
@@ -194,7 +194,7 @@ def test_jac_outputs_inconsistent_first_dimension(rows_y1: int, rows_y2: int):
         jac([y1, y2], x, jac_outputs=[j1, j2])
 
 
-def test_empty_inputs():
+def test_empty_inputs() -> None:
     """Tests that jac does not return any jacobian no input is specified."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -207,7 +207,7 @@ def test_empty_inputs():
     assert len(jacobians) == 0
 
 
-def test_partial_inputs():
+def test_partial_inputs() -> None:
     """
     Tests that jac returns the right jacobians when only a subset of the actual inputs are specified
     as inputs.
@@ -223,7 +223,7 @@ def test_partial_inputs():
     assert len(jacobians) == 1
 
 
-def test_empty_tensors_fails():
+def test_empty_tensors_fails() -> None:
     """Tests that jac raises an error when called with an empty list of tensors."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -233,7 +233,7 @@ def test_empty_tensors_fails():
         jac([], inputs=[a1, a2])
 
 
-def test_multiple_tensors():
+def test_multiple_tensors() -> None:
     """
     Tests that giving multiple tensors to jac is equivalent to giving a single tensor containing all
     the values of the original tensors.
@@ -268,7 +268,7 @@ def test_multiple_tensors():
 
 
 @mark.parametrize("chunk_size", [None, 1, 2, 4])
-def test_various_valid_chunk_sizes(chunk_size):
+def test_various_valid_chunk_sizes(chunk_size) -> None:
     """Tests that jac works for various valid values of parallel_chunk_size."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -282,7 +282,7 @@ def test_various_valid_chunk_sizes(chunk_size):
 
 
 @mark.parametrize("chunk_size", [0, -1])
-def test_non_positive_chunk_size_fails(chunk_size: int):
+def test_non_positive_chunk_size_fails(chunk_size: int) -> None:
     """Tests that jac raises an error when using invalid chunk sizes."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -295,7 +295,7 @@ def test_non_positive_chunk_size_fails(chunk_size: int):
         jac([y1, y2], [a1, a2], parallel_chunk_size=chunk_size)
 
 
-def test_input_retaining_grad_fails():
+def test_input_retaining_grad_fails() -> None:
     """
     Tests that jac raises an error when some input in the computation graph of the ``tensors``
     parameter retains grad and vmap has to be used.
@@ -315,7 +315,7 @@ def test_input_retaining_grad_fails():
         _ = -b.grad  # type: ignore[unsupported-operator]
 
 
-def test_non_input_retaining_grad_fails():
+def test_non_input_retaining_grad_fails() -> None:
     """
     Tests that jac fails to fill a valid `.grad` when some tensor in the computation graph of the
     ``tensors`` parameter retains grad and vmap has to be used.
@@ -335,7 +335,7 @@ def test_non_input_retaining_grad_fails():
 
 
 @mark.parametrize("chunk_size", [1, 3, None])
-def test_tensor_used_multiple_times(chunk_size: int | None):
+def test_tensor_used_multiple_times(chunk_size: int | None) -> None:
     """
     Tests that jac works correctly when one of the inputs is used multiple times. In this setup, the
     autograd graph is still acyclic, but the graph of tensors used becomes cyclic.
@@ -355,7 +355,7 @@ def test_tensor_used_multiple_times(chunk_size: int | None):
     assert_close(jacobians[0], J)
 
 
-def test_repeated_tensors():
+def test_repeated_tensors() -> None:
     """
     Tests that jac does not allow repeating tensors.
 
@@ -374,7 +374,7 @@ def test_repeated_tensors():
         jac([y1, y1, y2], [a1, a2])
 
 
-def test_repeated_inputs():
+def test_repeated_inputs() -> None:
     """
     Tests that jac correctly works when some inputs are repeated. In this case, since
     torch.autograd.grad repeats the output gradients, it is natural for autojac to also repeat the

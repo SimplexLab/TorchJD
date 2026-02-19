@@ -6,7 +6,7 @@ obtained `.jac` field.
 from utils.asserts import assert_jac_close
 
 
-def test_backward():
+def test_backward() -> None:
     import torch
 
     from torchjd.autojac import backward
@@ -21,7 +21,7 @@ def test_backward():
     assert_jac_close(param, torch.tensor([[-1.0, 1.0], [2.0, 4.0]]), rtol=0.0, atol=1e-04)
 
 
-def test_backward2():
+def test_backward2() -> None:
     import torch
 
     from torchjd.autojac import backward

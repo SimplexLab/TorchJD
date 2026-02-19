@@ -105,7 +105,7 @@ def _save_and_print_trace(
 
 
 def profile_autojac(factory: ModuleFactory, batch_size: int) -> None:
-    def forward_backward_fn(model, inputs, loss_fn):
+    def forward_backward_fn(model, inputs, loss_fn) -> None:
         aggregator = UPGrad()
         autojac_forward_backward(model, inputs, loss_fn, aggregator)
 
@@ -113,7 +113,7 @@ def profile_autojac(factory: ModuleFactory, batch_size: int) -> None:
 
 
 def profile_autogram(factory: ModuleFactory, batch_size: int) -> None:
-    def forward_backward_fn(model, inputs, loss_fn):
+    def forward_backward_fn(model, inputs, loss_fn) -> None:
         engine = Engine(model, batch_dim=0)
         weighting = UPGradWeighting()
         autogram_forward_backward(model, inputs, loss_fn, engine, weighting)
@@ -121,7 +121,7 @@ def profile_autogram(factory: ModuleFactory, batch_size: int) -> None:
     profile_method("autogram", forward_backward_fn, factory, batch_size)
 
 
-def main():
+def main() -> None:
     for factory, batch_size in PARAMETRIZATIONS:
         profile_autojac(factory, batch_size)
         print("\n" + "=" * 80 + "\n")

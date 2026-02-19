@@ -18,7 +18,7 @@ from torchjd.autojac._transform import OrderedSet
 
 
 @mark.parametrize("default_grad_tensors", [True, False])
-def test_check_create_transform(default_grad_tensors: bool):
+def test_check_create_transform(default_grad_tensors: bool) -> None:
     """Tests that _create_transform creates a valid Transform."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -48,7 +48,7 @@ def test_check_create_transform(default_grad_tensors: bool):
     assert output_keys == set()
 
 
-def test_shape_is_correct():
+def test_shape_is_correct() -> None:
     """Tests that mtl_backward works correctly."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -76,7 +76,7 @@ def test_value_is_correct(
     manually_specify_shared_params: bool,
     manually_specify_tasks_params: bool,
     chunk_size: int | None,
-):
+) -> None:
     """
     Tests that the .jac value filled by mtl_backward is correct in a simple example of
     matrix-vector product for three tasks whose loss are given by a simple inner product of the
@@ -116,7 +116,7 @@ def test_value_is_correct(
     assert_jac_close(p0, expected_jacobian)
 
 
-def test_empty_tasks_fails():
+def test_empty_tasks_fails() -> None:
     """Tests that mtl_backward raises an error when called with an empty list of tasks."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -128,7 +128,7 @@ def test_empty_tasks_fails():
         mtl_backward([], features=[f1, f2])
 
 
-def test_single_task():
+def test_single_task() -> None:
     """Tests that mtl_backward works correctly with a single task."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -144,7 +144,7 @@ def test_single_task():
     assert_has_grad(p1)
 
 
-def test_incoherent_task_number_fails():
+def test_incoherent_task_number_fails() -> None:
     """
     Tests that mtl_backward raises an error when called with the number of tasks losses different
     from the number of tasks parameters.
@@ -175,7 +175,7 @@ def test_incoherent_task_number_fails():
         )
 
 
-def test_empty_params():
+def test_empty_params() -> None:
     """Tests that mtl_backward does not fill the .jac/.grad values if no parameter is specified."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -199,7 +199,7 @@ def test_empty_params():
         assert_has_no_grad(p)
 
 
-def test_multiple_params_per_task():
+def test_multiple_params_per_task() -> None:
     """Tests that mtl_backward works correctly when the tasks each have several parameters."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -234,7 +234,7 @@ def test_multiple_params_per_task():
         [(5, 4, 3, 2), (5, 4, 3, 2)],
     ],
 )
-def test_various_shared_params(shared_params_shapes: list[tuple[int]]):
+def test_various_shared_params(shared_params_shapes: list[tuple[int]]) -> None:
     """Tests that mtl_backward works correctly with various kinds of shared_params."""
 
     shared_params = [rand_(shape, requires_grad=True) for shape in shared_params_shapes]
@@ -258,7 +258,7 @@ def test_various_shared_params(shared_params_shapes: list[tuple[int]]):
         assert_has_grad(p)
 
 
-def test_partial_params():
+def test_partial_params() -> None:
     """
     Tests that mtl_backward fills the right .jac/.grad values when only a subset of the parameters
     are specified as inputs.
@@ -285,7 +285,7 @@ def test_partial_params():
     assert_has_no_grad(p2)
 
 
-def test_empty_features_fails():
+def test_empty_features_fails() -> None:
     """Tests that mtl_backward expectedly raises an error when no there is no feature."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -310,7 +310,7 @@ def test_empty_features_fails():
         (5, 4, 3, 2),
     ],
 )
-def test_various_single_features(shape: tuple[int, ...]):
+def test_various_single_features(shape: tuple[int, ...]) -> None:
     """Tests that mtl_backward works correctly with various kinds of feature tensors."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -342,7 +342,7 @@ def test_various_single_features(shape: tuple[int, ...]):
         [(5, 4, 3, 2), (5, 4, 3, 2)],
     ],
 )
-def test_various_feature_lists(shapes: list[tuple[int]]):
+def test_various_feature_lists(shapes: list[tuple[int]]) -> None:
     """Tests that mtl_backward works correctly with various kinds of feature lists."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -361,7 +361,7 @@ def test_various_feature_lists(shapes: list[tuple[int]]):
         assert_has_grad(p)
 
 
-def test_non_scalar_loss_fails():
+def test_non_scalar_loss_fails() -> None:
     """Tests that mtl_backward raises an error when used with a non-scalar loss."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -378,7 +378,7 @@ def test_non_scalar_loss_fails():
 
 
 @mark.parametrize("chunk_size", [None, 1, 2, 4])
-def test_various_valid_chunk_sizes(chunk_size):
+def test_various_valid_chunk_sizes(chunk_size) -> None:
     """Tests that mtl_backward works for various valid values of parallel_chunk_size."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -402,7 +402,7 @@ def test_various_valid_chunk_sizes(chunk_size):
 
 
 @mark.parametrize("chunk_size", [0, -1])
-def test_non_positive_chunk_size_fails(chunk_size: int):
+def test_non_positive_chunk_size_fails(chunk_size: int) -> None:
     """Tests that mtl_backward raises an error when using invalid chunk sizes."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -422,7 +422,7 @@ def test_non_positive_chunk_size_fails(chunk_size: int):
         )
 
 
-def test_shared_param_retaining_grad_fails():
+def test_shared_param_retaining_grad_fails() -> None:
     """
     Tests that mtl_backward fails to fill a valid `.grad` when some shared param in the computation
     graph of the ``features`` parameter retains grad and vmap has to be used.
@@ -451,7 +451,7 @@ def test_shared_param_retaining_grad_fails():
         _ = -a.grad  # type: ignore[unsupported-operator]
 
 
-def test_shared_activation_retaining_grad_fails():
+def test_shared_activation_retaining_grad_fails() -> None:
     """
     Tests that mtl_backward fails to fill a valid `.grad` when some tensor in the computation graph
     of the ``features`` parameter retains grad and vmap has to be used.
@@ -480,7 +480,7 @@ def test_shared_activation_retaining_grad_fails():
         _ = -a.grad  # type: ignore[unsupported-operator]
 
 
-def test_tasks_params_overlap():
+def test_tasks_params_overlap() -> None:
     """Tests that mtl_backward works correctly when the tasks' parameters have some overlap."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -502,7 +502,7 @@ def test_tasks_params_overlap():
     assert_jac_close(p0, J)
 
 
-def test_tasks_params_are_the_same():
+def test_tasks_params_are_the_same() -> None:
     """Tests that mtl_backward works correctly when the tasks have the same params."""
 
     p0 = tensor_([1.0, 2.0], requires_grad=True)
@@ -520,7 +520,7 @@ def test_tasks_params_are_the_same():
     assert_jac_close(p0, J)
 
 
-def test_task_params_is_subset_of_other_task_params():
+def test_task_params_is_subset_of_other_task_params() -> None:
     """
     Tests that mtl_backward works correctly when one task's params is a subset of another task's
     params.
@@ -543,7 +543,7 @@ def test_task_params_is_subset_of_other_task_params():
     assert_jac_close(p0, J)
 
 
-def test_shared_params_overlapping_with_tasks_params_fails():
+def test_shared_params_overlapping_with_tasks_params_fails() -> None:
     """
     Tests that mtl_backward raises an error when the set of shared params overlaps with the set of
     task-specific params.
@@ -566,7 +566,7 @@ def test_shared_params_overlapping_with_tasks_params_fails():
         )
 
 
-def test_default_shared_params_overlapping_with_default_tasks_params_fails():
+def test_default_shared_params_overlapping_with_default_tasks_params_fails() -> None:
     """
     Tests that mtl_backward raises an error when the set of shared params obtained by default
     overlaps with the set of task-specific params obtained by default.
@@ -587,7 +587,7 @@ def test_default_shared_params_overlapping_with_default_tasks_params_fails():
         )
 
 
-def test_repeated_losses():
+def test_repeated_losses() -> None:
     """
     Tests that mtl_backward does not allow repeating losses.
 
@@ -610,7 +610,7 @@ def test_repeated_losses():
         mtl_backward(losses, features=[f1, f2], retain_graph=True)
 
 
-def test_repeated_features():
+def test_repeated_features() -> None:
     """
     Tests that mtl_backward does not allow repeating features.
 
@@ -633,7 +633,7 @@ def test_repeated_features():
         mtl_backward([y1, y2], features=features)
 
 
-def test_repeated_shared_params():
+def test_repeated_shared_params() -> None:
     """
     Tests that mtl_backward correctly works when some shared are repeated. Since these are tensors
     with respect to which we differentiate, to match the behavior of torch.autograd.backward, this
@@ -661,7 +661,7 @@ def test_repeated_shared_params():
     assert_grad_close(p2, g2)
 
 
-def test_repeated_task_params():
+def test_repeated_task_params() -> None:
     """
     Tests that mtl_backward correctly works when some task-specific params are repeated for some
     task. Since these are tensors with respect to which we differentiate, to match the behavior of
@@ -689,7 +689,7 @@ def test_repeated_task_params():
     assert_grad_close(p2, g2)
 
 
-def test_grad_tensors_value_is_correct():
+def test_grad_tensors_value_is_correct() -> None:
     """
     Tests that mtl_ackward correctly computes the element-wise product of grad_tensors and the
     tensors.
@@ -724,7 +724,7 @@ def test_grad_tensors_value_is_correct():
     assert_jac_close(p0, expected_jacobian)
 
 
-def test_grad_tensors_length_mismatch():
+def test_grad_tensors_length_mismatch() -> None:
     """Tests that mtl_backward raises a ValueError early if len(grad_tensors) != len(tensors)."""
 
     p0 = randn_(3, requires_grad=True)
@@ -747,7 +747,7 @@ def test_grad_tensors_length_mismatch():
         )
 
 
-def test_grad_tensors_shape_mismatch():
+def test_grad_tensors_shape_mismatch() -> None:
     """
     Tests that mtl_backward raises a ValueError early if the shape of a tensor in grad_tensors is
     incompatible with the corresponding tensor.
