@@ -1,3 +1,5 @@
+from typing import Any
+
 import torch
 from torch import Tensor
 from torch.testing import assert_close
@@ -16,7 +18,7 @@ def assert_has_no_jac(t: Tensor) -> None:
     assert not is_tensor_with_jac(t)
 
 
-def assert_jac_close(t: Tensor, expected_jac: Tensor, **kwargs) -> None:
+def assert_jac_close(t: Tensor, expected_jac: Tensor, **kwargs: Any) -> None:
     assert is_tensor_with_jac(t)
     assert_close(t.jac, expected_jac, **kwargs)
 
@@ -29,12 +31,12 @@ def assert_has_no_grad(t: Tensor) -> None:
     assert t.grad is None
 
 
-def assert_grad_close(t: Tensor, expected_grad: Tensor, **kwargs) -> None:
+def assert_grad_close(t: Tensor, expected_grad: Tensor, **kwargs: Any) -> None:
     assert t.grad is not None
     assert_close(t.grad, expected_grad, **kwargs)
 
 
-def assert_is_psd_matrix(matrix: Tensor, **kwargs) -> None:
+def assert_is_psd_matrix(matrix: Tensor, **kwargs: Any) -> None:
     assert is_psd_matrix(matrix)
     assert_close(matrix, matrix.mH, **kwargs)
 
@@ -44,7 +46,7 @@ def assert_is_psd_matrix(matrix: Tensor, **kwargs) -> None:
     assert_close(eig_vals, expected_eig_vals, **kwargs)
 
 
-def assert_is_psd_tensor(t: Tensor, **kwargs) -> None:
+def assert_is_psd_tensor(t: Tensor, **kwargs: Any) -> None:
     assert is_psd_tensor(t)
     matrix = flatten(t)
     assert_is_psd_matrix(matrix, **kwargs)

@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 import torch
 import torchvision
@@ -14,7 +14,7 @@ _T = TypeVar("_T", bound=nn.Module)
 
 
 class ModuleFactory(Generic[_T]):
-    def __init__(self, architecture: type[_T], *args, **kwargs) -> None:
+    def __init__(self, architecture: type[_T], *args: Any, **kwargs: Any) -> None:
         self.architecture: type[_T] = architecture
         self.args = args
         self.kwargs = kwargs
