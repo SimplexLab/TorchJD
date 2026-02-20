@@ -1,8 +1,18 @@
 from pytest import mark, raises
+from torch.testing import assert_close
 from utils.asserts import assert_grad_close, assert_has_jac, assert_has_no_jac
 from utils.tensors import tensor_
 
-from torchjd.aggregation import Aggregator, Mean, PCGrad, UPGrad
+from torchjd.aggregation import (
+    Aggregator,
+    Mean,
+    MeanWeighting,
+    PCGrad,
+    PCGradWeighting,
+    UPGrad,
+    UPGradWeighting,
+    Weighting,
+)
 from torchjd.autojac._jac_to_grad import jac_to_grad
 
 
@@ -21,6 +31,27 @@ def test_various_aggregators(aggregator: Aggregator):
 
     jac_to_grad([t1, t2], aggregator)
 
+    assert_grad_close(t1, g1)
+    assert_grad_close(t2, g2)
+
+
+@mark.parametrize("weighting", [MeanWeighting(), UPGradWeighting(), PCGradWeighting()])
+def test_various_weightings(weighting: Weighting):
+    """Tests that jac_to_grad works for various aggregators."""
+
+    t1 = tensor_(1.0, requires_grad=True)
+    t2 = tensor_([2.0, 3.0], requires_grad=True)
+    jac = tensor_([[-4.0, 1.0, 1.0], [6.0, 1.0, 1.0]])
+    t1.__setattr__("jac", jac[:, 0])
+    t2.__setattr__("jac", jac[:, 1:])
+    expected_weights = weighting(jac)
+    expected_grad = expected_weights @ jac
+    g1 = expected_grad[0]
+    g2 = expected_grad[1:]
+
+    weights = jac_to_grad([t1, t2], weighting)
+
+    assert_close(weights, expected_weights)
     assert_grad_close(t1, g1)
     assert_grad_close(t2, g2)
 
