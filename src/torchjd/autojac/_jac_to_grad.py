@@ -44,14 +44,14 @@ def jac_to_grad(
 
     :param tensors: The tensors whose ``.jac`` fields should be aggregated. All Jacobians must
         have the same first dimension (e.g. number of losses).
-    :param aggregator: The aggregator used to reduce the Jacobians into gradients. If a
-        :class:`WeightedAggregator <torchjd.aggregation._aggregator_bases.WeightedAggregator>` is
-        provided, ``jac_to_grad`` will also return the weights used to aggregate the Jacobians.
+    :param aggregator: The aggregator used to reduce the Jacobians into gradients. If it uses a
+        :class:`Weighting <torchjd.aggregation._weighting_bases.Weighting>` to combine the rows of
+        the Jacobians, ``jac_to_grad`` will also return the computed weights.
     :param retain_jac: Whether to preserve the ``.jac`` fields of the tensors after they have been
         used. Defaults to ``False``.
-    :returns: If ``aggregator`` is a
-        :class:`WeightedAggregator <torchjd.aggregation._aggregator_bases.WeightedAggregator>`,
-        returns the weights used to aggregate the Jacobians, otherwise ``None``.
+    :returns: If ``aggregator`` uses a
+        :class:`Weighting <torchjd.aggregation._weighting_bases.Weighting>` returns the weights used
+        to combine the rows of the Jacobians, otherwise ``None``.
 
     .. note::
         This function starts by "flattening" the ``.jac`` fields into matrices (i.e. flattening all
