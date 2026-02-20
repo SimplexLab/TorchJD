@@ -20,7 +20,7 @@ class Flattening(GeneralizedWeighting):
     :param weighting: The weighting to apply to the Gramian matrix.
     """
 
-    def __init__(self, weighting: Weighting):
+    def __init__(self, weighting: Weighting) -> None:
         super().__init__()
         self.weighting = weighting
 

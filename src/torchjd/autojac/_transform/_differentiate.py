@@ -31,7 +31,7 @@ class Differentiate(Transform, ABC):
         inputs: OrderedSet[Tensor],
         retain_graph: bool,
         create_graph: bool,
-    ):
+    ) -> None:
         self.outputs = list(outputs)
         self.inputs = list(inputs)
         self.retain_graph = retain_graph

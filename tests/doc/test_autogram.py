@@ -1,7 +1,7 @@
 """This file contains tests for the usage examples related to autogram."""
 
 
-def test_engine():
+def test_engine() -> None:
     import torch
     from torch.nn import Linear, MSELoss, ReLU, Sequential
     from torch.optim import SGD

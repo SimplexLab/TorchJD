@@ -15,7 +15,7 @@ class Constant(WeightedAggregator):
     :param weights: The weights associated to the rows of the input matrices.
     """
 
-    def __init__(self, weights: Tensor):
+    def __init__(self, weights: Tensor) -> None:
         super().__init__(weighting=ConstantWeighting(weights=weights))
         self._weights = weights
 
@@ -35,7 +35,7 @@ class ConstantWeighting(Weighting[Matrix]):
     :param weights: The weights to return at each call.
     """
 
-    def __init__(self, weights: Tensor):
+    def __init__(self, weights: Tensor) -> None:
         if weights.dim() != 1:
             raise ValueError(
                 "Parameter `weights` should be a 1-dimensional tensor. Found `weights.shape = "

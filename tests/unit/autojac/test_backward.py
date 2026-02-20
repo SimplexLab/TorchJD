@@ -9,7 +9,7 @@ from torchjd.autojac._transform import OrderedSet
 
 
 @mark.parametrize("default_jac_tensors", [True, False])
-def test_check_create_transform(default_jac_tensors: bool):
+def test_check_create_transform(default_jac_tensors: bool) -> None:
     """Tests that _create_transform creates a valid Transform."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -37,7 +37,7 @@ def test_check_create_transform(default_jac_tensors: bool):
     assert output_keys == set()
 
 
-def test_jac_is_populated():
+def test_jac_is_populated() -> None:
     """Tests that backward correctly fills the .jac field."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -59,7 +59,7 @@ def test_value_is_correct(
     shape: tuple[int, int],
     manually_specify_inputs: bool,
     chunk_size: int | None,
-):
+) -> None:
     """
     Tests that the .jac value filled by backward is correct in a simple example of matrix-vector
     product.
@@ -81,7 +81,7 @@ def test_value_is_correct(
 
 
 @mark.parametrize("rows", [1, 2, 5])
-def test_jac_tensors_value_is_correct(rows: int):
+def test_jac_tensors_value_is_correct(rows: int) -> None:
     """
     Tests that backward correctly computes the product of jac_tensors and the Jacobian.
     result = jac_tensors @ Jacobian(tensors, inputs).
@@ -107,7 +107,7 @@ def test_jac_tensors_value_is_correct(rows: int):
 
 
 @mark.parametrize("rows", [1, 3])
-def test_jac_tensors_multiple_components(rows: int):
+def test_jac_tensors_multiple_components(rows: int) -> None:
     """
     Tests that jac_tensors works correctly when tensors is a list of multiple tensors. The
     jac_tensors must match the structure of tensors.
@@ -132,7 +132,7 @@ def test_jac_tensors_multiple_components(rows: int):
     assert_jac_close(input, expected)
 
 
-def test_jac_tensors_length_mismatch():
+def test_jac_tensors_length_mismatch() -> None:
     """Tests that backward raises a ValueError early if len(jac_tensors) != len(tensors)."""
     x = tensor_([1.0, 2.0], requires_grad=True)
     y1 = x * 2
@@ -147,7 +147,7 @@ def test_jac_tensors_length_mismatch():
         backward([y1, y2], jac_tensors=[J1], inputs=[x])
 
 
-def test_jac_tensors_shape_mismatch():
+def test_jac_tensors_shape_mismatch() -> None:
     """
     Tests that backward raises a ValueError early if the shape of a tensor in jac_tensors is
     incompatible with the corresponding tensor.
@@ -171,7 +171,7 @@ def test_jac_tensors_shape_mismatch():
         (1, 2),
     ],
 )
-def test_jac_tensors_inconsistent_first_dimension(rows_y1: int, rows_y2: int):
+def test_jac_tensors_inconsistent_first_dimension(rows_y1: int, rows_y2: int) -> None:
     """
     Tests that backward raises a ValueError early when the provided jac_tensors have inconsistent
     first dimensions.
@@ -190,7 +190,7 @@ def test_jac_tensors_inconsistent_first_dimension(rows_y1: int, rows_y2: int):
         backward([y1, y2], jac_tensors=[j1, j2], inputs=[x])
 
 
-def test_empty_inputs():
+def test_empty_inputs() -> None:
     """Tests that backward does not fill the .jac values if no input is specified."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -205,7 +205,7 @@ def test_empty_inputs():
         assert_has_no_jac(a)
 
 
-def test_partial_inputs():
+def test_partial_inputs() -> None:
     """
     Tests that backward fills the right .jac values when only a subset of the actual inputs are
     specified as inputs.
@@ -223,7 +223,7 @@ def test_partial_inputs():
     assert_has_no_jac(a2)
 
 
-def test_empty_tensors_fails():
+def test_empty_tensors_fails() -> None:
     """Tests that backward raises an error when called with an empty list of tensors."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -233,7 +233,7 @@ def test_empty_tensors_fails():
         backward([], inputs=[a1, a2])
 
 
-def test_multiple_tensors():
+def test_multiple_tensors() -> None:
     """
     Tests that giving multiple tensors to backward is equivalent to giving a single tensor
     containing all the values of the original tensors.
@@ -268,7 +268,7 @@ def test_multiple_tensors():
 
 
 @mark.parametrize("chunk_size", [None, 1, 2, 4])
-def test_various_valid_chunk_sizes(chunk_size):
+def test_various_valid_chunk_sizes(chunk_size: int | None) -> None:
     """Tests that backward works for various valid values of parallel_chunk_size."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -284,7 +284,7 @@ def test_various_valid_chunk_sizes(chunk_size):
 
 
 @mark.parametrize("chunk_size", [0, -1])
-def test_non_positive_chunk_size_fails(chunk_size: int):
+def test_non_positive_chunk_size_fails(chunk_size: int) -> None:
     """Tests that backward raises an error when using invalid chunk sizes."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -297,7 +297,7 @@ def test_non_positive_chunk_size_fails(chunk_size: int):
         backward([y1, y2], parallel_chunk_size=chunk_size)
 
 
-def test_input_retaining_grad_fails():
+def test_input_retaining_grad_fails() -> None:
     """
     Tests that backward raises an error when some input in the computation graph of the ``tensors``
     parameter retains grad and vmap has to be used.
@@ -317,7 +317,7 @@ def test_input_retaining_grad_fails():
         _ = -b.grad  # type: ignore[unsupported-operator]
 
 
-def test_non_input_retaining_grad_fails():
+def test_non_input_retaining_grad_fails() -> None:
     """
     Tests that backward fails to fill a valid `.grad` when some tensor in the computation graph of
     the ``tensors`` parameter retains grad and vmap has to be used.
@@ -337,7 +337,7 @@ def test_non_input_retaining_grad_fails():
 
 
 @mark.parametrize("chunk_size", [1, 3, None])
-def test_tensor_used_multiple_times(chunk_size: int | None):
+def test_tensor_used_multiple_times(chunk_size: int | None) -> None:
     """
     Tests that backward works correctly when one of the inputs is used multiple times. In this
     setup, the autograd graph is still acyclic, but the graph of tensors used becomes cyclic.
@@ -356,7 +356,7 @@ def test_tensor_used_multiple_times(chunk_size: int | None):
     assert_jac_close(a, J)
 
 
-def test_repeated_tensors():
+def test_repeated_tensors() -> None:
     """
     Tests that backward does not allow repeating tensors.
 
@@ -375,7 +375,7 @@ def test_repeated_tensors():
         backward([y1, y1, y2])
 
 
-def test_repeated_inputs():
+def test_repeated_inputs() -> None:
     """
     Tests that backward correctly works when some inputs are repeated. In this case, since
     torch.autograd.backward ignores the repetition of the inputs, it is natural for autojac to

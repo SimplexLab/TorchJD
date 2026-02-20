@@ -15,7 +15,7 @@ class TrimmedMean(Aggregator):
         input matrix (note that ``2 * trim_number`` values are removed from each column).
     """
 
-    def __init__(self, trim_number: int):
+    def __init__(self, trim_number: int) -> None:
         super().__init__()
         if trim_number < 0:
             raise ValueError(

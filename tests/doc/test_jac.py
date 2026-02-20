@@ -5,7 +5,7 @@ This file contains the test of the jac usage example, with a verification of the
 from torch.testing import assert_close
 
 
-def test_jac():
+def test_jac() -> None:
     import torch
 
     from torchjd.autojac import jac
@@ -20,7 +20,7 @@ def test_jac():
     assert_close(jacobians[0], torch.tensor([[-1.0, 1.0], [2.0, 4.0]]), rtol=0.0, atol=1e-04)
 
 
-def test_jac_2():
+def test_jac_2() -> None:
     import torch
 
     from torchjd.autojac import jac
@@ -44,7 +44,7 @@ def test_jac_2():
     )
 
 
-def test_jac_3():
+def test_jac_3() -> None:
     import torch
 
     from torchjd.autojac import jac

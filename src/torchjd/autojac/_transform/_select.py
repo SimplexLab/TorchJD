@@ -12,7 +12,7 @@ class Select(Transform):
     :param keys: The keys that should be included in the returned subset.
     """
 
-    def __init__(self, keys: AbstractSet[Tensor]):
+    def __init__(self, keys: AbstractSet[Tensor]) -> None:
         self.keys = keys
 
     def __call__(self, tensor_dict: TensorDict, /) -> TensorDict:

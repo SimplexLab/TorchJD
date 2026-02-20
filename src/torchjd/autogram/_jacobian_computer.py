@@ -26,7 +26,7 @@ class JacobianComputer(ABC):
     :params module: The module to differentiate.
     """
 
-    def __init__(self, module: nn.Module):
+    def __init__(self, module: nn.Module) -> None:
         self.module = module
 
         self.rg_params = dict[str, Parameter]()
