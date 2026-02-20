@@ -49,9 +49,6 @@ def jac_to_grad(
         the Jacobians, ``jac_to_grad`` will also return the computed weights.
     :param retain_jac: Whether to preserve the ``.jac`` fields of the tensors after they have been
         used. Defaults to ``False``.
-    :returns: If ``aggregator`` uses a
-        :class:`Weighting <torchjd.aggregation._weighting_bases.Weighting>` returns the weights used
-        to combine the rows of the Jacobians, otherwise ``None``.
 
     .. note::
         This function starts by "flattening" the ``.jac`` fields into matrices (i.e. flattening all
