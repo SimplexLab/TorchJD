@@ -4,7 +4,8 @@ from typing import overload
 import torch
 from torch import Tensor
 
-from torchjd.aggregation import Aggregator, Weighting
+from torchjd.aggregation import Aggregator
+from torchjd.aggregation._aggregator_bases import WeightedAggregator
 
 from ._accumulation import TensorWithJac, accumulate_grads, is_tensor_with_jac
 from ._utils import check_consistent_first_dimension
@@ -13,26 +14,26 @@ from ._utils import check_consistent_first_dimension
 @overload
 def jac_to_grad(
     tensors: Iterable[Tensor],
-    aggregator: Aggregator,
-    /,
-    *,
-    retain_jac: bool = False,
-) -> None: ...
-
-
-@overload
-def jac_to_grad(
-    tensors: Iterable[Tensor],
-    weighting: Weighting,
+    aggregator: WeightedAggregator,
     /,
     *,
     retain_jac: bool = False,
 ) -> Tensor: ...
 
 
+@overload
 def jac_to_grad(
     tensors: Iterable[Tensor],
-    method: Aggregator | Weighting,
+    aggregator: Aggregator,  # Not a WeightedAggregator, because overloads are checked in order
+    /,
+    *,
+    retain_jac: bool = False,
+) -> None: ...
+
+
+def jac_to_grad(
+    tensors: Iterable[Tensor],
+    aggregator: Aggregator,
     /,
     *,
     retain_jac: bool = False,
@@ -43,15 +44,14 @@ def jac_to_grad(
 
     :param tensors: The tensors whose ``.jac`` fields should be aggregated. All Jacobians must
         have the same first dimension (e.g. number of losses).
-    :param method: The method used to reduce the Jacobians into gradients. Can be an
-        :class:`Aggregator <torchjd.aggregation._aggregator_bases.Aggregator>` or a
-        :class:`Weighting <torchjd.aggregation._aggregator_bases.Weighting>` in which case
-        ``jac_to_grad`` also returns the weights used to aggregator the Jacobians.
+    :param aggregator: The aggregator used to reduce the Jacobians into gradients. If a
+        :class:`WeightedAggregator <torchjd.aggregation._aggregator_bases.WeightedAggregator>` is
+        provided, ``jac_to_grad`` will also return the weights used to aggregate the Jacobians.
     :param retain_jac: Whether to preserve the ``.jac`` fields of the tensors after they have been
         used. Defaults to ``False``.
-    :returns: If ``method`` is a
-        :class:`Weighting <torchjd.aggregation._aggregator_bases.Weighting>`, returns the weights
-        used to aggregate the Jacobians, otherwise ``None``.
+    :returns: If ``aggregator`` is a
+        :class:`WeightedAggregator <torchjd.aggregation._aggregator_bases.WeightedAggregator>`,
+        returns the weights used to aggregate the Jacobians, otherwise ``None``.
 
     .. note::
         This function starts by "flattening" the ``.jac`` fields into matrices (i.e. flattening all
@@ -75,35 +75,15 @@ def jac_to_grad(
             >>> y2 = (param ** 2).sum()
             >>>
             >>> backward([y1, y2])  # param now has a .jac field
-            >>> jac_to_grad([param], UPGrad())  # param now has a .grad field
+            >>> weights = jac_to_grad([param], UPGrad())  # param now has a .grad field
             >>> param.grad
             tensor([0.5000, 2.5000])
-
-        The ``.grad`` field of ``param`` now contains the aggregation (by UPGrad) of the Jacobian of
-        :math:`\begin{bmatrix}y_1 \\ y_2\end{bmatrix}` with respect to ``param``.
-
-    .. admonition::
-        Example
-
-        This is the same example as before except that we also obtain the weights
-
-            >>> import torch
-            >>>
-            >>> from torchjd.aggregation import UPGradWeighting
-            >>> from torchjd.autojac import backward, jac_to_grad
-            >>>
-            >>> param = torch.tensor([1., 2.], requires_grad=True)
-            >>> # Compute arbitrary quantities that are function of param
-            >>> y1 = torch.tensor([-1., 1.]) @ param
-            >>> y2 = (param ** 2).sum()
-            >>>
-            >>> backward([y1, y2])
-            >>> weights = jac_to_grad([param], UPGradWeighting())
             >>> weights
-            tensor([1.,  1.])
+            tensor([0.5],  0.5])
 
         The ``.grad`` field of ``param`` now contains the aggregation (by UPGrad) of the Jacobian of
-        :math:`\begin{bmatrix}y_1 \\ y_2\end{bmatrix}` with respect to ``param``.
+        :math:`\begin{bmatrix}y_1 \\ y_2\end{bmatrix}` with respect to ``param``. In this case, the
+        weights used to combine the Jacobian are equal because there was no conflict.
     """
 
     tensors_ = list[TensorWithJac]()
@@ -126,12 +106,12 @@ def jac_to_grad(
         _free_jacs(tensors_)
 
     jacobian_matrix = _unite_jacobians(jacobians)
-    if isinstance(method, Weighting):
-        weights = method(jacobian_matrix)
+    if isinstance(aggregator, WeightedAggregator):
+        weights = aggregator.weighting(jacobian_matrix)
         gradient_vector = weights @ jacobian_matrix
     else:
         weights = None
-        gradient_vector = method(jacobian_matrix)
+        gradient_vector = aggregator(jacobian_matrix)
     gradients = _disunite_gradient(gradient_vector, tensors_)
     accumulate_grads(tensors_, gradients)
     return weights
