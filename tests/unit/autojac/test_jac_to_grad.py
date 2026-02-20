@@ -82,7 +82,7 @@ def test_row_mismatch():
 def test_no_tensors():
     """Tests that jac_to_grad correctly does nothing when an empty list of tensors is provided."""
 
-    jac_to_grad([], aggregator=UPGrad())
+    jac_to_grad([], UPGrad())
 
 
 @mark.parametrize("retain_jac", [True, False])
