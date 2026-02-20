@@ -1,6 +1,8 @@
 from collections.abc import Sequence
+from typing import cast
 
 from torch import Tensor
+from torch.overrides import is_tensor_like
 
 from torchjd.autojac._transform._base import Transform
 from torchjd.autojac._transform._diagonalize import Diagonalize
@@ -154,7 +156,7 @@ def jac(
         raise ValueError("`outputs` cannot be empty.")
 
     # Preserve repetitions to duplicate jacobians at the return statement
-    inputs_with_repetition = (inputs,) if isinstance(inputs, Tensor) else inputs
+    inputs_with_repetition = cast(Sequence[Tensor], (inputs,) if is_tensor_like(inputs) else inputs)
     inputs_ = OrderedSet(inputs_with_repetition)
 
     jac_outputs_dict = _create_jac_outputs_dict(outputs_, jac_outputs)
@@ -180,7 +182,9 @@ def _create_jac_outputs_dict(
         # Transform that turns the gradients into Jacobians.
         diag = Diagonalize(outputs)
         return (diag << init)({})
-    jac_outputs = [opt_jac_outputs] if isinstance(opt_jac_outputs, Tensor) else opt_jac_outputs
+    jac_outputs = cast(
+        Sequence[Tensor], (opt_jac_outputs,) if is_tensor_like(opt_jac_outputs) else opt_jac_outputs
+    )
     check_matching_length(jac_outputs, outputs, "jac_outputs", "outputs")
     check_matching_jac_shapes(jac_outputs, outputs, "jac_outputs", "outputs")
     check_consistent_first_dimension(jac_outputs, "jac_outputs")
