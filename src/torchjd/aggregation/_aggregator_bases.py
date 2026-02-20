@@ -13,7 +13,7 @@ class Aggregator(nn.Module, ABC):
     :math:`m \times n` into row vectors of dimension :math:`n`.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
     @staticmethod
@@ -48,7 +48,7 @@ class WeightedAggregator(Aggregator):
     :param weighting: The object responsible for extracting the vector of weights from the matrix.
     """
 
-    def __init__(self, weighting: Weighting[Matrix]):
+    def __init__(self, weighting: Weighting[Matrix]) -> None:
         super().__init__()
         self.weighting = weighting
 
@@ -77,6 +77,6 @@ class GramianWeightedAggregator(WeightedAggregator):
         gramian.
     """
 
-    def __init__(self, gramian_weighting: Weighting[PSDMatrix]):
+    def __init__(self, gramian_weighting: Weighting[PSDMatrix]) -> None:
         super().__init__(gramian_weighting << compute_gramian)
         self.gramian_weighting = gramian_weighting

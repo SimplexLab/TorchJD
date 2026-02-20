@@ -28,17 +28,17 @@ non_strong_pairs = [(_make_aggregator(matrix), matrix) for matrix in non_strong_
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
-def test_expected_structure(aggregator: Constant, matrix: Tensor):
+def test_expected_structure(aggregator: Constant, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
-def test_linear_under_scaling(aggregator: Constant, matrix: Tensor):
+def test_linear_under_scaling(aggregator: Constant, matrix: Tensor) -> None:
     assert_linear_under_scaling(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], non_strong_pairs)
-def test_strongly_stationary(aggregator: Constant, matrix: Tensor):
+def test_strongly_stationary(aggregator: Constant, matrix: Tensor) -> None:
     assert_strongly_stationary(aggregator, matrix)
 
 
@@ -57,7 +57,7 @@ def test_strongly_stationary(aggregator: Constant, matrix: Tensor):
         ([1, 1, 1, 1, 1], raises(ValueError)),
     ],
 )
-def test_weights_shape_check(weights_shape: list[int], expectation: ExceptionContext):
+def test_weights_shape_check(weights_shape: list[int], expectation: ExceptionContext) -> None:
     weights = ones_(weights_shape)
     with expectation:
         _ = Constant(weights=weights)
@@ -75,7 +75,9 @@ def test_weights_shape_check(weights_shape: list[int], expectation: ExceptionCon
         ([5], 4, raises(ValueError)),
     ],
 )
-def test_matrix_shape_check(weights_shape: list[int], n_rows: int, expectation: ExceptionContext):
+def test_matrix_shape_check(
+    weights_shape: list[int], n_rows: int, expectation: ExceptionContext
+) -> None:
     matrix = ones_([n_rows, 5])
     weights = ones_(weights_shape)
     aggregator = Constant(weights)
@@ -84,7 +86,7 @@ def test_matrix_shape_check(weights_shape: list[int], n_rows: int, expectation: 
         _ = aggregator(matrix)
 
 
-def test_representations():
+def test_representations() -> None:
     A = Constant(weights=torch.tensor([1.0, 2.0], device="cpu"))
     assert repr(A) == "Constant(weights=tensor([1., 2.]))"
     assert str(A) == "Constant([1., 2.])"

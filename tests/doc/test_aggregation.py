@@ -4,7 +4,7 @@ import torch
 from torch.testing import assert_close
 
 
-def test_aggregation_and_weighting():
+def test_aggregation_and_weighting() -> None:
     from torch import tensor
 
     from torchjd.aggregation import UPGrad, UPGradWeighting
@@ -22,7 +22,7 @@ def test_aggregation_and_weighting():
     assert_close(weights, tensor([1.1109, 0.7894]), rtol=0, atol=1e-4)
 
 
-def test_generalized_weighting():
+def test_generalized_weighting() -> None:
     from torch import ones
 
     from torchjd.aggregation import Flattening, UPGradWeighting

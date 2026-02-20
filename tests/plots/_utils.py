@@ -7,7 +7,7 @@ from torchjd.aggregation import Aggregator
 
 
 class Plotter:
-    def __init__(self, aggregators: list[Aggregator], matrix: torch.Tensor, seed: int = 0):
+    def __init__(self, aggregators: list[Aggregator], matrix: torch.Tensor, seed: int = 0) -> None:
         self.aggregators = aggregators
         self.matrix = matrix
         self.seed = seed

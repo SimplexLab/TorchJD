@@ -26,7 +26,7 @@ from torchjd.autogram._gramian_utils import flatten, movedim, reshape
         ([6, 7, 9], [6, 7, 9]),
     ],
 )
-def test_reshape_equivarience(original_shape: list[int], target_shape: list[int]):
+def test_reshape_equivarience(original_shape: list[int], target_shape: list[int]) -> None:
     """Tests that reshape_gramian is such that compute_gramian is equivariant to a reshape."""
 
     original_matrix = randn_([*original_shape, 2])
@@ -55,7 +55,7 @@ def test_reshape_equivarience(original_shape: list[int], target_shape: list[int]
         ([6, 7, 9], [6, 7, 9]),
     ],
 )
-def test_reshape_yields_psd(original_shape: list[int], target_shape: list[int]):
+def test_reshape_yields_psd(original_shape: list[int], target_shape: list[int]) -> None:
     matrix = randn_([*original_shape, 2])
     gramian = compute_gramian(matrix, 1)
     reshaped_gramian = reshape(gramian, target_shape)
@@ -72,7 +72,7 @@ def test_reshape_yields_psd(original_shape: list[int], target_shape: list[int]):
         [6, 7, 9],
     ],
 )
-def test_flatten_yields_matrix(shape: list[int]):
+def test_flatten_yields_matrix(shape: list[int]) -> None:
     matrix = randn_([*shape, 2])
     gramian = compute_gramian(matrix, 1)
     flattened_gramian = flatten(gramian)
@@ -89,7 +89,7 @@ def test_flatten_yields_matrix(shape: list[int]):
         [6, 7, 9],
     ],
 )
-def test_flatten_yields_psd(shape: list[int]):
+def test_flatten_yields_psd(shape: list[int]) -> None:
     matrix = randn_([*shape, 2])
     gramian = compute_gramian(matrix, 1)
     flattened_gramian = flatten(gramian)
@@ -114,7 +114,7 @@ def test_flatten_yields_psd(shape: list[int]):
         ([2, 2, 3], [0, 2, 1], [1, 0, 2]),
     ],
 )
-def test_movedim_equivariance(shape: list[int], source: list[int], destination: list[int]):
+def test_movedim_equivariance(shape: list[int], source: list[int], destination: list[int]) -> None:
     """Tests that movedim_gramian is such that compute_gramian is equivariant to a movedim."""
 
     original_matrix = randn_([*shape, 2])
@@ -146,7 +146,7 @@ def test_movedim_equivariance(shape: list[int], source: list[int], destination: 
         ([2, 2, 3], [0, 2, 1], [1, 0, 2]),
     ],
 )
-def test_movedim_yields_psd(shape: list[int], source: list[int], destination: list[int]):
+def test_movedim_yields_psd(shape: list[int], source: list[int], destination: list[int]) -> None:
     matrix = randn_([*shape, 2])
     gramian = compute_gramian(matrix, 1)
     moveddim_gramian = movedim(gramian, source, destination)

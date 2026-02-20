@@ -6,7 +6,7 @@ from utils.tensors import tensor_
 from torchjd.autojac._transform import Diagonalize, OrderedSet, RequirementError
 
 
-def test_single_input():
+def test_single_input() -> None:
     """Tests that the Diagonalize transform works when given a single input."""
 
     key = tensor_([1.0, 2.0, 3.0])
@@ -21,7 +21,7 @@ def test_single_input():
     assert_tensor_dicts_are_close(output, expected_output)
 
 
-def test_multiple_inputs():
+def test_multiple_inputs() -> None:
     """Tests that the Diagonalize transform works when given multiple inputs."""
 
     key1 = tensor_([[1.0, 2.0], [4.0, 5.0]])
@@ -77,7 +77,7 @@ def test_multiple_inputs():
     assert_tensor_dicts_are_close(output, expected_output)
 
 
-def test_permute_order():
+def test_permute_order() -> None:
     """
     Tests that the Diagonalize transform outputs a permuted mapping when its keys are permuted.
     """
@@ -98,7 +98,7 @@ def test_permute_order():
     assert_tensor_dicts_are_close(output, expected_output)
 
 
-def test_check_keys():
+def test_check_keys() -> None:
     """
     Tests that the `check_keys` method works correctly. The input_keys must match the stored
     considered keys.

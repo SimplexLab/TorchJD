@@ -9,7 +9,7 @@ from utils.asserts import assert_grad_close
 from torchjd.aggregation import UPGrad
 
 
-def test_jac_to_grad():
+def test_jac_to_grad() -> None:
     import torch
 
     from torchjd.autojac import backward, jac_to_grad

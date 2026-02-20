@@ -12,16 +12,16 @@ non_strong_pairs = [(Random(), matrix) for matrix in non_strong_matrices]
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
-def test_expected_structure(aggregator: Random, matrix: Tensor):
+def test_expected_structure(aggregator: Random, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], non_strong_pairs)
-def test_strongly_stationary(aggregator: Random, matrix: Tensor):
+def test_strongly_stationary(aggregator: Random, matrix: Tensor) -> None:
     assert_strongly_stationary(aggregator, matrix)
 
 
-def test_representations():
+def test_representations() -> None:
     A = Random()
     assert repr(A) == "Random()"
     assert str(A) == "Random"

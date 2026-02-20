@@ -9,7 +9,7 @@ from typing import no_type_check
 from pytest import mark
 
 
-def test_amp():
+def test_amp() -> None:
     import torch
     from torch.amp import GradScaler
     from torch.nn import Linear, MSELoss, ReLU, Sequential
@@ -51,7 +51,7 @@ def test_amp():
         optimizer.zero_grad()
 
 
-def test_basic_usage():
+def test_basic_usage() -> None:
     import torch
     from torch.nn import Linear, MSELoss, ReLU, Sequential
     from torch.optim import SGD
@@ -79,7 +79,7 @@ def test_basic_usage():
     optimizer.zero_grad()
 
 
-def test_iwmtl():
+def test_iwmtl() -> None:
     import torch
     from torch.nn import Linear, MSELoss, ReLU, Sequential
     from torch.optim import SGD
@@ -125,8 +125,8 @@ def test_iwmtl():
         optimizer.zero_grad()
 
 
-def test_iwrm():
-    def test_autograd():
+def test_iwrm() -> None:
+    def test_autograd() -> None:
         import torch
         from torch.nn import Linear, MSELoss, ReLU, Sequential
         from torch.optim import SGD
@@ -147,7 +147,7 @@ def test_iwrm():
             optimizer.step()
             optimizer.zero_grad()
 
-    def test_autojac():
+    def test_autojac() -> None:
         import torch
         from torch.nn import Linear, MSELoss, ReLU, Sequential
         from torch.optim import SGD
@@ -173,7 +173,7 @@ def test_iwrm():
             optimizer.step()
             optimizer.zero_grad()
 
-    def test_autogram():
+    def test_autogram() -> None:
         import torch
         from torch.nn import Linear, MSELoss, ReLU, Sequential
         from torch.optim import SGD
@@ -212,7 +212,7 @@ def test_iwrm():
     "ignore::lightning.fabric.utilities.warnings.PossibleUserWarning",
 )
 @no_type_check  # Typing is annoying with Lightning, which would make the example too hard to read.
-def test_lightning_integration():
+def test_lightning_integration() -> None:
     # Extra ----------------------------------------------------------------------------------------
     import logging
 
@@ -231,14 +231,14 @@ def test_lightning_integration():
     from torchjd.autojac import jac_to_grad, mtl_backward
 
     class Model(LightningModule):
-        def __init__(self):
+        def __init__(self) -> None:
             super().__init__()
             self.feature_extractor = Sequential(Linear(10, 5), ReLU(), Linear(5, 3), ReLU())
             self.task1_head = Linear(3, 1)
             self.task2_head = Linear(3, 1)
             self.automatic_optimization = False
 
-        def training_step(self, batch, batch_idx) -> None:
+        def training_step(self, batch, batch_idx) -> None:  # noqa: ANN001
             input, target1, target2 = batch
 
             features = self.feature_extractor(input)
@@ -278,7 +278,7 @@ def test_lightning_integration():
     trainer.fit(model=model, train_dataloaders=train_loader)
 
 
-def test_monitoring():
+def test_monitoring() -> None:
     import torch
     from torch.nn import Linear, MSELoss, ReLU, Sequential
     from torch.nn.functional import cosine_similarity
@@ -331,7 +331,7 @@ def test_monitoring():
         optimizer.zero_grad()
 
 
-def test_mtl():
+def test_mtl() -> None:
     import torch
     from torch.nn import Linear, MSELoss, ReLU, Sequential
     from torch.optim import SGD
@@ -369,7 +369,7 @@ def test_mtl():
         optimizer.zero_grad()
 
 
-def test_partial_jd():
+def test_partial_jd() -> None:
     import torch
     from torch.nn import Linear, MSELoss, ReLU, Sequential
     from torch.optim import SGD
@@ -402,7 +402,7 @@ def test_partial_jd():
         optimizer.zero_grad()
 
 
-def test_rnn():
+def test_rnn() -> None:
     import torch
     from torch.nn import RNN
     from torch.optim import SGD

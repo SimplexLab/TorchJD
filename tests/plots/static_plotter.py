@@ -25,14 +25,14 @@ RIGHT_ANGLE_SIZE = 0.07
 
 def main(
     *,
-    gradients=False,
-    cone=False,
-    projections=False,
-    upgrad=False,
-    mean=False,
-    dual_proj=False,
-    mgda=False,
-):
+    gradients: bool = False,
+    cone: bool = False,
+    projections: bool = False,
+    upgrad: bool = False,
+    mean: bool = False,
+    dual_proj: bool = False,
+    mgda: bool = False,
+) -> None:
     angle1 = 2.6
     angle2 = 0.3277
     norm1 = 0.9
@@ -76,13 +76,13 @@ def main(
     if cone:
         filename += "_cone"
         start_angle, opening = compute_2d_non_conflicting_cone(matrix.numpy())
-        cone = make_cone_scatter(
+        cone_scatter = make_cone_scatter(
             start_angle,
             opening,
             label="Non-conflicting cone",
             printable=False,
         )
-        fig.add_trace(cone)
+        fig.add_trace(cone_scatter)
 
     if projections:
         filename += "_projections"

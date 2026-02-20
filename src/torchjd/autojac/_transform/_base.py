@@ -67,7 +67,7 @@ class Composition(Transform):
     :param outer: The transform to apply second, to the result of ``inner``.
     """
 
-    def __init__(self, outer: Transform, inner: Transform):
+    def __init__(self, outer: Transform, inner: Transform) -> None:
         self.outer = outer
         self.inner = inner
 
@@ -92,7 +92,7 @@ class Conjunction(Transform):
     :param transforms: The transforms to apply. Their outputs should have disjoint sets of keys.
     """
 
-    def __init__(self, transforms: Sequence[Transform]):
+    def __init__(self, transforms: Sequence[Transform]) -> None:
         self.transforms = transforms
 
     def __str__(self) -> str:
