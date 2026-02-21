@@ -93,7 +93,7 @@ def jac_to_grad(
         tensors_.append(t)
 
     if len(tensors_) == 0:
-        return None
+        raise ValueError("The field `tensor` cannot be empty.")
 
     jacobians = [t.jac for t in tensors_]
 
