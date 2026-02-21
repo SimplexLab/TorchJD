@@ -18,7 +18,7 @@ jobs:
             const title = context.payload.pull_request.title;
             const pr_number = context.payload.pull_request.number;
 
-            const regex = /^([a-z-]+)(?:\(([^)]+)\))?(!?): (.+)$/;
+            const regex = /^([a-z-]+)(?:\(([^)]+)\))?(!?): ([A-Z].+)$/;
             const match = title.match(regex);
 
             if (!match) {
