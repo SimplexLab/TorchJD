@@ -3,6 +3,7 @@ This file contains the test of the jac_to_grad usage example, with a verificatio
 the obtained `.grad` field.
 """
 
+from torch.testing import assert_close
 from utils.asserts import assert_grad_close
 
 
@@ -17,6 +18,7 @@ def test_jac_to_grad() -> None:
     y1 = torch.tensor([-1.0, 1.0]) @ param
     y2 = (param**2).sum()
     backward([y1, y2])  # param now has a .jac field
-    jac_to_grad([param], aggregator=UPGrad())  # param now has a .grad field
+    weights = jac_to_grad([param], UPGrad())  # param now has a .grad field
 
     assert_grad_close(param, torch.tensor([0.5000, 2.5000]), rtol=0.0, atol=1e-04)
+    assert_close(weights, torch.tensor([0.5, 0.5]), rtol=0.0, atol=0.0)
