@@ -6,12 +6,11 @@ the obtained `.grad` field.
 from torch.testing import assert_close
 from utils.asserts import assert_grad_close
 
-from torchjd.aggregation import UPGrad
-
 
 def test_jac_to_grad() -> None:
     import torch
 
+    from torchjd.aggregation import UPGrad
     from torchjd.autojac import backward, jac_to_grad
 
     param = torch.tensor([1.0, 2.0], requires_grad=True)
