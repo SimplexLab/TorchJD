@@ -76,7 +76,7 @@ def jac_to_grad(
             >>> param.grad
             tensor([0.5000, 2.5000])
             >>> weights
-            tensor([0.5],  0.5])
+            tensor([0.5,  0.5])
 
         The ``.grad`` field of ``param`` now contains the aggregation (by UPGrad) of the Jacobian of
         :math:`\begin{bmatrix}y_1 \\ y_2\end{bmatrix}` with respect to ``param``. In this case, the
