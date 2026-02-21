@@ -60,3 +60,20 @@ def _to_array(tensor: Tensor) -> np.ndarray:
     """Transforms a tensor into a numpy array with float64 dtype."""
 
     return tensor.cpu().detach().numpy().astype(np.float64)
+
+
+def estimate_dual_cone_spherical_volume(G: Tensor, n_samples=1_000_000) -> Tensor:
+    """
+    Estimates the spherical volume of the dual cone defined by the Gramian G.
+    """
+    n = G.size(0)
+    device = G.device
+
+    L = torch.linalg.cholesky(G + torch.eye(n, device=device) * 1e-10)
+    ws = torch.randn(n_samples, n, device=device)
+    zs = ws @ L.T
+
+    is_inside = torch.all(zs >= 0, dim=1)
+    proportion = is_inside.float().mean()
+
+    return proportion
