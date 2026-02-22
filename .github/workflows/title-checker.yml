@@ -1,7 +1,7 @@
 name: PR Title Checker
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, edited, reopened]
 
 jobs:
@@ -75,6 +75,7 @@ jobs:
               owner,
               repo,
               issue_number: pr_number,
+              per_page: 100,
             });
             const managedPrefixes = ['cc: ', 'package: '];
             const labelsToRemove = prLabels.data
