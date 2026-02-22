@@ -38,20 +38,12 @@ jobs:
               return;
             }
 
-            const prLabels = await github.rest.issues.listLabelsOnIssue({
+            const repoLabels = await github.rest.issues.listLabelsForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: pr_number,
             });
-            const managedPrefixes = ['cc: ', 'package: '];
-            const labelNames = prLabels.data.map(l => l.name);
-            const labelsToRemove = labelNames.filter(
-              n => managedPrefixes.some(p => n.startsWith(p) || n === 'breaking-change')
-            );
-            for (const label of labelsToRemove) {
-              await github.rest.issues.removeLabel({ owner, repo, issue_number, name: label });
-            }
 
+            const labelNames = repoLabels.data.map(l => l.name);
             const labelsToAdd = [];
 
             const typeLabel = `cc: ${type}`;
