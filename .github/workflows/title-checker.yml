@@ -28,8 +28,13 @@ jobs:
 
             const [_, type, scope, breaking, description] = match;
 
-            if (title.length > 72) {
-              core.setFailed(`PR title is too long (${title.length}/72 characters).`);
+            const displayTitle = `${title} (${pr_number})`;
+            const maxLength = 72;
+
+            if (displayTitle.length > maxLength) {
+              core.setFailed(
+                `PR title is too long by ${displayTitle.length-maxLength} characters.`
+              );
               return;
             }
 
