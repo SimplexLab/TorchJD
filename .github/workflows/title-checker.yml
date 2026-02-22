@@ -22,7 +22,7 @@ jobs:
             const match = title.match(regex);
 
             if (!match) {
-              core.setFailed("PR title does not follow format: 'type(scope)!: description'");
+              core.setFailed("PR title does not follow any of the accepted formats:\n  'type(scope)!: Description'\n  'type(scope): Description'\n  'type!: Description'\n  'type: Description'\n  See https://www.conventionalcommits.org/ for more details");
               return;
             }
 
