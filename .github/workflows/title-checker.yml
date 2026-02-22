@@ -39,7 +39,11 @@ jobs:
               return;
             }
 
-            const repoLabels = await github.rest.issues.listLabelsForRepo({owner, repo});
+            const repoLabels = await github.rest.issues.listLabelsForRepo({
+              owner,
+              repo,
+              per_page: 100,
+            });
 
             const labelNames = repoLabels.data.map(l => l.name);
             const labelsToAdd = [];
