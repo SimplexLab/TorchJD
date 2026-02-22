@@ -16,6 +16,7 @@ jobs:
         with:
           script: |
             const title = context.payload.pull_request.title;
+            const { owner, repo } = context.repo;
             const pr_number = context.payload.pull_request.number;
 
             const regex = /^([a-z-]+)(?:\(([^)]+)\))?(!?): ([A-Z].+)$/;
@@ -38,10 +39,7 @@ jobs:
               return;
             }
 
-            const repoLabels = await github.rest.issues.listLabelsForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
+            const repoLabels = await github.rest.issues.listLabelsForRepo({owner, repo});
 
             const labelNames = repoLabels.data.map(l => l.name);
             const labelsToAdd = [];
@@ -67,8 +65,8 @@ jobs:
             }
 
             const prLabels = await github.rest.issues.listLabelsOnIssue({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              owner,
+              repo,
               issue_number: pr_number,
             });
             const managedPrefixes = ['cc: ', 'package: '];
