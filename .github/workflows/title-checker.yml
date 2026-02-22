@@ -26,9 +26,9 @@ jobs:
               return;
             }
 
-            const [_, type, scope, breaking, description] = match;
+            const [_, type, scope, breaking, __] = match;
 
-            const displayTitle = `${title} (${pr_number})`;
+            const displayTitle = `${title} (#${pr_number})`;
             const maxLength = 72;
 
             if (displayTitle.length > maxLength) {
@@ -79,7 +79,7 @@ jobs:
             const managedPrefixes = ['cc: ', 'package: '];
             const labelsToRemove = prLabels.data
               .map(l => l.name)
-              .filter(n => managedPrefixes.some(p => n.startsWith(p) || n === 'breaking-change'));
+              .filter(n => managedPrefixes.some(p => n.startsWith(p)) || n === 'breaking-change');
             for (const label of labelsToRemove) {
               await github.rest.issues.removeLabel({
                 owner,
@@ -90,8 +90,8 @@ jobs:
             }
 
             await github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              owner,
+              repo,
               issue_number: pr_number,
               labels: labelsToAdd
             });
