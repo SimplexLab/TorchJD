@@ -100,7 +100,8 @@ def test_row_mismatch() -> None:
 def test_no_tensors() -> None:
     """Tests that jac_to_grad correctly does nothing when an empty list of tensors is provided."""
 
-    jac_to_grad([], UPGrad())
+    with raises(ValueError):
+        jac_to_grad([], UPGrad())
 
 
 @mark.parametrize("retain_jac", [True, False])
