@@ -61,6 +61,10 @@ jobs:
             }
 
             if (breaking === '!') {
+              if (!labelNames.includes('breaking-change')) {
+                core.setFailed('No "breaking-change" label found in repo.');
+                return;
+              }
               labelsToAdd.push('breaking-change');
             }
 
