@@ -4,7 +4,8 @@ from typing import overload
 import torch
 from torch import Tensor
 
-from torchjd.aggregation import Aggregator
+from torchjd._linalg import Matrix
+from torchjd.aggregation import Aggregator, Weighting
 from torchjd.aggregation._aggregator_bases import WeightedAggregator
 
 from ._accumulation import TensorWithJac, accumulate_grads, is_tensor_with_jac
@@ -107,7 +108,7 @@ def jac_to_grad(
 
     if isinstance(aggregator, WeightedAggregator):
 
-        def capture_hook(_m: Aggregator, _i: tuple[Tensor], output: Tensor) -> None:
+        def capture_hook(_m: Weighting[Matrix], _i: tuple[Tensor], output: Tensor) -> None:
             nonlocal weights
             weights = output
 
