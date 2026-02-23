@@ -23,13 +23,12 @@ from torchjd.aggregation import (
     TrimmedMean,
     UPGrad,
 )
+from torchjd.aggregation._aggregator_bases import WeightedAggregator
 from torchjd.autojac._jac_to_grad import (
     _can_skip_jacobian_combination,
     _has_forward_hook,
     jac_to_grad,
 )
-
-from torchjd.aggregation._aggregator_bases import WeightedAggregator
 
 
 @mark.parametrize("aggregator", [Mean(), UPGrad(), PCGrad(), ConFIG()])
@@ -231,7 +230,7 @@ def test_can_skip_jacobian_combination(aggregator: Aggregator, expected: bool):
     assert not _can_skip_jacobian_combination(aggregator)
     handle.remove()
     assert _can_skip_jacobian_combination(aggregator) == expected
-    
+
 
 def test_noncontiguous_jac() -> None:
     """Tests that jac_to_grad works when the .jac field is non-contiguous."""
