@@ -32,7 +32,7 @@ from torchjd.autojac._jac_to_grad import (
 
 
 @mark.parametrize(
-    ["aggregator", "opt"],
+    ["aggregator", "optimize"],
     [(Mean(), False), (UPGrad(), True), (UPGrad(), False), (PCGrad(), True), (ConFIG(), False)],
 )
 def test_various_aggregators(aggregator: Aggregator, optimize: bool) -> None:
