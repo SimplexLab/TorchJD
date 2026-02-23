@@ -115,8 +115,12 @@ def jac_to_grad(
         # post-hooks of the outer and inner weighting are run (potentially with effect on the
         # weights) prior to capturing the weights.
         handle = aggregator.weighting.register_forward_hook(capture_hook)
-        gradient_vector = aggregator(jacobian_matrix)
-        handle.remove()
+
+        # Using a try-finally here in case an exception is raised by the aggregator.
+        try:
+            gradient_vector = aggregator(jacobian_matrix)
+        finally:
+            handle.remove()
     else:
         gradient_vector = aggregator(jacobian_matrix)
     gradients = _disunite_gradient(gradient_vector, tensors_)
