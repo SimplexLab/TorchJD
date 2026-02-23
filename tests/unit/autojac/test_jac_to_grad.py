@@ -23,7 +23,7 @@ from torchjd.aggregation import (
     TrimmedMean,
     UPGrad,
 )
-from torchjd.aggregation._aggregator_bases import WeightedAggregator
+from torchjd.aggregation._aggregator_bases import GramianWeightedAggregator, WeightedAggregator
 from torchjd.autojac._jac_to_grad import (
     _can_skip_jacobian_combination,
     _has_forward_hook,
@@ -226,10 +226,21 @@ def test_can_skip_jacobian_combination(aggregator: Aggregator, expected: bool) -
     handle = aggregator.register_forward_hook(lambda _module, _input, output: output)
     assert not _can_skip_jacobian_combination(aggregator)
     handle.remove()
+    assert _can_skip_jacobian_combination(aggregator) == expected
     handle = aggregator.register_forward_pre_hook(lambda _module, input: input)
     assert not _can_skip_jacobian_combination(aggregator)
     handle.remove()
     assert _can_skip_jacobian_combination(aggregator) == expected
+
+    if isinstance(aggregator, GramianWeightedAggregator):
+        handle = aggregator.weighting.register_forward_hook(lambda _module, _input, output: output)
+        assert not _can_skip_jacobian_combination(aggregator)
+        handle.remove()
+        assert _can_skip_jacobian_combination(aggregator) == expected
+        handle = aggregator.weighting.register_forward_pre_hook(lambda _module, input: input)
+        assert not _can_skip_jacobian_combination(aggregator)
+        handle.remove()
+        assert _can_skip_jacobian_combination(aggregator) == expected
 
 
 def test_noncontiguous_jac() -> None:
