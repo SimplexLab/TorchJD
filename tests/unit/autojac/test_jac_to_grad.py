@@ -1,3 +1,5 @@
+from typing import Any
+
 from pytest import mark, raises
 from torch.testing import assert_close
 from utils.asserts import assert_grad_close, assert_has_jac, assert_has_no_jac
@@ -134,3 +136,49 @@ def test_noncontiguous_jac() -> None:
 
     jac_to_grad([t], aggregator)
     assert_grad_close(t, g)
+
+
+@mark.parametrize("aggregator", [UPGrad(), ConFIG()])
+def test_aggregator_hook_is_run(aggregator: Aggregator) -> None:
+    """
+    Tests that jac_to_grad runs forward hooks registered on the aggregator, for both
+    WeightedAggregator (UPGrad) and plain Aggregator (ConFIG) paths.
+    """
+
+    call_count = [0]  # Pointer to int
+
+    def hook(_module: Any, _input: Any, _output: Any) -> None:
+        call_count[0] += 1
+
+    aggregator.register_forward_hook(hook)
+
+    t = tensor_([2.0, 3.0], requires_grad=True)
+    jac = tensor_([[-4.0, 1.0], [6.0, 1.0]])
+    t.__setattr__("jac", jac)
+
+    jac_to_grad([t], aggregator)
+
+    assert call_count[0] == 1
+
+
+@mark.parametrize("aggregator", [UPGrad(), PCGrad(), Mean()])
+def test_weighting_hook_is_run(aggregator: WeightedAggregator) -> None:
+    """
+    Tests that jac_to_grad runs forward hooks registered on the inner weighting of a
+    WeightedAggregator.
+    """
+
+    call_count = [0]  # Pointer to int
+
+    def hook(_module: Any, _input: Any, _output: Any) -> None:
+        call_count[0] += 1
+
+    aggregator.weighting.register_forward_hook(hook)
+
+    t = tensor_([2.0, 3.0], requires_grad=True)
+    jac = tensor_([[-4.0, 1.0], [6.0, 1.0]])
+    t.__setattr__("jac", jac)
+
+    jac_to_grad([t], aggregator)
+
+    assert call_count[0] == 1
