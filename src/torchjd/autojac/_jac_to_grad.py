@@ -124,8 +124,8 @@ def jac_to_grad(
         if not _can_skip_jacobian_combination(aggregator):
             raise ValueError(
                 "In order to use `jac_to_grad` with `optimize_gramian_computation=True`, you must "
-                "provide a `GramianWeightedAggregator` that doesn't have any forward hooks attached"
-                " to it."
+                "provide an `Aggregator` that computes weights based on the Gramian of the Jacobian"
+                " (e.g. `UPGrad`) and that doesn't have any forward hooks attached to it."
             )
 
         gradients, weights = _gramian_based(aggregator, jacobians)
