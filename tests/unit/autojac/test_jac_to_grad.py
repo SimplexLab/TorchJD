@@ -1,6 +1,7 @@
 from typing import Any
 
 from pytest import mark, raises
+from torch import Tensor
 from torch.testing import assert_close
 from utils.asserts import assert_grad_close, assert_has_jac, assert_has_no_jac
 from utils.tensors import tensor_
@@ -188,3 +189,28 @@ def test_weighting_hook_is_run(aggregator: GramianWeightedAggregator) -> None:
 
     assert call_count_outer[0] == 1
     assert call_count_inner[0] == 1
+
+
+def test_with_hooks() -> None:
+    """Tests that jac_to_grad correctly returns the weights modified by all applicable hooks."""
+
+    def hook_aggregator(_module: Any, _input: Any, aggregation: Tensor) -> Tensor:
+        return aggregation * 2  # should not affect the weights
+
+    def hook_outer(_module: Any, _input: Any, weights: Tensor) -> Tensor:
+        return weights * 3  # should affect the weights returned by jac_to_grad
+
+    def hook_inner(_module: Any, _input: Any, weights: Tensor) -> Tensor:
+        return weights * 5  # should affect the weights returned by jac_to_grad
+
+    aggregator = UPGrad()
+    aggregator.register_forward_hook(hook_aggregator)
+    aggregator.weighting.register_forward_hook(hook_outer)
+    aggregator.gramian_weighting.register_forward_hook(hook_inner)
+
+    t = tensor_([2.0, 3.0], requires_grad=True)
+    jac = tensor_([[-4.0, 1.0], [6.0, 1.0]])
+    t.__setattr__("jac", jac)
+
+    weights = jac_to_grad([t], aggregator)
+    assert_close(weights, aggregator.weighting(jac))
