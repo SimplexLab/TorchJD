@@ -68,10 +68,8 @@ changelog does not include internal changes that do not affect the user.
   - `GeneralizedWeighting.__call__`: The `generalized_gramian` parameter is now positional-only.
     Suggested change: `generalized_weighting(generalized_gramian=generalized_gramian)` =>
     `generalized_weighting(generalized_gramian)`.
-- Removed an unnecessary memory duplication. This should significantly improve the memory efficiency
-  of `autojac`.
-- Removed an unnecessary internal cloning of gradient. This should slightly improve the memory
-  efficiency of `autojac`.
+- Removed several unnecessary memory duplications. This should significantly improve the memory
+  efficiency and speed of `autojac`.
 - Increased the lower bounds of the torch (from 2.0.0 to 2.3.0) and numpy (from 1.21.0
   to 1.21.2) dependencies to reflect what really works with torchjd. We now also run torchjd's tests
   with the dependency lower-bounds specified in `pyproject.toml`, so we should now always accurately
