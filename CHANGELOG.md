@@ -8,6 +8,8 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-02-24
+
 ### Added
 
 - Added the function `torchjd.autojac.jac`. It's the same as `torchjd.autojac.backward` except that
