@@ -113,12 +113,15 @@ def jac_to_grad(
 
 
 def _can_skip_jacobian_combination(aggregator: Aggregator) -> TypeGuard[GramianWeightedAggregator]:
-    return isinstance(aggregator, GramianWeightedAggregator) and not _has_forward_hook(aggregator)
+    return (
+        isinstance(aggregator, GramianWeightedAggregator)
+        and not _has_forward_hook(aggregator)
+        and not _has_forward_hook(aggregator.weighting)
+    )
 
 
 def _has_forward_hook(module: nn.Module) -> bool:
     """Return whether the module has any forward hook registered."""
-    # TODO: also check hooks on the outer weighting
     return len(module._forward_hooks) > 0 or len(module._forward_pre_hooks) > 0
 
 
