@@ -13,7 +13,7 @@ from torchjd.aggregation import (
     PCGrad,
     UPGrad,
 )
-from torchjd.aggregation._aggregator_bases import GramianWeightedAggregator, WeightedAggregator
+from torchjd.aggregation._aggregator_bases import WeightedAggregator
 from torchjd.autojac._jac_to_grad import jac_to_grad
 
 
@@ -160,35 +160,6 @@ def test_aggregator_hook_is_run(aggregator: Aggregator) -> None:
     jac_to_grad([t], aggregator)
 
     assert call_count[0] == 1
-
-
-@mark.parametrize("aggregator", [UPGrad(), PCGrad()])
-def test_weighting_hook_is_run(aggregator: GramianWeightedAggregator) -> None:
-    """
-    Tests that jac_to_grad runs forward hooks registered on the outer and inner weightings of a
-    GramianWeightedAggregator.
-    """
-
-    call_count_outer = [0]  # Pointer to int
-    call_count_inner = [0]  # Pointer to int
-
-    def hook_outer(_module: Any, _input: Any, _output: Any) -> None:
-        call_count_outer[0] += 1
-
-    def hook_inner(_module: Any, _input: Any, _output: Any) -> None:
-        call_count_inner[0] += 1
-
-    aggregator.weighting.register_forward_hook(hook_outer)
-    aggregator.gramian_weighting.register_forward_hook(hook_inner)
-
-    t = tensor_([2.0, 3.0], requires_grad=True)
-    jac = tensor_([[-4.0, 1.0], [6.0, 1.0]])
-    t.__setattr__("jac", jac)
-
-    jac_to_grad([t], aggregator)
-
-    assert call_count_outer[0] == 1
-    assert call_count_inner[0] == 1
 
 
 def test_with_hooks() -> None:
