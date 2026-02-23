@@ -83,7 +83,7 @@ In the case of multi-task learning, an alternative to
 [`torchjd.autojac.mtl_backward`](https://torchjd.org/stable/docs/autojac/mtl_backward/). It computes
 the gradient of each task-specific loss with respect to the corresponding task's parameters, and
 stores it in their `.grad` fields. It also computes the Jacobian of the vector of losses with
-respect to the shared parameters and stores it their `.jac` field. Then, the
+respect to the shared parameters and stores it in their `.jac` field. Then, the
 [`torchjd.autojac.jac_to_grad`](https://torchjd.org/stable/docs/autojac/jac_to_grad/) function can
 be called to aggregate this Jacobian and replace the `.jac` fields by `.grad` fields for the shared
 parameters.
@@ -154,8 +154,8 @@ loss.
 The Gramian of the Jacobian, defined as the Jacobian multiplied by its transpose, contains all the
 dot products between individual gradients. It thus contains all the information about conflict and
 gradient imbalance. It turns out that most aggregators from the literature
-(e.g. [UPGrad](https://torchjd.org/stable/docs/aggregation/upgrad/)) make a linear combinations of
-the rows of the Jacobian, whose weights only depend only on the Gramian of the Jacobian.
+(e.g. [UPGrad](https://torchjd.org/stable/docs/aggregation/upgrad/)) make a linear combination of
+the rows of the Jacobian, whose weights only depend on the Gramian of the Jacobian.
 
 An alternative implementation of Jacobian descent is thus to:
 - Compute this Gramian incrementally (layer by layer), without ever storing the full Jacobian in
@@ -165,11 +165,12 @@ An alternative implementation of Jacobian descent is thus to:
 - Combine the losses using those weights and make a step of gradient descent on the combined loss.
 
 The main advantage of this approach is to save memory because the Jacobian (that is typically large)
-never has to be stored in memory. The [`torchjd.autogram.Engine`](https://torchjd.org/stable/docs/autogram/engine/) is precisely made
-to compute the Gramian of the Jacobian efficiently.
+never has to be stored in memory. The
+[`torchjd.autogram.Engine`](https://torchjd.org/stable/docs/autogram/engine/) is precisely made to
+compute the Gramian of the Jacobian efficiently.
 
-The following example shows how to use the `autogram` engine to minimize the vector of per-instance losses with
-Jacobian descent using [UPGrad](https://torchjd.org/stable/docs/aggregation/upgrad/).
+The following example shows how to use the `autogram` engine to minimize the vector of per-instance
+losses with Jacobian descent using [UPGrad](https://torchjd.org/stable/docs/aggregation/upgrad/).
 
 ```diff
   import torch
