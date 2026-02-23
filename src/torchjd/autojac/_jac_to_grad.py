@@ -63,13 +63,11 @@ def jac_to_grad(
         the Jacobians, ``jac_to_grad`` will also return the computed weights.
     :param retain_jac: Whether to preserve the ``.jac`` fields of the tensors after they have been
         used. Defaults to ``False``.
-    :param optimize_gramian_computation: When the ``aggregator`` is a
-        :class:`GramianWeightedAggregator <torchjd.aggregation._aggregator_bases.GramianWeightedAggregator>`
-        (e.g. :class:`UPGrad <torchjd.aggregation._upgrad.UPGrad>`), it's possible to skip the
-        concatenation of the Jacobians and to instead compute the Gramian as the sum of the Gramians
-        of the individual Jacobians. This saves memory (up to 50% memory saving) but can be slightly
-        slower (up to 15%) on CUDA. We advise to try this optimization if memory is an issue for
-        you. Defaults to ``False``.
+    :param optimize_gramian_computation: When the ``aggregator`` computes weights based on the
+        Gramian of the Jacobian, it's possible to skip the concatenation of the Jacobians and to
+        instead compute the Gramian as the sum of the Gramians of the individual Jacobians. This
+        saves memory (up to 50% memory saving) but can be slightly slower (up to 15%) on CUDA. We
+        advise to try this optimization if memory is an issue for you. Defaults to ``False``.
 
     .. note::
         This function starts by "flattening" the ``.jac`` fields into matrices (i.e. flattening all
