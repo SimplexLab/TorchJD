@@ -104,11 +104,18 @@ def jac_to_grad(
         _free_jacs(tensors_)
 
     jacobian_matrix = _unite_jacobians(jacobians)
+    weights: Tensor | None = None
+
     if isinstance(aggregator, WeightedAggregator):
-        weights = aggregator.weighting(jacobian_matrix)
-        gradient_vector = weights @ jacobian_matrix
+
+        def capture_hook(_m: Aggregator, _i: tuple[Tensor], output: Tensor) -> None:
+            nonlocal weights
+            weights = output
+
+        handle = aggregator.weighting.register_forward_hook(capture_hook)
+        gradient_vector = aggregator(jacobian_matrix)
+        handle.remove()
     else:
-        weights = None
         gradient_vector = aggregator(jacobian_matrix)
     gradients = _disunite_gradient(gradient_vector, tensors_)
     accumulate_grads(tensors_, gradients)
