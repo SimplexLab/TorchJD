@@ -1,10 +1,9 @@
-import numpy as np
 import torch
-from pytest import mark, raises
+from pytest import mark
 from torch.testing import assert_close
 from utils.tensors import rand_, randn_
 
-from torchjd.aggregation._utils.dual_cone import _project_weight_vector, project_weights
+from torchjd.aggregation._utils.dual_cone import project_weights
 
 
 @mark.parametrize("shape", [(5, 7), (9, 37), (2, 14), (32, 114), (50, 100)])
@@ -34,7 +33,7 @@ def test_solution_weights(shape: tuple[int, int]) -> None:
     G = J @ J.T
     u = rand_(shape[0])
 
-    w = project_weights(u, G, "quadprog")
+    w = project_weights(u, G)
     dual_gap = w - u
 
     # Dual feasibility
@@ -63,8 +62,8 @@ def test_scale_invariant(shape: tuple[int, int], scaling: float) -> None:
     G = J @ J.T
     u = rand_(shape[0])
 
-    w = project_weights(u, G, "quadprog")
-    w_scaled = project_weights(u, scaling * G, "quadprog")
+    w = project_weights(u, G)
+    w_scaled = project_weights(u, scaling * G)
 
     assert_close(w_scaled, w)
 
@@ -82,16 +81,7 @@ def test_tensorization_shape(shape: tuple[int, ...]) -> None:
 
     G = matrix @ matrix.T
 
-    W_tensor = project_weights(U_tensor, G, "quadprog")
-    W_matrix = project_weights(U_matrix, G, "quadprog")
+    W_tensor = project_weights(U_tensor, G)
+    W_matrix = project_weights(U_matrix, G)
 
     assert_close(W_matrix.reshape(shape), W_tensor)
-
-
-def test_project_weight_vector_failure() -> None:
-    """Tests that `_project_weight_vector` raises an error when the input G has too large values."""
-
-    large_J = np.random.randn(10, 100) * 1e5
-    large_G = large_J @ large_J.T
-    with raises(ValueError):
-        _project_weight_vector(np.ones(10), large_G, "quadprog")
