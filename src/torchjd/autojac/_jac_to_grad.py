@@ -70,10 +70,20 @@ def jac_to_grad(
         advise to try this optimization if memory is an issue for you. Defaults to ``False``.
 
     .. note::
-        This function starts by "flattening" the ``.jac`` fields into matrices (i.e. flattening all
-        of their dimensions except the first one), then concatenates those matrices into a combined
-        Jacobian matrix. The aggregator is then used on this matrix, which returns a combined
-        gradient vector, that is split and reshaped to fit into the ``.grad`` fields of the tensors.
+        When ``optimize_gramian_computation=False``, this function starts by "flattening" the
+        ``.jac`` fields into matrices (i.e. flattening all of their dimensions except the first
+        one), then concatenates those matrices into a combined Jacobian matrix. The ``aggregator``
+        is then used on this matrix, which returns a combined gradient vector, that is split and
+        reshaped to fit into the ``.grad`` fields of the tensors.
+
+    .. note::
+        When ``optimize_gramian_computation=True``, this function computes and sums the Gramian
+        of each individual ``.jac`` field, iteratively. The inner weighting of the ``aggregator`` is
+        then used to extract some weights from the obtained Gramian, used to compute a linear
+        combination of the rows of each ``.jac`` field, to be stored into the corresponding
+        ``.grad`` field. This is mathematically equivalent to the approach with
+        ``optimize_gramian_computation=False``, but saves memory by not having to hold the
+        concatenated Jacobian matrix in memory at any time.
 
     .. admonition::
         Example
