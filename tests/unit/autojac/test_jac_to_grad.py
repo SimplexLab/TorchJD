@@ -31,8 +31,11 @@ from torchjd.autojac._jac_to_grad import (
 )
 
 
-@mark.parametrize("aggregator", [Mean(), UPGrad(), PCGrad(), ConFIG()])
-def test_various_aggregators(aggregator: Aggregator) -> None:
+@mark.parametrize(
+    ["aggregator", "opt"],
+    [(Mean(), False), (UPGrad(), True), (UPGrad(), False), (PCGrad(), True), (ConFIG(), False)],
+)
+def test_various_aggregators(aggregator: Aggregator, opt: bool) -> None:
     """
     Tests that jac_to_grad works for various aggregators. For those that are weighted, the weights
     should also be returned. For the others, None should be returned.
@@ -47,7 +50,7 @@ def test_various_aggregators(aggregator: Aggregator) -> None:
     g1 = expected_grad[0]
     g2 = expected_grad[1:]
 
-    optional_weights = jac_to_grad([t1, t2], aggregator)
+    optional_weights = jac_to_grad([t1, t2], aggregator, optimize_gramian_computation=opt)
 
     assert_grad_close(t1, g1)
     assert_grad_close(t2, g2)
@@ -303,3 +306,20 @@ def test_with_hooks() -> None:
 
     weights = jac_to_grad([t], aggregator)
     assert_close(weights, aggregator.weighting(jac))
+
+
+def test_optimize_gramian_computation_error() -> None:
+    """
+    Tests that using optimize_gramian_computation on an incompatible aggregator raises an error.
+    """
+
+    aggregator = ConFIG()
+
+    t1 = tensor_(1.0, requires_grad=True)
+    t2 = tensor_([2.0, 3.0], requires_grad=True)
+    jac = tensor_([[-4.0, 1.0, 1.0], [6.0, 1.0, 1.0]])
+    t1.__setattr__("jac", jac[:, 0])
+    t2.__setattr__("jac", jac[:, 1:])
+
+    with raises(ValueError):
+        jac_to_grad([t1, t2], aggregator, optimize_gramian_computation=True)

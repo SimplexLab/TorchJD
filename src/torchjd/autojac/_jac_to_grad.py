@@ -20,6 +20,7 @@ def jac_to_grad(
     aggregator: WeightedAggregator,
     *,
     retain_jac: bool = False,
+    optimize_gramian_computation: bool = False,
 ) -> Tensor: ...
 
 
@@ -30,6 +31,7 @@ def jac_to_grad(
     aggregator: Aggregator,  # Not a WeightedAggregator, because overloads are checked in order
     *,
     retain_jac: bool = False,
+    optimize_gramian_computation: bool = False,
 ) -> None: ...
 
 
