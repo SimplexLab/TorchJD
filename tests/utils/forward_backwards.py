@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from types import TracebackType
 
 import torch
 from torch import Tensor, nn, vmap
@@ -162,7 +163,7 @@ class CloneParams:
     algorithm rather than a module-based algorithm.
     """
 
-    def __init__(self, model: nn.Module):
+    def __init__(self, model: nn.Module) -> None:
         self.model = model
         self.clones = list[nn.Parameter]()
         self._module_to_original_params = dict[nn.Module, dict[str, nn.Parameter]]()
@@ -192,7 +193,12 @@ class CloneParams:
 
         return self.clones
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool:
         """Remove hooks and restore parameters."""
         for handle in self._handles:
             handle.remove()
@@ -201,7 +207,7 @@ class CloneParams:
 
         return False  # don't suppress exceptions
 
-    def _restore_original_params(self, module: nn.Module):
+    def _restore_original_params(self, module: nn.Module) -> None:
         original_params = self._module_to_original_params.pop(module, {})
         for name, param in original_params.items():
             self._set_module_param(module, name, param)

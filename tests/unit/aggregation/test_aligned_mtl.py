@@ -19,16 +19,16 @@ typical_pairs = [(AlignedMTL(), matrix) for matrix in typical_matrices]
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
-def test_expected_structure(aggregator: AlignedMTL, matrix: Tensor):
+def test_expected_structure(aggregator: AlignedMTL, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
-def test_permutation_invariant(aggregator: AlignedMTL, matrix: Tensor):
+def test_permutation_invariant(aggregator: AlignedMTL, matrix: Tensor) -> None:
     assert_permutation_invariant(aggregator, matrix)
 
 
-def test_representations():
+def test_representations() -> None:
     A = AlignedMTL(pref_vector=None)
     assert repr(A) == "AlignedMTL(pref_vector=None, scale_mode='min')"
     assert str(A) == "AlignedMTL"
@@ -38,7 +38,7 @@ def test_representations():
     assert str(A) == "AlignedMTL([1., 2., 3.])"
 
 
-def test_invalid_scale_mode():
+def test_invalid_scale_mode() -> None:
     aggregator = AlignedMTL(scale_mode="test")  # type: ignore[arg-type]
     matrix = ones_(3, 4)
     with raises(ValueError, match=r"Invalid scale_mode=.*Expected"):

@@ -5,7 +5,7 @@ This file contains the test of the jac usage example, with a verification of the
 from torch.testing import assert_close
 
 
-def test_jac():
+def test_jac() -> None:
     import torch
 
     from torchjd.autojac import jac
@@ -14,13 +14,13 @@ def test_jac():
     # Compute arbitrary quantities that are function of param
     y1 = torch.tensor([-1.0, 1.0]) @ param
     y2 = (param**2).sum()
-    jacobians = jac([y1, y2], [param])
+    jacobians = jac([y1, y2], param)
 
     assert len(jacobians) == 1
     assert_close(jacobians[0], torch.tensor([[-1.0, 1.0], [2.0, 4.0]]), rtol=0.0, atol=1e-04)
 
 
-def test_jac_2():
+def test_jac_2() -> None:
     import torch
 
     from torchjd.autojac import jac
@@ -42,3 +42,21 @@ def test_jac_2():
         rtol=0.0,
         atol=1e-04,
     )
+
+
+def test_jac_3() -> None:
+    import torch
+
+    from torchjd.autojac import jac
+
+    x = torch.tensor([1.0, 2.0], requires_grad=True)
+    # Compose functions: x -> h -> y
+    h = x**2
+    y1 = h.sum()
+    y2 = torch.tensor([1.0, -1.0]) @ h
+    # Step 1: Compute d[y1,y2]/dh
+    jac_h = jac([y1, y2], [h])[0]  # Shape: [2, 2]
+    # Step 2: Use jac_outputs to compute d[y1,y2]/dx = (d[y1,y2]/dh) @ (dh/dx)
+    jac_x = jac(h, x, jac_outputs=jac_h)[0]
+
+    assert_close(jac_x, torch.tensor([[2.0, 4.0], [2.0, -4.0]]), rtol=0.0, atol=1e-04)

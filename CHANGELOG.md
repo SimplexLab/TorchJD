@@ -13,6 +13,14 @@ changelog does not include internal changes that do not affect the user.
 - Added the function `torchjd.autojac.jac`. It's the same as `torchjd.autojac.backward` except that
   it returns the Jacobians as a tuple instead of storing them in the `.jac` fields of the inputs.
   Its interface is analog to that of `torch.autograd.grad`.
+- Added a `jac_tensors` parameter to `backward`, allowing to pre-multiply the Jacobian computation
+  by initial Jacobians. This enables multi-step chain rule computations and is analogous to the
+  `grad_tensors` parameter in `torch.autograd.backward`.
+- Added a `grad_tensors` parameter to `mtl_backward`, allowing to use non-scalar `losses` (now
+  renamed to `tensors`). This is analogous to the `grad_tensors` parameter of
+  `torch.autograd.backward`. When using `scalar` losses, the usage does not change.
+- Added a `jac_outputs` parameter to `jac`, allowing to pre-multiply the Jacobian computation by
+  initial Jacobians. This is analogous to the `grad_outputs` parameter in `torch.autograd.grad`.
 - Added a `scale_mode` parameter to `AlignedMTL` and `AlignedMTLWeighting`, allowing to choose
   between `"min"`, `"median"`, and `"rmse"` scaling.
 - Added an attribute `gramian_weighting` to all aggregators that use a gramian-based `Weighting`.
@@ -45,7 +53,21 @@ changelog does not include internal changes that do not affect the user.
   mtl_backward(losses, features)
   jac_to_grad(shared_module.parameters(), aggregator)
   ```
-
+- **BREAKING**: Made some parameters of the public interface of `torchjd` positional-only or
+  keyword-only:
+  - `backward`: The `tensors` parameter is now positional-only. Suggested change:
+    `backward(tensors=losses)` => `backward(losses)`. All other parameters are now keyword-only.
+  - `mtl_backward`: The `tensors` parameter (previously named `losses`) is now positional-only.
+    Suggested change: `mtl_backward(losses=losses, features=features)` =>
+    `mtl_backward(losses, features=features)`. The `features` parameter remains usable as positional
+    or keyword. All other parameters are now keyword-only.
+  - `Aggregator.__call__`: The `matrix` parameter is now positonal-only. Suggested change:
+    `aggregator(matrix=matrix)` => `aggregator(matrix)`.
+  - `Weighting.__call__`: The `stat` parameter is now positional-only. Suggested change:
+    `weighting(stat=gramian)` => `weighting(gramian)`.
+  - `GeneralizedWeighting.__call__`: The `generalized_gramian` parameter is now positional-only.
+    Suggested change: `generalized_weighting(generalized_gramian=generalized_gramian)` =>
+    `generalized_weighting(generalized_gramian)`.
 - Removed several unnecessary memory duplications. This should significantly improve the memory
   efficiency and speed of `autojac`.
 - Increased the lower bounds of the torch (from 2.0.0 to 2.3.0) and numpy (from 1.21.0

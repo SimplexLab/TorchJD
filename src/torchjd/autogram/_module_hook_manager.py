@@ -1,9 +1,10 @@
 import weakref
-from typing import cast
+from typing import Any, cast
 
 import torch
 from torch import Tensor, nn
 from torch.autograd.graph import get_gradient_edge
+from torch.overrides import is_tensor_like
 from torch.utils._pytree import PyTree, tree_flatten, tree_unflatten
 from torch.utils.hooks import RemovableHandle as TorchRemovableHandle
 
@@ -33,7 +34,7 @@ class ModuleHookManager:
         self,
         target_edges: EdgeRegistry,
         gramian_accumulator: GramianAccumulator,
-    ):
+    ) -> None:
         self._target_edges = target_edges
         self._gramian_accumulator = gramian_accumulator
         self.gramian_accumulation_phase = BoolRef(False)
@@ -79,7 +80,7 @@ class ModuleHookManager:
 class BoolRef:
     """Class wrapping a boolean value, acting as a reference to this boolean value."""
 
-    def __init__(self, value: bool):
+    def __init__(self, value: bool) -> None:
         self.value = value
 
     def __bool__(self) -> bool:
@@ -93,7 +94,7 @@ class Hook:
         target_edges: EdgeRegistry,
         gramian_accumulator: GramianAccumulator,
         gramian_computer: GramianComputer,
-    ):
+    ) -> None:
         self.gramian_accumulation_phase = gramian_accumulation_phase
         self.target_edges = target_edges
         self.gramian_accumulator = gramian_accumulator
@@ -101,7 +102,7 @@ class Hook:
 
     def __call__(
         self,
-        module: nn.Module,
+        _module: nn.Module,
         args: tuple[PyTree, ...],
         kwargs: dict[str, PyTree],
         outputs: PyTree,
@@ -114,7 +115,7 @@ class Hook:
         rg_outputs = list[Tensor]()
         rg_output_indices = list[int]()
         for idx, output in enumerate(flat_outputs):
-            if isinstance(output, Tensor) and output.requires_grad:
+            if is_tensor_like(output) and output.requires_grad:
                 rg_outputs.append(output)
                 rg_output_indices.append(idx)
 
@@ -157,11 +158,11 @@ class AutogramNode(torch.autograd.Function):
 
     @staticmethod
     def forward(
-        gramian_accumulation_phase: BoolRef,
-        gramian_computer: GramianComputer,
-        args: tuple[PyTree, ...],
-        kwargs: dict[str, PyTree],
-        gramian_accumulator: GramianAccumulator,
+        _gramian_accumulation_phase: BoolRef,
+        _gramian_computer: GramianComputer,
+        _args: tuple[PyTree, ...],
+        _kwargs: dict[str, PyTree],
+        _gramian_accumulator: GramianAccumulator,
         *rg_tensors: Tensor,
     ) -> tuple[Tensor, ...]:
         return tuple(t.detach() for t in rg_tensors)
@@ -170,7 +171,7 @@ class AutogramNode(torch.autograd.Function):
     # tuple[BoolRef, GramianComputer, tuple[PyTree, ...], dict[str, PyTree], GramianAccumulator, *tuple[Tensor, ...]]
     @staticmethod
     def setup_context(
-        ctx,
+        ctx: Any,
         inputs: tuple,
         _,
     ) -> None:  # type: ignore[reportIncompatibleMethodOverride]
@@ -182,7 +183,7 @@ class AutogramNode(torch.autograd.Function):
         ctx.rg_outputs = inputs[5:]
 
     @staticmethod
-    def backward(ctx, *grad_outputs: Tensor) -> tuple:
+    def backward(ctx: Any, *grad_outputs: Tensor) -> tuple:
         # For python > 3.10: -> tuple[None, None, None, None, None, *tuple[Tensor, ...]]
 
         if ctx.gramian_accumulation_phase:

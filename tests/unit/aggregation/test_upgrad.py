@@ -22,36 +22,36 @@ requires_grad_pairs = [(UPGrad(), ones_(3, 5, requires_grad=True))]
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
-def test_expected_structure(aggregator: UPGrad, matrix: Tensor):
+def test_expected_structure(aggregator: UPGrad, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
-def test_non_conflicting(aggregator: UPGrad, matrix: Tensor):
+def test_non_conflicting(aggregator: UPGrad, matrix: Tensor) -> None:
     assert_non_conflicting(aggregator, matrix, atol=4e-04, rtol=4e-04)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
-def test_permutation_invariant(aggregator: UPGrad, matrix: Tensor):
+def test_permutation_invariant(aggregator: UPGrad, matrix: Tensor) -> None:
     assert_permutation_invariant(aggregator, matrix, n_runs=5, atol=5e-07, rtol=5e-07)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
-def test_linear_under_scaling(aggregator: UPGrad, matrix: Tensor):
+def test_linear_under_scaling(aggregator: UPGrad, matrix: Tensor) -> None:
     assert_linear_under_scaling(aggregator, matrix, n_runs=5, atol=6e-02, rtol=6e-02)
 
 
 @mark.parametrize(["aggregator", "matrix"], non_strong_pairs)
-def test_strongly_stationary(aggregator: UPGrad, matrix: Tensor):
+def test_strongly_stationary(aggregator: UPGrad, matrix: Tensor) -> None:
     assert_strongly_stationary(aggregator, matrix, threshold=5e-03)
 
 
 @mark.parametrize(["aggregator", "matrix"], requires_grad_pairs)
-def test_non_differentiable(aggregator: UPGrad, matrix: Tensor):
+def test_non_differentiable(aggregator: UPGrad, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
 
 
-def test_representations():
+def test_representations() -> None:
     A = UPGrad(pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, solver="quadprog")
     assert repr(A) == "UPGrad(pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, solver='quadprog')"
     assert str(A) == "UPGrad"

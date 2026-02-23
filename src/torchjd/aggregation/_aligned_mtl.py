@@ -61,7 +61,7 @@ class AlignedMTL(GramianWeightedAggregator):
         self,
         pref_vector: Tensor | None = None,
         scale_mode: SUPPORTED_SCALE_MODE = "min",
-    ):
+    ) -> None:
         self._pref_vector = pref_vector
         self._scale_mode: SUPPORTED_SCALE_MODE = scale_mode
         super().__init__(AlignedMTLWeighting(pref_vector, scale_mode=scale_mode))
@@ -92,7 +92,7 @@ class AlignedMTLWeighting(Weighting[PSDMatrix]):
         self,
         pref_vector: Tensor | None = None,
         scale_mode: SUPPORTED_SCALE_MODE = "min",
-    ):
+    ) -> None:
         super().__init__()
         self._pref_vector = pref_vector
         self._scale_mode: SUPPORTED_SCALE_MODE = scale_mode

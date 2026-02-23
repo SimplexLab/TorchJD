@@ -29,6 +29,7 @@ from torchjd.aggregation import (
     TrimmedMean,
     UPGrad,
     UPGradWeighting,
+    Weighting,
 )
 
 J_base = tensor([[-4.0, 1.0, 1.0], [6.0, 1.0, 1.0]])
@@ -109,14 +110,14 @@ except ImportError:
 
 
 @mark.parametrize(["A", "J", "expected_output"], AGGREGATOR_PARAMETRIZATIONS)
-def test_aggregator_output(A: Aggregator, J: Tensor, expected_output: Tensor):
+def test_aggregator_output(A: Aggregator, J: Tensor, expected_output: Tensor) -> None:
     """Test that the output values of an aggregator are fixed (on cpu)."""
 
     assert_close(A(J), expected_output, rtol=0, atol=1e-4)
 
 
 @mark.parametrize(["W", "G", "expected_output"], WEIGHTING_PARAMETRIZATIONS)
-def test_weighting_output(W: Aggregator, G: Tensor, expected_output: Tensor):
+def test_weighting_output(W: Weighting, G: Tensor, expected_output: Tensor) -> None:
     """Test that the output values of a weighting are fixed (on cpu)."""
 
     assert_close(W(G), expected_output, rtol=0, atol=1e-4)

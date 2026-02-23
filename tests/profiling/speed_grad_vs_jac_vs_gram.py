@@ -1,5 +1,6 @@
 import gc
 import time
+from collections.abc import Callable
 
 import torch
 from settings import DEVICE
@@ -41,13 +42,13 @@ PARAMETRIZATIONS = [
 ]
 
 
-def main():
+def main() -> None:
     for factory, batch_size in PARAMETRIZATIONS:
         compare_autograd_autojac_and_autogram_speed(factory, batch_size)
         print("\n")
 
 
-def compare_autograd_autojac_and_autogram_speed(factory: ModuleFactory, batch_size: int):
+def compare_autograd_autojac_and_autogram_speed(factory: ModuleFactory, batch_size: int) -> None:
     model = factory()
     inputs, targets = make_inputs_and_targets(model, batch_size)
     loss_fn = make_mse_loss_fn(targets)
@@ -57,47 +58,47 @@ def compare_autograd_autojac_and_autogram_speed(factory: ModuleFactory, batch_si
 
     print(f"\nTimes for forward + backward on {factory} with BS={batch_size}, A={A} on {DEVICE}.")
 
-    def fn_autograd():
+    def fn_autograd() -> None:
         autograd_forward_backward(model, inputs, loss_fn)
 
-    def init_fn_autograd():
+    def init_fn_autograd() -> None:
         torch.cuda.empty_cache()
         gc.collect()
         fn_autograd()
 
-    def fn_autograd_gramian():
+    def fn_autograd_gramian() -> None:
         autograd_gramian_forward_backward(model, inputs, loss_fn, W)
 
-    def init_fn_autograd_gramian():
+    def init_fn_autograd_gramian() -> None:
         torch.cuda.empty_cache()
         gc.collect()
         fn_autograd_gramian()
 
-    def fn_autojac():
+    def fn_autojac() -> None:
         autojac_forward_backward(model, inputs, loss_fn, A)
 
-    def init_fn_autojac():
+    def init_fn_autojac() -> None:
         torch.cuda.empty_cache()
         gc.collect()
         fn_autojac()
 
-    def fn_autogram():
+    def fn_autogram() -> None:
         autogram_forward_backward(model, inputs, loss_fn, engine, W)
 
-    def init_fn_autogram():
+    def init_fn_autogram() -> None:
         torch.cuda.empty_cache()
         gc.collect()
         fn_autogram()
 
-    def optionally_cuda_sync():
+    def optionally_cuda_sync() -> None:
         if DEVICE.type == "cuda":
             torch.cuda.synchronize()
 
-    def pre_fn():
+    def pre_fn() -> None:
         model.zero_grad()
         optionally_cuda_sync()
 
-    def post_fn():
+    def post_fn() -> None:
         optionally_cuda_sync()
 
     n_runs = 10
@@ -121,11 +122,17 @@ def compare_autograd_autojac_and_autogram_speed(factory: ModuleFactory, batch_si
     print_times("autogram", autogram_times)
 
 
-def noop():
+def noop() -> None:
     pass
 
 
-def time_call(fn, init_fn=noop, pre_fn=noop, post_fn=noop, n_runs: int = 10) -> Tensor:
+def time_call(
+    fn: Callable[[], None],
+    init_fn: Callable[[], None] = noop,
+    pre_fn: Callable[[], None] = noop,
+    post_fn: Callable[[], None] = noop,
+    n_runs: int = 10,
+) -> Tensor:
     init_fn()
 
     times = []

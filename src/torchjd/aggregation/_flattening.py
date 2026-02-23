@@ -20,11 +20,11 @@ class Flattening(GeneralizedWeighting):
     :param weighting: The weighting to apply to the Gramian matrix.
     """
 
-    def __init__(self, weighting: Weighting):
+    def __init__(self, weighting: Weighting) -> None:
         super().__init__()
         self.weighting = weighting
 
-    def forward(self, generalized_gramian: PSDTensor) -> Tensor:
+    def forward(self, generalized_gramian: PSDTensor, /) -> Tensor:
         k = generalized_gramian.ndim // 2
         shape = generalized_gramian.shape[:k]
         square_gramian = flatten(generalized_gramian)

@@ -1,6 +1,8 @@
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
+from typing import cast
 
 from torch import Tensor
+from torch.overrides import is_tensor_like
 
 from torchjd.autojac._transform._base import Transform
 from torchjd.autojac._transform._diagonalize import Diagonalize
@@ -9,27 +11,37 @@ from torchjd.autojac._transform._jac import Jac
 from torchjd.autojac._transform._ordered_set import OrderedSet
 from torchjd.autojac._utils import (
     as_checked_ordered_set,
+    check_consistent_first_dimension,
+    check_matching_jac_shapes,
+    check_matching_length,
     check_optional_positive_chunk_size,
-    get_leaf_tensors,
 )
 
 
 def jac(
     outputs: Sequence[Tensor] | Tensor,
-    inputs: Iterable[Tensor] | None = None,
+    inputs: Sequence[Tensor] | Tensor,
+    *,
+    jac_outputs: Sequence[Tensor] | Tensor | None = None,
     retain_graph: bool = False,
     parallel_chunk_size: int | None = None,
 ) -> tuple[Tensor, ...]:
     r"""
-    Computes the Jacobian of all values in ``outputs`` with respect to all ``inputs``. Returns the
-    result as a tuple, with one Jacobian per input tensor. The returned Jacobian with respect to
-    input ``t`` has shape ``[m] + t.shape``.
+    Computes the Jacobians of ``outputs`` with respect to ``inputs``, left-multiplied by
+    ``jac_outputs`` (or identity if ``jac_outputs`` is ``None``), and returns the result as a tuple,
+    with one Jacobian per input tensor. The returned Jacobian with respect to input ``t`` has shape
+    ``[m] + t.shape``.
 
-    :param outputs: The tensor or tensors to differentiate. Should be non-empty. The Jacobians will
-        have one row for each value of each of these tensors.
-    :param inputs: The tensors with respect to which the Jacobian must be computed. These must have
-        their ``requires_grad`` flag set to ``True``. If not provided, defaults to the leaf tensors
-        that were used to compute the ``outputs`` parameter.
+    :param outputs: The tensor or tensors to differentiate. Should be non-empty.
+    :param inputs: The tensor or tensors with respect to which the Jacobian must be computed. These
+        must have their ``requires_grad`` flag set to ``True``.
+    :param jac_outputs: The initial Jacobians to backpropagate, analog to the ``grad_outputs``
+        parameter of :func:`torch.autograd.grad`. If provided, it must have the same structure as
+        ``outputs`` and each tensor in ``jac_outputs`` must match the shape of the corresponding
+        tensor in ``outputs``, with an extra leading dimension representing the number of rows of
+        the resulting Jacobian (e.g. the number of losses). If ``None``, defaults to the identity
+        matrix. In this case, the standard Jacobian of ``outputs`` is computed, with one row for
+        each value in the ``outputs``.
     :param retain_graph: If ``False``, the graph used to compute the grad will be freed. Defaults to
         ``False``.
     :param parallel_chunk_size: The number of scalars to differentiate simultaneously in the
@@ -57,10 +69,10 @@ def jac(
             >>> y1 = torch.tensor([-1., 1.]) @ param
             >>> y2 = (param ** 2).sum()
             >>>
-            >>> jacobians = jac([y1, y2], [param])
+            >>> jacobians = jac([y1, y2], param)
             >>>
             >>> jacobians
-            (tensor([-1., 1.],
+            (tensor([[-1., 1.],
                     [ 2., 4.]]),)
 
     .. admonition::
@@ -99,6 +111,34 @@ def jac(
         gradients are exactly orthogonal (they have an inner product of 0), but they conflict with
         the third gradient (inner product of -1 and -3).
 
+    .. admonition::
+        Example
+
+        This example shows how to apply chain rule using the ``jac_outputs`` parameter to compute
+        the Jacobian in two steps.
+
+            >>> import torch
+            >>>
+            >>> from torchjd.autojac import jac
+            >>>
+            >>> x = torch.tensor([1., 2.], requires_grad=True)
+            >>> # Compose functions: x -> h -> y
+            >>> h = x ** 2
+            >>> y1 = h.sum()
+            >>> y2 = torch.tensor([1., -1.]) @ h
+            >>>
+            >>> # Step 1: Compute d[y1,y2]/dh
+            >>> jac_h = jac([y1, y2], [h])[0]  # Shape: [2, 2]
+            >>>
+            >>> # Step 2: Use chain rule to compute d[y1,y2]/dx = (d[y1,y2]/dh) @ (dh/dx)
+            >>> jac_x = jac(h, x, jac_outputs=jac_h)[0]
+            >>>
+            >>> jac_x
+            tensor([[ 2.,  4.],
+                    [ 2., -4.]])
+
+        This two-step computation is equivalent to directly computing ``jac([y1, y2], x)``.
+
     .. warning::
         To differentiate in parallel, ``jac`` relies on ``torch.vmap``, which has some
         limitations: `it does not work on the output of compiled functions
@@ -113,39 +153,48 @@ def jac(
 
     outputs_ = as_checked_ordered_set(outputs, "outputs")
     if len(outputs_) == 0:
-        raise ValueError("`outputs` cannot be empty")
+        raise ValueError("`outputs` cannot be empty.")
 
-    if inputs is None:
-        inputs_ = get_leaf_tensors(tensors=outputs_, excluded=set())
-        inputs_with_repetition = list(inputs_)
-    else:
-        inputs_with_repetition = list(inputs)  # Create a list to avoid emptying generator
-        inputs_ = OrderedSet(inputs_with_repetition)
+    # Preserve repetitions to duplicate jacobians at the return statement
+    inputs_with_repetition = cast(Sequence[Tensor], (inputs,) if is_tensor_like(inputs) else inputs)
+    inputs_ = OrderedSet(inputs_with_repetition)
 
-    jac_transform = _create_transform(
-        outputs=outputs_,
-        inputs=inputs_,
-        retain_graph=retain_graph,
-        parallel_chunk_size=parallel_chunk_size,
-    )
-
-    result = jac_transform({})
+    jac_outputs_dict = _create_jac_outputs_dict(outputs_, jac_outputs)
+    transform = _create_transform(outputs_, inputs_, parallel_chunk_size, retain_graph)
+    result = transform(jac_outputs_dict)
     return tuple(result[input] for input in inputs_with_repetition)
+
+
+def _create_jac_outputs_dict(
+    outputs: OrderedSet[Tensor],
+    opt_jac_outputs: Sequence[Tensor] | Tensor | None,
+) -> dict[Tensor, Tensor]:
+    """
+    Creates a dictionary mapping outputs to their corresponding Jacobians.
+
+    :param outputs: The tensors to differentiate.
+    :param opt_jac_outputs: The initial Jacobians to backpropagate. If ``None``, defaults to
+        identity.
+    """
+    if opt_jac_outputs is None:
+        # Transform that creates gradient outputs containing only ones.
+        init = Init(outputs)
+        # Transform that turns the gradients into Jacobians.
+        diag = Diagonalize(outputs)
+        return (diag << init)({})
+    jac_outputs = cast(
+        Sequence[Tensor], (opt_jac_outputs,) if is_tensor_like(opt_jac_outputs) else opt_jac_outputs
+    )
+    check_matching_length(jac_outputs, outputs, "jac_outputs", "outputs")
+    check_matching_jac_shapes(jac_outputs, outputs, "jac_outputs", "outputs")
+    check_consistent_first_dimension(jac_outputs, "jac_outputs")
+    return dict(zip(outputs, jac_outputs, strict=True))
 
 
 def _create_transform(
     outputs: OrderedSet[Tensor],
     inputs: OrderedSet[Tensor],
-    retain_graph: bool,
     parallel_chunk_size: int | None,
+    retain_graph: bool,
 ) -> Transform:
-    # Transform that creates gradient outputs containing only ones.
-    init = Init(outputs)
-
-    # Transform that turns the gradients into Jacobians.
-    diag = Diagonalize(outputs)
-
-    # Transform that computes the required Jacobians.
-    jac = Jac(outputs, inputs, parallel_chunk_size, retain_graph)
-
-    return jac << diag << init
+    return Jac(outputs, inputs, parallel_chunk_size, retain_graph)

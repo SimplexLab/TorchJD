@@ -1,14 +1,15 @@
 import torch
 from pytest import mark, raises
 from torch.testing import assert_close
-from utils.tensors import randn_, tensor_
+from utils.tensors import eye_, randn_, tensor_
 
 from torchjd.autojac import jac
-from torchjd.autojac._jac import _create_transform
+from torchjd.autojac._jac import _create_jac_outputs_dict, _create_transform
 from torchjd.autojac._transform import OrderedSet
 
 
-def test_check_create_transform():
+@mark.parametrize("default_jac_outputs", [True, False])
+def test_check_create_transform(default_jac_outputs: bool) -> None:
     """Tests that _create_transform creates a valid Transform."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -17,18 +18,26 @@ def test_check_create_transform():
     y1 = tensor_([-1.0, 1.0]) @ a1 + a2.sum()
     y2 = (a1**2).sum() + a2.norm()
 
+    optional_jac_outputs = (
+        None if default_jac_outputs else [tensor_([1.0, 0.0]), tensor_([0.0, 1.0])]
+    )
+
+    jac_outputs = _create_jac_outputs_dict(
+        outputs=OrderedSet([y1, y2]),
+        opt_jac_outputs=optional_jac_outputs,
+    )
     transform = _create_transform(
         outputs=OrderedSet([y1, y2]),
         inputs=OrderedSet([a1, a2]),
-        retain_graph=False,
         parallel_chunk_size=None,
+        retain_graph=False,
     )
 
-    output_keys = transform.check_keys(set())
+    output_keys = transform.check_keys(set(jac_outputs.keys()))
     assert output_keys == {a1, a2}
 
 
-def test_jac():
+def test_jac() -> None:
     """Tests that jac works."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -47,14 +56,16 @@ def test_jac():
         assert jacobian.shape[1:] == a.shape
 
 
-@mark.parametrize("shape", [(1, 3), (2, 3), (2, 6), (5, 8), (20, 55)])
-@mark.parametrize("manually_specify_inputs", [True, False])
+@mark.parametrize("shape", [(1, 1), (1, 3), (2, 1), (2, 6), (20, 55)])
 @mark.parametrize("chunk_size", [1, 2, None])
+@mark.parametrize("outputs_is_list", [True, False])
+@mark.parametrize("inputs_is_list", [True, False])
 def test_value_is_correct(
     shape: tuple[int, int],
-    manually_specify_inputs: bool,
     chunk_size: int | None,
-):
+    outputs_is_list: bool,
+    inputs_is_list: bool,
+) -> None:
     """
     Tests that the jacobians returned by jac are correct in a simple example of matrix-vector
     product.
@@ -64,19 +75,126 @@ def test_value_is_correct(
     input = randn_([shape[1]], requires_grad=True)
     output = J @ input  # Note that the Jacobian of output w.r.t. input is J.
 
-    inputs = [input] if manually_specify_inputs else None
+    outputs = [output] if outputs_is_list else output
+    inputs = [input] if inputs_is_list else input
 
-    jacobians = jac(
-        [output],
-        inputs=inputs,
-        parallel_chunk_size=chunk_size,
-    )
+    jacobians = jac(outputs, inputs, parallel_chunk_size=chunk_size)
 
     assert len(jacobians) == 1
     assert_close(jacobians[0], J)
 
 
-def test_empty_inputs():
+@mark.parametrize("rows", [1, 2, 5])
+def test_jac_outputs_value_is_correct(rows: int) -> None:
+    """
+    Tests that jac correctly computes the product of jac_outputs and the Jacobian.
+    result = jac_outputs @ Jacobian(outputs, inputs).
+    """
+    input_size = 4
+    output_size = 3
+
+    J_model = randn_((output_size, input_size))
+
+    input = randn_([input_size], requires_grad=True)
+    output = J_model @ input
+
+    J_init = randn_((rows, output_size))
+
+    jacobians = jac(
+        output,
+        input,
+        jac_outputs=J_init,
+    )
+
+    expected_jac = J_init @ J_model
+    assert_close(jacobians[0], expected_jac)
+
+
+@mark.parametrize("rows", [1, 3])
+def test_jac_outputs_multiple_components(rows: int) -> None:
+    """
+    Tests that jac_outputs works correctly when outputs is a list of multiple tensors. The
+    jac_outputs must match the structure of outputs.
+    """
+    input_len = 2
+    input = randn_([input_len], requires_grad=True)
+
+    y1 = input * 2
+    y2 = torch.cat([input, input[:1]])
+
+    J1 = randn_((rows, 2))
+    J2 = randn_((rows, 3))
+
+    jacobians = jac([y1, y2], input, jac_outputs=[J1, J2])
+
+    jac_y1 = eye_(2) * 2
+
+    jac_y2 = tensor_([[1.0, 0.0], [0.0, 1.0], [1.0, 0.0]])
+
+    expected = J1 @ jac_y1 + J2 @ jac_y2
+
+    assert_close(jacobians[0], expected)
+
+
+def test_jac_outputs_length_mismatch() -> None:
+    """Tests that jac raises a ValueError early if len(jac_outputs) != len(outputs)."""
+    x = tensor_([1.0, 2.0], requires_grad=True)
+    y1 = x * 2
+    y2 = x * 3
+
+    J1 = randn_((2, 2))
+
+    with raises(
+        ValueError,
+        match=r"`jac_outputs` should have the same length as `outputs`\. \(got 1 and 2\)",
+    ):
+        jac([y1, y2], x, jac_outputs=[J1])
+
+
+def test_jac_outputs_shape_mismatch() -> None:
+    """
+    Tests that jac raises a ValueError early if the shape of a tensor in jac_outputs is
+    incompatible with the corresponding output tensor.
+    """
+    x = tensor_([1.0, 2.0], requires_grad=True)
+    y = x * 2
+
+    J_bad = randn_((3, 5))
+
+    with raises(
+        ValueError,
+        match=r"Shape mismatch: `jac_outputs\[0\]` has shape .* but `outputs\[0\]` has shape .*\.",
+    ):
+        jac(y, x, jac_outputs=J_bad)
+
+
+@mark.parametrize(
+    "rows_y1, rows_y2",
+    [
+        (3, 5),
+        (1, 2),
+    ],
+)
+def test_jac_outputs_inconsistent_first_dimension(rows_y1: int, rows_y2: int) -> None:
+    """
+    Tests that jac raises a ValueError early when the provided jac_outputs have inconsistent first
+    dimensions.
+    """
+    x = tensor_([1.0, 2.0], requires_grad=True)
+
+    y1 = x * 2
+    y2 = x.sum()
+
+    j1 = randn_((rows_y1, 2))
+    j2 = randn_((rows_y2,))
+
+    with raises(
+        ValueError, match=r"All Jacobians in `jac_outputs` should have the same number of rows\."
+    ):
+        jac([y1, y2], x, jac_outputs=[j1, j2])
+
+
+def test_empty_inputs() -> None:
     """Tests that jac does not return any jacobian no input is specified."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -89,7 +207,7 @@ def test_empty_inputs():
     assert len(jacobians) == 0
 
 
-def test_partial_inputs():
+def test_partial_inputs() -> None:
     """
     Tests that jac returns the right jacobians when only a subset of the actual inputs are specified
     as inputs.
@@ -101,11 +219,11 @@ def test_partial_inputs():
     y1 = tensor_([-1.0, 1.0]) @ a1 + a2.sum()
     y2 = (a1**2).sum() + a2.norm()
 
-    jacobians = jac([y1, y2], inputs=[a1])
+    jacobians = jac([y1, y2], a1)
     assert len(jacobians) == 1
 
 
-def test_empty_tensors_fails():
+def test_empty_tensors_fails() -> None:
     """Tests that jac raises an error when called with an empty list of tensors."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -115,7 +233,7 @@ def test_empty_tensors_fails():
         jac([], inputs=[a1, a2])
 
 
-def test_multiple_tensors():
+def test_multiple_tensors() -> None:
     """
     Tests that giving multiple tensors to jac is equivalent to giving a single tensor containing all
     the values of the original tensors.
@@ -131,7 +249,7 @@ def test_multiple_tensors():
     y1 = tensor_([-1.0, 1.0]) @ a1 + a2.sum()
     y2 = (a1**2).sum() + a2.norm()
 
-    jacobians = jac([y1, y2])
+    jacobians = jac([y1, y2], [a1, a2])
     assert len(jacobians) == 2
     assert_close(jacobians[0], J1)
     assert_close(jacobians[1], J2)
@@ -143,14 +261,14 @@ def test_multiple_tensors():
     z1 = tensor_([-1.0, 1.0]) @ b1 + b2.sum()
     z2 = (b1**2).sum() + b2.norm()
 
-    jacobians = jac(torch.cat([z1.reshape(-1), z2.reshape(-1)]))
+    jacobians = jac(torch.cat([z1.reshape(-1), z2.reshape(-1)]), [b1, b2])
     assert len(jacobians) == 2
     assert_close(jacobians[0], J1)
     assert_close(jacobians[1], J2)
 
 
 @mark.parametrize("chunk_size", [None, 1, 2, 4])
-def test_various_valid_chunk_sizes(chunk_size):
+def test_various_valid_chunk_sizes(chunk_size: int | None) -> None:
     """Tests that jac works for various valid values of parallel_chunk_size."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -159,12 +277,12 @@ def test_various_valid_chunk_sizes(chunk_size):
     y1 = tensor_([-1.0, 1.0]) @ a1 + a2.sum()
     y2 = (a1**2).sum() + a2.norm()
 
-    jacobians = jac([y1, y2], parallel_chunk_size=chunk_size)
+    jacobians = jac([y1, y2], [a1, a2], parallel_chunk_size=chunk_size)
     assert len(jacobians) == 2
 
 
 @mark.parametrize("chunk_size", [0, -1])
-def test_non_positive_chunk_size_fails(chunk_size: int):
+def test_non_positive_chunk_size_fails(chunk_size: int) -> None:
     """Tests that jac raises an error when using invalid chunk sizes."""
 
     a1 = tensor_([1.0, 2.0], requires_grad=True)
@@ -174,10 +292,10 @@ def test_non_positive_chunk_size_fails(chunk_size: int):
     y2 = (a1**2).sum() + a2.norm()
 
     with raises(ValueError):
-        jac([y1, y2], parallel_chunk_size=chunk_size)
+        jac([y1, y2], [a1, a2], parallel_chunk_size=chunk_size)
 
 
-def test_input_retaining_grad_fails():
+def test_input_retaining_grad_fails() -> None:
     """
     Tests that jac raises an error when some input in the computation graph of the ``tensors``
     parameter retains grad and vmap has to be used.
@@ -190,14 +308,14 @@ def test_input_retaining_grad_fails():
 
     # jac itself doesn't raise the error, but it fills b.grad with a BatchedTensor (and it also
     # returns the correct Jacobian)
-    jac(outputs=y, inputs=[b])
+    jac(y, b)
 
     with raises(RuntimeError):
         # Using such a BatchedTensor should result in an error
         _ = -b.grad  # type: ignore[unsupported-operator]
 
 
-def test_non_input_retaining_grad_fails():
+def test_non_input_retaining_grad_fails() -> None:
     """
     Tests that jac fails to fill a valid `.grad` when some tensor in the computation graph of the
     ``tensors`` parameter retains grad and vmap has to be used.
@@ -209,7 +327,7 @@ def test_non_input_retaining_grad_fails():
     y = 3 * b
 
     # jac itself doesn't raise the error, but it fills b.grad with a BatchedTensor
-    jac(outputs=y, inputs=[a])
+    jac(y, a)
 
     with raises(RuntimeError):
         # Using such a BatchedTensor should result in an error
@@ -217,7 +335,7 @@ def test_non_input_retaining_grad_fails():
 
 
 @mark.parametrize("chunk_size", [1, 3, None])
-def test_tensor_used_multiple_times(chunk_size: int | None):
+def test_tensor_used_multiple_times(chunk_size: int | None) -> None:
     """
     Tests that jac works correctly when one of the inputs is used multiple times. In this setup, the
     autograd graph is still acyclic, but the graph of tensors used becomes cyclic.
@@ -229,7 +347,7 @@ def test_tensor_used_multiple_times(chunk_size: int | None):
     d = a * c
     e = a * d
 
-    jacobians = jac([d, e], parallel_chunk_size=chunk_size)
+    jacobians = jac([d, e], a, parallel_chunk_size=chunk_size)
     assert len(jacobians) == 1
 
     J = tensor_([2.0 * 3.0 * (a**2).item(), 2.0 * 4.0 * (a**3).item()])
@@ -237,7 +355,7 @@ def test_tensor_used_multiple_times(chunk_size: int | None):
     assert_close(jacobians[0], J)
 
 
-def test_repeated_tensors():
+def test_repeated_tensors() -> None:
     """
     Tests that jac does not allow repeating tensors.
 
@@ -253,10 +371,10 @@ def test_repeated_tensors():
     y2 = (a1**2).sum() + (a2**2).sum()
 
     with raises(ValueError):
-        jac([y1, y1, y2])
+        jac([y1, y1, y2], [a1, a2])
 
 
-def test_repeated_inputs():
+def test_repeated_inputs() -> None:
     """
     Tests that jac correctly works when some inputs are repeated. In this case, since
     torch.autograd.grad repeats the output gradients, it is natural for autojac to also repeat the

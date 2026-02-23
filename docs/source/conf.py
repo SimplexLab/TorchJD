@@ -96,11 +96,11 @@ def linkcode_resolve(domain: str, info: dict[str, str]) -> str | None:
     line_str = _get_line_str(obj)
     version_str = _get_version_str()
 
-    link = f"https://github.com/TorchJD/torchjd/blob/{version_str}/{file_name}{line_str}"
+    link = f"https://github.com/SimplexLab/TorchJD/blob/{version_str}/{file_name}{line_str}"
     return link
 
 
-def _get_obj(_info: dict[str, str]):
+def _get_obj(_info: dict[str, str]) -> object:
     module_name = _info["module"]
     full_name = _info["fullname"]
     sub_module = sys.modules.get(module_name)
@@ -112,7 +112,7 @@ def _get_obj(_info: dict[str, str]):
     return obj
 
 
-def _get_file_name(obj) -> str | None:
+def _get_file_name(obj: object) -> str | None:
     try:
         file_name = inspect.getsourcefile(obj)
         file_name = os.path.relpath(file_name, start=_PATH_ROOT)
@@ -121,7 +121,7 @@ def _get_file_name(obj) -> str | None:
     return file_name
 
 
-def _get_line_str(obj) -> str:
+def _get_line_str(obj: object) -> str:
     source, start = inspect.getsourcelines(obj)
     end = start + len(source) - 1
     line_str = f"#L{start}-L{end}"
