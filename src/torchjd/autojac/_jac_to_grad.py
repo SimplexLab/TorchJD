@@ -17,7 +17,7 @@ from ._utils import check_consistent_first_dimension
 def jac_to_grad(
     tensors: Iterable[Tensor],
     /,
-    aggregator: WeightedAggregator,
+    aggregator: GramianWeightedAggregator,
     *,
     retain_jac: bool = False,
     optimize_gramian_computation: bool = False,
@@ -28,10 +28,19 @@ def jac_to_grad(
 def jac_to_grad(
     tensors: Iterable[Tensor],
     /,
+    aggregator: WeightedAggregator,  # Not a GramianWA, because overloads are checked in order
+    *,
+    retain_jac: bool = False,
+) -> Tensor: ...
+
+
+@overload
+def jac_to_grad(
+    tensors: Iterable[Tensor],
+    /,
     aggregator: Aggregator,  # Not a WeightedAggregator, because overloads are checked in order
     *,
     retain_jac: bool = False,
-    optimize_gramian_computation: bool = False,
 ) -> None: ...
 
 

@@ -35,7 +35,7 @@ from torchjd.autojac._jac_to_grad import (
     ["aggregator", "opt"],
     [(Mean(), False), (UPGrad(), True), (UPGrad(), False), (PCGrad(), True), (ConFIG(), False)],
 )
-def test_various_aggregators(aggregator: Aggregator, opt: bool) -> None:
+def test_various_aggregators(aggregator: Aggregator, optimize: bool) -> None:
     """
     Tests that jac_to_grad works for various aggregators. For those that are weighted, the weights
     should also be returned. For the others, None should be returned.
@@ -50,7 +50,11 @@ def test_various_aggregators(aggregator: Aggregator, opt: bool) -> None:
     g1 = expected_grad[0]
     g2 = expected_grad[1:]
 
-    optional_weights = jac_to_grad([t1, t2], aggregator, optimize_gramian_computation=opt)
+    if optimize:
+        assert isinstance(aggregator, GramianWeightedAggregator)
+        optional_weights = jac_to_grad([t1, t2], aggregator, optimize_gramian_computation=True)
+    else:
+        optional_weights = jac_to_grad([t1, t2], aggregator)
 
     assert_grad_close(t1, g1)
     assert_grad_close(t2, g2)
@@ -322,4 +326,4 @@ def test_optimize_gramian_computation_error() -> None:
     t2.__setattr__("jac", jac[:, 1:])
 
     with raises(ValueError):
-        jac_to_grad([t1, t2], aggregator, optimize_gramian_computation=True)
+        jac_to_grad([t1, t2], aggregator, optimize_gramian_computation=True)  # ty:ignore[invalid-argument-type]
