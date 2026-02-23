@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "torchjd"
-version = "0.8.1"
+version = "0.9.0"
 description = "Library for Jacobian Descent with PyTorch."
 readme = "README.md"
 authors = [
