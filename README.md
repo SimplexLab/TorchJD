@@ -75,7 +75,8 @@ store it in the `.jac` fields of the model parameters. You then have to call
 [`torchjd.autojac.jac_to_grad`](https://torchjd.org/stable/docs/autojac/jac_to_grad/) to aggregate
 this Jacobian using the specified
 [`Aggregator`](https://torchjd.org/stable/docs/aggregation#torchjd.aggregation.Aggregator), and to
-store the result into the `.grad` fields of the model parameters.
+store the result into the `.grad` fields of the model parameters. See this
+[usage example](https://torchjd.org/stable/examples/basic_usage/) for more details.
 
 #### 2. `mtl_backward` + `jac_to_grad`
 In the case of multi-task learning, an alternative to
