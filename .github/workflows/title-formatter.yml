@@ -2,7 +2,7 @@ name: PR Title Formatter
 
 on:
   pull_request_target:
-    types: [opened, edited, reopened, labeled, unlabeled]
+    types: [opened, edited, reopened, labeled, unlabeled, synchronize]
 
 jobs:
   format-title:
@@ -18,15 +18,12 @@ jobs:
             const pr_number = context.payload.pull_request.number;
             const rawTitle = context.payload.pull_request.title;
 
-            // Step 1: Strip any existing CC prefix to get the bare description.
             const ccRegex = /^[a-z-]+(?:\([^)]+\))?!?: (.+)$/;
             const ccMatch = rawTitle.match(ccRegex);
             let description = ccMatch ? ccMatch[1] : rawTitle;
 
-            // Step 2: Capitalize first letter.
             description = description.charAt(0).toUpperCase() + description.slice(1);
 
-            // Step 3: Read PR labels and require exactly one "cc: <type>" label.
             const prLabels = await github.rest.issues.listLabelsOnIssue({
               owner,
               repo,
@@ -46,20 +43,21 @@ jobs:
             }
             const type = ccLabels[0].slice(4);
 
-            // Step 4: Use scope from "package: <name>" label if exactly one is present.
             const packageLabels = labelNames.filter(n => n.startsWith('package: '));
             const scope = packageLabels.length === 1 ? packageLabels[0].slice(9) : null;
 
-            // Step 5: Check for breaking-change label.
             const isBreaking = labelNames.includes('breaking-change');
 
-            // Step 6: Build new title.
             let newTitle = type;
             if (scope) newTitle += `(${scope})`;
             if (isBreaking) newTitle += '!';
             newTitle += `: ${description}`;
 
-            // Step 7: Enforce 72-character limit (counting the trailing " (#NNN)").
+            if (rawTitle === newTitle) {
+              console.log("Title is already correctly formatted. Skipping update.");
+              return;
+            }
+
             const displayTitle = `${newTitle} (#${pr_number})`;
             if (displayTitle.length > 72) {
               core.setFailed(
@@ -68,7 +66,6 @@ jobs:
               return;
             }
 
-            // Step 8: Update the PR title.
             await github.rest.pulls.update({
               owner,
               repo,
