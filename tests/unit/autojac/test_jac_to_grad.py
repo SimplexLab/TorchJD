@@ -139,21 +139,21 @@ def test_jacs_are_freed(retain_jac: bool) -> None:
     check(t2)
 
 
-def test_has_forward_hook():
+def test_has_forward_hook() -> None:
     """Tests that _has_forward_hook correctly detects the presence of forward hooks."""
 
     module = UPGrad()
 
-    def dummy_forward_hook(_module, _input, _output):
+    def dummy_forward_hook(_module, _input, _output) -> Tensor:
         return _output
 
-    def dummy_forward_pre_hook(_module, _input):
+    def dummy_forward_pre_hook(_module, _input) -> Tensor:
         return _input
 
-    def dummy_backward_hook(_module, _grad_input, _grad_output):
+    def dummy_backward_hook(_module, _grad_input, _grad_output) -> Tensor:
         return _grad_input
 
-    def dummy_backward_pre_hook(_module, _grad_output):
+    def dummy_backward_pre_hook(_module, _grad_output) -> Tensor:
         return _grad_output
 
     # Module with no hooks or backward hooks only should return False
@@ -217,16 +217,16 @@ except ImportError:
 
 
 @mark.parametrize("aggregator, expected", _PARAMETRIZATIONS)
-def test_can_skip_jacobian_combination(aggregator: Aggregator, expected: bool):
+def test_can_skip_jacobian_combination(aggregator: Aggregator, expected: bool) -> None:
     """
     Tests that _can_skip_jacobian_combination correctly identifies when optimization can be used.
     """
 
     assert _can_skip_jacobian_combination(aggregator) == expected
-    handle = aggregator.register_forward_hook(lambda module, input, output: output)
+    handle = aggregator.register_forward_hook(lambda _module, _input, output: output)
     assert not _can_skip_jacobian_combination(aggregator)
     handle.remove()
-    handle = aggregator.register_forward_pre_hook(lambda module, input: input)
+    handle = aggregator.register_forward_pre_hook(lambda _module, input: input)
     assert not _can_skip_jacobian_combination(aggregator)
     handle.remove()
     assert _can_skip_jacobian_combination(aggregator) == expected

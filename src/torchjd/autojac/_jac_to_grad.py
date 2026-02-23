@@ -104,10 +104,12 @@ def jac_to_grad(
         _free_jacs(tensors_)
 
     if _can_skip_jacobian_combination(aggregator):
-        gradients, weights = _gramian_based(aggregator, jacobians, tensors_)
+        gradients, weights = _gramian_based(aggregator, jacobians)
     else:
         gradients, weights = _jacobian_based(aggregator, jacobians, tensors_)
     accumulate_grads(tensors_, gradients)
+
+    return weights
 
 
 def _can_skip_jacobian_combination(aggregator: Aggregator) -> TypeGuard[GramianWeightedAggregator]:
@@ -116,6 +118,7 @@ def _can_skip_jacobian_combination(aggregator: Aggregator) -> TypeGuard[GramianW
 
 def _has_forward_hook(module: nn.Module) -> bool:
     """Return whether the module has any forward hook registered."""
+    # TODO: also check hooks on the outer weighting
     return len(module._forward_hooks) > 0 or len(module._forward_pre_hooks) > 0
 
 
@@ -145,14 +148,13 @@ def _jacobian_based(
             handle.remove()
     else:
         gradient_vector = aggregator(jacobian_matrix)
-    gradients = _disunite_gradient(gradient_vector, tensors_)
+    gradients = _disunite_gradient(gradient_vector, tensors)
     return gradients, weights
 
 
 def _gramian_based(
     aggregator: GramianWeightedAggregator,
     jacobians: deque[Tensor],
-    tensors: list[TensorWithJac],
 ) -> tuple[list[Tensor], Tensor]:
     weighting = aggregator.gramian_weighting
     gramian = _compute_gramian_sum(jacobians)
