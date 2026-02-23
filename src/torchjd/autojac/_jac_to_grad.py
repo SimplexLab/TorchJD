@@ -111,6 +111,9 @@ def jac_to_grad(
             nonlocal weights
             weights = output
 
+        # Append the weight-capturing post-hook to the outer weighting to ensure that all other
+        # post-hooks of the outer and inner weighting are run (potentially with effect on the
+        # weights) prior to capturing the weights.
         handle = aggregator.weighting.register_forward_hook(capture_hook)
         gradient_vector = aggregator(jacobian_matrix)
         handle.remove()
