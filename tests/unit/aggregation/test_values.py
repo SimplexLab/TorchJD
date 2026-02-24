@@ -55,7 +55,7 @@ AGGREGATOR_PARAMETRIZATIONS = [
     (AlignedMTL(), J_base, tensor([0.2133, 0.9673, 0.9673])),
     (ConFIG(), J_base, tensor([0.1588, 2.0706, 2.0706])),
     (Constant(tensor([1.0, 2.0])), J_base, tensor([8.0, 3.0, 3.0])),
-    (DualProj(), J_base, tensor([0.5563, 1.1109, 1.1109])),
+    (DualProj(), J_base, tensor([0.5556, 1.1111, 1.1111])),
     (GradDrop(), J_base, tensor([6.0, 2.0, 2.0])),
     (IMTLG(), J_base, tensor([0.0767, 1.0000, 1.0000])),
     (Krum(n_byzantine=1, n_selected=4), J_Krum, tensor([1.2500, 0.7500, 1.5000])),
@@ -65,7 +65,7 @@ AGGREGATOR_PARAMETRIZATIONS = [
     (Random(), J_base, tensor([-2.6229, 1.0000, 1.0000])),
     (Sum(), J_base, tensor([2.0, 2.0, 2.0])),
     (TrimmedMean(trim_number=1), J_TrimmedMean, tensor([1.5000, 2.5000])),
-    (UPGrad(), J_base, tensor([0.2929, 1.9004, 1.9004])),
+    (UPGrad(), J_base, tensor([0.2924, 1.9006, 1.9006])),
 ]
 
 G_base = J_base @ J_base.T
@@ -74,7 +74,7 @@ G_Krum = J_Krum @ J_Krum.T
 WEIGHTING_PARAMETRIZATIONS = [
     (AlignedMTLWeighting(), G_base, tensor([0.5591, 0.4083])),
     (ConstantWeighting(tensor([1.0, 2.0])), G_base, tensor([1.0, 2.0])),
-    (DualProjWeighting(), G_base, tensor([0.6109, 0.5000])),
+    (DualProjWeighting(), G_base, tensor([0.6111, 0.5000])),
     (IMTLGWeighting(), G_base, tensor([0.5923, 0.4077])),
     (KrumWeighting(1, 4), G_Krum, tensor([0.2500, 0.2500, 0.0000, 0.2500, 0.2500])),
     (MeanWeighting(), G_base, tensor([0.5000, 0.5000])),
@@ -82,7 +82,7 @@ WEIGHTING_PARAMETRIZATIONS = [
     (PCGradWeighting(), G_base, tensor([2.2222, 1.5789])),
     (RandomWeighting(), G_base, tensor([0.8623, 0.1377])),
     (SumWeighting(), G_base, tensor([1.0, 1.0])),
-    (UPGradWeighting(), G_base, tensor([1.1109, 0.7894])),
+    (UPGradWeighting(), G_base, tensor([1.1111, 0.7895])),
 ]
 
 try:

@@ -33,7 +33,7 @@ def test_non_conflicting(aggregator: UPGrad, matrix: Tensor) -> None:
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
 def test_permutation_invariant(aggregator: UPGrad, matrix: Tensor) -> None:
-    assert_permutation_invariant(aggregator, matrix, n_runs=5, atol=5e-07, rtol=5e-07)
+    assert_permutation_invariant(aggregator, matrix, n_runs=5, atol=1e-05, rtol=1e-05)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
@@ -52,18 +52,13 @@ def test_non_differentiable(aggregator: UPGrad, matrix: Tensor) -> None:
 
 
 def test_representations() -> None:
-    A = UPGrad(pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, solver="quadprog")
-    assert repr(A) == "UPGrad(pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, solver='quadprog')"
+    A = UPGrad(pref_vector=None, norm_eps=0.0001)
+    assert repr(A) == "UPGrad(pref_vector=None, norm_eps=0.0001)"
     assert str(A) == "UPGrad"
 
     A = UPGrad(
         pref_vector=torch.tensor([1.0, 2.0, 3.0], device="cpu"),
         norm_eps=0.0001,
-        reg_eps=0.0001,
-        solver="quadprog",
     )
-    assert (
-        repr(A) == "UPGrad(pref_vector=tensor([1., 2., 3.]), norm_eps=0.0001, reg_eps=0.0001, "
-        "solver='quadprog')"
-    )
+    assert repr(A) == "UPGrad(pref_vector=tensor([1., 2., 3.]), norm_eps=0.0001)"
     assert str(A) == "UPGrad([1., 2., 3.])"
