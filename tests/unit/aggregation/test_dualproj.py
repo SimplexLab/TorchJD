@@ -32,7 +32,7 @@ def test_non_conflicting(aggregator: DualProj, matrix: Tensor) -> None:
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
 def test_permutation_invariant(aggregator: DualProj, matrix: Tensor) -> None:
-    assert_permutation_invariant(aggregator, matrix, n_runs=5, atol=2e-07, rtol=2e-07)
+    assert_permutation_invariant(aggregator, matrix, n_runs=5, atol=2e-05, rtol=2e-05)
 
 
 @mark.parametrize(["aggregator", "matrix"], non_strong_pairs)

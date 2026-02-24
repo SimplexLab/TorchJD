@@ -1,7 +1,7 @@
 import torch
 from torch import Tensor
 
-from torchjd._linalg import PSDMatrix, normalize, regularize
+from torchjd._linalg import PSDMatrix, normalize
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._mean import MeanWeighting
@@ -71,7 +71,5 @@ class UPGradWeighting(Weighting[PSDMatrix]):
     def forward(self, gramian: PSDMatrix, /) -> Tensor:
         U = torch.diag(self.weighting(gramian))
         G = normalize(gramian, self.norm_eps)
-        if self.norm_eps > 0:
-            G = regularize(G, 1e-4)
         W = project_weights(U, G)
         return torch.sum(W, dim=0)
