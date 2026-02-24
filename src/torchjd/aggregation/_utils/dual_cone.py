@@ -35,7 +35,7 @@ def _solve_batch_qp(U: Tensor, G: Tensor) -> Tensor:
 
     Three improvements over basic ADMM ensure convergence on ill-conditioned Gramians:
 
-    - **Ruiz equilibration** (10 iterations): symmetrically scales G to bring all rows and
+    - **Ruiz equilibration** (5 iterations): symmetrically scales G to bring all rows and
       columns to unit infinity norm, reducing the effective condition number.
     - **Adaptive rho**: the ADMM penalty parameter is updated every ``sqrt(m)`` iterations
       when primal and dual residuals are severely imbalanced, triggering a cheap re-factorization.
@@ -55,7 +55,7 @@ def _solve_batch_qp(U: Tensor, G: Tensor) -> Tensor:
     # Variable substitution: v_orig = D * v_scaled  =>  U_scaled = U / D.
     G_s = G.clone()
     D = torch.ones(m, dtype=torch.float64, device=device)
-    for _ in range(10):
+    for _ in range(5):
         delta = G_s.abs().amax(dim=1).clamp(min=1e-10).rsqrt()
         G_s = G_s * (delta.unsqueeze(1) * delta.unsqueeze(0))
         D = D * delta
@@ -72,30 +72,31 @@ def _solve_batch_qp(U: Tensor, G: Tensor) -> Tensor:
     u = torch.zeros(B, m, dtype=torch.float64, device=device)  # scaled dual variable
 
     eps_abs = eps_rel = 1e-7
-    check_freq = max(1, round(m**0.5))
+    check_freq = round(m**0.5)
     tau = 10.0  # adaptive-rho trigger threshold
 
-    Z_prev = Z
     for k in range(2000):
+        Z_prev = Z
+
         # V-update: (G_s + rho*I) V = rho*(Z - u)
         V = torch.cholesky_solve((rho * (Z - u)).T, L).T
 
-        Z_prev = Z
         # Z-update: project onto {z : z >= U_s}
         Z = (V + u).clamp(min=U_s)
 
         # Scaled dual update
-        u = u + V - Z
+        primal_residual = V - Z
+        u = u + primal_residual
 
         if k % check_freq == 0:
-            primal_res = (V - Z).abs().amax().item()
-            dual_res = (rho * (Z - Z_prev)).abs().amax().item()
+            primal_res = primal_residual.norm(torch.inf).item()
+            dual_res = (rho * (Z - Z_prev)).norm(torch.inf).item()
 
-            tol_p = eps_abs + eps_rel * max(V.abs().amax().item(), Z.abs().amax().item())
-            tol_d = eps_abs + eps_rel * max(
-                (rho * u).abs().amax().item(),
-                (G_s @ V.T).abs().amax().item(),
+            tol_p = eps_abs + eps_rel * max(
+                V.norm(torch.inf).item(),
+                Z.norm(torch.inf).item(),
             )
+            tol_d = eps_abs + eps_rel * (rho * u).norm(torch.inf).item()
             if primal_res < tol_p and dual_res < tol_d:
                 break
 
@@ -109,7 +110,7 @@ def _solve_batch_qp(U: Tensor, G: Tensor) -> Tensor:
                 u = u * tau
                 L = torch.linalg.cholesky(G_s + rho * I_m)
 
-    if (V - Z).abs().amax() > 1e-3:
+    if (V - Z).norm(torch.inf) > 1e-3:
         raise ValueError("Failed to solve the quadratic programming problem.")
 
     # Unscale: v_orig = D * v_scaled
