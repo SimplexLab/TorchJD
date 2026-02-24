@@ -1,0 +1,53 @@
+/* ── Toggle button injected into the function-signature <dt> ────────────── */
+
+.overloads-toggle {
+    float: right;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    margin-left: 1em;
+    padding: 0.1em 0.5em;
+    font-size: 0.75em;
+    font-family: var(--font-stack);
+    color: var(--color-foreground-secondary);
+    background: transparent;
+    border: 1px solid var(--color-foreground-muted, currentColor);
+    border-radius: 0.25em;
+    cursor: pointer;
+    opacity: 0.7;
+    user-select: none;
+    line-height: 1.8;
+    vertical-align: middle;
+}
+
+.overloads-toggle:hover {
+    opacity: 1;
+    color: var(--color-foreground-primary);
+}
+
+/* Animated chevron symbol supplied via CSS so it can be rotated smoothly. */
+.overloads-toggle-chevron::before {
+    content: "▶";
+    display: inline-block;
+    font-size: 0.7em;
+    transition: transform 0.2s ease;
+}
+
+.overloads-toggle--open .overloads-toggle-chevron::before {
+    transform: rotate(90deg);
+}
+
+/* When the button precedes a [source] link in the same <dt>, push [source]
+   below the button by clearing its float.  This only activates for functions
+   that have overloads (where the button is present). */
+.overloads-toggle ~ a.reference .viewcode-link {
+    clear: right;
+}
+
+/* ── Overloads content panel ─────────────────────────────────────────────── */
+
+.overloads-block {
+    margin-bottom: 1em;
+    padding-left: 1em;
+    border-left: 2px solid var(--color-brand-primary);
+}

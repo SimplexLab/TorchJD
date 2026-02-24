@@ -16,6 +16,8 @@ _PATH_HERE = os.path.abspath(os.path.dirname(__file__))
 _PATH_ROOT = os.path.realpath(os.path.join(_PATH_HERE, "..", ".."))
 _PATH_PYPROJECT = os.path.join(_PATH_ROOT, "pyproject.toml")
 
+sys.path.insert(0, _PATH_HERE)
+
 # Read all metadata from pyproject.toml, so that we don't duplicate it.
 
 with open(_PATH_PYPROJECT, mode="rb") as fp:
@@ -40,6 +42,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "myst_parser",  # Enables markdown support
     "sphinx_design",  # Enables side to side cards
+    "overload_dropdown",  # Shows @overload stubs in a collapsible dropdown
 ]
 
 # -- Options for HTML output -------------------------------------------------
@@ -69,8 +72,10 @@ html_theme_options = {
     "sidebar_hide_name": True,
 }
 
+html_css_files = ["overload_dropdown.css"]
 html_js_files = [
     ("https://stats.torchjd.org/js/script.js", {"data-domain": "torchjd.org", "defer": "defer"}),
+    "overload_dropdown.js",
 ]
 
 html_title = "TorchJD"
@@ -108,21 +113,22 @@ def _get_obj(_info: dict[str, str]) -> object:
     for part in full_name.split("."):
         obj = getattr(obj, part)
     # strip decorators, which would resolve to the source of the decorator
-    obj = inspect.unwrap(obj)
+    obj = inspect.unwrap(obj)  # type: ignore[arg-type]
     return obj
 
 
 def _get_file_name(obj: object) -> str | None:
     try:
-        file_name = inspect.getsourcefile(obj)
-        file_name = os.path.relpath(file_name, start=_PATH_ROOT)
+        file_name = inspect.getsourcefile(obj)  # type: ignore[arg-type]
+        if file_name is None:
+            return None
+        return os.path.relpath(file_name, start=_PATH_ROOT)
     except TypeError:  # This seems to happen when obj is a property
-        file_name = None
-    return file_name
+        return None
 
 
 def _get_line_str(obj: object) -> str:
-    source, start = inspect.getsourcelines(obj)
+    source, start = inspect.getsourcelines(obj)  # type: ignore[arg-type]
     end = start + len(source) - 1
     line_str = f"#L{start}-L{end}"
     return line_str
