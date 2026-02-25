@@ -42,5 +42,6 @@ Abstract base classes
     nash_mtl.rst
     pcgrad.rst
     random.rst
+    stch.rst
     sum.rst
     trimmed_mean.rst

@@ -72,6 +72,7 @@ from ._mean import Mean, MeanWeighting
 from ._mgda import MGDA, MGDAWeighting
 from ._pcgrad import PCGrad, PCGradWeighting
 from ._random import Random, RandomWeighting
+from ._stch import STCH, STCHWeighting
 from ._sum import Sum, SumWeighting
 from ._trimmed_mean import TrimmedMean
 from ._upgrad import UPGrad, UPGradWeighting
@@ -104,6 +105,8 @@ __all__ = [
     "PCGradWeighting",
     "Random",
     "RandomWeighting",
+    "STCH",
+    "STCHWeighting",
     "Sum",
     "SumWeighting",
     "TrimmedMean",
