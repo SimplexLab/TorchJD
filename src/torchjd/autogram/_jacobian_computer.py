@@ -195,5 +195,5 @@ class ComputeModuleJacobians(torch.autograd.Function):
         return cast(Matrix, jacobian), None
 
     @staticmethod
-    def setup_context(*_) -> None:
+    def setup_context(*_, **__) -> None:
         pass
