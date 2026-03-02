@@ -5,8 +5,27 @@ on:
     types: [published]
 
 jobs:
+  check-version:
+    name: Verify version matches tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Extract and compare versions
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          TOML_VERSION=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+
+          if [ "$TAG_VERSION" != "$TOML_VERSION" ]; then
+            echo "Version mismatch: tag is v$TAG_VERSION, pyproject.toml is $TOML_VERSION"
+            exit 1
+          fi
+          echo "Versions match: $TOML_VERSION"
+
   pypi-publish:
     name: Publish to PyPI
+    needs: check-version
     environment: release
     runs-on: ubuntu-latest
     permissions:
