@@ -4,4 +4,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    # Dependabot can update major versions (e.g., v6 -> v7) when using major version tags
+  
+  - package-ecosystem: "pre-commit"
+    directory: "/"
+    schedule:
+      interval: "quarterly"
