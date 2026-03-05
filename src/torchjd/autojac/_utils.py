@@ -106,8 +106,8 @@ def check_matching_grad_shapes(
 def create_jac_dict(
     tensors: OrderedSet[Tensor],
     opt_jacobians: Sequence[Tensor] | Tensor | None,
-    jacobian_param_name: str,
     tensor_param_name: str,
+    jacobian_param_name: str,
 ) -> dict[Tensor, Tensor]:
     """
     Creates a dictionary mapping tensors to their corresponding Jacobians.
@@ -118,8 +118,8 @@ def create_jac_dict(
     :param tensors: The tensors to differentiate.
     :param opt_jacobians: The initial Jacobians to backpropagate. If ``None``, defaults to
         identity.
-    :param jacobian_param_name: The name of the jacobian parameter for error messages.
     :param tensor_param_name: The name of the tensor parameter for error messages.
+    :param jacobian_param_name: The name of the jacobian parameter for error messages.
     """
     from torchjd.autojac._transform._diagonalize import Diagonalize
     from torchjd.autojac._transform._init import Init

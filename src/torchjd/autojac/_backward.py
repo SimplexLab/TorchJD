@@ -116,7 +116,7 @@ def backward(
     else:
         inputs_ = OrderedSet(inputs)
 
-    jac_tensors_dict = create_jac_dict(tensors_, jac_tensors, "jac_tensors", "tensors")
+    jac_tensors_dict = create_jac_dict(tensors_, jac_tensors, "tensors", "jac_tensors")
     transform = _create_transform(tensors_, inputs_, parallel_chunk_size, retain_graph)
     transform(jac_tensors_dict)
 

@@ -26,8 +26,8 @@ def test_check_create_transform(default_jac_tensors: bool) -> None:
     jac_tensors = create_jac_dict(
         tensors=OrderedSet([y1, y2]),
         opt_jacobians=optional_jac_tensors,
-        jacobian_param_name="jac_tensors",
         tensor_param_name="tensors",
+        jacobian_param_name="jac_tensors",
     )
     transform = _create_transform(
         tensors=OrderedSet([y1, y2]),

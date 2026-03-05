@@ -155,7 +155,7 @@ def jac(
     inputs_with_repetition = cast(Sequence[Tensor], (inputs,) if is_tensor_like(inputs) else inputs)
     inputs_ = OrderedSet(inputs_with_repetition)
 
-    jac_outputs_dict = create_jac_dict(outputs_, jac_outputs, "jac_outputs", "outputs")
+    jac_outputs_dict = create_jac_dict(outputs_, jac_outputs, "outputs", "jac_outputs")
     transform = _create_transform(outputs_, inputs_, parallel_chunk_size, retain_graph)
     result = transform(jac_outputs_dict)
     return tuple(result[input] for input in inputs_with_repetition)
