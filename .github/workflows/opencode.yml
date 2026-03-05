@@ -64,5 +64,5 @@ jobs:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           OPENCODE_PERMISSION: '{"bash": "deny"}'
         with:
-          model: opencode-go/glm-5
+          model: opencode-go/kimi-k2.5
           agent: ${{ steps.agent.outputs.agent }}
