@@ -4,8 +4,9 @@ from utils.asserts import assert_has_jac, assert_has_no_jac, assert_jac_close
 from utils.tensors import eye_, randn_, tensor_
 
 from torchjd.autojac import backward
-from torchjd.autojac._backward import _create_jac_tensors_dict, _create_transform
+from torchjd.autojac._backward import _create_transform
 from torchjd.autojac._transform import OrderedSet
+from torchjd.autojac._utils import create_jac_dict
 
 
 @mark.parametrize("default_jac_tensors", [True, False])
@@ -22,9 +23,11 @@ def test_check_create_transform(default_jac_tensors: bool) -> None:
         None if default_jac_tensors else [tensor_([1.0, 0.0]), tensor_([0.0, 1.0])]
     )
 
-    jac_tensors = _create_jac_tensors_dict(
+    jac_tensors = create_jac_dict(
         tensors=OrderedSet([y1, y2]),
-        opt_jac_tensors=optional_jac_tensors,
+        opt_jacobians=optional_jac_tensors,
+        jacobian_param_name="jac_tensors",
+        tensor_param_name="tensors",
     )
     transform = _create_transform(
         tensors=OrderedSet([y1, y2]),

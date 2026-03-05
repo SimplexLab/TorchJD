@@ -1,16 +1,12 @@
 from collections.abc import Iterable, Sequence
-from typing import cast
 
 from torch import Tensor
-from torch.overrides import is_tensor_like
 
-from ._transform import AccumulateJac, Diagonalize, Init, Jac, OrderedSet, Transform
+from ._transform import AccumulateJac, Jac, OrderedSet, Transform
 from ._utils import (
     as_checked_ordered_set,
-    check_consistent_first_dimension,
-    check_matching_jac_shapes,
-    check_matching_length,
     check_optional_positive_chunk_size,
+    create_jac_dict,
     get_leaf_tensors,
 )
 
@@ -120,35 +116,9 @@ def backward(
     else:
         inputs_ = OrderedSet(inputs)
 
-    jac_tensors_dict = _create_jac_tensors_dict(tensors_, jac_tensors)
+    jac_tensors_dict = create_jac_dict(tensors_, jac_tensors, "jac_tensors", "tensors")
     transform = _create_transform(tensors_, inputs_, parallel_chunk_size, retain_graph)
     transform(jac_tensors_dict)
-
-
-def _create_jac_tensors_dict(
-    tensors: OrderedSet[Tensor],
-    opt_jac_tensors: Sequence[Tensor] | Tensor | None,
-) -> dict[Tensor, Tensor]:
-    """
-    Creates a dictionary mapping tensors to their corresponding Jacobians.
-
-    :param tensors: The tensors to differentiate.
-    :param opt_jac_tensors: The initial Jacobians to backpropagate. If ``None``, defaults to
-        identity.
-    """
-    if opt_jac_tensors is None:
-        # Transform that creates gradient outputs containing only ones.
-        init = Init(tensors)
-        # Transform that turns the gradients into Jacobians.
-        diag = Diagonalize(tensors)
-        return (diag << init)({})
-    jac_tensors = cast(
-        Sequence[Tensor], (opt_jac_tensors,) if is_tensor_like(opt_jac_tensors) else opt_jac_tensors
-    )
-    check_matching_length(jac_tensors, tensors, "jac_tensors", "tensors")
-    check_matching_jac_shapes(jac_tensors, tensors, "jac_tensors", "tensors")
-    check_consistent_first_dimension(jac_tensors, "jac_tensors")
-    return dict(zip(tensors, jac_tensors, strict=True))
 
 
 def _create_transform(
