@@ -11,40 +11,12 @@ on:
     types: [submitted]
 
 jobs:
-  opencode-read:
-    name: OpenCode (Read-only)
+  opencode:
     if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/opencode:read')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '/opencode:read')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '/opencode:read')) ||
-      (github.event_name == 'issues' && contains(github.event.issue.body, '/opencode:read'))
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-      pull-requests: write
-      issues: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 1
-          persist-credentials: false
-
-      - name: Run opencode
-        uses: anomalyco/opencode/github@latest
-        env:
-          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
-        with:
-          model: opencode-go/glm-5
-
-  opencode-write:
-    name: OpenCode (Write access)
-    if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/opencode:write')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '/opencode:write')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '/opencode:write')) ||
-      (github.event_name == 'issues' && contains(github.event.issue.body, '/opencode:write'))
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/opencode:')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '/opencode:')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '/opencode:')) ||
+      (github.event_name == 'issues' && contains(github.event.issue.body, '/opencode:'))
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -58,9 +30,23 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
 
+      - name: Extract agent name
+        id: agent
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body || github.event.review.body || github.event.issue.body }}
+        run: |
+          AGENT=$(echo "$COMMENT_BODY" | grep -oP '/opencode:\K[A-Za-z]+' | head -1)
+          if [ -z "$AGENT" ]; then
+            echo "Error: No agent specified after /opencode:"
+            exit 1
+          fi
+          echo "agent=$AGENT" >> $GITHUB_OUTPUT
+
       - name: Run opencode
         uses: anomalyco/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          OPENCODE_PERMISSION: '{"bash": "deny"}'
         with:
           model: opencode-go/glm-5
+          agent: ${{ steps.agent.outputs.agent }}
