@@ -4,10 +4,6 @@ on:
   release:
     types: [published]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
   pypi-publish:
     name: Publish to PyPI
