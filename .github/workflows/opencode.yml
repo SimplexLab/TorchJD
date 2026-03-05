@@ -11,18 +11,46 @@ on:
     types: [submitted]
 
 jobs:
-  opencode:
+  opencode-read:
+    name: OpenCode (Read-only)
     if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/opencode')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '/opencode')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '/opencode')) ||
-      (github.event_name == 'issues' && contains(github.event.issue.body, '/opencode'))
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/opencode:read')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '/opencode:read')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '/opencode:read')) ||
+      (github.event_name == 'issues' && contains(github.event.issue.body, '/opencode:read'))
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
-      pull-requests: read
-      issues: read
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Run opencode
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+        with:
+          model: opencode-go/glm-5
+
+  opencode-write:
+    name: OpenCode (Write access)
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/opencode:write')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '/opencode:write')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '/opencode:write')) ||
+      (github.event_name == 'issues' && contains(github.event.issue.body, '/opencode:write'))
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
