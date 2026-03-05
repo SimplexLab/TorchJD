@@ -1,21 +1,7 @@
 version: 2
 updates:
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    groups:
-      dependencies:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 5
-
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-    groups:
-      actions:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 5
+    # Dependabot can update major versions (e.g., v6 -> v7) when using major version tags
