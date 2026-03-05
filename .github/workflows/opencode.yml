@@ -34,10 +34,26 @@ jobs:
         id: agent
         env:
           COMMENT_BODY: ${{ github.event.comment.body || github.event.review.body || github.event.issue.body }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           AGENT=$(echo "$COMMENT_BODY" | grep -oP '/opencode:\K[A-Za-z]+' | head -1)
-          if [ -z "$AGENT" ]; then
-            echo "Error: No agent specified after /opencode:"
+          if [[ ! "$AGENT" =~ ^(Build|Plan)$ ]]; then
+            ERROR_MSG="Error: Invalid agent '$AGENT'. Must be Build or Plan"
+            echo "$ERROR_MSG"
+
+            # Post comment with error
+            if [ "${{ github.event_name }}" = "issues" ]; then
+              NUMBER=${{ github.event.issue.number }}
+            else
+              NUMBER=${{ github.event.issue.number || github.event.pull_request.number }}
+            fi
+
+            curl -s -X POST \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/${{ github.repository }}/issues/$NUMBER/comments" \
+              -d "{\"body\": \"❌ $ERROR_MSG\"}"
+
             exit 1
           fi
           echo "agent=$AGENT" >> $GITHUB_OUTPUT
