@@ -11,7 +11,7 @@ case, the losses) should preferably be scaled with a `GradScaler
 <https://pytorch.org/docs/stable/amp.html#gradient-scaling>`_ to avoid gradient underflow. The
 following example shows the resulting code for a multi-task learning use-case.
 
-.. code-block:: python
+.. testcode::
     :emphasize-lines: 2, 17, 27, 34-35, 37-38
 
     import torch

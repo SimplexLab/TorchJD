@@ -12,7 +12,7 @@ the parameters are updated using the resulting aggregation.
 
 Import several classes from ``torch`` and ``torchjd``:
 
-.. code-block:: python
+.. testcode::
 
     import torch
     from torch.nn import Linear, MSELoss, ReLU, Sequential
@@ -24,14 +24,14 @@ Import several classes from ``torch`` and ``torchjd``:
 
 Define the model and the optimizer, as usual:
 
-.. code-block:: python
+.. testcode::
 
     model = Sequential(Linear(10, 5), ReLU(), Linear(5, 2))
     optimizer = SGD(model.parameters(), lr=0.1)
 
 Define the aggregator that will be used to combine the Jacobian matrix:
 
-.. code-block:: python
+.. testcode::
 
     aggregator = UPGrad()
 
@@ -41,7 +41,7 @@ negatively affected by the update.
 
 Now that everything is defined, we can train the model. Define the input and the associated target:
 
-.. code-block:: python
+.. testcode::
 
     input = torch.randn(16, 10)  # Batch of 16 random input vectors of length 10
     target1 = torch.randn(16)  # First batch of 16 targets
@@ -51,7 +51,7 @@ Here, we generate fake inputs and labels for the sake of the example.
 
 We can now compute the losses associated to each element of the batch.
 
-.. code-block:: python
+.. testcode::
 
     loss_fn = MSELoss()
     output = model(input)
@@ -62,7 +62,7 @@ The last steps are similar to gradient descent-based optimization, but using the
 
 Perform the Jacobian descent backward pass:
 
-.. code-block:: python
+.. testcode::
 
     autojac.backward([loss1, loss2])
     jac_to_grad(model.parameters(), aggregator)
@@ -73,7 +73,7 @@ field of the parameters. It also deletes the ``.jac`` fields save some memory.
 
 Update each parameter based on its ``.grad`` field, using the ``optimizer``:
 
-.. code-block:: python
+.. testcode::
 
     optimizer.step()
 
@@ -81,6 +81,6 @@ The model's parameters have been updated!
 
 As usual, you should now reset the ``.grad`` field of each model parameter:
 
-.. code-block:: python
+.. testcode::
 
     optimizer.zero_grad()

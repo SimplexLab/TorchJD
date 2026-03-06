@@ -9,7 +9,7 @@ this Gramian to reweight the gradients and resolve conflict entirely.
 
 The following example shows how to do that.
 
-.. code-block:: python
+.. testcode::
     :emphasize-lines: 5-6, 18-20, 31-32, 34-35, 37-38, 40-41
 
     import torch
