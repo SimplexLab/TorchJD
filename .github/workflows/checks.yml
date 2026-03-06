@@ -6,6 +6,10 @@ on:
   schedule:
     - cron: '41 16 * * *'  # Every day at 16:41 UTC (to avoid high load at exact hour values).
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   UV_NO_SYNC: 1
 
