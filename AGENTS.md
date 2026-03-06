@@ -15,3 +15,4 @@
   test files in `tests/` and run them with e.g.
   `uv run pytest tests/unit/aggregation/test_upgrad.py -W error`. Fix any error, either in the
   changes you've made or by adapting the tests to the new specifications.
+- Test
