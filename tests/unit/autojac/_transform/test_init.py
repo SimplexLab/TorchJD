@@ -5,7 +5,7 @@ from utils.tensors import tensor_
 from torchjd.autojac._transform import Init, RequirementError
 
 
-def test_single_input():
+def test_single_input() -> None:
     """
     Tests that when there is a single key to initialize, the Init transform creates a TensorDict
     whose value is a tensor full of ones, of the same shape as its key.
@@ -22,7 +22,7 @@ def test_single_input():
     assert_tensor_dicts_are_close(output, expected_output)
 
 
-def test_multiple_inputs():
+def test_multiple_inputs() -> None:
     """
     Tests that when there are several keys to initialize, the Init transform creates a TensorDict
     whose values are tensors full of ones, of the same shape as their corresponding keys.
@@ -42,7 +42,7 @@ def test_multiple_inputs():
     assert_tensor_dicts_are_close(output, expected)
 
 
-def test_conjunction_of_inits_is_init():
+def test_conjunction_of_inits_is_init() -> None:
     """
     Tests that the conjunction of 2 Init transforms is equivalent to a single Init transform with
     multiple keys.
@@ -63,7 +63,7 @@ def test_conjunction_of_inits_is_init():
     assert_tensor_dicts_are_close(output, expected_output)
 
 
-def test_check_keys():
+def test_check_keys() -> None:
     """Tests that the `check_keys` method works correctly: the input_keys should be empty."""
 
     key = tensor_([1.0])

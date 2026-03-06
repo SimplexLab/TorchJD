@@ -8,7 +8,7 @@ from torchjd.aggregation._utils.dual_cone import _project_weight_vector, project
 
 
 @mark.parametrize("shape", [(5, 7), (9, 37), (2, 14), (32, 114), (50, 100)])
-def test_solution_weights(shape: tuple[int, int]):
+def test_solution_weights(shape: tuple[int, int]) -> None:
     r"""
     Tests that `_project_weights` returns valid weights corresponding to the projection onto the
     dual cone of a matrix with the specified shape.
@@ -54,7 +54,7 @@ def test_solution_weights(shape: tuple[int, int]):
 
 @mark.parametrize("shape", [(5, 7), (9, 37), (32, 114)])
 @mark.parametrize("scaling", [2 ** (-4), 2 ** (-2), 2**2, 2**4])
-def test_scale_invariant(shape: tuple[int, int], scaling: float):
+def test_scale_invariant(shape: tuple[int, int], scaling: float) -> None:
     """
     Tests that `_project_weights` is invariant under scaling.
     """
@@ -70,7 +70,7 @@ def test_scale_invariant(shape: tuple[int, int], scaling: float):
 
 
 @mark.parametrize("shape", [(5, 2, 3), (1, 3, 6, 9), (2, 1, 1, 5, 8), (3, 1)])
-def test_tensorization_shape(shape: tuple[int, ...]):
+def test_tensorization_shape(shape: tuple[int, ...]) -> None:
     """
     Tests that applying `_project_weights` on a tensor is equivalent to applying it on the tensor
     reshaped as matrix and to reshape the result back to the original tensor's shape.
@@ -88,7 +88,7 @@ def test_tensorization_shape(shape: tuple[int, ...]):
     assert_close(W_matrix.reshape(shape), W_tensor)
 
 
-def test_project_weight_vector_failure():
+def test_project_weight_vector_failure() -> None:
     """Tests that `_project_weight_vector` raises an error when the input G has too large values."""
 
     large_J = np.random.randn(10, 100) * 1e5

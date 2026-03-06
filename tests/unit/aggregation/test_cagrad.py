@@ -23,17 +23,17 @@ non_conflicting_pairs_2 = [(CAGrad(c=2.0), matrix) for matrix in typical_matrice
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
-def test_expected_structure(aggregator: CAGrad, matrix: Tensor):
+def test_expected_structure(aggregator: CAGrad, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], requires_grad_pairs)
-def test_non_differentiable(aggregator: CAGrad, matrix: Tensor):
+def test_non_differentiable(aggregator: CAGrad, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], non_conflicting_pairs_1 + non_conflicting_pairs_2)
-def test_non_conflicting(aggregator: CAGrad, matrix: Tensor):
+def test_non_conflicting(aggregator: CAGrad, matrix: Tensor) -> None:
     """Tests that CAGrad is non-conflicting when c >= 1 (it should not hold when c < 1)."""
     assert_non_conflicting(aggregator, matrix)
 
@@ -48,12 +48,12 @@ def test_non_conflicting(aggregator: CAGrad, matrix: Tensor):
         (50.0, does_not_raise()),
     ],
 )
-def test_c_check(c: float, expectation: ExceptionContext):
+def test_c_check(c: float, expectation: ExceptionContext) -> None:
     with expectation:
         _ = CAGrad(c=c)
 
 
-def test_representations():
+def test_representations() -> None:
     A = CAGrad(c=0.5, norm_eps=0.0001)
     assert repr(A) == "CAGrad(c=0.5, norm_eps=0.0001)"
     assert str(A) == "CAGrad0.5"

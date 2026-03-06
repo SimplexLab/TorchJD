@@ -31,7 +31,7 @@ class Differentiate(Transform, ABC):
         inputs: OrderedSet[Tensor],
         retain_graph: bool,
         create_graph: bool,
-    ):
+    ) -> None:
         self.outputs = list(outputs)
         self.inputs = list(inputs)
         self.retain_graph = retain_graph
@@ -55,7 +55,7 @@ class Differentiate(Transform, ABC):
         tensor_outputs should be.
         """
 
-    def check_keys(self, input_keys: set[Tensor]) -> set[Tensor]:
+    def check_keys(self, input_keys: set[Tensor], /) -> set[Tensor]:
         outputs = set(self.outputs)
         if not outputs == input_keys:
             raise RequirementError(

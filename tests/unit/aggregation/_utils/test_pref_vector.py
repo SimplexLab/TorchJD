@@ -21,6 +21,8 @@ from torchjd.aggregation._utils.pref_vector import pref_vector_to_weighting
         (ones_([1, 1, 1]), raises(ValueError)),
     ],
 )
-def test_pref_vector_to_weighting_check(pref_vector: Tensor | None, expectation: ExceptionContext):
+def test_pref_vector_to_weighting_check(
+    pref_vector: Tensor | None, expectation: ExceptionContext
+) -> None:
     with expectation:
         _ = pref_vector_to_weighting(pref_vector, default=MeanWeighting())

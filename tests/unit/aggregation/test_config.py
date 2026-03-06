@@ -20,26 +20,26 @@ requires_grad_pairs = [(ConFIG(), ones_(3, 5, requires_grad=True))]
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
-def test_expected_structure(aggregator: ConFIG, matrix: Tensor):
+def test_expected_structure(aggregator: ConFIG, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
-def test_permutation_invariant(aggregator: ConFIG, matrix: Tensor):
+def test_permutation_invariant(aggregator: ConFIG, matrix: Tensor) -> None:
     assert_permutation_invariant(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
-def test_linear_under_scaling(aggregator: ConFIG, matrix: Tensor):
+def test_linear_under_scaling(aggregator: ConFIG, matrix: Tensor) -> None:
     assert_linear_under_scaling(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], requires_grad_pairs)
-def test_non_differentiable(aggregator: ConFIG, matrix: Tensor):
+def test_non_differentiable(aggregator: ConFIG, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
 
 
-def test_representations():
+def test_representations() -> None:
     A = ConFIG()
     assert repr(A) == "ConFIG(pref_vector=None)"
     assert str(A) == "ConFIG"

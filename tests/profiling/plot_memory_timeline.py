@@ -24,7 +24,7 @@ class MemoryFrame:
     device_id: int  # -1 for CPU, 0+ for CUDA devices
 
     @staticmethod
-    def from_event(event: dict):
+    def from_event(event: dict) -> "MemoryFrame":
         args = event["args"]
         return MemoryFrame(
             timestamp=event["ts"],
@@ -112,7 +112,7 @@ def plot_memory_timelines(experiment: str, folders: list[str]) -> None:
     print("Plot saved successfully!")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Plot memory timeline from profiling traces.")
     parser.add_argument(
         "experiment",

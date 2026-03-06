@@ -17,26 +17,26 @@ non_strong_pairs = [(Sum(), matrix) for matrix in non_strong_matrices]
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
-def test_expected_structure(aggregator: Sum, matrix: Tensor):
+def test_expected_structure(aggregator: Sum, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
-def test_permutation_invariant(aggregator: Sum, matrix: Tensor):
+def test_permutation_invariant(aggregator: Sum, matrix: Tensor) -> None:
     assert_permutation_invariant(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
-def test_linear_under_scaling(aggregator: Sum, matrix: Tensor):
+def test_linear_under_scaling(aggregator: Sum, matrix: Tensor) -> None:
     assert_linear_under_scaling(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], non_strong_pairs)
-def test_strongly_stationary(aggregator: Sum, matrix: Tensor):
+def test_strongly_stationary(aggregator: Sum, matrix: Tensor) -> None:
     assert_strongly_stationary(aggregator, matrix)
 
 
-def test_representations():
+def test_representations() -> None:
     A = Sum()
     assert repr(A) == "Sum()"
     assert str(A) == "Sum"

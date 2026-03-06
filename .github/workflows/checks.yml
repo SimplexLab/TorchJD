@@ -6,6 +6,10 @@ on:
   schedule:
     - cron: '41 16 * * *'  # Every day at 16:41 UTC (to avoid high load at exact hour values).
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   UV_NO_SYNC: 1
 
@@ -56,7 +60,7 @@ jobs:
           PYTEST_TORCH_DTYPE: ${{ matrix.dtype || 'float32' }}
 
       - name: Upload results to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -85,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # This will restore the cache for the current commit if it exists, or the most recent lychee
       # cache otherwise (including those saved for the main branch). It will also save the cache for
@@ -94,7 +98,7 @@ jobs:
       # temporary (rate limiting, network issue, etc.), and we always want to retry those links
       # everytime this action is run.
       - name: Restore lychee cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .lycheecache
           key: cache-lychee-${{ github.sha }}
@@ -110,7 +114,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   code-quality:
-    name: Code quality (ty and ruff)
+    name: Code quality (ty and pre-commit hooks)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -125,8 +129,8 @@ jobs:
         with:
           groups: check test plot
 
+      - name: Run pre-commit hooks
+        run: uv run pre-commit run --all-files
+
       - name: Run ty
         run: uv run ty check --output-format=github
-
-      - name: Run ruff
-        run: uv run ruff check --output-format=github

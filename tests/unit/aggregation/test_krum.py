@@ -15,7 +15,7 @@ typical_pairs = [(Krum(n_byzantine=1), matrix) for matrix in typical_matrices_2_
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
-def test_expected_structure(aggregator: Krum, matrix: Tensor):
+def test_expected_structure(aggregator: Krum, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 
 
@@ -29,7 +29,7 @@ def test_expected_structure(aggregator: Krum, matrix: Tensor):
         (5, does_not_raise()),
     ],
 )
-def test_n_byzantine_check(n_byzantine: int, expectation: ExceptionContext):
+def test_n_byzantine_check(n_byzantine: int, expectation: ExceptionContext) -> None:
     with expectation:
         _ = Krum(n_byzantine=n_byzantine, n_selected=1)
 
@@ -44,7 +44,7 @@ def test_n_byzantine_check(n_byzantine: int, expectation: ExceptionContext):
         (5, does_not_raise()),
     ],
 )
-def test_n_selected_check(n_selected: int, expectation: ExceptionContext):
+def test_n_selected_check(n_selected: int, expectation: ExceptionContext) -> None:
     with expectation:
         _ = Krum(n_byzantine=1, n_selected=n_selected)
 
@@ -66,7 +66,7 @@ def test_matrix_shape_check(
     n_selected: int,
     n_rows: int,
     expectation: ExceptionContext,
-):
+) -> None:
     aggregator = Krum(n_byzantine=n_byzantine, n_selected=n_selected)
     matrix = ones_([n_rows, 5])
 
@@ -74,7 +74,7 @@ def test_matrix_shape_check(
         _ = aggregator(matrix)
 
 
-def test_representations():
+def test_representations() -> None:
     A = Krum(n_byzantine=1, n_selected=2)
     assert repr(A) == "Krum(n_byzantine=1, n_selected=2)"
     assert str(A) == "Krum1-2"

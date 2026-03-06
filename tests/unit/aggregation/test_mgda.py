@@ -19,17 +19,17 @@ typical_pairs = [(MGDA(), matrix) for matrix in typical_matrices]
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
-def test_expected_structure(aggregator: MGDA, matrix: Tensor):
+def test_expected_structure(aggregator: MGDA, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
-def test_non_conflicting(aggregator: MGDA, matrix: Tensor):
+def test_non_conflicting(aggregator: MGDA, matrix: Tensor) -> None:
     assert_non_conflicting(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
-def test_permutation_invariant(aggregator: MGDA, matrix: Tensor):
+def test_permutation_invariant(aggregator: MGDA, matrix: Tensor) -> None:
     assert_permutation_invariant(aggregator, matrix)
 
 
@@ -43,7 +43,7 @@ def test_permutation_invariant(aggregator: MGDA, matrix: Tensor):
         (50, 100),
     ],
 )
-def test_mgda_satisfies_kkt_conditions(shape: tuple[int, int]):
+def test_mgda_satisfies_kkt_conditions(shape: tuple[int, int]) -> None:
     matrix = randn_(shape)
     gramian = compute_gramian(matrix)
 
@@ -66,7 +66,7 @@ def test_mgda_satisfies_kkt_conditions(shape: tuple[int, int]):
     assert_close(positive_mu.norm(), mu.norm(), atol=1e-02, rtol=0.0)
 
 
-def test_representations():
+def test_representations() -> None:
     A = MGDA(epsilon=0.001, max_iters=100)
     assert repr(A) == "MGDA(epsilon=0.001, max_iters=100)"
     assert str(A) == "MGDA"

@@ -38,7 +38,7 @@ class Jac(Differentiate):
         chunk_size: int | None,
         retain_graph: bool = False,
         create_graph: bool = False,
-    ):
+    ) -> None:
         super().__init__(outputs, inputs, retain_graph, create_graph)
         self.chunk_size = chunk_size
 

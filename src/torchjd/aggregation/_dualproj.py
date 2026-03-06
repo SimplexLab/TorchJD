@@ -33,7 +33,7 @@ class DualProj(GramianWeightedAggregator):
         norm_eps: float = 0.0001,
         reg_eps: float = 0.0001,
         solver: SUPPORTED_SOLVER = "quadprog",
-    ):
+    ) -> None:
         self._pref_vector = pref_vector
         self._norm_eps = norm_eps
         self._reg_eps = reg_eps
@@ -77,7 +77,7 @@ class DualProjWeighting(Weighting[PSDMatrix]):
         norm_eps: float = 0.0001,
         reg_eps: float = 0.0001,
         solver: SUPPORTED_SOLVER = "quadprog",
-    ):
+    ) -> None:
         super().__init__()
         self._pref_vector = pref_vector
         self.weighting = pref_vector_to_weighting(pref_vector, default=MeanWeighting())

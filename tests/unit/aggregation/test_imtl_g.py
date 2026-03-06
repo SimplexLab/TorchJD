@@ -18,21 +18,21 @@ requires_grad_pairs = [(IMTLG(), ones_(3, 5, requires_grad=True))]
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
-def test_expected_structure(aggregator: IMTLG, matrix: Tensor):
+def test_expected_structure(aggregator: IMTLG, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
-def test_permutation_invariant(aggregator: IMTLG, matrix: Tensor):
+def test_permutation_invariant(aggregator: IMTLG, matrix: Tensor) -> None:
     assert_permutation_invariant(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], requires_grad_pairs)
-def test_non_differentiable(aggregator: IMTLG, matrix: Tensor):
+def test_non_differentiable(aggregator: IMTLG, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
 
 
-def test_imtlg_zero():
+def test_imtlg_zero() -> None:
     """
     Tests that IMTLG correctly returns the 0 vector in the special case where input matrix only
     consists of zeros.
@@ -43,7 +43,7 @@ def test_imtlg_zero():
     assert_close(A(J), zeros_(3))
 
 
-def test_representations():
+def test_representations() -> None:
     A = IMTLG()
     assert repr(A) == "IMTLG()"
     assert str(A) == "IMTLG"

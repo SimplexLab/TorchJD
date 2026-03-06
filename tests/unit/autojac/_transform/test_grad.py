@@ -6,7 +6,7 @@ from utils.tensors import tensor_
 from torchjd.autojac._transform import Grad, OrderedSet, RequirementError
 
 
-def test_single_input():
+def test_single_input() -> None:
     """
     Tests that the Grad transform works correctly for a very simple example of differentiation.
     Here, the function considered is: `y = a * x`. We want to compute the derivative of `y` with
@@ -26,7 +26,7 @@ def test_single_input():
     assert_tensor_dicts_are_close(gradients, expected_gradients)
 
 
-def test_empty_inputs_1():
+def test_empty_inputs_1() -> None:
     """
     Tests that the Grad transform works correctly when the `inputs` parameter is an empty
     `Iterable`.
@@ -43,7 +43,7 @@ def test_empty_inputs_1():
     assert_tensor_dicts_are_close(gradients, expected_gradients)
 
 
-def test_empty_inputs_2():
+def test_empty_inputs_2() -> None:
     """
     Tests that the Grad transform works correctly when the `inputs` parameter is an empty
     `Iterable`.
@@ -62,7 +62,7 @@ def test_empty_inputs_2():
     assert_tensor_dicts_are_close(gradients, expected_gradients)
 
 
-def test_empty_outputs():
+def test_empty_outputs() -> None:
     """
     Tests that the Grad transform works correctly when the `outputs` parameter is an empty
     `Iterable`.
@@ -80,7 +80,7 @@ def test_empty_outputs():
     assert_tensor_dicts_are_close(gradients, expected_gradients)
 
 
-def test_retain_graph():
+def test_retain_graph() -> None:
     """Tests that the `Grad` transform behaves as expected with the `retain_graph` flag."""
 
     x = tensor_(5.0)
@@ -100,7 +100,7 @@ def test_retain_graph():
         grad_discard_graph(input)
 
 
-def test_single_input_two_levels():
+def test_single_input_two_levels() -> None:
     """
     Tests that the Grad transform works correctly when composed with another Grad transform.
     Here, the function considered is: `z = a * x1 * x2`, which is computed in 2 parts: `y = a * x1`
@@ -125,7 +125,7 @@ def test_single_input_two_levels():
     assert_tensor_dicts_are_close(gradients, expected_gradients)
 
 
-def test_empty_inputs_two_levels():
+def test_empty_inputs_two_levels() -> None:
     """
     Tests that the Grad transform works correctly when the `inputs` parameter is an empty
     `Iterable`, with 2 composed Grad transforms.
@@ -148,7 +148,7 @@ def test_empty_inputs_two_levels():
     assert_tensor_dicts_are_close(gradients, expected_gradients)
 
 
-def test_vector_output():
+def test_vector_output() -> None:
     """
     Tests that the Grad transform works correctly when the `outputs` contains a single vector.
     The input (grad_outputs) is not the same for both values of the output, so that this test also
@@ -168,7 +168,7 @@ def test_vector_output():
     assert_tensor_dicts_are_close(gradients, expected_gradients)
 
 
-def test_multiple_outputs():
+def test_multiple_outputs() -> None:
     """
     Tests that the Grad transform works correctly when the `outputs` contains 2 scalars.
     The input (grad_outputs) is not the same for both outputs, so that this test also checks that
@@ -189,7 +189,7 @@ def test_multiple_outputs():
     assert_tensor_dicts_are_close(gradients, expected_gradients)
 
 
-def test_multiple_tensor_outputs():
+def test_multiple_tensor_outputs() -> None:
     """
     Tests that the Grad transform works correctly when the `outputs` contains several tensors of
     different shapes. The input (grad_outputs) is not the same for all values of the outputs, so
@@ -216,7 +216,7 @@ def test_multiple_tensor_outputs():
     assert_tensor_dicts_are_close(gradients, expected_gradients)
 
 
-def test_composition_of_grads_is_grad():
+def test_composition_of_grads_is_grad() -> None:
     """
     Tests that the composition of 2 Grad transforms is equivalent to computing the Grad directly in
     a single transform.
@@ -243,7 +243,7 @@ def test_composition_of_grads_is_grad():
     assert_tensor_dicts_are_close(gradients, expected_gradients)
 
 
-def test_conjunction_of_grads_is_grad():
+def test_conjunction_of_grads_is_grad() -> None:
     """
     Tests that the conjunction of 2 Grad transforms is equivalent to computing the Grad directly in
     a single transform.
@@ -267,7 +267,7 @@ def test_conjunction_of_grads_is_grad():
     assert_tensor_dicts_are_close(gradients, expected_gradients)
 
 
-def test_create_graph():
+def test_create_graph() -> None:
     """Tests that the Grad transform behaves correctly when `create_graph` is set to `True`."""
 
     a = tensor_(2.0, requires_grad=True)
@@ -281,7 +281,7 @@ def test_create_graph():
     assert gradients[a].requires_grad
 
 
-def test_check_keys():
+def test_check_keys() -> None:
     """
     Tests that the `check_keys` method works correctly: the input_keys should match the stored
     outputs.

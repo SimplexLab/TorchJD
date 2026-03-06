@@ -18,6 +18,6 @@ from torchjd.aggregation import Aggregator
         ([1, 2, 3, 4], raises(ValueError)),
     ],
 )
-def test_check_is_matrix(shape: Sequence[int], expectation: ExceptionContext):
+def test_check_is_matrix(shape: Sequence[int], expectation: ExceptionContext) -> None:
     with expectation:
         Aggregator._check_is_matrix(randn_(shape))

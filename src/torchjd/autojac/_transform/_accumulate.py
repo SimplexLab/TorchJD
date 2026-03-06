@@ -18,7 +18,7 @@ class AccumulateGrad(Transform):
         accumulate_grads(gradients.keys(), gradients.values())
         return {}
 
-    def check_keys(self, input_keys: set[Tensor]) -> set[Tensor]:
+    def check_keys(self, _input_keys: set[Tensor], /) -> set[Tensor]:
         return set()
 
 
@@ -35,5 +35,5 @@ class AccumulateJac(Transform):
         accumulate_jacs(jacobians.keys(), jacobians.values())
         return {}
 
-    def check_keys(self, input_keys: set[Tensor]) -> set[Tensor]:
+    def check_keys(self, _input_keys: set[Tensor], /) -> set[Tensor]:
         return set()

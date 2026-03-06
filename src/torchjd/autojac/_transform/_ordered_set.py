@@ -10,7 +10,7 @@ _T = TypeVar("_T", bound=Hashable)
 class OrderedSet(MutableSet[_T]):
     """Ordered collection of distinct elements."""
 
-    def __init__(self, elements: Iterable[_T]):
+    def __init__(self, elements: Iterable[_T]) -> None:
         super().__init__()
         self.ordered_dict = OrderedDict[_T, None]([(element, None) for element in elements])
 

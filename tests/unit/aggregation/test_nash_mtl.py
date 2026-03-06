@@ -29,18 +29,18 @@ requires_grad_pairs = [(NashMTL(n_tasks=3), ones_(3, 5, requires_grad=True))]
     "ignore:You are solving a parameterized problem that is not DPP.",
 )
 @mark.parametrize(["aggregator", "matrix"], standard_pairs)
-def test_expected_structure(aggregator: NashMTL, matrix: Tensor):
+def test_expected_structure(aggregator: NashMTL, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 
 
 @mark.filterwarnings("ignore:You are solving a parameterized problem that is not DPP.")
 @mark.parametrize(["aggregator", "matrix"], requires_grad_pairs)
-def test_non_differentiable(aggregator: NashMTL, matrix: Tensor):
+def test_non_differentiable(aggregator: NashMTL, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
 
 
 @mark.filterwarnings("ignore: You are solving a parameterized problem that is not DPP.")
-def test_nash_mtl_reset():
+def test_nash_mtl_reset() -> None:
     """
     Tests that the reset method of NashMTL correctly resets its internal state, by verifying that
     the result is the same after reset as it is right after instantiation.
@@ -59,7 +59,7 @@ def test_nash_mtl_reset():
         assert_close(result, expected)
 
 
-def test_representations():
+def test_representations() -> None:
     A = NashMTL(n_tasks=2, max_norm=1.5, update_weights_every=2, optim_niter=5)
     assert repr(A) == "NashMTL(n_tasks=2, max_norm=1.5, update_weights_every=2, optim_niter=5)"
     assert str(A) == "NashMTL"

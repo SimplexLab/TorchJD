@@ -31,7 +31,7 @@ class Grad(Differentiate):
         inputs: OrderedSet[Tensor],
         retain_graph: bool = False,
         create_graph: bool = False,
-    ):
+    ) -> None:
         super().__init__(outputs, inputs, retain_graph, create_graph)
 
     def _differentiate(self, grad_outputs: Sequence[Tensor], /) -> tuple[Tensor, ...]:

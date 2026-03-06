@@ -10,26 +10,26 @@ class FakeTransform(Transform):
     Fake ``Transform`` to test `check_keys` when composing and conjuncting.
     """
 
-    def __init__(self, required_keys: set[Tensor], output_keys: set[Tensor]):
+    def __init__(self, required_keys: set[Tensor], output_keys: set[Tensor]) -> None:
         self._required_keys = required_keys
         self._output_keys = output_keys
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "T"
 
-    def __call__(self, input: TensorDict, /) -> TensorDict:
+    def __call__(self, _input: TensorDict, /) -> TensorDict:
         # Ignore the input, create a dictionary with the right keys as an output.
         output_dict = {key: empty_(0) for key in self._output_keys}
         return output_dict
 
-    def check_keys(self, input_keys: set[Tensor]) -> set[Tensor]:
+    def check_keys(self, input_keys: set[Tensor], /) -> set[Tensor]:
         # Arbitrary requirement for testing purposes.
         if not input_keys == self._required_keys:
             raise RequirementError()
         return self._output_keys
 
 
-def test_composition_check_keys():
+def test_composition_check_keys() -> None:
     """
     Tests that `check_keys` works correctly for a composition of transforms: the inner transform's
     `output_keys` has to satisfy the outer transform's requirements.
@@ -52,7 +52,7 @@ def test_composition_check_keys():
         (t2 << t1).check_keys({a1})
 
 
-def test_conjunct_check_keys_1():
+def test_conjunct_check_keys_1() -> None:
     """
     Tests that `check_keys` works correctly for a conjunction of transforms: all transforms should
     successfully check their keys.
@@ -75,7 +75,7 @@ def test_conjunct_check_keys_1():
         (t1 | t2 | t3).check_keys({a1, a2})
 
 
-def test_conjunct_check_keys_2():
+def test_conjunct_check_keys_2() -> None:
     """
     Tests that `check_keys` works correctly for a conjunction of transforms: their `output_keys`
     should be disjoint.
@@ -98,7 +98,7 @@ def test_conjunct_check_keys_2():
         (t1 | t2 | t3).check_keys(set())
 
 
-def test_empty_conjunction():
+def test_empty_conjunction() -> None:
     """
     Tests that it is possible to take the conjunction of no transform. This should return an empty
     dictionary.
@@ -109,7 +109,7 @@ def test_empty_conjunction():
     assert len(conjunction({})) == 0
 
 
-def test_str():
+def test_str() -> None:
     """
     Tests that the __str__ method works correctly even for transform involving compositions and
     conjunctions.

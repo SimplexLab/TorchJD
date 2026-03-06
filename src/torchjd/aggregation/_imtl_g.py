@@ -16,7 +16,7 @@ class IMTLG(GramianWeightedAggregator):
     <https://arxiv.org/pdf/2406.16232>`_, supports matrices with some linearly dependant rows.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(IMTLGWeighting())
 
         # This prevents computing gradients that can be very wrong.

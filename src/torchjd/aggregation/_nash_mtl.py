@@ -77,7 +77,7 @@ class NashMTL(WeightedAggregator):
         max_norm: float = 1.0,
         update_weights_every: int = 1,
         optim_niter: int = 20,
-    ):
+    ) -> None:
         super().__init__(
             weighting=_NashMTLWeighting(
                 n_tasks=n_tasks,
@@ -126,7 +126,7 @@ class _NashMTLWeighting(Weighting[Matrix]):
         max_norm: float,
         update_weights_every: int,
         optim_niter: int,
-    ):
+    ) -> None:
         super().__init__()
 
         self.n_tasks = n_tasks

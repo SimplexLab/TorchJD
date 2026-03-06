@@ -18,7 +18,7 @@ from torchjd.autojac._transform import (
 )
 
 
-def test_jac_is_stack_of_grads():
+def test_jac_is_stack_of_grads() -> None:
     """
     Tests that the Jac transform (composed with a Diagonalize) is equivalent to a Stack of Grad and
     Select transforms.
@@ -52,7 +52,7 @@ def test_jac_is_stack_of_grads():
     assert_tensor_dicts_are_close(jacobians, expected_jacobians)
 
 
-def test_single_differentiation():
+def test_single_differentiation() -> None:
     """
     Tests that we can perform a single scalar differentiation with the composition of a Grad and an
     Init transform.
@@ -72,7 +72,7 @@ def test_single_differentiation():
     assert_tensor_dicts_are_close(output, expected_output)
 
 
-def test_multiple_differentiations():
+def test_multiple_differentiations() -> None:
     """
     Tests that we can perform multiple scalar differentiations with the conjunction of multiple Grad
     transforms, composed with an Init transform.
@@ -100,7 +100,7 @@ def test_multiple_differentiations():
     assert_tensor_dicts_are_close(output, expected_output)
 
 
-def test_str():
+def test_str() -> None:
     """Tests that the __str__ method works correctly even for a complex transform."""
     init = Init(set())
     diag = Diagonalize(OrderedSet([]))
@@ -110,7 +110,7 @@ def test_str():
     assert str(transform) == "Jac ∘ Diagonalize ∘ Init"
 
 
-def test_simple_conjunction():
+def test_simple_conjunction() -> None:
     """
     Tests that the Conjunction transform works correctly with a simple example involving several
     Select transforms, whose keys form a partition of the keys of the input tensor dict.
@@ -133,7 +133,7 @@ def test_simple_conjunction():
     assert_tensor_dicts_are_close(output, expected_output)
 
 
-def test_conjunction_is_commutative():
+def test_conjunction_is_commutative() -> None:
     """
     Tests that the Conjunction transform gives the same result no matter the order in which its
     transforms are given.
@@ -154,7 +154,7 @@ def test_conjunction_is_commutative():
     assert_tensor_dicts_are_close(output, expected_output)
 
 
-def test_conjunction_is_associative():
+def test_conjunction_is_associative() -> None:
     """
     Tests that the Conjunction transform gives the same result no matter how it is parenthesized.
     """
@@ -184,7 +184,7 @@ def test_conjunction_is_associative():
     assert_tensor_dicts_are_close(output, expected_output)
 
 
-def test_conjunction_accumulate_select():
+def test_conjunction_accumulate_select() -> None:
     """
     Tests that it is possible to conjunct an AccumulateGrad and a Select in this order.
     It is not trivial since the type of the TensorDict returned by the first transform
@@ -206,7 +206,7 @@ def test_conjunction_accumulate_select():
     assert_tensor_dicts_are_close(output, expected_output)
 
 
-def test_equivalence_jac_grads():
+def test_equivalence_jac_grads() -> None:
     """
     Tests that differentiation in parallel using `_jac` is equivalent to sequential differentiation
     using several calls to `_grad` and stacking the resulting gradients.
@@ -248,7 +248,7 @@ def test_equivalence_jac_grads():
     assert_close(jac_c, torch.stack([grad_1_c, grad_2_c]))
 
 
-def test_stack_check_keys():
+def test_stack_check_keys() -> None:
     """
     Tests that the `check_keys` method works correctly for a stack of transforms: all of them should
     successfully check their keys.

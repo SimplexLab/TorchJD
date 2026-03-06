@@ -17,12 +17,12 @@ requires_grad_pairs = [(PCGrad(), ones_(3, 5, requires_grad=True))]
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
-def test_expected_structure(aggregator: PCGrad, matrix: Tensor):
+def test_expected_structure(aggregator: PCGrad, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], requires_grad_pairs)
-def test_non_differentiable(aggregator: PCGrad, matrix: Tensor):
+def test_non_differentiable(aggregator: PCGrad, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
 
 
@@ -41,7 +41,7 @@ def test_non_differentiable(aggregator: PCGrad, matrix: Tensor):
         (2, 11100),
     ],
 )
-def test_equivalence_upgrad_sum_two_rows(shape: tuple[int, int]):
+def test_equivalence_upgrad_sum_two_rows(shape: tuple[int, int]) -> None:
     """
     Tests that UPGradWeighting of a SumWeighting is equivalent to PCGradWeighting for matrices of 2
     rows.
@@ -64,7 +64,7 @@ def test_equivalence_upgrad_sum_two_rows(shape: tuple[int, int]):
     assert_close(result, expected, atol=4e-04, rtol=0.0)
 
 
-def test_representations():
+def test_representations() -> None:
     A = PCGrad()
     assert repr(A) == "PCGrad()"
     assert str(A) == "PCGrad"

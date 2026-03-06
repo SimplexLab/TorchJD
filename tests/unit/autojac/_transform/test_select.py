@@ -6,7 +6,7 @@ from utils.tensors import tensor_
 from torchjd.autojac._transform import RequirementError, Select
 
 
-def test_partition():
+def test_partition() -> None:
     """
     Tests that the Select transform works correctly by applying 2 different Selects to a TensorDict,
     whose keys form a partition of the keys of the TensorDict.
@@ -34,7 +34,7 @@ def test_partition():
     assert_tensor_dicts_are_close(output2, expected_output2)
 
 
-def test_conjunction_of_selects_is_select():
+def test_conjunction_of_selects_is_select() -> None:
     """
     Tests that the conjunction of 2 Select transforms is equivalent to directly using a Select with
     the union of the keys of the 2 Selects.
@@ -56,7 +56,7 @@ def test_conjunction_of_selects_is_select():
     assert_tensor_dicts_are_close(output, expected_output)
 
 
-def test_check_keys():
+def test_check_keys() -> None:
     """
     Tests that the `check_keys` method works correctly: the set of keys to select should be a subset
     of the set of required_keys.

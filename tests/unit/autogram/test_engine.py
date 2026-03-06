@@ -147,7 +147,7 @@ def _assert_gramian_is_equivalent_to_autograd(
     factory: ModuleFactory,
     batch_size: int,
     batch_dim: int | None,
-):
+) -> None:
     model_autograd, model_autogram = factory(), factory()
     engine = Engine(model_autogram, batch_dim=batch_dim)
     inputs, targets = make_inputs_and_targets(model_autograd, batch_size)
@@ -191,7 +191,7 @@ _get_losses_and_params = _get_losses_and_params_with_cross_terms
 
 @mark.parametrize(["factory", "batch_size"], PARAMETRIZATIONS)
 @mark.parametrize("batch_dim", [0, None])
-def test_compute_gramian(factory: ModuleFactory, batch_size: int, batch_dim: int | None):
+def test_compute_gramian(factory: ModuleFactory, batch_size: int, batch_dim: int | None) -> None:
     """Tests that the autograd and the autogram engines compute the same gramian."""
 
     _assert_gramian_is_equivalent_to_autograd(factory, batch_size, batch_dim)
@@ -213,7 +213,7 @@ def test_compute_gramian_with_weird_modules(
     factory: ModuleFactory,
     batch_size: int,
     batch_dim: int | None,
-):
+) -> None:
     """
     Tests that compute_gramian works even with some problematic modules when batch_dim is None. It
     is expected to fail on those when the engine uses the batched optimization (when batch_dim=0).
@@ -237,7 +237,7 @@ def test_compute_gramian_unsupported_architectures(
     factory: ModuleFactory,
     batch_size: int,
     batch_dim: int | None,
-):
+) -> None:
     """
     Tests compute_gramian on some architectures that are known to be unsupported. It is expected to
     fail.
@@ -275,7 +275,7 @@ def test_compute_gramian_various_output_shapes(
     batch_dim: int | None,
     movedim_source: list[int],
     movedim_destination: list[int],
-):
+) -> None:
     """
     Tests that the autograd and the autogram engines compute the same gramian when the output can
     have various different shapes, and can be batched in any of its dimensions.
@@ -301,16 +301,18 @@ def test_compute_gramian_various_output_shapes(
     assert_close(autogram_gramian, expected_gramian, rtol=1e-4, atol=1e-5)
 
 
-def _non_empty_subsets(elements: set) -> list[set]:
+def _non_empty_subsets(S: set) -> list[list]:
     """
-    Generates the list of subsets of the given set, excluding the empty set.
+    Generates the list of subsets of the given set, excluding the empty set. The sets are returned
+    in the form of sorted lists so that the order is always the same, to make the parametrization of
+    the test reproducible.
     """
-    return [set(c) for r in range(1, len(elements) + 1) for c in combinations(elements, r)]
+    return [sorted(set(c)) for r in range(1, len(S) + 1) for c in combinations(S, r)]
 
 
 @mark.parametrize("gramian_module_names", _non_empty_subsets({"fc0", "fc1", "fc2", "fc3", "fc4"}))
 @mark.parametrize("batch_dim", [0, None])
-def test_compute_partial_gramian(gramian_module_names: set[str], batch_dim: int | None):
+def test_compute_partial_gramian(gramian_module_names: set[str], batch_dim: int | None) -> None:
     """
     Tests that the autograd and the autogram engines compute the same gramian when only a subset of
     the model parameters is specified.
@@ -338,7 +340,9 @@ def test_compute_partial_gramian(gramian_module_names: set[str], batch_dim: int 
 
 @mark.parametrize(["factory", "batch_size"], PARAMETRIZATIONS)
 @mark.parametrize("batch_dim", [0, None])
-def test_iwrm_steps_with_autogram(factory: ModuleFactory, batch_size: int, batch_dim: int | None):
+def test_iwrm_steps_with_autogram(
+    factory: ModuleFactory, batch_size: int, batch_dim: int | None
+) -> None:
     """Tests that the autogram engine doesn't raise any error during several IWRM iterations."""
 
     n_iter = 3
@@ -363,7 +367,7 @@ def test_autograd_while_modules_are_hooked(
     batch_size: int,
     use_engine: bool,
     batch_dim: int | None,
-):
+) -> None:
     """
     Tests that the hooks added when constructing the engine do not interfere with a simple autograd
     call.
@@ -400,7 +404,7 @@ def test_autograd_while_modules_are_hooked(
         (ModuleFactory(BatchNorm2d, num_features=3, affine=True, track_running_stats=False), 0),
     ],
 )
-def test_incompatible_modules(factory: ModuleFactory, batch_dim: int | None):
+def test_incompatible_modules(factory: ModuleFactory, batch_dim: int | None) -> None:
     """Tests that the engine cannot be constructed with incompatible modules."""
 
     model = factory()
@@ -408,7 +412,7 @@ def test_incompatible_modules(factory: ModuleFactory, batch_dim: int | None):
         _ = Engine(model, batch_dim=batch_dim)
 
 
-def test_compute_gramian_manual():
+def test_compute_gramian_manual() -> None:
     """
     Tests that the Gramian computed by the `Engine` equals to a manual computation of the expected
     Gramian.
@@ -452,7 +456,7 @@ def test_compute_gramian_manual():
         [1],
     ],
 )
-def test_reshape_equivariance(shape: list[int]):
+def test_reshape_equivariance(shape: list[int]) -> None:
     """
     Test equivariance of `compute_gramian` under reshape operation. More precisely, if we reshape
     the `output` to some `shape`, then the result is the same as reshaping the Gramian to the
@@ -490,7 +494,7 @@ def test_reshape_equivariance(shape: list[int]):
         ([1, 1, 1], [1, 0], [0, 1]),
     ],
 )
-def test_movedim_equivariance(shape: list[int], source: list[int], destination: list[int]):
+def test_movedim_equivariance(shape: list[int], source: list[int], destination: list[int]) -> None:
     """
     Test equivariance of `compute_gramian` under movedim operation. More precisely, if we movedim
     the `output` on some dimensions, then the result is the same as movedim on the Gramian with the
@@ -530,7 +534,7 @@ def test_movedim_equivariance(shape: list[int], source: list[int], destination: 
         ([4, 3, 1], 2),
     ],
 )
-def test_batched_non_batched_equivalence(shape: list[int], batch_dim: int):
+def test_batched_non_batched_equivalence(shape: list[int], batch_dim: int) -> None:
     """
     Tests that for a vector with some batched dimensions, the gramian is the same if we use the
     appropriate `batch_dim` or if we don't use any.
@@ -556,7 +560,7 @@ def test_batched_non_batched_equivalence(shape: list[int], batch_dim: int):
 
 
 @mark.parametrize(["factory", "batch_size"], PARAMETRIZATIONS)
-def test_batched_non_batched_equivalence_2(factory: ModuleFactory, batch_size: int):
+def test_batched_non_batched_equivalence_2(factory: ModuleFactory, batch_size: int) -> None:
     """
     Same as test_batched_non_batched_equivalence but on real architectures, and thus only between
     batch_size=0 and batch_size=None.

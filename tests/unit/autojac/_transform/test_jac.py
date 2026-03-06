@@ -7,7 +7,7 @@ from torchjd.autojac._transform import Jac, OrderedSet, RequirementError
 
 
 @mark.parametrize("chunk_size", [1, 3, None])
-def test_single_input(chunk_size: int | None):
+def test_single_input(chunk_size: int | None) -> None:
     """
     Tests that the Jac transform works correctly for an example of multiple differentiation. Here,
     the function considered is: `y = [a1 * x, a2 * x]`. We want to compute the jacobians of `y` with
@@ -32,7 +32,7 @@ def test_single_input(chunk_size: int | None):
 
 
 @mark.parametrize("chunk_size", [1, 3, None])
-def test_empty_inputs_1(chunk_size: int | None):
+def test_empty_inputs_1(chunk_size: int | None) -> None:
     """
     Tests that the Jac transform works correctly when the `inputs` parameter is an empty `Iterable`.
     """
@@ -51,7 +51,7 @@ def test_empty_inputs_1(chunk_size: int | None):
 
 
 @mark.parametrize("chunk_size", [1, 3, None])
-def test_empty_inputs_2(chunk_size: int | None):
+def test_empty_inputs_2(chunk_size: int | None) -> None:
     """
     Tests that the Jac transform works correctly when the `inputs` parameter is an empty `Iterable`.
     """
@@ -73,7 +73,7 @@ def test_empty_inputs_2(chunk_size: int | None):
 
 
 @mark.parametrize("chunk_size", [1, 3, None])
-def test_empty_outputs(chunk_size: int | None):
+def test_empty_outputs(chunk_size: int | None) -> None:
     """
     Tests that the Jac transform works correctly when the `outputs` parameter is an empty
     `Iterable`.
@@ -94,7 +94,7 @@ def test_empty_outputs(chunk_size: int | None):
     assert_tensor_dicts_are_close(jacobians, expected_jacobians)
 
 
-def test_retain_graph():
+def test_retain_graph() -> None:
     """Tests that the `Jac` transform behaves as expected with the `retain_graph` flag."""
 
     x = tensor_(5.0)
@@ -127,7 +127,7 @@ def test_retain_graph():
         jac_discard_graph(input)
 
 
-def test_two_levels():
+def test_two_levels() -> None:
     """
     Tests that the Jac transform works correctly for an example of chained differentiation. Here,
     the function considered is: `z = a * x1 * x2`, which is computed in 2 parts: `y = a * x1` and
@@ -167,7 +167,7 @@ def test_two_levels():
 
 
 @mark.parametrize("chunk_size", [1, 3, None])
-def test_multiple_outputs_1(chunk_size: int | None):
+def test_multiple_outputs_1(chunk_size: int | None) -> None:
     """
     Tests that the Jac transform works correctly when the `outputs` contains 3 vectors.
     The input (jac_outputs) is not the same for all outputs, so that this test also checks that the
@@ -201,7 +201,7 @@ def test_multiple_outputs_1(chunk_size: int | None):
 
 
 @mark.parametrize("chunk_size", [1, 3, None])
-def test_multiple_outputs_2(chunk_size: int | None):
+def test_multiple_outputs_2(chunk_size: int | None) -> None:
     """
     Same as test_multiple_outputs_1 but with different jac_outputs, so the returned jacobians are of
     different shapes.
@@ -232,7 +232,7 @@ def test_multiple_outputs_2(chunk_size: int | None):
     assert_tensor_dicts_are_close(jacobians, expected_jacobians)
 
 
-def test_composition_of_jacs_is_jac():
+def test_composition_of_jacs_is_jac() -> None:
     """
     Tests that the composition of 2 Jac transforms is equivalent to computing the Jac directly in
     a single transform.
@@ -268,7 +268,7 @@ def test_composition_of_jacs_is_jac():
     assert_tensor_dicts_are_close(jacobians, expected_jacobians)
 
 
-def test_conjunction_of_jacs_is_jac():
+def test_conjunction_of_jacs_is_jac() -> None:
     """
     Tests that the conjunction of 2 Jac transforms is equivalent to computing the Jac directly in
     a single transform.
@@ -294,7 +294,7 @@ def test_conjunction_of_jacs_is_jac():
     assert_tensor_dicts_are_close(jacobians, expected_jacobians)
 
 
-def test_create_graph():
+def test_create_graph() -> None:
     """Tests that the Jac transform behaves correctly when `create_graph` is set to `True`."""
 
     x = tensor_(5.0)
@@ -318,7 +318,7 @@ def test_create_graph():
     assert jacobians[a2].requires_grad
 
 
-def test_check_keys():
+def test_check_keys() -> None:
     """
     Tests that the `check_keys` method works correctly: the input_keys should match the stored
     outputs.

@@ -63,7 +63,7 @@ they have a negative inner product).
         loss1 = loss_fn(output1, target1)
         loss2 = loss_fn(output2, target2)
 
-        mtl_backward(losses=[loss1, loss2], features=features)
+        mtl_backward([loss1, loss2], features=features)
         jac_to_grad(shared_module.parameters(), aggregator)
         optimizer.step()
         optimizer.zero_grad()

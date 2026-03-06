@@ -13,7 +13,7 @@ class Aggregator(nn.Module, ABC):
     :math:`m \times n` into row vectors of dimension :math:`n`.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
     @staticmethod
@@ -25,10 +25,10 @@ class Aggregator(nn.Module, ABC):
             )
 
     @abstractmethod
-    def forward(self, matrix: Matrix) -> Tensor:
+    def forward(self, matrix: Matrix, /) -> Tensor:
         """Computes the aggregation from the input matrix."""
 
-    def __call__(self, matrix: Tensor) -> Tensor:
+    def __call__(self, matrix: Tensor, /) -> Tensor:
         """Computes the aggregation from the input matrix and applies all registered hooks."""
         Aggregator._check_is_matrix(matrix)
         return super().__call__(matrix)
@@ -48,7 +48,7 @@ class WeightedAggregator(Aggregator):
     :param weighting: The object responsible for extracting the vector of weights from the matrix.
     """
 
-    def __init__(self, weighting: Weighting[Matrix]):
+    def __init__(self, weighting: Weighting[Matrix]) -> None:
         super().__init__()
         self.weighting = weighting
 
@@ -62,7 +62,7 @@ class WeightedAggregator(Aggregator):
         vector = weights @ matrix
         return vector
 
-    def forward(self, matrix: Matrix) -> Tensor:
+    def forward(self, matrix: Matrix, /) -> Tensor:
         weights = self.weighting(matrix)
         vector = self.combine(matrix, weights)
         return vector
@@ -77,6 +77,6 @@ class GramianWeightedAggregator(WeightedAggregator):
         gramian.
     """
 
-    def __init__(self, gramian_weighting: Weighting[PSDMatrix]):
+    def __init__(self, gramian_weighting: Weighting[PSDMatrix]) -> None:
         super().__init__(gramian_weighting << compute_gramian)
         self.gramian_weighting = gramian_weighting

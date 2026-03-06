@@ -4,7 +4,7 @@ from utils.tensors import randn_
 from torchjd.autogram._edge_registry import EdgeRegistry
 
 
-def test_all_edges_are_leaves1():
+def test_all_edges_are_leaves1() -> None:
     """Tests that get_leaf_edges works correctly when all edges are already leaves."""
 
     a = randn_([3, 4], requires_grad=True)
@@ -22,7 +22,7 @@ def test_all_edges_are_leaves1():
     assert leaves == expected_leaves
 
 
-def test_all_edges_are_leaves2():
+def test_all_edges_are_leaves2() -> None:
     """
     Tests that get_leaf_edges works correctly when all edges are already leaves of the graph of
     edges leading to them, but are not leaves of the autograd graph.
@@ -46,7 +46,7 @@ def test_all_edges_are_leaves2():
     assert leaves == expected_leaves
 
 
-def test_some_edges_are_not_leaves1():
+def test_some_edges_are_not_leaves1() -> None:
     """Tests that get_leaf_edges works correctly when some edges are leaves and some are not."""
 
     a = randn_([3, 4], requires_grad=True)
@@ -67,7 +67,7 @@ def test_some_edges_are_not_leaves1():
     assert leaves == expected_leaves
 
 
-def test_some_edges_are_not_leaves2():
+def test_some_edges_are_not_leaves2() -> None:
     """
     Tests that get_leaf_edges works correctly when some edges are leaves and some are not. This
     time, not all tensors in the graph are registered so not all leavese in the graph have to be

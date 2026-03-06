@@ -20,14 +20,14 @@ class Weighting(nn.Module, ABC, Generic[_T]):
     generally its Gramian, of dimension :math:`m \times m`.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
     @abstractmethod
     def forward(self, stat: _T, /) -> Tensor:
         """Computes the vector of weights from the input stat."""
 
-    def __call__(self, stat: Tensor) -> Tensor:
+    def __call__(self, stat: Tensor, /) -> Tensor:
         """Computes the vector of weights from the input stat and applies all registered hooks."""
 
         # The value of _T (e.g. PSDMatrix) is not public, so we need the user-facing type hint of
@@ -46,7 +46,7 @@ class _Composition(Weighting[_T]):
     output of the function.
     """
 
-    def __init__(self, weighting: Weighting[_FnOutputT], fn: Callable[[_T], _FnOutputT]):
+    def __init__(self, weighting: Weighting[_FnOutputT], fn: Callable[[_T], _FnOutputT]) -> None:
         super().__init__()
         self.fn = fn
         self.weighting = weighting
@@ -63,14 +63,14 @@ class GeneralizedWeighting(nn.Module, ABC):
     :math:`m_1 \times \dots \times m_k \times m_k \times \dots \times m_1`.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
     @abstractmethod
-    def forward(self, generalized_gramian: PSDTensor) -> Tensor:
+    def forward(self, generalized_gramian: PSDTensor, /) -> Tensor:
         """Computes the vector of weights from the input generalized Gramian."""
 
-    def __call__(self, generalized_gramian: Tensor) -> Tensor:
+    def __call__(self, generalized_gramian: Tensor, /) -> Tensor:
         """
         Computes the tensor of weights from the input generalized Gramian and applies all registered
         hooks.

@@ -101,7 +101,7 @@ def assert_strongly_stationary(
     assert norm > threshold
 
 
-def assert_non_differentiable(aggregator: Aggregator, matrix: Tensor):
+def assert_non_differentiable(aggregator: Aggregator, matrix: Tensor) -> None:
     """
     Tests empirically that a given non-differentiable `Aggregator` correctly raises a
     NonDifferentiableError whenever we try to backward through it.

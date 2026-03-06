@@ -15,7 +15,7 @@ class TrimmedMean(Aggregator):
         input matrix (note that ``2 * trim_number`` values are removed from each column).
     """
 
-    def __init__(self, trim_number: int):
+    def __init__(self, trim_number: int) -> None:
         super().__init__()
         if trim_number < 0:
             raise ValueError(
@@ -24,7 +24,7 @@ class TrimmedMean(Aggregator):
             )
         self.trim_number = trim_number
 
-    def forward(self, matrix: Tensor) -> Tensor:
+    def forward(self, matrix: Tensor, /) -> Tensor:
         self._check_matrix_has_enough_rows(matrix)
 
         n_rows = matrix.shape[0]

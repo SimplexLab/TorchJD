@@ -20,7 +20,7 @@ class Stack(Transform):
         to those dicts.
     """
 
-    def __init__(self, transforms: Sequence[Transform]):
+    def __init__(self, transforms: Sequence[Transform]) -> None:
         self.transforms = transforms
 
     def __call__(self, input: TensorDict, /) -> TensorDict:
@@ -28,7 +28,7 @@ class Stack(Transform):
         result = _stack(results)
         return result
 
-    def check_keys(self, input_keys: set[Tensor]) -> set[Tensor]:
+    def check_keys(self, input_keys: set[Tensor], /) -> set[Tensor]:
         return {key for transform in self.transforms for key in transform.check_keys(input_keys)}
 
 

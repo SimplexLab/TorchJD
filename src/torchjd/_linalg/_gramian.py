@@ -35,11 +35,20 @@ def compute_gramian(t: Tensor, contracted_dims: int = -1) -> PSDTensor:
     first dimension).
     """
 
-    contracted_dims = contracted_dims if contracted_dims >= 0 else contracted_dims + t.ndim
-    indices_source = list(range(t.ndim - contracted_dims))
-    indices_dest = list(range(t.ndim - 1, contracted_dims - 1, -1))
-    transposed = t.movedim(indices_source, indices_dest)
-    gramian = torch.tensordot(t, transposed, dims=contracted_dims)
+    # Optimization: it's faster to do that than moving dims and using tensordot, and this case
+    # happens very often, sometimes hundreds of times for a single jac_to_grad.
+    if contracted_dims == -1:
+        matrix = t.unsqueeze(1) if t.ndim == 1 else t.flatten(start_dim=1)
+
+        gramian = matrix @ matrix.T
+
+    else:
+        contracted_dims = contracted_dims if contracted_dims >= 0 else contracted_dims + t.ndim
+        indices_source = list(range(t.ndim - contracted_dims))
+        indices_dest = list(range(t.ndim - 1, contracted_dims - 1, -1))
+        transposed = t.movedim(indices_source, indices_dest)
+        gramian = torch.tensordot(t, transposed, dims=contracted_dims)
+
     return cast(PSDTensor, gramian)
 
 

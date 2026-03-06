@@ -15,12 +15,12 @@ typical_pairs = [(TrimmedMean(trim_number=1), matrix) for matrix in typical_matr
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
-def test_expected_structure(aggregator: TrimmedMean, matrix: Tensor):
+def test_expected_structure(aggregator: TrimmedMean, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 
 
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
-def test_permutation_invariant(aggregator: TrimmedMean, matrix: Tensor):
+def test_permutation_invariant(aggregator: TrimmedMean, matrix: Tensor) -> None:
     assert_permutation_invariant(aggregator, matrix)
 
 
@@ -34,7 +34,7 @@ def test_permutation_invariant(aggregator: TrimmedMean, matrix: Tensor):
         (5, does_not_raise()),
     ],
 )
-def test_trim_number_check(trim_number: int, expectation: ExceptionContext):
+def test_trim_number_check(trim_number: int, expectation: ExceptionContext) -> None:
     with expectation:
         _ = TrimmedMean(trim_number=trim_number)
 
@@ -49,7 +49,7 @@ def test_trim_number_check(trim_number: int, expectation: ExceptionContext):
         (10, 5, raises(ValueError)),
     ],
 )
-def test_matrix_shape_check(n_rows: int, trim_number: int, expectation: ExceptionContext):
+def test_matrix_shape_check(n_rows: int, trim_number: int, expectation: ExceptionContext) -> None:
     matrix = ones_([n_rows, 5])
     aggregator = TrimmedMean(trim_number=trim_number)
 
@@ -57,7 +57,7 @@ def test_matrix_shape_check(n_rows: int, trim_number: int, expectation: Exceptio
         _ = aggregator(matrix)
 
 
-def test_representations():
+def test_representations() -> None:
     aggregator = TrimmedMean(trim_number=2)
     assert repr(aggregator) == "TrimmedMean(trim_number=2)"
     assert str(aggregator) == "TM2"
