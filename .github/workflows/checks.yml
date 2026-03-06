@@ -114,7 +114,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   code-quality:
-    name: Code quality (ty and ruff)
+    name: Code quality (ty and pre-commit hooks)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -129,8 +129,8 @@ jobs:
         with:
           groups: check test plot
 
+      - name: Run pre-commit hooks
+        run: uv run pre-commit run --all-files
+
       - name: Run ty
         run: uv run ty check --output-format=github
-
-      - name: Run ruff
-        run: uv run ruff check --output-format=github
