@@ -99,10 +99,9 @@ uv run pre-commit install
      CUBLAS_WORKSPACE_CONFIG=:4096:8 PYTEST_TORCH_DEVICE=cuda:0 uv run pytest tests/unit
      ```
 
-   - To check that the usage examples from docstrings and `.rst` files are correct, we test their
-   behavior in `tests/doc`. To run these tests, do:
+   - To check that the usage examples from docstrings and `.rst` files are correct, run:
      ```bash
-     uv run pytest tests/doc
+     uv run make doctest -C docs
      ```
 
   - To compute the code coverage locally, you should run the unit tests and the doc tests together,
