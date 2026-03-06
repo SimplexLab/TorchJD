@@ -5,16 +5,12 @@ from torch import Tensor
 from torch.overrides import is_tensor_like
 
 from torchjd.autojac._transform._base import Transform
-from torchjd.autojac._transform._diagonalize import Diagonalize
-from torchjd.autojac._transform._init import Init
 from torchjd.autojac._transform._jac import Jac
 from torchjd.autojac._transform._ordered_set import OrderedSet
 from torchjd.autojac._utils import (
     as_checked_ordered_set,
-    check_consistent_first_dimension,
-    check_matching_jac_shapes,
-    check_matching_length,
     check_optional_positive_chunk_size,
+    create_jac_dict,
 )
 
 
@@ -159,36 +155,10 @@ def jac(
     inputs_with_repetition = cast(Sequence[Tensor], (inputs,) if is_tensor_like(inputs) else inputs)
     inputs_ = OrderedSet(inputs_with_repetition)
 
-    jac_outputs_dict = _create_jac_outputs_dict(outputs_, jac_outputs)
+    jac_outputs_dict = create_jac_dict(outputs_, jac_outputs, "outputs", "jac_outputs")
     transform = _create_transform(outputs_, inputs_, parallel_chunk_size, retain_graph)
     result = transform(jac_outputs_dict)
     return tuple(result[input] for input in inputs_with_repetition)
-
-
-def _create_jac_outputs_dict(
-    outputs: OrderedSet[Tensor],
-    opt_jac_outputs: Sequence[Tensor] | Tensor | None,
-) -> dict[Tensor, Tensor]:
-    """
-    Creates a dictionary mapping outputs to their corresponding Jacobians.
-
-    :param outputs: The tensors to differentiate.
-    :param opt_jac_outputs: The initial Jacobians to backpropagate. If ``None``, defaults to
-        identity.
-    """
-    if opt_jac_outputs is None:
-        # Transform that creates gradient outputs containing only ones.
-        init = Init(outputs)
-        # Transform that turns the gradients into Jacobians.
-        diag = Diagonalize(outputs)
-        return (diag << init)({})
-    jac_outputs = cast(
-        Sequence[Tensor], (opt_jac_outputs,) if is_tensor_like(opt_jac_outputs) else opt_jac_outputs
-    )
-    check_matching_length(jac_outputs, outputs, "jac_outputs", "outputs")
-    check_matching_jac_shapes(jac_outputs, outputs, "jac_outputs", "outputs")
-    check_consistent_first_dimension(jac_outputs, "jac_outputs")
-    return dict(zip(outputs, jac_outputs, strict=True))
 
 
 def _create_transform(
