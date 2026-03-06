@@ -2,16 +2,10 @@ name: PR Title Formatter
 
 on:
   pull_request_target:
-    types: [opened, edited, reopened, labeled, unlabeled]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+    types: [opened, edited, reopened, labeled, unlabeled, synchronize]
 
 jobs:
   format-title:
-    # Prevent running the job when only the PR body is edited.
-    if: github.event.action != 'edited' || github.event.changes.title != null
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
