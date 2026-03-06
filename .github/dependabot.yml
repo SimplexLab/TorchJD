@@ -4,8 +4,16 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    commit-message:
+      prefix: ""
+    labels:
+      - "cc: chore"
 
   - package-ecosystem: "pre-commit"
     directory: "/"
     schedule:
       interval: "monthly"
+    commit-message:
+      prefix: ""
+    labels:
+      - "cc: chore"
