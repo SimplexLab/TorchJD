@@ -191,7 +191,7 @@ def test_has_forward_hook() -> None:
     assert not _has_forward_hook(module)
 
 
-_PARAMETRIZATIONS = [
+_PARAMETRIZATIONS: list[tuple] = [
     (AlignedMTL(), True),
     (DualProj(), True),
     (IMTLG(), True),
