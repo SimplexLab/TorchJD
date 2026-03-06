@@ -41,7 +41,7 @@ batch of data. When minimizing per-instance losses (IWRM), we use either autojac
 .. tab-set::
     .. tab-item:: autograd (baseline)
 
-        .. code-block:: python
+        .. testcode::
 
             import torch
             from torch.nn import Linear, MSELoss, ReLU, Sequential
@@ -75,7 +75,7 @@ batch of data. When minimizing per-instance losses (IWRM), we use either autojac
 
     .. tab-item:: autojac
 
-        .. code-block:: python
+        .. testcode::
             :emphasize-lines: 5-6, 12, 16, 21-23
 
             import torch
@@ -110,7 +110,7 @@ batch of data. When minimizing per-instance losses (IWRM), we use either autojac
 
     .. tab-item:: autogram (recommended)
 
-        .. code-block:: python
+        .. testcode::
             :emphasize-lines: 5-6, 12, 16-17, 21-24
 
             import torch

@@ -18,7 +18,7 @@ For the sake of the example, we generate a fake dataset consisting of 8 batches 
 vectors of dimension 10, and their corresponding scalar labels for both tasks.
 
 
-.. code-block:: python
+.. testcode::
     :emphasize-lines: 5-6, 19, 32-33
 
     import torch

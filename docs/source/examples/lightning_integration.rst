@@ -10,7 +10,18 @@ The following code example demonstrates a basic multi-task learning setup using 
 :class:`~lightning.pytorch.core.LightningModule` that will call :doc:`mtl_backward
 <../docs/autojac/mtl_backward>` at each training iteration.
 
-.. code-block:: python
+.. testsetup::
+
+    import warnings
+    import logging
+    from lightning.fabric.utilities.warnings import PossibleUserWarning
+
+    logging.disable(logging.INFO)
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    warnings.filterwarnings("ignore", category=FutureWarning)
+    warnings.filterwarnings("ignore", category=PossibleUserWarning)
+
+.. testcode::
     :emphasize-lines: 9-10, 18, 31-32
 
     import torch

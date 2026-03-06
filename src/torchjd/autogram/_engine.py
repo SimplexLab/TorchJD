@@ -78,7 +78,7 @@ class Engine:
 
         Train a model using Gramian-based Jacobian descent.
 
-        .. code-block:: python
+        .. testcode::
             :emphasize-lines: 5-6, 15-16, 18-19, 26-29
 
             import torch
@@ -162,15 +162,21 @@ class Engine:
         Parent modules should call their child modules directly rather than using their child
         modules' parameters themselves. For instance, the following model is not supported:
 
-        >>> class Model(nn.Module):
-        >>>     def __init__(self):
-        >>>         super().__init__()
-        >>>         self.linear = nn.Linear(2, 3)  # Child module
-        >>>
-        >>>     def forward(self, input: Tensor) -> Tensor:
-        >>>         # Incorrect: Use the child module's parameters directly without calling it.
-        >>>         return input @ self.linear.weight.T + self.linear.bias
-        >>>         # Correct alternative: return self.linear(input)
+        .. testsetup::
+
+            from torch import nn
+
+        .. testcode::
+
+            class Model(nn.Module):
+                def __init__(self):
+                    super().__init__()
+                    self.linear = nn.Linear(2, 3)  # Child module
+
+                def forward(self, input: Tensor) -> Tensor:
+                    # Incorrect: Use the child module's parameters directly without calling it.
+                    return input @ self.linear.weight.T + self.linear.bias
+                    # Correct alternative: return self.linear(input)
 
     .. note::
           For maximum efficiency, modules should ideally not contain both direct trainable
