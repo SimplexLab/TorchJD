@@ -68,8 +68,8 @@ def jac(
             >>> jacobians = jac([y1, y2], param)
             >>>
             >>> jacobians
-            (tensor([[-1., 1.],
-                    [ 2., 4.]]),)
+            (tensor([[-1.,  1.],
+                    [ 2.,  4.]]),)
 
     .. admonition::
         Example
