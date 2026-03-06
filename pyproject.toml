@@ -78,6 +78,7 @@ doc = [
     "sphinx-autodoc-typehints>=3.5.0",  # Bugged Union on Python 3.14 before 3.5.0
     "myst-parser>=3.0.1",  # Never tested lower versions
     "sphinx-design>=0.6.0",  # Never tested lower versions
+    "docutils>=0.22.4",  # Never tested lower versions
 ]
 
 test = [
