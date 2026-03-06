@@ -40,6 +40,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "myst_parser",  # Enables markdown support
     "sphinx_design",  # Enables side to side cards
+    "sphinx.ext.doctest",
 ]
 
 # -- Options for HTML output -------------------------------------------------
