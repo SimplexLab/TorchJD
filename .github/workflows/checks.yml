@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # This will restore the cache for the current commit if it exists, or the most recent lychee
       # cache otherwise (including those saved for the main branch). It will also save the cache for
