@@ -150,6 +150,10 @@ class _TestcodeWithEmphasisDirective(TestcodeDirective):
     Sphinx's built-in ``.. testcode::`` directive does not support ``:emphasize-lines:``. This
     subclass adds that option and forwards it as ``highlight_args['hl_lines']`` on the resulting
     node, which is the same mechanism used by ``.. code-block::``.
+
+    Ideally, this should be integrated to sphinx.ext.doctest as part of a solution to
+    https://github.com/sphinx-doc/sphinx/issues/6915 and
+    https://github.com/sphinx-doc/sphinx/issues/6858.
     """
 
     option_spec: ClassVar[OptionSpec] = {
