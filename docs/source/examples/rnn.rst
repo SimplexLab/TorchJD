@@ -5,7 +5,7 @@ When training recurrent neural networks for sequence modelling, we can easily ob
 element of the output sequences. If the gradients of these losses are likely to conflict, Jacobian
 descent can be leveraged to enhance optimization.
 
-.. code-block:: python
+.. testcode::
     :emphasize-lines: 5-6, 10, 17, 19-20
 
     import torch

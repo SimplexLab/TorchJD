@@ -14,7 +14,12 @@ Jacobian descent is doing something different than gradient descent. With
 :doc:`UPGrad <../docs/aggregation/upgrad>`, this happens when the original gradients conflict (i.e.
 they have a negative inner product).
 
-.. code-block:: python
+.. testsetup::
+
+    import torch
+    torch.manual_seed(0)
+
+.. testcode::
     :emphasize-lines: 9-11, 13-18, 33-34
 
     import torch
@@ -67,3 +72,22 @@ they have a negative inner product).
         jac_to_grad(shared_module.parameters(), aggregator)
         optimizer.step()
         optimizer.zero_grad()
+
+.. testoutput::
+
+    Weights: tensor([0.5000, 0.5000])
+    Cosine similarity: 1.0000
+    Weights: tensor([0.5000, 0.5000])
+    Cosine similarity: 1.0000
+    Weights: tensor([0.5000, 0.5000])
+    Cosine similarity: 1.0000
+    Weights: tensor([0.6618, 1.0554])
+    Cosine similarity: 0.9249
+    Weights: tensor([0.6569, 1.2146])
+    Cosine similarity: 0.8661
+    Weights: tensor([0.5004, 0.5060])
+    Cosine similarity: 1.0000
+    Weights: tensor([0.5000, 0.5000])
+    Cosine similarity: 1.0000
+    Weights: tensor([0.5746, 1.1607])
+    Cosine similarity: 0.9301

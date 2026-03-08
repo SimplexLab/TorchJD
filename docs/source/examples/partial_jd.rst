@@ -13,7 +13,7 @@ perform the partial descent by considering only the parameters of the last two `
 doing this, we avoid computing the Jacobian and its Gramian with respect to the parameters of the
 first ``Linear`` layer, thereby reducing memory usage and computation time.
 
-.. code-block:: python
+.. testcode::
     :emphasize-lines: 16-18
 
     import torch
