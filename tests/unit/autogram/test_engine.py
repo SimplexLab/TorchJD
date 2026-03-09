@@ -79,10 +79,9 @@ from utils.forward_backwards import (
 )
 from utils.tensors import make_inputs_and_targets, ones_, randn_, zeros_
 
-from torchjd._linalg import PSDMatrix, compute_gramian
+from torchjd._linalg import PSDMatrix, compute_gramian, movedim, reshape
 from torchjd.aggregation import UPGradWeighting
 from torchjd.autogram._engine import Engine
-from torchjd.autogram._gramian_utils import movedim, reshape
 
 PARAMETRIZATIONS = [
     (ModuleFactory(OverlyNested), 32),

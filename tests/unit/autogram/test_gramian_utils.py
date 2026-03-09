@@ -3,8 +3,7 @@ from torch.testing import assert_close
 from utils.asserts import assert_is_psd_matrix, assert_is_psd_tensor
 from utils.tensors import randn_
 
-from torchjd._linalg import compute_gramian, is_psd_matrix
-from torchjd.autogram._gramian_utils import flatten, movedim, reshape
+from torchjd._linalg import compute_gramian, flatten, is_psd_matrix, movedim, reshape
 
 
 @mark.parametrize(

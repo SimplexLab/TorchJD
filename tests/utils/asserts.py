@@ -4,8 +4,7 @@ import torch
 from torch import Tensor
 from torch.testing import assert_close
 
-from torchjd._linalg import is_psd_matrix, is_psd_tensor
-from torchjd.autogram._gramian_utils import flatten
+from torchjd._linalg import flatten, is_psd_matrix, is_psd_tensor
 from torchjd.autojac._accumulation import is_tensor_with_jac
 
 
