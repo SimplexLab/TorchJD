@@ -4,12 +4,11 @@ import torch
 from torch import Tensor, nn, vmap
 from torch.autograd.graph import get_gradient_edge
 
-from torchjd._linalg import PSDMatrix
+from torchjd._linalg import PSDMatrix, movedim, reshape
 
 from ._edge_registry import EdgeRegistry
 from ._gramian_accumulator import GramianAccumulator
 from ._gramian_computer import GramianComputer, JacobianBasedGramianComputerWithCrossTerms
-from ._gramian_utils import movedim, reshape
 from ._jacobian_computer import (
     AutogradJacobianComputer,
     FunctionalJacobianComputer,

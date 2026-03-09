@@ -3,7 +3,7 @@ from typing import cast
 
 from torch import Tensor
 
-from torchjd._linalg import PSDMatrix, PSDTensor
+from torchjd._linalg._matrix import PSDMatrix, PSDTensor
 
 
 def flatten(gramian: PSDTensor) -> PSDMatrix:
