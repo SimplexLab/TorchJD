@@ -1,8 +1,7 @@
 from torch import Tensor
 
-from torchjd._linalg import PSDTensor
+from torchjd._linalg import PSDTensor, flatten
 from torchjd.aggregation._weighting_bases import GeneralizedWeighting, Weighting
-from torchjd.autogram._gramian_utils import flatten
 
 
 class Flattening(GeneralizedWeighting):
