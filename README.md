@@ -1,7 +1,7 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/source/icons/TorchJD_text_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="docs/source/icons/TorchJD_text.svg">
-  <img alt="Fallback image description" src="docs/source/icons/TorchJD_text.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/source/icons/TorchJD_text_dark_1475x320.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/source/icons/TorchJD_text_1475x320.png">
+  <img alt="Fallback image description" src="docs/source/icons/TorchJD_text_1475x320.png">
 </picture>
 
 ---
