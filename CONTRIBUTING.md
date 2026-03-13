@@ -115,16 +115,12 @@ uv run pre-commit install
     > the CI runs the tests in several different environments.
 
 ### Building the documentation locally
-   - From the `docs` folder, run:
+   - Run:
      ```bash
-     uv run make html
+     uv run make clean -C docs
+     uv run make html -C docs
      ```
    - You can then open `docs/build/html/index.html` with a web browser.
-   - Sometimes, you need to manually delete the built documentation before generating it. To do
-   this, from the `docs` folder, run:
-     ```bash
-     uv run make clean
-     ```
 
 ### Type checking
 
