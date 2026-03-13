@@ -19,3 +19,5 @@
   that the documentation can be built by running
   `uv run make clean -C docs; uv run make html -C docs`.
 - Prefix protected functions and modules with '_'.
+- Always follow SOLID principles when implementing stuff, and in particular the single
+  responsibility principle and the Liskov substitution principle.
