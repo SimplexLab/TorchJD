@@ -6,8 +6,6 @@
 - We use uv for everything (e.g. we do `uv run python ...` to run some python code, and
   `uv run pytest tests/unit` to run unit tests). Please prefer `uv run python -c ...` over
   `python3 -c ...`
-- After generating code, please run `uv run ty check`, `uv run ruff check` and `uv run ruff format`.
-  Fix any error.
 - After changing anything in `src` or in `tests/unit` or `tests/doc`, please identify the affected
   test files in `tests/` and run them with e.g.
   `uv run pytest tests/unit/aggregation/test_upgrad.py -W error`. Fix any error, either in the
