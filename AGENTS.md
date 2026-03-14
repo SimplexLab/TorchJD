@@ -5,8 +5,19 @@
   return type hints of None), but type hints are not needed when initializing variables.
 - We use uv for everything (e.g. we do `uv run python ...` to run some python code, and
   `uv run pytest tests/unit` to run unit tests). Please prefer `uv run python -c ...` over
-  `python3 -c ...`
-- After changing anything in `src` or in `tests/unit` or `tests/doc`, please identify the affected
-  test files in `tests/` and run them with e.g.
-  `uv run pytest tests/unit/aggregation/test_upgrad.py -W error`. Fix any error, either in the
-  changes you've made or by adapting the tests to the new specifications.
+  `python3 -c ...`.
+- To test the usage examples, run `uv run make doctest -C docs`.
+- After generating code, please run `uv run ty check`, `uv run ruff check` and `uv run ruff format`.
+  Fix any error.
+- After changing anything in `src` or in `tests/unit`, please identify the affected test files in
+  `tests/` and run them with e.g. `uv run pytest tests/unit/aggregation/test_upgrad.py -W error`.
+  Fix any error, either in the changes you've made or by adapting the tests to the new
+  specifications.
+- If you create new user-facing content, add a `.rst` file in `docs/source` and link to it
+  appropriately.
+- If you make any change that affects the documentation (e.g. docstring or `.rst` files), verify
+  that the documentation can be built by running
+  `uv run make clean -C docs; uv run make html -C docs`.
+- Prefix protected functions and modules with '_'.
+- Always follow SOLID principles when implementing stuff, and in particular the single
+  responsibility principle and the Liskov substitution principle.
