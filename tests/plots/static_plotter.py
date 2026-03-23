@@ -58,7 +58,7 @@ def main(
     if gradients:
         filename += "gradients"
         for i in range(len(matrix)):
-            label = r"$\huge{\nabla f_" f"{i + 1}" + r"}$"
+            label = r"$\LARGE{\nabla f_" f"{i + 1}" + r"}$"
 
             gradient_scatter = make_vector_scatter(
                 matrix[i],
@@ -91,7 +91,7 @@ def main(
         origin_g1_proj_vector = make_vector_scatter(
             g1_proj,
             color="rgb(100, 100, 100)",
-            label=r"$\huge{p_2}$",
+            label=r"$\huge{p_1}$",
             line_width=3,
             marker_size=16,
             textposition="top left",
@@ -99,7 +99,7 @@ def main(
         origin_g2_proj_vector = make_vector_scatter(
             g2_proj,
             color="rgb(100, 100, 100)",
-            label=r"$\huge{p_1}$",
+            label=r"$\huge{p_2}$",
             line_width=3,
             marker_size=16,
             textposition="top right",
@@ -138,7 +138,7 @@ def main(
         result = results[name]
         aggregation_scatter = make_vector_scatter(
             result,
-            color="rgb(0, 0, 215)",
+            color="rgb(142, 20, 242)",
             label="",  # Label will be added as text element at the end
             textposition="top center",
             showlegend=False,
@@ -148,7 +148,7 @@ def main(
             line_width=4,
         )
         fig.add_trace(aggregation_scatter)
-        aggregation_labels[name] = r"$\Huge{\frac{p_1 + p_2}{2}}$"
+        aggregation_labels[name] = r"$\huge{\frac{p_1 + p_2}{2}}$"
 
     if mean:
         filename += "_mean"
@@ -160,7 +160,7 @@ def main(
         result = results[name]
         aggregation_scatter = make_vector_scatter(
             result,
-            color="rgb(0, 0, 215)",
+            color="rgb(142, 20, 242)",
             label="",  # Label will be added as text element at the end
             textposition="top center",
             showlegend=False,
@@ -170,7 +170,7 @@ def main(
             line_width=4,
         )
         fig.add_trace(aggregation_scatter)
-        aggregation_labels[name] = r"$\Huge{\nabla \frac{f_1 + f_2}{2}}$"
+        aggregation_labels[name] = r"$\huge{\nabla \frac{f_1 + f_2}{2}}$"
 
     if dual_proj:
         filename += "_dual_proj"
@@ -192,7 +192,7 @@ def main(
         result = results[name]
         aggregation_scatter = make_vector_scatter(
             result,
-            color="rgb(0, 0, 215)",
+            color="rgb(142, 20, 242)",
             label="",  # Label will be added as text element at the end
             textposition="top center",
             showlegend=False,
@@ -224,7 +224,7 @@ def main(
         result = results[name]
         aggregation_scatter = make_vector_scatter(
             result,
-            color="rgb(0, 0, 215)",
+            color="rgb(142, 20, 242)",
             label="",  # Label will be added as text element at the end
             textposition="top center",
             showlegend=False,
@@ -241,10 +241,10 @@ def main(
         result = results[name]
         fig.add_annotation(
             x=result[0].item(),
-            y=result[1].item(),
+            y=result[1].item() + 0.05,
             text=label,
             showarrow=False,
-            font={"size": 32, "color": "rgb(0, 0, 215)"},
+            font={"size": 32, "color": "rgb(142, 20, 242)"},
             yanchor="bottom",
             xanchor="center",
         )
@@ -279,7 +279,7 @@ def main(
 
 
 def name_to_label(name: str) -> str:
-    return r"$\huge{\mathcal{A}_{\mathrm{" + name + r"}}(J)}$"
+    return r"$\LARGE{\mathcal{A}_{\mathrm{" + name + r"}}(J)}$"
 
 
 if __name__ == "__main__":
