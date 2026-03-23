@@ -91,7 +91,7 @@ def main(
         origin_g1_proj_vector = make_vector_scatter(
             g1_proj,
             color="rgb(100, 100, 100)",
-            label=r"$\huge{" + r"\pi(\nabla f_1)" + r"}$",
+            label=r"$\huge{p_2}$",
             line_width=3,
             marker_size=16,
             textposition="top left",
@@ -99,7 +99,7 @@ def main(
         origin_g2_proj_vector = make_vector_scatter(
             g2_proj,
             color="rgb(100, 100, 100)",
-            label=r"$\huge{" + r"\pi(\nabla f_2)" + r"}$",
+            label=r"$\huge{p_1}$",
             line_width=3,
             marker_size=16,
             textposition="top right",
@@ -148,7 +148,7 @@ def main(
             line_width=4,
         )
         fig.add_trace(aggregation_scatter)
-        aggregation_labels[name] = r"$\huge{\frac{\pi(\nabla f_1) + \pi(\nabla f_2)}{2}}$"
+        aggregation_labels[name] = r"$\Huge{\frac{p_1 + p_2}{2}}$"
 
     if mean:
         filename += "_mean"
@@ -170,7 +170,7 @@ def main(
             line_width=4,
         )
         fig.add_trace(aggregation_scatter)
-        aggregation_labels[name] = r"$\huge{\nabla \frac{f_1 + f_2}{2}}$"
+        aggregation_labels[name] = r"$\Huge{\nabla \frac{f_1 + f_2}{2}}$"
 
     if dual_proj:
         filename += "_dual_proj"
