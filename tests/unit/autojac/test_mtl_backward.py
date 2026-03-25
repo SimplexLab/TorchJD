@@ -448,7 +448,7 @@ def test_shared_param_retaining_grad_fails() -> None:
 
     with raises(RuntimeError):
         # Using such a BatchedTensor should result in an error
-        _ = -a.grad  # type: ignore[unsupported-operator]
+        _ = -a.grad  # ty: ignore[unsupported-operator]
 
 
 def test_shared_activation_retaining_grad_fails() -> None:
@@ -477,7 +477,7 @@ def test_shared_activation_retaining_grad_fails() -> None:
 
     with raises(RuntimeError):
         # Using such a BatchedTensor should result in an error
-        _ = -a.grad  # type: ignore[unsupported-operator]
+        _ = -a.grad  # ty: ignore[unsupported-operator]
 
 
 def test_tasks_params_overlap() -> None:
