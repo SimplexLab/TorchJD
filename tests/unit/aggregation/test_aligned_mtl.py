@@ -39,7 +39,7 @@ def test_representations() -> None:
 
 
 def test_invalid_scale_mode() -> None:
-    aggregator = AlignedMTL(scale_mode="test")  # type: ignore[arg-type]
+    aggregator = AlignedMTL(scale_mode="test")  # ty: ignore[invalid-argument-type]
     matrix = ones_(3, 4)
     with raises(ValueError, match=r"Invalid scale_mode=.*Expected"):
         aggregator(matrix)
