@@ -6,14 +6,8 @@
 import inspect
 import os
 import sys
-from typing import ClassVar
 
 import tomli
-from docutils.parsers.rst import directives
-from sphinx.application import Sphinx
-from sphinx.directives.code import parse_line_num_spec
-from sphinx.ext.doctest import TestcodeDirective
-from sphinx.util.typing import OptionSpec
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -141,37 +135,3 @@ def _get_version_str() -> str:
     except KeyError:
         version_str = "main"
     return version_str
-
-
-class _TestcodeWithEmphasisDirective(TestcodeDirective):
-    """
-    Extension of ``.. testcode::`` that additionally supports ``:emphasize-lines:``.
-
-    Sphinx's built-in ``.. testcode::`` directive does not support ``:emphasize-lines:``. This
-    subclass adds that option and forwards it as ``highlight_args['hl_lines']`` on the resulting
-    node, which is the same mechanism used by ``.. code-block::``.
-
-    Ideally, this should be integrated to sphinx.ext.doctest as part of a solution to
-    https://github.com/sphinx-doc/sphinx/issues/6915 and
-    https://github.com/sphinx-doc/sphinx/issues/6858.
-    """
-
-    option_spec: ClassVar[OptionSpec] = {
-        **TestcodeDirective.option_spec,
-        "emphasize-lines": directives.unchanged_required,
-    }
-
-    def run(self) -> list:
-        result = super().run()
-        linespec = self.options.get("emphasize-lines")
-        if linespec and result:
-            node = result[0]
-            nlines = len(self.content)
-            hl_lines = parse_line_num_spec(linespec, nlines)
-            hl_lines = [x + 1 for x in hl_lines if x < nlines]
-            node["highlight_args"] = {"hl_lines": hl_lines}
-        return result
-
-
-def setup(app: Sphinx) -> None:
-    app.add_directive("testcode", _TestcodeWithEmphasisDirective, override=True)
