@@ -174,7 +174,7 @@ class AutogramNode(torch.autograd.Function):
         ctx: Any,
         inputs: tuple,
         _,
-    ) -> None:  # type: ignore[reportIncompatibleMethodOverride]
+    ) -> None:  # ty: ignore[invalid-method-override]
         ctx.gramian_accumulation_phase = inputs[0]
         ctx.gramian_computer = inputs[1]
         ctx.args = inputs[2]

@@ -179,7 +179,7 @@ def get_leaf_tensors(tensors: Iterable[Tensor], excluded: Iterable[Tensor]) -> O
 
     # accumulate_grads contains instances of AccumulateGrad, which contain a `variable` field.
     # They cannot be typed as such because AccumulateGrad is not public.
-    leaves = OrderedSet([g.variable for g in accumulate_grads])  # type: ignore[attr-defined]
+    leaves = OrderedSet([g.variable for g in accumulate_grads])  # ty: ignore[unresolved-attribute]
 
     return leaves
 

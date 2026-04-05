@@ -139,9 +139,10 @@ def compute_gramian_with_autograd(
 
     jacobians = vmap(get_vjp)(torch.diag(torch.ones_like(output)))
     jacobian_matrices = [jacobian.reshape([jacobian.shape[0], -1]) for jacobian in jacobians]
-    gramian = sum([jacobian @ jacobian.T for jacobian in jacobian_matrices])
+    products = [jacobian @ jacobian.T for jacobian in jacobian_matrices]
+    gramian = torch.stack(products).sum(dim=0)
 
-    return gramian
+    return PSDTensor(gramian)
 
 
 class CloneParams:

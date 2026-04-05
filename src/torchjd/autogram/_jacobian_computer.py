@@ -181,7 +181,7 @@ class ComputeModuleJacobians(torch.autograd.Function):
         jac_outputs: tuple[Tensor, ...],
         args: tuple[PyTree, ...],
         kwargs: dict[str, PyTree],
-    ) -> tuple[Tensor, None]:  # type: ignore[reportIncompatibleMethodOverride]
+    ) -> tuple[Tensor, None]:  # ty: ignore[invalid-method-override]
         # There is a non-batched dimension
         # We do not vmap over the args, kwargs, or rg_outputs for the non-batched dimension
         generalized_jacobian = torch.vmap(compute_jacobian_fn, in_dims=in_dims[1:])(
