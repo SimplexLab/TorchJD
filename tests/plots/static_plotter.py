@@ -32,6 +32,7 @@ def main(
     mean: bool = False,
     dual_proj: bool = False,
     mgda: bool = False,
+    only_one_grad: bool = False,
 ) -> None:
     angle1 = 2.6
     angle2 = 0.3277
@@ -55,9 +56,12 @@ def main(
     fig = go.Figure()
     aggregation_labels = {}  # Collect aggregator names to add labels as text elements at the end
 
+    if only_one_grad:
+        filename += "only_one_"
+
     if gradients:
         filename += "gradients"
-        for i in range(len(matrix)):
+        for i in range(1 if only_one_grad else len(matrix)):
             label = r"$\LARGE{\nabla f_" f"{i + 1}" + r"}$"
 
             gradient_scatter = make_vector_scatter(
@@ -284,6 +288,7 @@ def name_to_label(name: str) -> str:
 
 if __name__ == "__main__":
     # Step-by-step construction of UPGrad for the presentation
+    main(gradients=True, only_one_grad=True)
     main(gradients=True)
     main(gradients=True, mean=True)
     main(gradients=True, mean=True, cone=True)
