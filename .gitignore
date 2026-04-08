@@ -1,3 +1,6 @@
+# Jupyter notebooks
+*.ipynb
+
 # uv
 uv.lock
 
