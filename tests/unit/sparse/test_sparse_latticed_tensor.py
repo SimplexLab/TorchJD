@@ -23,7 +23,7 @@ def test_to_dense():
     n = 2
     m = 3
     a = randn_([n, m])
-    b = SparseLatticedTensor(a, tensor([[1, 0], [0, 1], [0, 1], [1, 0]]), margin=None)
+    b = SparseLatticedTensor(a, tensor([[1, 0], [0, 1], [0, 1], [1, 0]]), offset=None, shape=None)
     c = b.to_dense()
 
     for i in range(n):
@@ -33,7 +33,7 @@ def test_to_dense():
 
 def test_to_dense2():
     a = tensor_([1.0, 2.0, 3.0])
-    b = SparseLatticedTensor(a, tensor([[4]]), margin=None)
+    b = SparseLatticedTensor(a, tensor([[4]]), offset=None, shape=None)
     c = b.to_dense()
     expected = tensor_([1.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 3.0])
     assert torch.all(torch.eq(c, expected))
@@ -80,8 +80,8 @@ def test_einsum(
     b_indices: list[int],
     output_indices: list[int],
 ):
-    a = SparseLatticedTensor(randn_(a_pshape), a_basis, margin=None)
-    b = SparseLatticedTensor(randn_(b_pshape), b_basis, margin=None)
+    a = SparseLatticedTensor(randn_(a_pshape), a_basis, offset=None, shape=None)
+    b = SparseLatticedTensor(randn_(b_pshape), b_basis, offset=None, shape=None)
 
     res = einsum((a, a_indices), (b, b_indices), output=output_indices)
 
@@ -102,7 +102,7 @@ def test_einsum(
 )
 def test_sparse_latticed_tensor_scalar(shape: list[int]):
     a = randn_(shape)
-    b = SparseLatticedTensor(a, torch.eye(len(shape), dtype=torch.int64), margin=None)
+    b = SparseLatticedTensor(a, torch.eye(len(shape), dtype=torch.int64), offset=None, shape=None)
 
     assert_close(a, b.to_dense())
 
@@ -110,7 +110,7 @@ def test_sparse_latticed_tensor_scalar(shape: list[int]):
 @mark.parametrize("dim", [2, 3, 4, 5, 10])
 def test_diag_equivalence(dim: int):
     a = randn_([dim])
-    b = SparseLatticedTensor(a, tensor([[1], [1]]), margin=None)
+    b = SparseLatticedTensor(a, tensor([[1], [1]]), offset=None, shape=None)
 
     diag_a = torch.diag(a)
 
@@ -120,7 +120,7 @@ def test_diag_equivalence(dim: int):
 def test_three_virtual_single_physical():
     dim = 10
     a = randn_([dim])
-    b = SparseLatticedTensor(a, tensor([[1], [1], [1]]), margin=None)
+    b = SparseLatticedTensor(a, tensor([[1], [1], [1]]), offset=None, shape=None)
 
     expected = zeros_([dim, dim, dim])
     for i in range(dim):
@@ -133,7 +133,7 @@ def test_three_virtual_single_physical():
 def test_pointwise(func):
     dim = 10
     a = randn_([dim])
-    b = SparseLatticedTensor(a, tensor([[1], [1]]), margin=None)
+    b = SparseLatticedTensor(a, tensor([[1], [1]]), offset=None, shape=None)
     c = b.to_dense()
     res = func(b)
     assert isinstance(res, SparseLatticedTensor)
@@ -145,7 +145,7 @@ def test_pointwise(func):
 def test_inplace_pointwise(func):
     dim = 10
     a = randn_([dim])
-    b = SparseLatticedTensor(a, tensor([[1], [1]]), margin=None)
+    b = SparseLatticedTensor(a, tensor([[1], [1]]), offset=None, shape=None)
     c = b.to_dense()
     func(b)
     assert isinstance(b, SparseLatticedTensor)
@@ -157,7 +157,7 @@ def test_inplace_pointwise(func):
 def test_unary(func):
     dim = 10
     a = randn_([dim])
-    b = SparseLatticedTensor(a, tensor([[1], [1]]), margin=None)
+    b = SparseLatticedTensor(a, tensor([[1], [1]]), offset=None, shape=None)
     c = b.to_dense()
 
     res = func(b)
@@ -254,7 +254,7 @@ def test_view(
     expected_basis: Tensor,
 ):
     a = randn_(tuple(physical_shape))
-    t = SparseLatticedTensor(a, basis, margin=None)
+    t = SparseLatticedTensor(a, basis, offset=None, shape=None)
 
     result = aten.view.default(t, target_shape)
     expected = t.to_dense().reshape(target_shape)
@@ -345,7 +345,8 @@ def test_concatenate(
     expected_densify: bool,
 ):
     tensors = [
-        SparseLatticedTensor(randn_(pshape), basis, margin=None) for pshape, basis in slt_args
+        SparseLatticedTensor(randn_(pshape), basis, offset=None, shape=None)
+        for pshape, basis in slt_args
     ]
     res = aten.cat.default(tensors, dim)
     expected = aten.cat.default([t.to_dense() for t in tensors], dim)

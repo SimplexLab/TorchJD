@@ -71,7 +71,7 @@ def _override_pointwise(op):
     @impl(op)
     def func_(t: SparseLatticedTensor) -> SparseLatticedTensor:
         assert isinstance(t, SparseLatticedTensor)
-        return SparseLatticedTensor(op(t.physical), t.basis, t.margin)
+        return SparseLatticedTensor(op(t.physical), t.basis, t.offset, t.shape)
 
     return func_
 
@@ -100,7 +100,7 @@ def pow_Tensor_Scalar(t: SparseLatticedTensor, exponent: float) -> SparseLattice
         return aten.pow.Tensor_Scalar(t.to_dense(), exponent)
 
     new_physical = aten.pow.Tensor_Scalar(t.physical, exponent)
-    return SparseLatticedTensor(new_physical, t.basis, t.margin)
+    return SparseLatticedTensor(new_physical, t.basis, t.offset, t.shape)
 
 
 # Somehow there's no pow_.Tensor_Scalar and pow_.Scalar takes tensor and scalar.
@@ -122,4 +122,4 @@ def div_Scalar(t: SparseLatticedTensor, divisor: float) -> SparseLatticedTensor:
     assert isinstance(t, SparseLatticedTensor)
 
     new_physical = aten.div.Scalar(t.physical, divisor)
-    return SparseLatticedTensor(new_physical, t.basis, t.margin)
+    return SparseLatticedTensor(new_physical, t.basis, t.offset, t.shape)

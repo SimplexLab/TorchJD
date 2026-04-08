@@ -54,8 +54,8 @@ def view_default(t: SparseLatticedTensor, shape: list[int]) -> Tensor:
     c_prime = _reverse_cumulative_product(shape)
     new_basis = ((c @ S).unsqueeze(0) // c_prime.unsqueeze(1)) % tensor(shape).unsqueeze(1)
 
-    new_margin = torch.zeros([len(shape), 2], dtype=torch.int64)
-    return to_most_efficient_tensor(t.physical, new_basis, new_margin)
+    new_offset = torch.zeros(len(shape), dtype=torch.int64)
+    return to_most_efficient_tensor(t.physical, new_basis, new_offset, shape)
 
 
 def _reverse_cumulative_product(values: list[int]) -> Tensor:
@@ -90,8 +90,9 @@ def unsqueeze_default(t: SparseLatticedTensor, dim: int) -> SparseLatticedTensor
 
     pdims = t.basis.shape[1]
     new_basis = cat([t.basis[:dim], torch.zeros(1, pdims, dtype=torch.int64), t.basis[dim:]])
-    new_margin = cat([t.margin[:dim], torch.zeros([1, 2], dtype=torch.int64), t.margin[dim:]])
-    return SparseLatticedTensor(t.physical, new_basis, new_margin)
+    new_offset = cat([t.offset[:dim], torch.zeros(1, dtype=torch.int64), t.offset[dim:]])
+    new_size = cat([t.shape_t[:dim], torch.ones(1, dtype=torch.int64), t.shape_t[dim:]])
+    return SparseLatticedTensor(t.physical, new_basis, new_offset, new_size)
 
 
 @impl(aten.squeeze.dims)
@@ -108,15 +109,17 @@ def squeeze_dims(t: SparseLatticedTensor, dims: list[int] | int | None) -> Tenso
 
     is_row_kept = [i not in excluded for i in range(t.ndim)]
     new_basis = t.basis[is_row_kept]
-    new_margin = t.margin[is_row_kept]
-    return to_most_efficient_tensor(t.physical, new_basis, new_margin)
+    new_offset = t.offset[is_row_kept]
+    new_size = t.shape_t[is_row_kept]
+    return to_most_efficient_tensor(t.physical, new_basis, new_offset, new_size)
 
 
 @impl(aten.permute.default)
 def permute_default(t: SparseLatticedTensor, dims: list[int]) -> SparseLatticedTensor:
     new_basis = t.basis[dims]
-    new_margin = t.margin[dims]
-    return SparseLatticedTensor(t.physical, new_basis, new_margin)
+    new_offset = t.offset[dims]
+    new_size = t.shape_t[dims]
+    return SparseLatticedTensor(t.physical, new_basis, new_offset, new_size)
 
 
 @impl(aten.cat.default)
@@ -145,6 +148,7 @@ def expand_default(t: SparseLatticedTensor, sizes: list[int]) -> SparseLatticedT
     # Try to expand each dimension to its new size
     new_physical = t.physical
     new_basis = t.basis
+    new_sizes = t.shape_t
     for d, (v, orig_size, new_size) in enumerate(zip(t.basis, t.shape, sizes, strict=True)):
         if v.sum() > 0 and orig_size != new_size and new_size != -1:
             raise ValueError(
@@ -162,8 +166,9 @@ def expand_default(t: SparseLatticedTensor, sizes: list[int]) -> SparseLatticedT
             new_basis_vector = torch.zeros(t.ndim, 1, dtype=torch.int64)
             new_basis_vector[d, 0] = 1
             new_basis = torch.cat([new_basis, new_basis_vector], dim=1)
+            new_sizes[d] = new_size
 
-    return SparseLatticedTensor(new_physical, new_basis, t.margin)
+    return SparseLatticedTensor(new_physical, new_basis, t.offset, new_sizes)
 
 
 @impl(aten.broadcast_tensors.default)
@@ -202,6 +207,7 @@ def transpose_int(t: SparseLatticedTensor, dim0: int, dim1: int) -> SparseLattic
     new_index[dim1] = dim0
 
     new_basis = t.basis[new_index]
-    new_margin = t.margin[new_index]
+    new_offset = t.offset[new_index]
+    new_shape = list(tensor(t.shape, dtype=torch.int64)[new_index])
 
-    return SparseLatticedTensor(t.physical, new_basis, new_margin)
+    return SparseLatticedTensor(t.physical, new_basis, new_offset, new_shape)

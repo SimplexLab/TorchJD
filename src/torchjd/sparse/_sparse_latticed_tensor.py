@@ -16,7 +16,8 @@ class SparseLatticedTensor(Tensor):
         cls,
         physical: Tensor,
         basis: Tensor,
-        margin: Tensor | None = None,
+        offset: Tensor | None = None,
+        shape: list[int] | tuple[int, ...] | torch.Size | Tensor | None = None,
     ):
         assert basis.dtype == torch.int64
 
@@ -30,11 +31,9 @@ class SparseLatticedTensor(Tensor):
         # (which is bad!)
         assert not physical.requires_grad or not torch.is_grad_enabled()
 
-        if margin is None:
-            margin = torch.zeros([basis.shape[0], 2], dtype=torch.int64)
-
-        pshape_t = tensor(physical.shape, dtype=torch.int64)
-        shape = physical_image_size(basis, pshape_t) + margin.sum(dim=1)
+        if shape is None:
+            pshape = tensor(physical.shape, dtype=torch.int64)
+            shape = basis @ (pshape - 1) + 1
 
         return Tensor._make_wrapper_subclass(
             cls, list(shape), dtype=physical.dtype, device=physical.device
@@ -44,7 +43,8 @@ class SparseLatticedTensor(Tensor):
         self,
         physical: Tensor,
         basis: Tensor,
-        margin: Tensor | None,
+        offset: Tensor | None,
+        shape: list[int] | tuple[int, ...] | torch.Size | Tensor | None,
     ):
         """
         This constructor is made for specifying physical and basis exactly. It should not modify
@@ -56,12 +56,17 @@ class SparseLatticedTensor(Tensor):
         :param physical: The dense tensor holding the actual data.
         :param basis: Integer (int64) tensor of shape [virtual_ndim, physical_ndim], representing
             the linear transformation between an index in the physical tensor and the corresponding
-            index in the virtual tensor, i.e. v_index = basis @ p_index + margin[:, 0]
-        :param margin: Number of extra elements at the start and end of each virtual dimension.
+            index in the virtual tensor, i.e. v_index = basis @ p_index + offset.
+        :param offset: Offset for the virtual index, i.e. v_index = basis @ p_index + offset.
+        :param shape: Size of the sparse tensor. If not provided, the size will be inferred as the
+            minimum size big enough to hold all non-zero elements.
+
+        # TODO: make a nicer interface where it's possible to provide lists or sizes instead of
+            always having to provide int tensors
         """
 
-        if margin is None:
-            margin = torch.zeros([basis.shape[0], 2], dtype=torch.int64)
+        if offset is None:
+            offset = torch.zeros(len(self.shape), dtype=torch.int64)
 
         if any(s == 1 for s in physical.shape):
             raise ValueError(
@@ -89,8 +94,16 @@ class SparseLatticedTensor(Tensor):
 
         self.physical = physical
         self.basis = basis
-        self.margin = margin
-        self.shape_t = tensor(self.shape, dtype=torch.int64)
+        self.offset = offset
+
+        if shape is None:
+            pshape = tensor(physical.shape, dtype=torch.int64)
+            shape = basis @ (pshape - 1) + 1
+        if isinstance(shape, torch.Tensor):
+            self.shape_t = shape
+        else:
+            self.shape_t = tensor(shape, dtype=torch.int64)
+
         self.pshape_t = tensor(physical.shape, dtype=torch.int64)
 
     def to_dense(
@@ -125,8 +138,8 @@ class SparseLatticedTensor(Tensor):
         unwrapped_kwargs = tree_map(unwrap_to_dense, kwargs)
         return func(*unwrapped_args, **unwrapped_kwargs)
 
-    def __repr__(self, *, tensor_contents=None) -> str:  # type: ignore[override]
-        return f"SparseLatticedTensor(physical={self.physical}, basis={self.basis}, margin={self.margin})"
+    def __repr__(self, *, tensor_contents=None) -> str:
+        return f"SparseLatticedTensor(physical={self.physical}, basis={self.basis}, offset={self.offset}, size={self.shape_t})"
 
     @classmethod
     def implements(cls, torch_function):
@@ -140,51 +153,69 @@ class SparseLatticedTensor(Tensor):
         return decorator
 
     @property
-    def offset(self) -> Tensor:
+    def start_margin(self) -> Tensor:
         """
         Returns the margin at the start of each virtual dimension. Can be negative.
 
         The result is an int tensor of shape [virtual_ndim].
         """
 
-        return self.margin[:, 0]
+        return self.offset
+
+    @property
+    def end_margin(self) -> Tensor:
+        """
+        Returns the margin at the end of each virtual dimension. Can be negative.
+
+        The result is an int tensor of shape [virtual_ndim].
+        """
+
+        return self.shape_t - self.physical_image_size - self.offset
+
+    @property
+    def margin(self) -> Tensor:
+        """
+         Returns the margin at the start and end of each virtual dimension. Can be negative.
+
+        The result is an int tensor of shape [virtual_ndim, 2].
+        """
+
+        return torch.stack([self.start_margin, self.end_margin], dim=1)
+
+    @property
+    def min_natural_virtual_indices(self) -> Tensor:
+        # Basis where each positive element is replaced by 0
+        non_positive_basis = torch.min(self.basis, torch.zeros_like(self.basis))
+        max_physical_index = self.pshape_t - 1
+        return (non_positive_basis * max_physical_index.unsqueeze(0)).sum(dim=1)
+
+    @property
+    def max_natural_virtual_indices(self) -> Tensor:
+        # Basis where each negative element is replaced by 0
+        non_negative = torch.max(self.basis, torch.zeros_like(self.basis))
+        max_physical_index = self.pshape_t - 1
+        return (non_negative * max_physical_index.unsqueeze(0)).sum(dim=1)
+
+    @property
+    def physical_image_size(self) -> Tensor:
+        """
+        Returns the shape of the image of the physical through the basis transform.
+
+        The result is an int tensor of shape [virtual_ndim].
+        """
+
+        one = torch.ones(self.ndim, dtype=torch.int64)
+        return self.max_natural_virtual_indices - self.min_natural_virtual_indices + one
 
 
 impl = SparseLatticedTensor.implements
-
-
-def min_natural_virtual_indices(basis: Tensor, pshape: Tensor) -> Tensor:
-    # Basis where each positive element is replaced by 0
-    non_positive_basis = torch.min(basis, torch.zeros_like(basis))
-    max_physical_index = pshape - 1
-    return (non_positive_basis * max_physical_index.unsqueeze(0)).sum(dim=1)
-
-
-def max_natural_virtual_indices(basis: Tensor, pshape: Tensor) -> Tensor:
-    # Basis where each negative element is replaced by 0
-    non_negative = torch.max(basis, torch.zeros_like(basis))
-    max_physical_index = pshape - 1
-    return (non_negative * max_physical_index.unsqueeze(0)).sum(dim=1)
-
-
-def physical_image_size(basis: Tensor, pshape: Tensor) -> Tensor:
-    """
-    Returns the shape of the image of the physical through the basis transform.
-
-    The result is an int tensor of shape [virtual_ndim].
-    """
-
-    one = torch.ones(basis.shape[0], dtype=torch.int64)
-    max_idx = max_natural_virtual_indices(basis, pshape)
-    min_idx = min_natural_virtual_indices(basis, pshape)
-    return max_idx - min_idx + one
 
 
 def print_fallback(func, args, kwargs) -> None:
     def tensor_to_str(t: Tensor) -> str:
         result = f"{t.__class__.__name__} - shape: {t.shape}"
         if isinstance(t, SparseLatticedTensor):
-            result += f" - pshape: {t.physical.shape} - basis: {t.basis} - margin: {t.margin}"
+            result += f" - pshape: {t.physical.shape} - basis: {t.basis} - offset: {t.offset}"
 
         return result
 
@@ -227,13 +258,14 @@ def to_sparse_latticed_tensor(t: Tensor) -> SparseLatticedTensor:
     if isinstance(t, SparseLatticedTensor):
         return t
     else:
-        return make_slt(t, torch.eye(t.ndim, dtype=torch.int64), None)
+        return make_slt(t, torch.eye(t.ndim, dtype=torch.int64), None, None)
 
 
 def to_most_efficient_tensor(
     physical: Tensor,
     basis: Tensor,
-    margin: Tensor | None,
+    offset: Tensor | None,
+    size: list[int] | tuple[int, ...] | torch.Size | Tensor | None,
 ) -> Tensor:
     physical, basis = fix_dim_of_size_1(physical, basis)
     physical, basis = fix_ungrouped_dims(physical, basis)
@@ -243,9 +275,9 @@ def to_most_efficient_tensor(
         # TODO: this condition is broken if basis is allowed to have negative values. It also only
         #  works when size is the default and offset is 0.
         # TODO: this can be done more efficiently (without even creating the SLT)
-        return SparseLatticedTensor(physical, basis, margin).to_dense()
+        return SparseLatticedTensor(physical, basis, offset, size).to_dense()
     else:
-        return SparseLatticedTensor(physical, basis, margin)
+        return SparseLatticedTensor(physical, basis, offset, size)
 
 
 def unwrap_to_dense(t: Tensor):
@@ -304,10 +336,11 @@ def fix_ungrouped_dims(physical: Tensor, basis: Tensor) -> tuple[Tensor, Tensor]
 def make_slt(
     physical: Tensor,
     basis: Tensor,
-    margin: Tensor | None,
+    offset: Tensor | None,
+    size: list[int] | tuple[int, ...] | torch.Size | Tensor | None,
 ) -> SparseLatticedTensor:
     """Fix physical and basis and create a SparseLatticedTensor with them."""
 
     physical, basis = fix_dim_of_size_1(physical, basis)
     physical, basis = fix_ungrouped_dims(physical, basis)
-    return SparseLatticedTensor(physical, basis, margin)
+    return SparseLatticedTensor(physical, basis, offset, size)

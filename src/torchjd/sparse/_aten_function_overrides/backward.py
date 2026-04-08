@@ -10,7 +10,9 @@ def threshold_backward_default(
 ) -> SparseLatticedTensor:
     new_physical = aten.threshold_backward.default(grad_output.physical, self, threshold)
 
-    return SparseLatticedTensor(new_physical, grad_output.basis, grad_output.margin)
+    return SparseLatticedTensor(
+        new_physical, grad_output.basis, grad_output.offset, grad_output.shape_t
+    )
 
 
 @impl(aten.hardtanh_backward.default)
@@ -24,7 +26,9 @@ def hardtanh_backward_default(
         raise NotImplementedError()
 
     new_physical = aten.hardtanh_backward.default(grad_output.physical, self, min_val, max_val)
-    return SparseLatticedTensor(new_physical, grad_output.basis, grad_output.margin)
+    return SparseLatticedTensor(
+        new_physical, grad_output.basis, grad_output.offset, grad_output.shape_t
+    )
 
 
 @impl(aten.hardswish_backward.default)
@@ -33,4 +37,6 @@ def hardswish_backward_default(grad_output: SparseLatticedTensor, self: Tensor):
         raise NotImplementedError()
 
     new_physical = aten.hardswish_backward.default(grad_output.physical, self)
-    return SparseLatticedTensor(new_physical, grad_output.basis, grad_output.margin)
+    return SparseLatticedTensor(
+        new_physical, grad_output.basis, grad_output.offset, grad_output.shape_t
+    )
