@@ -35,6 +35,7 @@ Abstract base classes
     dualproj.rst
     flattening.rst
     graddrop.rst
+    gradvac.rst
     imtl_g.rst
     krum.rst
     mean.rst

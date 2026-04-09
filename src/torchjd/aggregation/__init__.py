@@ -66,6 +66,7 @@ from ._constant import Constant, ConstantWeighting
 from ._dualproj import DualProj, DualProjWeighting
 from ._flattening import Flattening
 from ._graddrop import GradDrop
+from ._gradvac import DEFAULT_GRADVAC_EPS, GradVac
 from ._imtl_g import IMTLG, IMTLGWeighting
 from ._krum import Krum, KrumWeighting
 from ._mean import Mean, MeanWeighting
@@ -87,11 +88,13 @@ __all__ = [
     "ConFIG",
     "Constant",
     "ConstantWeighting",
+    "DEFAULT_GRADVAC_EPS",
     "DualProj",
     "DualProjWeighting",
     "Flattening",
     "GeneralizedWeighting",
     "GradDrop",
+    "GradVac",
     "IMTLG",
     "IMTLGWeighting",
     "Krum",
