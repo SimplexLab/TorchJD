@@ -3,6 +3,16 @@
 This document explains how to contribute to TorchJD. Please use issues or discussions to communicate
 with maintainers before implementing major changes.
 
+## Code Ownership
+
+This project uses a [CODEOWNERS](CODEOWNERS) file to automatically assign reviewers to pull requests
+based on which files are changed. The code owners are the people or groups who created or maintain
+specific parts of the codebase.
+
+When you open a pull request, GitHub will automatically request reviews from the relevant code owners
+for the files you've modified. This ensures that changes are reviewed by the people most familiar
+with the affected code.
+
 ## Installation
 
 To work with TorchJD, we suggest you to use [uv](https://docs.astral.sh/uv/). While this is not

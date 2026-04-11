@@ -1,0 +1,13 @@
+# Code Owners for TorchJD
+#
+# This file defines the code owners for the repository. When a pull request is opened,
+# GitHub automatically requests reviews from the appropriate code owners based on the
+# files changed.
+#
+# Each line contains a pattern followed by one or more owners (GitHub usernames or team names).
+# Patterns use gitignore-style glob patterns.
+#
+# For more information, see https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# All Python source files are owned by Pierre Quinton and Valérian Rey
+/src/**/*.py    @PierreQuinton @ValerianRey
