@@ -4,7 +4,7 @@ This document defines the governance structure and decision-making process for t
 
 ## Project Ownership
 
-The TorchJD project is the property of SimplexLab. SimplexLab has full authority over the project, including itsdirection, governance structure, and major decisions. Maintainers are typically members of SimplexLab and are responsible for day-to-day operations, code reviews, and technical decisions.
+The TorchJD project is the property of SimplexLab. SimplexLab has full authority over the project, including its direction, governance structure, and major decisions. Maintainers are typically members of SimplexLab and are responsible for day-to-day operations, code reviews, and technical decisions.
 
 ## Maintainers
 
