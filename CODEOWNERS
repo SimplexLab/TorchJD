@@ -11,6 +11,9 @@
 #
 # Note: Ownership for new packages should be decided by the maintainers and SimplexLab.
 
+# Default owners for the entire repository
+*    @SimplexLab/maintainers
+
 # CI workflows
 /.github/workflows/    @PierreQuinton @ValerianRey
 
