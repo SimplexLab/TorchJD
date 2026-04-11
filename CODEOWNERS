@@ -1,0 +1,24 @@
+# Code Owners for TorchJD
+#
+# This file defines the code owners for the repository. When a pull request is opened,
+# GitHub automatically requests reviews from the appropriate code owners based on the
+# files changed.
+#
+# Each line contains a pattern followed by one or more owners (GitHub usernames or team names).
+# Patterns use gitignore-style glob patterns.
+#
+# For more information, see https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customifying-your-repository/about-code-owners
+#
+# Note: Ownership for new packages should be decided by the maintainers and SimplexLab.
+
+# Default owners for the entire repository
+*    @SimplexLab/maintainers
+
+# CI workflows
+/.github/workflows/    @PierreQuinton @ValerianRey
+
+# Python packages in src/torchjd
+/src/torchjd/_linalg/    @PierreQuinton @ValerianRey
+/src/torchjd/aggregation/    @PierreQuinton @ValerianRey
+/src/torchjd/autogram/    @PierreQuinton @ValerianRey
+/src/torchjd/autojac/    @PierreQuinton @ValerianRey
