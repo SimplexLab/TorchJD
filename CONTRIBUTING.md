@@ -1,7 +1,11 @@
 # Contributing to TorchJD
 
-This document explains how to contribute to TorchJD. Please use issues or discussions to communicate
-with maintainers before implementing major changes.
+This document explains how to contribute to TorchJD.
+
+## Getting Started
+
+- **Minor changes** (bug fixes, documentation, small improvements): Open a pull request directly following the guidelines in this document.
+- **Significant or major changes** (new features, API changes, architectural decisions): Join the [SimplexLab Discord server](https://discord.gg/76KkRnb3nk), introduce yourself and your idea, and discuss it with the community to determine if and how it fits within the project's goals before implementing.
 
 ## Code Ownership
 

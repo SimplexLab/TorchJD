@@ -29,6 +29,8 @@ Most technical decisions are made through the pull request process:
 2. **Significant changes** (new features, API changes, refactoring): Should be discussed in an issue first, then require approval from at least one maintainer
 3. **Major changes** (breaking changes, architectural decisions): Should be discussed in an issue or discussion thread and require consensus from all maintainers
 
+For significant or major changes, contributors should join the [SimplexLab Discord server](https://discord.gg/76KkRnb3nk), introduce themselves and their idea, and discuss it with the community to determine if and how it fits within the project's goals.
+
 ### Pull Request Process
 
 1. Contributors submit pull requests following the guidelines in [CONTRIBUTING.md](CONTRIBUTING.md)
