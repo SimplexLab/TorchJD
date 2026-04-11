@@ -2,6 +2,10 @@
 
 This document defines the governance structure and decision-making process for the TorchJD project.
 
+## Project Ownership
+
+The TorchJD project is the property of SimplexLab. SimplexLab has full authority over the project, including itsdirection, governance structure, and major decisions. Maintainers are typically members of SimplexLab and are responsible for day-to-day operations, code reviews, and technical decisions.
+
 ## Maintainers
 
 TorchJD is maintained by:
@@ -34,9 +38,9 @@ Most technical decisions are made through the pull request process:
 
 ### Consensus
 
-For major decisions, maintainers aim for consensus. If consensus cannot be reached:
+For major decisions, maintainers aim for consensus. SimplexLab operates as a democratic decision-making body. If consensus among maintainers cannot be reached:
 - The decision may be postponed for further discussion
-- If a decision must be made, the maintainer with the most relevant expertise in the area makes the final call
+- If a decision must be made, SimplexLab resolves the consensus based on the expertise of all maintainers relevant to the discussion as well as all people involved in the discussion
 
 ## Release Process
 
@@ -55,14 +59,15 @@ New maintainers may be added when:
 - They demonstrate understanding of the project's goals and coding standards
 - They are committed to the long-term maintenance of the project
 
-New maintainers must be approved by all existing maintainers.
+New maintainers must be approved by SimplexLab, based on the report and recommendation of all existing maintainers.
 
 ## Conflict Resolution
 
 Conflicts are resolved through discussion:
 1. Issues should first be discussed in the relevant issue or pull request
 2. If unresolved, maintainers discuss privately to reach consensus
-3. The goal is always to find the best solution for the project and its users
+3. If maintainers cannot reach consensus, SimplexLab has the final authority to resolve the conflict
+4. The goal is always to find the best solution for the project and its users
 
 ## Code of Conduct
 
@@ -70,4 +75,4 @@ This project follows the [Linux Foundation Code of Conduct](https://lfprojects.o
 
 ## Changes to Governance
 
-Changes to this governance document require approval from all maintainers.
+Changes to this governance document can only be made upon request from SimplexLab, which defines when and how such changes are possible.
