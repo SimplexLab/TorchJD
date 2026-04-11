@@ -163,7 +163,6 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "**/conftest.py" = ["ARG"]  # Can't change argument names in the functions pytest expects
-"tests/doc/test_rst.py" = ["ARG"]  # For the lightning example
 
 [tool.ruff.lint.flake8-annotations]
 suppress-dummy-args = true
