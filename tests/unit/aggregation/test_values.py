@@ -1,4 +1,3 @@
-import torch
 from pytest import mark, param
 from torch import Tensor, tensor
 from torch.testing import assert_close
@@ -118,8 +117,6 @@ except ImportError:
 def test_aggregator_output(A: Aggregator, J: Tensor, expected_output: Tensor) -> None:
     """Test that the output values of an aggregator are fixed (on cpu)."""
 
-    if isinstance(A, GradVac):
-        torch.manual_seed(0)
     assert_close(A(J), expected_output, rtol=0, atol=1e-4)
 
 
