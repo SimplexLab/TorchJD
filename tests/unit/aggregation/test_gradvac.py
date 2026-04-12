@@ -35,6 +35,12 @@ def test_beta_setter_out_of_range() -> None:
         g.beta = 1.1
 
 
+def test_beta_setter_updates_value() -> None:
+    g = GradVac()
+    g.beta = 0.25
+    assert g.beta == 0.25
+
+
 def test_eps_rejects_negative() -> None:
     with raises(ValueError, match="eps"):
         GradVac(eps=-1e-9)
