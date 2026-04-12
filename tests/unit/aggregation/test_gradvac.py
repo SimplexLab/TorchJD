@@ -15,9 +15,9 @@ requires_grad_pairs = [(GradVac(), ones_(3, 5, requires_grad=True))]
 
 
 def test_representations() -> None:
-    g = GradVac()
-    assert repr(g) == "GradVac(beta=0.5, eps=1e-08)"
-    assert str(g) == "GradVac"
+    A = GradVac()
+    assert repr(A) == "GradVac(beta=0.5, eps=1e-08)"
+    assert str(A) == "GradVac"
 
 
 def test_beta_out_of_range() -> None:
@@ -28,17 +28,17 @@ def test_beta_out_of_range() -> None:
 
 
 def test_beta_setter_out_of_range() -> None:
-    g = GradVac()
+    A = GradVac()
     with raises(ValueError, match="beta"):
-        g.beta = -0.1
+        A.beta = -0.1
     with raises(ValueError, match="beta"):
-        g.beta = 1.1
+        A.beta = 1.1
 
 
 def test_beta_setter_updates_value() -> None:
-    g = GradVac()
-    g.beta = 0.25
-    assert g.beta == 0.25
+    A = GradVac()
+    A.beta = 0.25
+    assert A.beta == 0.25
 
 
 def test_eps_rejects_negative() -> None:
@@ -47,19 +47,19 @@ def test_eps_rejects_negative() -> None:
 
 
 def test_eps_setter_rejects_negative() -> None:
-    g = GradVac()
+    A = GradVac()
     with raises(ValueError, match="eps"):
-        g.eps = -1e-9
+        A.eps = -1e-9
 
 
 def test_eps_can_be_changed_between_steps() -> None:
-    j = tensor_([[1.0, 0.0], [0.0, 1.0]])
-    agg = GradVac()
-    agg.eps = 1e-6
-    assert agg(j).isfinite().all()
-    agg.reset()
-    agg.eps = 1e-10
-    assert agg(j).isfinite().all()
+    J = tensor_([[1.0, 0.0], [0.0, 1.0]])
+    A = GradVac()
+    A.eps = 1e-6
+    assert A(J).isfinite().all()
+    A.reset()
+    A.eps = 1e-10
+    assert A(J).isfinite().all()
 
 
 def test_zero_rows_returns_zero_vector() -> None:
@@ -73,25 +73,25 @@ def test_zero_columns_returns_zero_vector() -> None:
 
 
 def test_reproducible_with_manual_seed() -> None:
-    j = randn_((3, 8))
+    J = randn_((3, 8))
     torch.manual_seed(12345)
-    a1 = GradVac(beta=0.3)
-    out1 = a1(j)
+    A1 = GradVac(beta=0.3)
+    out1 = A1(J)
     torch.manual_seed(12345)
-    a2 = GradVac(beta=0.3)
-    out2 = a2(j)
+    A2 = GradVac(beta=0.3)
+    out2 = A2(J)
     assert_close(out1, out2)
 
 
 @mark.parametrize("matrix", typical_matrices_2_plus_rows)
 def test_reset_restores_first_step_behavior(matrix: Tensor) -> None:
     torch.manual_seed(7)
-    agg = GradVac(beta=0.5)
-    first = agg(matrix)
-    agg(matrix)
-    agg.reset()
+    A = GradVac(beta=0.5)
+    first = A(matrix)
+    A(matrix)
+    A.reset()
     torch.manual_seed(7)
-    assert_close(first, agg(matrix))
+    assert_close(first, A(matrix))
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
@@ -117,8 +117,8 @@ def test_weighting_eps_rejects_negative() -> None:
 
 
 def test_weighting_reset_restores_first_step_behavior() -> None:
-    j = randn_((3, 8))
-    G = j @ j.T
+    J = randn_((3, 8))
+    G = J @ J.T
     torch.manual_seed(7)
     w = GradVacWeighting(beta=0.5)
     first = w(G)
@@ -131,16 +131,16 @@ def test_weighting_reset_restores_first_step_behavior() -> None:
 def test_aggregator_and_weighting_agree() -> None:
     """GradVac()(J) == GradVacWeighting()(J @ J.T) @ J for any matrix J."""
 
-    j = randn_((3, 8))
-    G = j @ j.T
+    J = randn_((3, 8))
+    G = J @ J.T
 
     torch.manual_seed(42)
-    agg = GradVac(beta=0.3)
-    expected = agg(j)
+    A = GradVac(beta=0.3)
+    expected = A(J)
 
     torch.manual_seed(42)
-    weighting = GradVacWeighting(beta=0.3)
-    weights = weighting(G)
-    result = weights @ j
+    W = GradVacWeighting(beta=0.3)
+    weights = W(G)
+    result = weights @ J
 
     assert_close(result, expected, rtol=1e-4, atol=1e-4)
