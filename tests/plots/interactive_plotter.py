@@ -8,6 +8,7 @@ import numpy as np
 import torch
 from dash import Dash, Input, Output, callback, dcc, html
 from plotly.graph_objs import Figure
+from typing_extensions import Unpack
 
 from plots._utils import Plotter, angle_to_coord, coord_to_angle
 from torchjd.aggregation import (
@@ -141,7 +142,7 @@ def main() -> None:
         *gradient_slider_inputs,
         prevent_initial_call=True,
     )
-    def update_gradient_coordinate(*values: str) -> tuple[Figure, ...]:
+    def update_gradient_coordinate(*values: str) -> tuple[Figure, Unpack[tuple[str, ...]]]:
         values_ = [float(value) for value in values]
 
         display_parts: list[str] = []
