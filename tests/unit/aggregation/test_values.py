@@ -1,3 +1,4 @@
+import torch
 from pytest import mark, param
 from torch import Tensor, tensor
 from torch.testing import assert_close
@@ -14,6 +15,7 @@ from torchjd.aggregation import (
     DualProj,
     DualProjWeighting,
     GradDrop,
+    GradVac,
     IMTLGWeighting,
     Krum,
     KrumWeighting,
@@ -57,6 +59,7 @@ AGGREGATOR_PARAMETRIZATIONS: list[tuple] = [
     (Constant(tensor([1.0, 2.0])), J_base, tensor([8.0, 3.0, 3.0])),
     (DualProj(), J_base, tensor([0.5563, 1.1109, 1.1109])),
     (GradDrop(), J_base, tensor([6.0, 2.0, 2.0])),
+    (GradVac(), J_base, tensor([0.5848, 3.8012, 3.8012])),
     (IMTLG(), J_base, tensor([0.0767, 1.0000, 1.0000])),
     (Krum(n_byzantine=1, n_selected=4), J_Krum, tensor([1.2500, 0.7500, 1.5000])),
     (Mean(), J_base, tensor([1.0, 1.0, 1.0])),
@@ -113,6 +116,8 @@ except ImportError:
 def test_aggregator_output(A: Aggregator, J: Tensor, expected_output: Tensor) -> None:
     """Test that the output values of an aggregator are fixed (on cpu)."""
 
+    if isinstance(A, GradVac):
+        torch.manual_seed(0)
     assert_close(A(J), expected_output, rtol=0, atol=1e-4)
 
 
