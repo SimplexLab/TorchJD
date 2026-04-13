@@ -1,5 +1,3 @@
-from collections.abc import Callable
-
 import numpy as np
 import torch
 from plotly import graph_objects as go
@@ -9,22 +7,14 @@ from torchjd.aggregation import Aggregator
 
 
 class Plotter:
-    def __init__(
-        self,
-        aggregator_factories: dict[str, Callable[[], Aggregator]],
-        selected_keys: list[str],
-        matrix: torch.Tensor,
-        seed: int = 0,
-    ) -> None:
-        self._aggregator_factories = aggregator_factories
-        self.selected_keys = selected_keys
+    def __init__(self, aggregators: list[Aggregator], matrix: torch.Tensor, seed: int = 0) -> None:
+        self.aggregators = aggregators
         self.matrix = matrix
         self.seed = seed
 
     def make_fig(self) -> Figure:
         torch.random.manual_seed(self.seed)
-        aggregators = [self._aggregator_factories[key]() for key in self.selected_keys]
-        results = [agg(self.matrix) for agg in aggregators]
+        results = [agg(self.matrix) for agg in self.aggregators]
 
         fig = go.Figure()
 
@@ -33,19 +23,14 @@ class Plotter:
         fig.add_trace(cone)
 
         for i in range(len(self.matrix)):
-            scatter = make_vector_scatter(
-                self.matrix[i],
-                "blue",
-                f"g{i + 1}",
-                textposition="top right",
-            )
+            scatter = make_vector_scatter(self.matrix[i], "blue", f"g{i + 1}")
             fig.add_trace(scatter)
 
         for i in range(len(results)):
             scatter = make_vector_scatter(
                 results[i],
                 "black",
-                self.selected_keys[i],
+                str(self.aggregators[i]),
                 showlegend=True,
                 dash=True,
             )
