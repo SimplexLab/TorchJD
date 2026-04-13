@@ -12,6 +12,9 @@ changelog does not include internal changes that do not affect the user.
 
 - Added `GradVac` and `GradVacWeighting` from
   [Gradient Vaccine: Investigating and Improving Multi-task Optimization in Massively Multilingual Models](https://arxiv.org/pdf/2010.05874).
+
+### Fixed
+
 - Added a fallback for when the inner optimization of `NashMTL` fails (which can happen for example
   on the matrix [[0., 0.], [0., 1.]]).
 
