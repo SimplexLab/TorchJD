@@ -34,6 +34,7 @@ requires_grad_pairs = [(NashMTL(n_tasks=3), ones_(3, 5, requires_grad=True))]
     "ignore:divide by zero encountered in divide",
     "ignore:divide by zero encountered in true_divide",
     "ignore:overflow encountered in divide",
+    "ignore:overflow encountered in true_divide",
     "ignore:invalid value encountered in matmul",
 )
 @mark.parametrize(["aggregator", "matrix"], standard_pairs + edge_case_pairs)
