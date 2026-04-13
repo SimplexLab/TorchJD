@@ -43,9 +43,12 @@ class GradVac(GramianWeightedAggregator):
         you need reproducibility.
 
     .. note::
-        To apply GradVac with per-layer or per-parameter-group granularity, first aggregate the
-        Jacobian into groups, apply GradVac per group, and sum the results. See the grouping usage
-        example for details.
+        To apply GradVac with per-layer or per-parameter-group granularity, create a separate
+        :class:`GradVac` instance for each group and call
+        :func:`~torchjd.autojac.jac_to_grad` once per group after
+        :func:`~torchjd.autojac.mtl_backward`. Each instance maintains its own EMA state,
+        matching the per-block targets :math:`\hat{\phi}_{ijk}` from the original paper. See
+        the :doc:`Grouping </examples/grouping>` example for details.
     """
 
     def __init__(self, beta: float = 0.5, eps: float = 1e-8) -> None:
