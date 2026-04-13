@@ -1,7 +1,7 @@
 from pytest import mark
 from torch import Tensor
 from torch.testing import assert_close
-from utils.tensors import ones_, randn_
+from utils.tensors import ones_, randn_, tensor_
 
 try:
     from torchjd.aggregation import NashMTL
@@ -19,6 +19,10 @@ def _make_aggregator(matrix: Tensor) -> NashMTL:
 
 
 standard_pairs = [(_make_aggregator(matrix), matrix) for matrix in nash_mtl_matrices]
+edge_case_matrices = [
+    tensor_([[0.0, 0.0], [0.0, 1.0]])  # This leads to a (caught) ValueError in _solve_optimization.
+]
+edge_case_pairs = [(_make_aggregator(matrix), matrix) for matrix in edge_case_matrices]
 requires_grad_pairs = [(NashMTL(n_tasks=3), ones_(3, 5, requires_grad=True))]
 
 
@@ -27,8 +31,13 @@ requires_grad_pairs = [(NashMTL(n_tasks=3), ones_(3, 5, requires_grad=True))]
 @mark.filterwarnings(
     "ignore:Solution may be inaccurate.",
     "ignore:You are solving a parameterized problem that is not DPP.",
+    "ignore:divide by zero encountered in divide",
+    "ignore:divide by zero encountered in true_divide",
+    "ignore:overflow encountered in divide",
+    "ignore:overflow encountered in true_divide",
+    "ignore:invalid value encountered in matmul",
 )
-@mark.parametrize(["aggregator", "matrix"], standard_pairs)
+@mark.parametrize(["aggregator", "matrix"], standard_pairs + edge_case_pairs)
 def test_expected_structure(aggregator: NashMTL, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 

@@ -1,7 +1,21 @@
 # Contributing to TorchJD
 
-This document explains how to contribute to TorchJD. Please use issues or discussions to communicate
-with maintainers before implementing major changes.
+This document explains how to contribute to TorchJD.
+
+## Getting Started
+
+- **Minor changes** (bug fixes, documentation, small improvements): Open a pull request directly following the guidelines in this document.
+- **Significant or major changes** (new features, API changes, architectural decisions): Join the [SimplexLab Discord server](https://discord.gg/76KkRnb3nk), introduce yourself and your idea, and discuss it with the community to determine if and how it fits within the project's goals before implementing.
+
+## Code Ownership
+
+This project uses a [CODEOWNERS](CODEOWNERS) file to automatically assign reviewers to pull requests
+based on which files are changed. The code owners are the people or groups who created or maintain
+specific parts of the codebase.
+
+When you open a pull request, GitHub will automatically request reviews from the relevant code owners
+for the files you've modified. This ensures that changes are reviewed by the people most familiar
+with the affected code.
 
 ## Installation
 
@@ -104,10 +118,9 @@ uv run pre-commit install
      uv run make doctest -C docs
      ```
 
-  - To compute the code coverage locally, you should run the unit tests and the doc tests together,
-  with the `--cov` flag:
+  - To compute the code coverage locally, you should run the unit tests with the `--cov` flag:
     ```bash
-    uv run pytest tests/unit tests/doc --cov=src
+    uv run pytest tests/unit --cov=src
     ```
 
     > [!TIP]
@@ -148,8 +161,7 @@ should create it.
 ### Testing
 
 We ask contributors to implement the unit tests necessary to check the correctness of their
-implementations. Besides, whenever usage examples are provided, we require the example's code to be
-tested in `tests/doc`. We aim for 100% code coverage, but we greatly appreciate any PR, even with
+implementations. We aim for 100% code coverage, but we greatly appreciate any PR, even with
 insufficient code coverage. To ensure that the tensors generated during the tests are on the right
 device and dtype, you have to use the partial functions defined in `tests/utils/tensors.py` to
 instantiate tensors. For instance, instead of

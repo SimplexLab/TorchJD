@@ -158,9 +158,10 @@ class _NashMTLWeighting(Weighting[Matrix]):
 
             try:
                 self.prob.solve(solver=cp.ECOS, warm_start=True, max_iters=100)
-            except SolverError:
-                # On macOS, this can happen with: Solver 'ECOS' failed.
+            except (SolverError, ValueError):
+                # On macOS, SolverError can happen with: Solver 'ECOS' failed.
                 # No idea why. The corresponding matrix is of shape [9, 11] with rank 5.
+                # ValueError happens with for example matrix [[0., 0.], [0., 1.]].
                 # Maybe other exceptions can happen in other cases.
                 self.alpha_param.value = self.prvs_alpha_param.value
 

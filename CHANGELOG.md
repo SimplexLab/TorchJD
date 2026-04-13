@@ -8,6 +8,11 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Fixed
+
+- Added a fallback for when the inner optimization of `NashMTL` fails (which can happen for example
+  on the matrix [[0., 0.], [0., 1.]]).
+
 ## [0.9.0] - 2026-02-24
 
 ### Added
