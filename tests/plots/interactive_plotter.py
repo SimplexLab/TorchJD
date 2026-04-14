@@ -35,7 +35,7 @@ MAX_LENGTH = 25.0
 
 
 def _format_angle_display(angle: float) -> str:
-    return f"{angle:.4f} rad ({np.degrees(angle):.1f}°)"
+    return f"{np.degrees(angle):.1f}°"
 
 
 def _format_length_display(r: float) -> str:
