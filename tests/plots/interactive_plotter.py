@@ -39,7 +39,7 @@ def _format_angle_display(angle: float) -> str:
 
 
 def _format_length_display(r: float) -> str:
-    return f"{r:.4f}"
+    return f"{r:.2f}"
 
 
 def main() -> None:
