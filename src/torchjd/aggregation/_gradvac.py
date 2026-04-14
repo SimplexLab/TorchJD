@@ -31,11 +31,8 @@ class GradVac(GramianWeightedAggregator):
     This aggregator is stateful: it keeps :math:`\hat{\phi}` across calls. Use :meth:`reset` when
     the number of tasks or dtype changes.
 
-    :param beta: EMA decay for :math:`\hat{\phi}` (paper default ``0.5``). You may read or assign
-        the :attr:`beta` attribute between steps to tune the EMA update.
-    :param eps: Small non-negative constant added to denominators when computing cosines and the
-        vaccine weight (default ``1e-8``); set to ``0`` to omit this stabilization. You may read or
-        assign the :attr:`eps` attribute between steps to tune numerical behavior.
+    :param beta: EMA decay for :math:`\hat{\phi}`.
+    :param eps: Small non-negative constant added to denominators.
 
     .. note::
         For each task :math:`i`, the order of other tasks :math:`j` is shuffled independently
@@ -95,8 +92,8 @@ class GradVacWeighting(Weighting[PSDMatrix]):
     This weighting is stateful: it keeps :math:`\hat{\phi}` across calls. Use :meth:`reset` when
     the number of tasks or dtype changes.
 
-    :param beta: EMA decay for :math:`\hat{\phi}` (paper default ``0.5``).
-    :param eps: Small non-negative constant added to denominators (default ``1e-8``).
+    :param beta: EMA decay for :math:`\hat{\phi}`.
+    :param eps: Small non-negative constant added to denominators.
     """
 
     def __init__(self, beta: float = 0.5, eps: float = 1e-8) -> None:
