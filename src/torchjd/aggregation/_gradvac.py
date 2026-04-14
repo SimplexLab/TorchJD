@@ -31,24 +31,13 @@ class GradVac(GramianWeightedAggregator):
     This aggregator is stateful: it keeps :math:`\hat{\phi}` across calls. Use :meth:`reset` when
     the number of tasks or dtype changes.
 
-    :param beta: EMA decay for :math:`\hat{\phi}` (paper default ``0.5``). You may read or assign
-        the :attr:`beta` attribute between steps to tune the EMA update.
-    :param eps: Small non-negative constant added to denominators when computing cosines and the
-        vaccine weight (default ``1e-8``); set to ``0`` to omit this stabilization. You may read or
-        assign the :attr:`eps` attribute between steps to tune numerical behavior.
+    :param beta: EMA decay for :math:`\hat{\phi}`.
+    :param eps: Small non-negative constant added to denominators.
 
     .. note::
         For each task :math:`i`, the order of other tasks :math:`j` is shuffled independently
         using the global PyTorch RNG (``torch.randperm``). Seed it with ``torch.manual_seed`` if
         you need reproducibility.
-
-    .. note::
-        To apply GradVac with per-layer or per-parameter-group granularity, create a separate
-        :class:`GradVac` instance for each group and call
-        :func:`~torchjd.autojac.jac_to_grad` once per group after
-        :func:`~torchjd.autojac.mtl_backward`. Each instance maintains its own EMA state,
-        matching the per-block targets :math:`\hat{\phi}_{ijk}` from the original paper. See
-        the :doc:`Grouping </examples/grouping>` example for details.
     """
 
     def __init__(self, beta: float = 0.5, eps: float = 1e-8) -> None:
@@ -59,8 +48,6 @@ class GradVac(GramianWeightedAggregator):
 
     @property
     def beta(self) -> float:
-        """EMA decay coefficient for :math:`\\hat{\\phi}` (paper default ``0.5``)."""
-
         return self._gradvac_weighting.beta
 
     @beta.setter
@@ -69,8 +56,6 @@ class GradVac(GramianWeightedAggregator):
 
     @property
     def eps(self) -> float:
-        """Small non-negative constant added to denominators for numerical stability."""
-
         return self._gradvac_weighting.eps
 
     @eps.setter
@@ -107,8 +92,8 @@ class GradVacWeighting(Weighting[PSDMatrix]):
     This weighting is stateful: it keeps :math:`\hat{\phi}` across calls. Use :meth:`reset` when
     the number of tasks or dtype changes.
 
-    :param beta: EMA decay for :math:`\hat{\phi}` (paper default ``0.5``).
-    :param eps: Small non-negative constant added to denominators (default ``1e-8``).
+    :param beta: EMA decay for :math:`\hat{\phi}`.
+    :param eps: Small non-negative constant added to denominators.
     """
 
     def __init__(self, beta: float = 0.5, eps: float = 1e-8) -> None:
@@ -125,8 +110,6 @@ class GradVacWeighting(Weighting[PSDMatrix]):
 
     @property
     def beta(self) -> float:
-        """EMA decay coefficient for :math:`\\hat{\\phi}` (paper default ``0.5``)."""
-
         return self._beta
 
     @beta.setter
@@ -137,8 +120,6 @@ class GradVacWeighting(Weighting[PSDMatrix]):
 
     @property
     def eps(self) -> float:
-        """Small non-negative constant added to denominators for numerical stability."""
-
         return self._eps
 
     @eps.setter
