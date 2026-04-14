@@ -51,8 +51,6 @@ class GradVac(GramianWeightedAggregator):
 
     @property
     def beta(self) -> float:
-        """EMA decay coefficient for :math:`\\hat{\\phi}` (paper default ``0.5``)."""
-
         return self._gradvac_weighting.beta
 
     @beta.setter
@@ -61,8 +59,6 @@ class GradVac(GramianWeightedAggregator):
 
     @property
     def eps(self) -> float:
-        """Small non-negative constant added to denominators for numerical stability."""
-
         return self._gradvac_weighting.eps
 
     @eps.setter
@@ -117,8 +113,6 @@ class GradVacWeighting(Weighting[PSDMatrix]):
 
     @property
     def beta(self) -> float:
-        """EMA decay coefficient for :math:`\\hat{\\phi}` (paper default ``0.5``)."""
-
         return self._beta
 
     @beta.setter
@@ -129,8 +123,6 @@ class GradVacWeighting(Weighting[PSDMatrix]):
 
     @property
     def eps(self) -> float:
-        """Small non-negative constant added to denominators for numerical stability."""
-
         return self._eps
 
     @eps.setter
