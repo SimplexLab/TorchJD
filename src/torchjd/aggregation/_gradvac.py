@@ -6,14 +6,14 @@ import torch
 from torch import Tensor
 
 from torchjd._linalg import PSDMatrix
-from torchjd.aggregation._mixins import ResettableMixin
+from torchjd.aggregation._mixins import Resettable
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
 from ._weighting_bases import Weighting
 
 
-class GradVac(GramianWeightedAggregator, ResettableMixin):
+class GradVac(GramianWeightedAggregator, Resettable):
     r"""
     :class:`~torchjd.aggregation._aggregator_bases.Aggregator` implementing the aggregation step of
     Gradient Vaccine (GradVac) from `Gradient Vaccine: Investigating and Improving Multi-task
@@ -72,7 +72,7 @@ class GradVac(GramianWeightedAggregator, ResettableMixin):
         return f"GradVac(beta={self.beta!r}, eps={self.eps!r})"
 
 
-class GradVacWeighting(Weighting[PSDMatrix], ResettableMixin):
+class GradVacWeighting(Weighting[PSDMatrix], Resettable):
     r"""
     :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
     :class:`~torchjd.aggregation.GradVac`.

@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
 
-class ResettableMixin(ABC):
-    """Class implementing a reset method."""
+class Resettable(ABC):
+    """Mixin adding a reset method."""
 
     @abstractmethod
     def reset(self) -> None:

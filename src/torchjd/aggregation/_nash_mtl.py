@@ -2,7 +2,7 @@
 # See NOTICES for the full license text.
 
 from torchjd._linalg import Matrix
-from torchjd.aggregation._mixins import ResettableMixin
+from torchjd.aggregation._mixins import Resettable
 
 from ._utils.check_dependencies import check_dependencies_are_installed
 from ._weighting_bases import Weighting
@@ -21,7 +21,7 @@ from ._aggregator_bases import WeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
 
 
-class NashMTL(WeightedAggregator, ResettableMixin):
+class NashMTL(WeightedAggregator, Resettable):
     """
     :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as proposed in Algorithm 1 of
     `Multi-Task Learning as a Bargaining Game <https://arxiv.org/pdf/2202.01017.pdf>`_.
@@ -84,7 +84,7 @@ class NashMTL(WeightedAggregator, ResettableMixin):
         )
 
 
-class _NashMTLWeighting(Weighting[Matrix], ResettableMixin):
+class _NashMTLWeighting(Weighting[Matrix], Resettable):
     """
     :class:`~torchjd.aggregation.Weighting` that extracts weights using the step decision
     of Algorithm 1 of `Multi-Task Learning as a Bargaining Game
