@@ -208,9 +208,15 @@ the context of Jacobian descent, it is used to reduce a Jacobian matrix into a v
 used to update the parameters. In TorchJD, an `Aggregator` subclass should be a faithful
 implementation of a mathematical aggregator.
 
-> [!WARNING]
-> Currently, we only accept aggregators that have the same interface as the `Aggregator` base class.
-> We do not support stateful aggregators yet, so the proposed aggregators **must be immutable**.
+> [!NOTE]
+> We also accept stateful aggregators, whose output depends both on the Jacobian and on some
+> internal state (which can be affected for example by previous Jacobians).
+
+> [!NOTE]
+> Some aggregators may depend on something else than the Jacobian. To implement them, please add
+> setters so that any extra information can be given by the user to the aggregator before it is
+> actually used. For example, if your aggregator needs to take the loss values, this can be given
+> at every iteration through a `set_losses` setter.
 
 > [!NOTE]
 > Before working on the implementation of a new aggregator, please contact us via an issue or a
