@@ -209,7 +209,7 @@ used to update the parameters. In TorchJD, an `Aggregator` subclass should be a 
 implementation of a mathematical aggregator.
 
 > [!NOTE]
-> We now also accept stateful aggregators, whose output depends both on the Jacobian and on some
+> We also accept stateful aggregators, whose output depends both on the Jacobian and on some
 > internal state (which can be affected for example by previous Jacobians).
 
 > [!NOTE]
