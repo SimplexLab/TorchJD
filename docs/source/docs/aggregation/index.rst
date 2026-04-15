@@ -22,7 +22,7 @@ Abstract base classes
     :undoc-members:
     :exclude-members: forward
 
-.. autoclass:: torchjd.aggregation.Resettable
+.. autoclass:: torchjd.aggregation.Stateful
     :members:
     :undoc-members:
 

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class Resettable(ABC):
+class Stateful(ABC):
     """Mixin adding a reset method."""
 
     @abstractmethod
