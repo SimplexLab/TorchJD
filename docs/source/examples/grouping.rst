@@ -2,29 +2,29 @@ Grouping
 ========
 
 The aggregation can be made independently on groups of parameters, at different granularities. The
-[Gradient Vaccine paper](https://arxiv.org/pdf/2010.05874) introduces four strategies to partition
+`Gradient Vaccine paper <https://arxiv.org/pdf/2010.05874>`_ introduces four strategies to partition
 the parameters:
 
-1. **Together** (baseline): one group covering all shared parameters. Corresponds to the
-   `whole_model` stategy in the paper.
+1. **Together** (baseline): one group covering all parameters. Corresponds to the `whole_model`
+   stategy in the paper.
 
 2. **Per network**: one group per top-level sub-network (e.g. encoder and decoder separately).
    Corresponds to the `enc_dec` stategy in the paper.
 
-3. **Per layer**: one group per leaf module of the encoder. Corresponds to the `all_layer` stategy
+3. **Per layer**: one group per leaf module of the network. Corresponds to the `all_layer` stategy
    in the paper.
 
 4. **Per tensor**: one group per individual parameter tensor. Corresponds to the `all_matrix`
    stategy in the paper.
 
 In TorchJD, grouping is achieved by calling :func:`~torchjd.autojac.jac_to_grad` once per group
-after :func:`~torchjd.autojac.mtl_backward`, with a dedicated aggregator instance per group.
-For :class:`~torchjd.aggregation.Stateful` aggregators, each instance independently maintains its
-own state (e.g. the EMA :math:`\hat{\phi}` state in :class:`~torchjd.aggregation.GradVac`), matching
-the per-block targets from the original paper.
+after :func:`~torchjd.autojac.backward` or :func:`~torchjd.autojac.mtl_backward`, with a dedicated
+aggregator instance per group. For :class:`~torchjd.aggregation.Stateful` aggregators, each instance
+should independently maintains its own state (e.g. the EMA :math:`\hat{\phi}` state in
+:class:`~torchjd.aggregation.GradVac`, matching the per-block targets from the original paper).
 
 .. note::
-    The grouping is orthogonal to the choice of
+    The grouping is orthogonal to the choice between
     :func:`~torchjd.autojac.backward` vs :func:`~torchjd.autojac.mtl_backward`. Those functions
     determine *which* parameters receive Jacobians; grouping then determines *how* those Jacobians
     are partitioned for aggregation.
