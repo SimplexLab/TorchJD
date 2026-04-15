@@ -101,7 +101,7 @@ class CAGrad(GramianWeightedAggregator[CAGradWeighting]):
 
     def __init__(self, c: float, norm_eps: float = 0.0001) -> None:
         super().__init__(CAGradWeighting(c=c, norm_eps=norm_eps))
-        self._c = c
+        self.c = c
         self._norm_eps = norm_eps
 
         # This prevents considering the computed weights as constant w.r.t. the matrix.
@@ -113,13 +113,8 @@ class CAGrad(GramianWeightedAggregator[CAGradWeighting]):
 
     @c.setter
     def c(self, value: float) -> None:
-        if value < 0.0:
-            raise ValueError(
-                f"Parameter `value` should be a non-negative float. Found `value = {value}`."
-            )
-
-        self._c = value
         self.gramian_weighting.c = value
+        self._c = value
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(c={self._c}, norm_eps={self._norm_eps})"
