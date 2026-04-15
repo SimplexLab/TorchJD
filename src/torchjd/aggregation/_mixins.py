@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 
 class ResettableMixin(ABC):
-    """Mixin that resettable classes should inherit from."""
+    """Class implementing a reset method."""
 
     @abstractmethod
     def reset(self) -> None:
