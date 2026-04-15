@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Generic, TypeVar
 
 from torch import Tensor, nn
 
@@ -68,7 +69,10 @@ class WeightedAggregator(Aggregator):
         return vector
 
 
-class GramianWeightedAggregator(WeightedAggregator):
+_T = TypeVar("_T", bound=Weighting[PSDMatrix])
+
+
+class GramianWeightedAggregator(WeightedAggregator, Generic[_T]):
     """
     WeightedAggregator that computes the gramian of the input jacobian matrix before applying a
     Weighting to it.
@@ -77,6 +81,6 @@ class GramianWeightedAggregator(WeightedAggregator):
         gramian.
     """
 
-    def __init__(self, gramian_weighting: Weighting[PSDMatrix]) -> None:
+    def __init__(self, gramian_weighting: _T) -> None:
         super().__init__(gramian_weighting << compute_gramian)
         self.gramian_weighting = gramian_weighting
