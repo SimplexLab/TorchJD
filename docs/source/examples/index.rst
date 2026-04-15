@@ -31,7 +31,7 @@ This section contains some usage examples for TorchJD.
   ``LightningModule`` optimized by Jacobian descent.
 - :doc:`Grouping <grouping>` shows how to apply an aggregator independently per parameter group
   (e.g. per layer), so that conflict resolution happens at a finer granularity than the full
-  shared parameter vector.
+  parameter vector.
 - :doc:`Automatic Mixed Precision <amp>` shows how to combine mixed precision training with TorchJD.
 
 .. toctree::
