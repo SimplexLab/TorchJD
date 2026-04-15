@@ -22,6 +22,10 @@ Abstract base classes
     :undoc-members:
     :exclude-members: forward
 
+.. autoclass:: torchjd.aggregation.Stateful
+    :members:
+    :undoc-members:
+
 
 .. toctree::
     :hidden:

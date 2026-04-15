@@ -1,14 +1,15 @@
 # Partly adapted from https://github.com/AvivNavon/nash-mtl — MIT License, Copyright (c) 2022 Aviv Navon.
 # See NOTICES for the full license text.
 
-from typing import cast
-
 from torchjd._linalg import Matrix
+from torchjd.aggregation._mixins import Stateful
 
 from ._utils.check_dependencies import check_dependencies_are_installed
 from ._weighting_bases import Weighting
 
 check_dependencies_are_installed(["cvxpy", "ecos"])
+
+from typing import cast
 
 import cvxpy as cp
 import numpy as np
@@ -20,8 +21,9 @@ from ._aggregator_bases import WeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
 
 
-class NashMTL(WeightedAggregator):
+class NashMTL(WeightedAggregator, Stateful):
     """
+    :class:`~torchjd.aggregation._mixins.Stateful`
     :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as proposed in Algorithm 1 of
     `Multi-Task Learning as a Bargaining Game <https://arxiv.org/pdf/2202.01017.pdf>`_.
 
@@ -83,11 +85,11 @@ class NashMTL(WeightedAggregator):
         )
 
 
-class _NashMTLWeighting(Weighting[Matrix]):
+class _NashMTLWeighting(Weighting[Matrix], Stateful):
     """
-    :class:`~torchjd.aggregation.Weighting` that extracts weights using the step decision
-    of Algorithm 1 of `Multi-Task Learning as a Bargaining Game
-    <https://arxiv.org/pdf/2202.01017.pdf>`_.
+    :class:`~torchjd.aggregation._mixins.Stateful` :class:`~torchjd.aggregation.Weighting` that
+    extracts weights using the step decision of Algorithm 1 of `Multi-Task Learning as a Bargaining
+    Game <https://arxiv.org/pdf/2202.01017.pdf>`_.
 
     :param n_tasks: The number of tasks, corresponding to the number of rows in the provided
         matrices.

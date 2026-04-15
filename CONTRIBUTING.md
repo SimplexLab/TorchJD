@@ -210,7 +210,8 @@ implementation of a mathematical aggregator.
 
 > [!NOTE]
 > We also accept stateful aggregators, whose output depends both on the Jacobian and on some
-> internal state (which can be affected for example by previous Jacobians).
+> internal state (which can be affected for example by previous Jacobians). Such aggregators should
+> inherit from the `Stateful` mixin and implement a `reset` method.
 
 > [!NOTE]
 > Some aggregators may depend on something else than the Jacobian. To implement them, please add
