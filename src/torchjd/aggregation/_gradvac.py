@@ -15,6 +15,7 @@ from ._weighting_bases import Weighting
 
 class GradVac(GramianWeightedAggregator, Resettable):
     r"""
+    :class:`~torchjd.aggregation._mixins.Resettable`
     :class:`~torchjd.aggregation._aggregator_bases.Aggregator` implementing the aggregation step of
     Gradient Vaccine (GradVac) from `Gradient Vaccine: Investigating and Improving Multi-task
     Optimization in Massively Multilingual Models (ICLR 2021 Spotlight)
@@ -74,6 +75,7 @@ class GradVac(GramianWeightedAggregator, Resettable):
 
 class GradVacWeighting(Weighting[PSDMatrix], Resettable):
     r"""
+    :class:`~torchjd.aggregation._mixins.Resettable`
     :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
     :class:`~torchjd.aggregation.GradVac`.
 
