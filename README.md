@@ -292,6 +292,15 @@ TorchJD provides many existing aggregators from the literature, listed in the fo
 | [Sum](https://torchjd.org/stable/docs/aggregation/sum#torchjd.aggregation.Sum)                             | [SumWeighting](https://torchjd.org/stable/docs/aggregation/sum#torchjd.aggregation.SumWeighting)                       | -                                                                                                                                                                    |
 | [Trimmed Mean](https://torchjd.org/stable/docs/aggregation/trimmed_mean#torchjd.aggregation.TrimmedMean)   | -                                                                                                                      | [Byzantine-Robust Distributed Learning: Towards Optimal Statistical Rates](https://proceedings.mlr.press/v80/yin18a/yin18a.pdf)                                      |
 
+## Release Methodology
+
+We try to make a release whenever have something worth sharing to users (bug fix, minor or large
+feature, etc.). TorchJD follows [semantic versioning](https://semver.org/). Since the library is
+still in beta (`0.x.y`), we sometimes make interface changes in minor versions. We prioritize the
+long-term quality of the library, which occasionally means introducing breaking changes. Whenever a
+release contains breaking changes, the [changelog](CHANGELOG.md) and the GitHub release notes always
+include clear instructions on how to migrate.
+
 ## Contribution
 Please read the [Contribution page](CONTRIBUTING.md).
 
