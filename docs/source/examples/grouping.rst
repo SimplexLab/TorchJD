@@ -1,10 +1,9 @@
 Grouping
 ========
 
-When applying a conflict-resolving aggregator such as :class:`~torchjd.aggregation.GradVac` in
-multi-task learning, the cosine similarities between task gradients can be computed at different
-granularities. The [Gradient Vaccine paper](https://arxiv.org/pdf/2010.05874) introduces four
-strategies, each partitioning the shared parameter vector differently:
+The aggregation can be made independently on groups of parameters, at different granularities. The
+[Gradient Vaccine paper](https://arxiv.org/pdf/2010.05874) introduces four strategies to partition
+the parameters:
 
 1. **Together** (baseline): one group covering all shared parameters. Corresponds to the
    `whole_model` stategy in the paper.
