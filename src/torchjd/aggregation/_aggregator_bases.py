@@ -69,7 +69,7 @@ class WeightedAggregator(Aggregator):
         return vector
 
 
-_T = TypeVar("_T", bound=Weighting[PSDMatrix])
+_T = TypeVar("_T", covariant=True, bound=Weighting[PSDMatrix])
 
 
 class GramianWeightedAggregator(WeightedAggregator, Generic[_T]):
