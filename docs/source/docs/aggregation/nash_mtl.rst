@@ -4,6 +4,4 @@ Nash-MTL
 ========
 
 .. autoclass:: torchjd.aggregation.NashMTL
-    :members:
-    :undoc-members:
-    :exclude-members: forward
+    :members: reset
