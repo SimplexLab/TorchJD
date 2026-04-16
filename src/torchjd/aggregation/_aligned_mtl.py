@@ -17,42 +17,6 @@ from ._weighting_bases import Weighting
 SUPPORTED_SCALE_MODE: TypeAlias = Literal["min", "median", "rmse"]
 
 
-class AlignedMTL(GramianWeightedAggregator):
-    r"""
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as defined in Algorithm 1 of
-    `Independent Component Alignment for Multi-Task Learning
-    <https://openaccess.thecvf.com/content/CVPR2023/papers/Senushkin_Independent_Component_Alignment_for_Multi-Task_Learning_CVPR_2023_paper.pdf>`_.
-
-    :param pref_vector: The preference vector to use.  If not provided, defaults to
-        :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in \mathbb{R}^m`.
-    :param scale_mode: The scaling mode used to build the balance transformation. ``"min"`` uses
-        the smallest eigenvalue (default), ``"median"`` uses the median eigenvalue, and ``"rmse"``
-        uses the mean eigenvalue (as in the original implementation).
-
-    .. note::
-        This implementation was adapted from the official implementation of SamsungLabs/MTL,
-        which is not available anymore at the time of writing.
-    """
-
-    def __init__(
-        self,
-        pref_vector: Tensor | None = None,
-        scale_mode: SUPPORTED_SCALE_MODE = "min",
-    ) -> None:
-        self._pref_vector = pref_vector
-        self._scale_mode: SUPPORTED_SCALE_MODE = scale_mode
-        super().__init__(AlignedMTLWeighting(pref_vector, scale_mode=scale_mode))
-
-    def __repr__(self) -> str:
-        return (
-            f"{self.__class__.__name__}(pref_vector={repr(self._pref_vector)}, "
-            f"scale_mode={repr(self._scale_mode)})"
-        )
-
-    def __str__(self) -> str:
-        return f"AlignedMTL{pref_vector_to_str_suffix(self._pref_vector)}"
-
-
 class AlignedMTLWeighting(Weighting[PSDMatrix]):
     r"""
     :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
@@ -113,3 +77,41 @@ class AlignedMTLWeighting(Weighting[PSDMatrix]):
 
         B = scale.sqrt() * V @ sigma_inv @ V.T
         return B
+
+
+class AlignedMTL(GramianWeightedAggregator):
+    r"""
+    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as defined in Algorithm 1 of
+    `Independent Component Alignment for Multi-Task Learning
+    <https://openaccess.thecvf.com/content/CVPR2023/papers/Senushkin_Independent_Component_Alignment_for_Multi-Task_Learning_CVPR_2023_paper.pdf>`_.
+
+    :param pref_vector: The preference vector to use.  If not provided, defaults to
+        :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in \mathbb{R}^m`.
+    :param scale_mode: The scaling mode used to build the balance transformation. ``"min"`` uses
+        the smallest eigenvalue (default), ``"median"`` uses the median eigenvalue, and ``"rmse"``
+        uses the mean eigenvalue (as in the original implementation).
+
+    .. note::
+        This implementation was adapted from the official implementation of SamsungLabs/MTL,
+        which is not available anymore at the time of writing.
+    """
+
+    gramian_weighting: AlignedMTLWeighting
+
+    def __init__(
+        self,
+        pref_vector: Tensor | None = None,
+        scale_mode: SUPPORTED_SCALE_MODE = "min",
+    ) -> None:
+        self._pref_vector = pref_vector
+        self._scale_mode: SUPPORTED_SCALE_MODE = scale_mode
+        super().__init__(AlignedMTLWeighting(pref_vector, scale_mode=scale_mode))
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(pref_vector={repr(self._pref_vector)}, "
+            f"scale_mode={repr(self._scale_mode)})"
+        )
+
+    def __str__(self) -> str:
+        return f"AlignedMTL{pref_vector_to_str_suffix(self._pref_vector)}"

@@ -10,19 +10,6 @@ from ._utils.non_differentiable import raise_non_differentiable_error
 from ._weighting_bases import Weighting
 
 
-class PCGrad(GramianWeightedAggregator):
-    """
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as defined in algorithm 1 of
-    `Gradient Surgery for Multi-Task Learning <https://arxiv.org/pdf/2001.06782.pdf>`_.
-    """
-
-    def __init__(self) -> None:
-        super().__init__(PCGradWeighting())
-
-        # This prevents running into a RuntimeError due to modifying stored tensors in place.
-        self.register_full_backward_pre_hook(raise_non_differentiable_error)
-
-
 class PCGradWeighting(Weighting[PSDMatrix]):
     """
     :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
@@ -57,3 +44,18 @@ class PCGradWeighting(Weighting[PSDMatrix]):
             weights = weights + current_weights
 
         return weights.to(device)
+
+
+class PCGrad(GramianWeightedAggregator):
+    """
+    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as defined in algorithm 1 of
+    `Gradient Surgery for Multi-Task Learning <https://arxiv.org/pdf/2001.06782.pdf>`_.
+    """
+
+    gramian_weighting: PCGradWeighting
+
+    def __init__(self) -> None:
+        super().__init__(PCGradWeighting())
+
+        # This prevents running into a RuntimeError due to modifying stored tensors in place.
+        self.register_full_backward_pre_hook(raise_non_differentiable_error)

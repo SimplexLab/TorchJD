@@ -7,26 +7,6 @@ from ._utils.str import vector_to_str
 from ._weighting_bases import Weighting
 
 
-class Constant(WeightedAggregator):
-    """
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that makes a linear combination of
-    the rows of the provided matrix, with constant, pre-determined weights.
-
-    :param weights: The weights associated to the rows of the input matrices.
-    """
-
-    def __init__(self, weights: Tensor) -> None:
-        super().__init__(weighting=ConstantWeighting(weights=weights))
-        self._weights = weights
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(weights={repr(self._weights)})"
-
-    def __str__(self) -> str:
-        weights_str = vector_to_str(self._weights)
-        return f"{self.__class__.__name__}([{weights_str}])"
-
-
 class ConstantWeighting(Weighting[Matrix]):
     """
     :class:`~torchjd.aggregation._weighting_bases.Weighting` that returns constant, pre-determined
@@ -55,3 +35,25 @@ class ConstantWeighting(Weighting[Matrix]):
                 f"Parameter `matrix` should have {len(self.weights)} rows (the number of specified "
                 f"weights). Found `matrix` with {matrix.shape[0]} rows.",
             )
+
+
+class Constant(WeightedAggregator):
+    """
+    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that makes a linear combination of
+    the rows of the provided matrix, with constant, pre-determined weights.
+
+    :param weights: The weights associated to the rows of the input matrices.
+    """
+
+    weighting: ConstantWeighting
+
+    def __init__(self, weights: Tensor) -> None:
+        super().__init__(weighting=ConstantWeighting(weights=weights))
+        self._weights = weights
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(weights={repr(self._weights)})"
+
+    def __str__(self) -> str:
+        weights_str = vector_to_str(self._weights)
+        return f"{self.__class__.__name__}([{weights_str}])"

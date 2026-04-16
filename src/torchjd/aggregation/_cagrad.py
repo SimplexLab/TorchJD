@@ -18,38 +18,6 @@ from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
 
 
-class CAGrad(GramianWeightedAggregator):
-    """
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as defined in Algorithm 1 of
-    `Conflict-Averse Gradient Descent for Multi-task Learning
-    <https://arxiv.org/pdf/2110.14048.pdf>`_.
-
-    :param c: The scale of the radius of the ball constraint.
-    :param norm_eps: A small value to avoid division by zero when normalizing.
-
-    .. note::
-        This aggregator is not installed by default. When not installed, trying to import it should
-        result in the following error:
-        ``ImportError: cannot import name 'CAGrad' from 'torchjd.aggregation'``.
-        To install it, use ``pip install "torchjd[cagrad]"``.
-    """
-
-    def __init__(self, c: float, norm_eps: float = 0.0001) -> None:
-        super().__init__(CAGradWeighting(c=c, norm_eps=norm_eps))
-        self._c = c
-        self._norm_eps = norm_eps
-
-        # This prevents considering the computed weights as constant w.r.t. the matrix.
-        self.register_full_backward_pre_hook(raise_non_differentiable_error)
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(c={self._c}, norm_eps={self._norm_eps})"
-
-    def __str__(self) -> str:
-        c_str = str(self._c).rstrip("0")
-        return f"CAGrad{c_str}"
-
-
 class CAGradWeighting(Weighting[PSDMatrix]):
     """
     :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
@@ -104,3 +72,37 @@ class CAGradWeighting(Weighting[PSDMatrix]):
         weights = torch.from_numpy(weight_array).to(device=gramian.device, dtype=gramian.dtype)
 
         return weights
+
+
+class CAGrad(GramianWeightedAggregator):
+    """
+    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as defined in Algorithm 1 of
+    `Conflict-Averse Gradient Descent for Multi-task Learning
+    <https://arxiv.org/pdf/2110.14048.pdf>`_.
+
+    :param c: The scale of the radius of the ball constraint.
+    :param norm_eps: A small value to avoid division by zero when normalizing.
+
+    .. note::
+        This aggregator is not installed by default. When not installed, trying to import it should
+        result in the following error:
+        ``ImportError: cannot import name 'CAGrad' from 'torchjd.aggregation'``.
+        To install it, use ``pip install "torchjd[cagrad]"``.
+    """
+
+    gramian_weighting: CAGradWeighting
+
+    def __init__(self, c: float, norm_eps: float = 0.0001) -> None:
+        super().__init__(CAGradWeighting(c=c, norm_eps=norm_eps))
+        self._c = c
+        self._norm_eps = norm_eps
+
+        # This prevents considering the computed weights as constant w.r.t. the matrix.
+        self.register_full_backward_pre_hook(raise_non_differentiable_error)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(c={self._c}, norm_eps={self._norm_eps})"
+
+    def __str__(self) -> str:
+        c_str = str(self._c).rstrip("0")
+        return f"CAGrad{c_str}"
