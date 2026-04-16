@@ -28,7 +28,11 @@ class Weighting(nn.Module, ABC, Generic[_T]):
         """Computes the vector of weights from the input stat."""
 
     def __call__(self, stat: Tensor, /) -> Tensor:
-        """Computes the vector of weights from the input stat and applies all registered hooks."""
+        """
+        Computes the vector of weights from the input stat and applies all registered hooks.
+
+        :param stat: The stat from which the weights must be extracted.
+        """
 
         # The value of _T (e.g. PSDMatrix) is not public, so we need the user-facing type hint of
         # stat to be Tensor.
