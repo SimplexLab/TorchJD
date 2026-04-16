@@ -4,4 +4,4 @@ Nash-MTL
 ========
 
 .. autoclass:: torchjd.aggregation.NashMTL
-    :members: reset
+    :members: __call__, reset
