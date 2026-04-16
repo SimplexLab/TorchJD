@@ -94,7 +94,12 @@ def linkcode_resolve(domain: str, info: dict[str, str]) -> str | None:
     if domain != "py" or not info["module"]:
         return None
 
-    obj = _get_obj(info)
+    try:
+        obj = _get_obj(info)
+    except AttributeError:
+        # This can happen when trying to get a field typed at the class level, e.g. the
+        # gramian_weighting attribute of GramianWeightedAggregator.
+        return None
     file_name = _get_file_name(obj)
 
     if not file_name:
