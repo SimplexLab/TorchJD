@@ -40,6 +40,10 @@ class GradVac(GramianWeightedAggregator, Stateful):
         For each task :math:`i`, the order of other tasks :math:`j` is shuffled independently
         using the global PyTorch RNG (``torch.randperm``). Seed it with ``torch.manual_seed`` if
         you need reproducibility.
+
+    .. note::
+        To apply GradVac with the `whole_model`, `enc_dec`, `all_layer` or `all_matrix` grouping
+        strategy, please refer to the :doc:`Grouping </examples/grouping>` examples.
     """
 
     def __init__(self, beta: float = 0.5, eps: float = 1e-8) -> None:
