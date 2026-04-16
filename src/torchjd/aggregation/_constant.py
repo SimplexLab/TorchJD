@@ -45,6 +45,8 @@ class Constant(WeightedAggregator):
     :param weights: The weights associated to the rows of the input matrices.
     """
 
+    weighting: ConstantWeighting
+
     def __init__(self, weights: Tensor) -> None:
         super().__init__(weighting=ConstantWeighting(weights=weights))
         self._weights = weights

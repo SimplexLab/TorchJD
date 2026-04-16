@@ -28,5 +28,7 @@ class Random(WeightedAggregator):
     <https://arxiv.org/pdf/2111.10603.pdf>`_.
     """
 
+    weighting: RandomWeighting
+
     def __init__(self) -> None:
         super().__init__(RandomWeighting())

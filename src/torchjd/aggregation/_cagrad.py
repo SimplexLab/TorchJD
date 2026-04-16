@@ -90,6 +90,8 @@ class CAGrad(GramianWeightedAggregator):
         To install it, use ``pip install "torchjd[cagrad]"``.
     """
 
+    gramian_weighting: CAGradWeighting
+
     def __init__(self, c: float, norm_eps: float = 0.0001) -> None:
         super().__init__(CAGradWeighting(c=c, norm_eps=norm_eps))
         self._c = c

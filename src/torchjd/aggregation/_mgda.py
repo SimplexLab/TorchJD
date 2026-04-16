@@ -63,6 +63,8 @@ class MGDA(GramianWeightedAggregator):
     :param max_iters: The maximum number of iterations of the optimization loop.
     """
 
+    gramian_weighting: MGDAWeighting
+
     def __init__(self, epsilon: float = 0.001, max_iters: int = 100) -> None:
         super().__init__(MGDAWeighting(epsilon=epsilon, max_iters=max_iters))
         self._epsilon = epsilon

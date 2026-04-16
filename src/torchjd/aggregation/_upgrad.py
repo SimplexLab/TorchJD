@@ -64,6 +64,8 @@ class UPGrad(GramianWeightedAggregator):
     :param solver: The solver used to optimize the underlying optimization problem.
     """
 
+    gramian_weighting: UPGradWeighting
+
     def __init__(
         self,
         pref_vector: Tensor | None = None,

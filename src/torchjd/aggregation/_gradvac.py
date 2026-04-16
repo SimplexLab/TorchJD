@@ -166,6 +166,8 @@ class GradVac(GramianWeightedAggregator, Stateful):
         strategy, please refer to the :doc:`Grouping </examples/grouping>` examples.
     """
 
+    gramian_weighting: GradVacWeighting
+
     def __init__(self, beta: float = 0.5, eps: float = 1e-8) -> None:
         weighting = GradVacWeighting(beta=beta, eps=eps)
         super().__init__(weighting)

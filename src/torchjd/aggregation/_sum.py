@@ -26,5 +26,7 @@ class Sum(WeightedAggregator):
     matrices.
     """
 
+    weighting: SumWeighting
+
     def __init__(self) -> None:
         super().__init__(weighting=SumWeighting())

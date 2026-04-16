@@ -63,6 +63,8 @@ class DualProj(GramianWeightedAggregator):
     :param solver: The solver used to optimize the underlying optimization problem.
     """
 
+    gramian_weighting: DualProjWeighting
+
     def __init__(
         self,
         pref_vector: Tensor | None = None,

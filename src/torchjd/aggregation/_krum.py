@@ -80,6 +80,8 @@ class Krum(GramianWeightedAggregator):
     :param n_selected: The number of selected rows in the context of Multi-Krum. Defaults to 1.
     """
 
+    gramian_weighting: KrumWeighting
+
     def __init__(self, n_byzantine: int, n_selected: int = 1) -> None:
         self._n_byzantine = n_byzantine
         self._n_selected = n_selected

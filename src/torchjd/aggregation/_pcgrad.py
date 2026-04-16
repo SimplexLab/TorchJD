@@ -52,6 +52,8 @@ class PCGrad(GramianWeightedAggregator):
     `Gradient Surgery for Multi-Task Learning <https://arxiv.org/pdf/2001.06782.pdf>`_.
     """
 
+    gramian_weighting: PCGradWeighting
+
     def __init__(self) -> None:
         super().__init__(PCGradWeighting())
 

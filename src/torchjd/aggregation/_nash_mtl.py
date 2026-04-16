@@ -179,6 +179,8 @@ class NashMTL(WeightedAggregator, Stateful):
         experiments.
     """
 
+    weighting: _NashMTLWeighting
+
     def __init__(
         self,
         n_tasks: int,

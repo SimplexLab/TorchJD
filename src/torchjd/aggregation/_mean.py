@@ -28,5 +28,7 @@ class Mean(WeightedAggregator):
     matrices.
     """
 
+    weighting: MeanWeighting
+
     def __init__(self) -> None:
         super().__init__(weighting=MeanWeighting())

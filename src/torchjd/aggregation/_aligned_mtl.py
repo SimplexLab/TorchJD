@@ -96,6 +96,8 @@ class AlignedMTL(GramianWeightedAggregator):
         which is not available anymore at the time of writing.
     """
 
+    gramian_weighting: AlignedMTLWeighting
+
     def __init__(
         self,
         pref_vector: Tensor | None = None,
