@@ -97,8 +97,7 @@ def linkcode_resolve(domain: str, info: dict[str, str]) -> str | None:
     try:
         obj = _get_obj(info)
     except AttributeError:
-        # This can happen when trying to get a field typed at the class level, e.g. the
-        # gramian_weighting attribute of GramianWeightedAggregator.
+        # This can happen when trying to get a field typed at the class level.
         return None
     file_name = _get_file_name(obj)
 
