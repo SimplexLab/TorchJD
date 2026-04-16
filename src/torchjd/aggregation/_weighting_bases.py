@@ -78,6 +78,8 @@ class GeneralizedWeighting(nn.Module, ABC):
         """
         Computes the tensor of weights from the input generalized Gramian and applies all registered
         hooks.
+
+        :param generalized_gramian: The tensor from which the weights must be extracted.
         """
 
         assert is_psd_tensor(generalized_gramian)
