@@ -7,16 +7,6 @@ from ._aggregator_bases import WeightedAggregator
 from ._weighting_bases import Weighting
 
 
-class Sum(WeightedAggregator):
-    """
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that sums of the rows of the input
-    matrices.
-    """
-
-    def __init__(self) -> None:
-        super().__init__(weighting=SumWeighting())
-
-
 class SumWeighting(Weighting[Matrix]):
     r"""
     :class:`~torchjd.aggregation._weighting_bases.Weighting` that gives the weights
@@ -28,3 +18,13 @@ class SumWeighting(Weighting[Matrix]):
         dtype = matrix.dtype
         weights = torch.ones(matrix.shape[0], device=device, dtype=dtype)
         return weights
+
+
+class Sum(WeightedAggregator):
+    """
+    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that sums of the rows of the input
+    matrices.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(weighting=SumWeighting())

@@ -13,70 +13,6 @@ from ._utils.non_differentiable import raise_non_differentiable_error
 from ._weighting_bases import Weighting
 
 
-class GradVac(GramianWeightedAggregator, Stateful):
-    r"""
-    :class:`~torchjd.aggregation._mixins.Stateful`
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` implementing the aggregation step of
-    Gradient Vaccine (GradVac) from `Gradient Vaccine: Investigating and Improving Multi-task
-    Optimization in Massively Multilingual Models (ICLR 2021 Spotlight)
-    <https://openreview.net/forum?id=F1vEjWK-lH_>`_.
-
-    For each task :math:`i`, the order in which other tasks :math:`j` are visited is drawn at
-    random. For each pair :math:`(i, j)`, the cosine similarity :math:`\phi_{ij}` between the
-    (possibly already modified) gradient of task :math:`i` and the original gradient of task
-    :math:`j` is compared to an EMA target :math:`\hat{\phi}_{ij}`. When
-    :math:`\phi_{ij} < \hat{\phi}_{ij}`, a closed-form correction adds a scaled copy of
-    :math:`g_j` to :math:`g_i^{(\mathrm{PC})}`. The EMA is then updated with
-    :math:`\hat{\phi}_{ij} \leftarrow (1-\beta)\hat{\phi}_{ij} + \beta \phi_{ij}`. The aggregated
-    vector is the sum of the modified rows.
-
-    This aggregator is stateful: it keeps :math:`\hat{\phi}` across calls. Use :meth:`reset` when
-    the number of tasks or dtype changes.
-
-    :param beta: EMA decay for :math:`\hat{\phi}`.
-    :param eps: Small non-negative constant added to denominators.
-
-    .. note::
-        For each task :math:`i`, the order of other tasks :math:`j` is shuffled independently
-        using the global PyTorch RNG (``torch.randperm``). Seed it with ``torch.manual_seed`` if
-        you need reproducibility.
-
-    .. note::
-        To apply GradVac with the `whole_model`, `enc_dec`, `all_layer` or `all_matrix` grouping
-        strategy, please refer to the :doc:`Grouping </examples/grouping>` examples.
-    """
-
-    def __init__(self, beta: float = 0.5, eps: float = 1e-8) -> None:
-        weighting = GradVacWeighting(beta=beta, eps=eps)
-        super().__init__(weighting)
-        self._gradvac_weighting = weighting
-        self.register_full_backward_pre_hook(raise_non_differentiable_error)
-
-    @property
-    def beta(self) -> float:
-        return self._gradvac_weighting.beta
-
-    @beta.setter
-    def beta(self, value: float) -> None:
-        self._gradvac_weighting.beta = value
-
-    @property
-    def eps(self) -> float:
-        return self._gradvac_weighting.eps
-
-    @eps.setter
-    def eps(self, value: float) -> None:
-        self._gradvac_weighting.eps = value
-
-    def reset(self) -> None:
-        """Clears EMA state so the next forward starts from zero targets."""
-
-        self._gradvac_weighting.reset()
-
-    def __repr__(self) -> str:
-        return f"GradVac(beta={self.beta!r}, eps={self.eps!r})"
-
-
 class GradVacWeighting(Weighting[PSDMatrix], Stateful):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`
@@ -195,3 +131,67 @@ class GradVacWeighting(Weighting[PSDMatrix], Stateful):
         if self._state_key != key or self._phi_t is None:
             self._phi_t = torch.zeros(m, m, dtype=dtype)
             self._state_key = key
+
+
+class GradVac(GramianWeightedAggregator, Stateful):
+    r"""
+    :class:`~torchjd.aggregation._mixins.Stateful`
+    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` implementing the aggregation step of
+    Gradient Vaccine (GradVac) from `Gradient Vaccine: Investigating and Improving Multi-task
+    Optimization in Massively Multilingual Models (ICLR 2021 Spotlight)
+    <https://openreview.net/forum?id=F1vEjWK-lH_>`_.
+
+    For each task :math:`i`, the order in which other tasks :math:`j` are visited is drawn at
+    random. For each pair :math:`(i, j)`, the cosine similarity :math:`\phi_{ij}` between the
+    (possibly already modified) gradient of task :math:`i` and the original gradient of task
+    :math:`j` is compared to an EMA target :math:`\hat{\phi}_{ij}`. When
+    :math:`\phi_{ij} < \hat{\phi}_{ij}`, a closed-form correction adds a scaled copy of
+    :math:`g_j` to :math:`g_i^{(\mathrm{PC})}`. The EMA is then updated with
+    :math:`\hat{\phi}_{ij} \leftarrow (1-\beta)\hat{\phi}_{ij} + \beta \phi_{ij}`. The aggregated
+    vector is the sum of the modified rows.
+
+    This aggregator is stateful: it keeps :math:`\hat{\phi}` across calls. Use :meth:`reset` when
+    the number of tasks or dtype changes.
+
+    :param beta: EMA decay for :math:`\hat{\phi}`.
+    :param eps: Small non-negative constant added to denominators.
+
+    .. note::
+        For each task :math:`i`, the order of other tasks :math:`j` is shuffled independently
+        using the global PyTorch RNG (``torch.randperm``). Seed it with ``torch.manual_seed`` if
+        you need reproducibility.
+
+    .. note::
+        To apply GradVac with the `whole_model`, `enc_dec`, `all_layer` or `all_matrix` grouping
+        strategy, please refer to the :doc:`Grouping </examples/grouping>` examples.
+    """
+
+    def __init__(self, beta: float = 0.5, eps: float = 1e-8) -> None:
+        weighting = GradVacWeighting(beta=beta, eps=eps)
+        super().__init__(weighting)
+        self._gradvac_weighting = weighting
+        self.register_full_backward_pre_hook(raise_non_differentiable_error)
+
+    @property
+    def beta(self) -> float:
+        return self._gradvac_weighting.beta
+
+    @beta.setter
+    def beta(self, value: float) -> None:
+        self._gradvac_weighting.beta = value
+
+    @property
+    def eps(self) -> float:
+        return self._gradvac_weighting.eps
+
+    @eps.setter
+    def eps(self, value: float) -> None:
+        self._gradvac_weighting.eps = value
+
+    def reset(self) -> None:
+        """Clears EMA state so the next forward starts from zero targets."""
+
+        self._gradvac_weighting.reset()
+
+    def __repr__(self) -> str:
+        return f"GradVac(beta={self.beta!r}, eps={self.eps!r})"
