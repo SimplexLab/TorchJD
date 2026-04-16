@@ -1,13 +1,11 @@
 from torch import Tensor
 
-from torchjd._linalg import Matrix
-
 from ._aggregator_bases import WeightedAggregator
 from ._utils.str import vector_to_str
-from ._weighting_bases import Weighting
+from ._weighting_bases import MatrixWeighting
 
 
-class ConstantWeighting(Weighting[Matrix]):
+class ConstantWeighting(MatrixWeighting):
     """
     :class:`~torchjd.aggregation._weighting_bases.Weighting` that returns constant, pre-determined
     weights.

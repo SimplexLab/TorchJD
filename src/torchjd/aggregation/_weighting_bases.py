@@ -6,7 +6,7 @@ from typing import Generic, TypeVar
 
 from torch import Tensor, nn
 
-from torchjd._linalg import PSDTensor, is_psd_tensor
+from torchjd._linalg import Matrix, PSDMatrix, PSDTensor, is_psd_tensor
 
 _T = TypeVar("_T", contravariant=True, bound=Tensor)
 _FnInputT = TypeVar("_FnInputT", bound=Tensor)
@@ -84,3 +84,31 @@ class GeneralizedWeighting(nn.Module, ABC):
 
         assert is_psd_tensor(generalized_gramian)
         return super().__call__(generalized_gramian)
+
+
+# Subclasses used only to redefine the __call__ method with more specific parameter names and
+# docstrings. Note that MatrixWeighting <: Weighting[Matrix] <: Weighting[PSDMatrix], because
+# PSDMatrix <: Matrix and Weighting[_T] is contravariant with _T.
+# Also note that we don't have: MatrixWeighting <: GramianWeighting. GramianWeighting is not
+# just an alias of Weighting[PSDMatrix], it's a subtype of it. So the type Weighting[PSDMatrix]
+# should still be used when we expect a Weighting that works at least on PSD matrices.
+
+
+class MatrixWeighting(Weighting[Matrix]):
+    def __call__(self, matrix: Tensor, /) -> Tensor:
+        """
+        Computes the vector of weights from the input matrix and applies all registered hooks.
+
+        :param matrix: The matrix from which the weights must be extracted.
+        """
+        return super().__call__(matrix)
+
+
+class GramianWeighting(Weighting[PSDMatrix]):
+    def __call__(self, gramian: Tensor, /) -> Tensor:
+        """
+        Computes the vector of weights from the input gramian and applies all registered hooks.
+
+        :param gramian: The gramian from which the weights must be extracted.
+        """
+        return super().__call__(gramian)
