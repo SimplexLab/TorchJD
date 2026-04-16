@@ -8,6 +8,8 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-04-16
+
 ### Added
 
 - Added `GradVac` and `GradVacWeighting` from
