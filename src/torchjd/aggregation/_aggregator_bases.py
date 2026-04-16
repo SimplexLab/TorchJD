@@ -29,7 +29,11 @@ class Aggregator(nn.Module, ABC):
         """Computes the aggregation from the input matrix."""
 
     def __call__(self, matrix: Tensor, /) -> Tensor:
-        """Computes the aggregation from the input matrix and applies all registered hooks."""
+        """
+        Computes the aggregation from the input matrix and applies all registered hooks.
+
+        :param matrix: The Jacobian to aggregate.
+        """
         Aggregator._check_is_matrix(matrix)
         return super().__call__(matrix)
 
