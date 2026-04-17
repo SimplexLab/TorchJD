@@ -71,7 +71,7 @@ from ._imtl_g import IMTLG, IMTLGWeighting
 from ._krum import Krum, KrumWeighting
 from ._mean import Mean, MeanWeighting
 from ._mgda import MGDA, MGDAWeighting
-from ._mixins import Stateful
+from ._mixins import Stateful, Stochastic
 from ._pcgrad import PCGrad, PCGradWeighting
 from ._random import Random, RandomWeighting
 from ._sum import Sum, SumWeighting
@@ -109,6 +109,7 @@ __all__ = [
     "Random",
     "RandomWeighting",
     "Stateful",
+    "Stochastic",
     "Sum",
     "SumWeighting",
     "TrimmedMean",
