@@ -10,11 +10,6 @@ from ._weighting_bases import Weighting
 
 
 class _RandomWeighting(Weighting[Structure]):
-    """
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` that generates positive random weights
-    at each call.
-    """
-
     def forward(self, structure: Structure, /) -> Tensor:
         random_vector = torch.randn(structure.m, device=structure.device, dtype=structure.dtype)
         weights = F.softmax(random_vector, dim=-1)
@@ -22,6 +17,11 @@ class _RandomWeighting(Weighting[Structure]):
 
 
 class RandomWeighting(FromStructureWeighting):
+    """
+    :class:`~torchjd.aggregation._weighting_bases.Weighting` that generates positive random weights
+    at each call.
+    """
+
     def __init__(self) -> None:
         super().__init__(_RandomWeighting())
 

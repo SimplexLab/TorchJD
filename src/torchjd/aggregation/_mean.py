@@ -9,12 +9,6 @@ from ._weighting_bases import Weighting
 
 
 class _MeanWeighting(Weighting[Structure]):
-    r"""
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` that gives the weights
-    :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in
-    \mathbb{R}^m`.
-    """
-
     def forward(self, structure: Structure, /) -> Tensor:
         device = structure.device
         dtype = structure.dtype
@@ -24,6 +18,12 @@ class _MeanWeighting(Weighting[Structure]):
 
 
 class MeanWeighting(FromStructureWeighting):
+    r"""
+    :class:`~torchjd.aggregation._weighting_bases.Weighting` that gives the weights
+    :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in
+    \mathbb{R}^m`.
+    """
+
     def __init__(self) -> None:
         super().__init__(_MeanWeighting())
 

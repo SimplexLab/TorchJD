@@ -8,13 +8,6 @@ from ._weighting_bases import Weighting
 
 
 class _ConstantWeighting(Weighting[None]):
-    """
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` that returns constant, pre-determined
-    weights.
-
-    :param weights: The weights to return at each call.
-    """
-
     def __init__(self, weights: Tensor) -> None:
         if weights.dim() != 1:
             raise ValueError(
@@ -30,6 +23,13 @@ class _ConstantWeighting(Weighting[None]):
 
 
 class ConstantWeighting(FromNothingWeighting):
+    """
+    :class:`~torchjd.aggregation._weighting_bases.Weighting` that returns constant, pre-determined
+    weights.
+
+    :param weights: The weights to return at each call.
+    """
+
     def __init__(self, weights: Tensor) -> None:
         super().__init__(_ConstantWeighting(weights))
 

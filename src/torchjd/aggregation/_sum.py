@@ -15,6 +15,11 @@ class _SumWeighting(Weighting[Structure]):
 
 
 class SumWeighting(FromStructureWeighting):
+    r"""
+    :class:`~torchjd.aggregation._weighting_bases.Weighting` that gives the weights
+    :math:`\begin{bmatrix} 1 & \dots & 1 \end{bmatrix}^T \in \mathbb{R}^m`.
+    """
+
     def __init__(self) -> None:
         super().__init__(_SumWeighting())
 
