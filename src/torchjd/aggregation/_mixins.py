@@ -22,25 +22,17 @@ class Stateful(ABC):
         """Resets the internal state :math:`s_0`."""
 
 
-class Stochastic(Stateful, ABC):
+class StochasticState(Stateful):
     r"""
-    Stateful mixin that represents mappings that have inherent randomness.
+    State respresenting stochasticity.
 
-    Internally, a ``Stochastic`` mapping holds a :class:`torch.Generator` that serves as an
-    independent random number stream. Implementing classes must pass this generator to all torch
-    random functions via their ``generator`` argument, e.g.:
-
-    .. code-block:: python
-
-        torch.rand(n, generator=self.generator)
-        torch.randn(n, generator=self.generator)
-        torch.randperm(n, generator=self.generator)
+    Internally, a ``StochasticState`` mapping holds a :class:`torch.Generator` that serves as an
+    independent random number stream.
 
     :param seed: Seed for the internal :class:`torch.Generator`. If ``None``, a seed is drawn
         from the global PyTorch RNG to fork an independent stream.
     :param generator: An existing :class:`torch.Generator` to share, typically from a companion
-        :class:`Stochastic` instance (e.g. a :class:`Weighting` sharing the generator of its
-        :class:`Aggregator`). Mutually exclusive with ``seed``.
+        :class:`StochasticState` instance. Mutually exclusive with ``seed``.
     """
 
     def __init__(self, seed: int | None = None, generator: torch.Generator | None = None) -> None:

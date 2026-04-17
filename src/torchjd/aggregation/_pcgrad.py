@@ -4,14 +4,15 @@ import torch
 from torch import Tensor
 
 from torchjd._linalg import PSDMatrix
+from torchjd.aggregation import Stateful
+from torchjd.aggregation._mixins import StochasticState
 
 from ._aggregator_bases import GramianWeightedAggregator
-from ._mixins import Stochastic
 from ._utils.non_differentiable import raise_non_differentiable_error
 from ._weighting_bases import Weighting
 
 
-class PCGradWeighting(Weighting[PSDMatrix], Stochastic):
+class PCGradWeighting(Weighting[PSDMatrix], Stateful):
     """
     :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
     :class:`~torchjd.aggregation.PCGrad`.
@@ -21,8 +22,8 @@ class PCGradWeighting(Weighting[PSDMatrix], Stochastic):
     """
 
     def __init__(self, seed: int | None = None) -> None:
-        Weighting.__init__(self)
-        Stochastic.__init__(self, seed=seed)
+        super().__init__()
+        self.state = StochasticState(seed=seed)
 
     def forward(self, gramian: PSDMatrix, /) -> Tensor:
         # Move all computations on cpu to avoid moving memory between cpu and gpu at each iteration
@@ -35,7 +36,7 @@ class PCGradWeighting(Weighting[PSDMatrix], Stochastic):
         weights = torch.zeros(dimension, device=cpu, dtype=dtype)
 
         for i in range(dimension):
-            permutation = torch.randperm(dimension, generator=self.generator)
+            permutation = torch.randperm(dimension, generator=self.state.generator)
             current_weights = torch.zeros(dimension, device=cpu, dtype=dtype)
             current_weights[i] = 1.0
 
@@ -54,7 +55,7 @@ class PCGradWeighting(Weighting[PSDMatrix], Stochastic):
         return weights.to(device)
 
 
-class PCGrad(GramianWeightedAggregator, Stochastic):
+class PCGrad(GramianWeightedAggregator, Stateful):
     """
     :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as defined in algorithm 1 of
     `Gradient Surgery for Multi-Task Learning <https://arxiv.org/pdf/2001.06782.pdf>`_.
@@ -64,9 +65,7 @@ class PCGrad(GramianWeightedAggregator, Stochastic):
     """
 
     def __init__(self, seed: int | None = None) -> None:
-        weighting = PCGradWeighting(seed=seed)
-        GramianWeightedAggregator.__init__(self, weighting)
-        Stochastic.__init__(self, generator=weighting.generator)
+        super().__init__(PCGradWeighting(seed=seed))
 
         # This prevents running into a RuntimeError due to modifying stored tensors in place.
         self.register_full_backward_pre_hook(raise_non_differentiable_error)
