@@ -9,23 +9,6 @@ from ._mixins import Stochastic
 from ._weighting_bases import Weighting
 
 
-class Random(WeightedAggregator, Stochastic):
-    """
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that computes a random combination of
-    the rows of the provided matrices, as defined in algorithm 2 of `Reasonable Effectiveness of
-    Random Weighting: A Litmus Test for Multi-Task Learning
-    <https://arxiv.org/pdf/2111.10603.pdf>`_.
-
-    :param seed: Seed for the internal random number generator. If ``None``, a seed is drawn from
-        the global PyTorch RNG to fork an independent stream.
-    """
-
-    def __init__(self, seed: int | None = None) -> None:
-        weighting = RandomWeighting(seed=seed)
-        WeightedAggregator.__init__(self, weighting)
-        Stochastic.__init__(self, generator=weighting.generator)
-
-
 class RandomWeighting(Weighting[Matrix], Stochastic):
     """
     :class:`~torchjd.aggregation._weighting_bases.Weighting` that generates positive random weights
@@ -45,3 +28,17 @@ class RandomWeighting(Weighting[Matrix], Stochastic):
         )
         weights = F.softmax(random_vector, dim=-1)
         return weights
+
+
+class Random(WeightedAggregator):
+    """
+    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that computes a random combination of
+    the rows of the provided matrices, as defined in algorithm 2 of `Reasonable Effectiveness of
+    Random Weighting: A Litmus Test for Multi-Task Learning
+    <https://arxiv.org/pdf/2111.10603.pdf>`_.
+    """
+
+    weighting: RandomWeighting
+
+    def __init__(self) -> None:
+        super().__init__(RandomWeighting())

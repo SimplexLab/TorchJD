@@ -8,10 +8,13 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-04-16
+
 ### Added
 
 - Added `GradVac` and `GradVacWeighting` from
   [Gradient Vaccine: Investigating and Improving Multi-task Optimization in Massively Multilingual Models](https://arxiv.org/pdf/2010.05874).
+- Documented per-parameter-group aggregation (GradVac-style grouping) in a new Grouping example.
 
 ### Fixed
 

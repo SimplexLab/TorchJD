@@ -7,16 +7,6 @@ from ._aggregator_bases import WeightedAggregator
 from ._weighting_bases import Weighting
 
 
-class Mean(WeightedAggregator):
-    """
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that averages the rows of the input
-    matrices.
-    """
-
-    def __init__(self) -> None:
-        super().__init__(weighting=MeanWeighting())
-
-
 class MeanWeighting(Weighting[Matrix]):
     r"""
     :class:`~torchjd.aggregation._weighting_bases.Weighting` that gives the weights
@@ -30,3 +20,15 @@ class MeanWeighting(Weighting[Matrix]):
         m = matrix.shape[0]
         weights = torch.full(size=[m], fill_value=1 / m, device=device, dtype=dtype)
         return weights
+
+
+class Mean(WeightedAggregator):
+    """
+    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that averages the rows of the input
+    matrices.
+    """
+
+    weighting: MeanWeighting
+
+    def __init__(self) -> None:
+        super().__init__(weighting=MeanWeighting())

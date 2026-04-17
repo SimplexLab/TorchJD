@@ -29,6 +29,9 @@ This section contains some usage examples for TorchJD.
 - :doc:`PyTorch Lightning Integration <lightning_integration>` showcases how to combine
   TorchJD with PyTorch Lightning, by providing an example implementation of a multi-task
   ``LightningModule`` optimized by Jacobian descent.
+- :doc:`Grouping <grouping>` shows how to apply an aggregator independently per parameter group
+  (e.g. per layer), so that conflict resolution happens at a finer granularity than the full
+  parameter vector.
 - :doc:`Automatic Mixed Precision <amp>` shows how to combine mixed precision training with TorchJD.
 
 .. toctree::
@@ -43,3 +46,4 @@ This section contains some usage examples for TorchJD.
     monitoring.rst
     lightning_integration.rst
     amp.rst
+    grouping.rst

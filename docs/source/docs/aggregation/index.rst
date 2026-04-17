@@ -8,23 +8,13 @@ Abstract base classes
 ---------------------
 
 .. autoclass:: torchjd.aggregation.Aggregator
-    :members:
-    :undoc-members:
-    :exclude-members: forward
 
 .. autoclass:: torchjd.aggregation.Weighting
-    :members:
-    :undoc-members:
-    :exclude-members: forward
 
 .. autoclass:: torchjd.aggregation.GeneralizedWeighting
-    :members:
-    :undoc-members:
-    :exclude-members: forward
 
 .. autoclass:: torchjd.aggregation.Stateful
-    :members:
-    :undoc-members:
+    :members: reset
 
 
 .. toctree::

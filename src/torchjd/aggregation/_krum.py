@@ -8,32 +8,6 @@ from ._aggregator_bases import GramianWeightedAggregator
 from ._weighting_bases import Weighting
 
 
-class Krum(GramianWeightedAggregator):
-    """
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` for adversarial federated learning,
-    as defined in `Machine Learning with Adversaries: Byzantine Tolerant Gradient Descent
-    <https://proceedings.neurips.cc/paper/2017/file/f4b9ec30ad9f68f89b29639786cb62ef-Paper.pdf>`_.
-
-    :param n_byzantine: The number of rows of the input matrix that can come from an adversarial
-        source.
-    :param n_selected: The number of selected rows in the context of Multi-Krum. Defaults to 1.
-    """
-
-    def __init__(self, n_byzantine: int, n_selected: int = 1) -> None:
-        self._n_byzantine = n_byzantine
-        self._n_selected = n_selected
-        super().__init__(KrumWeighting(n_byzantine=n_byzantine, n_selected=n_selected))
-
-    def __repr__(self) -> str:
-        return (
-            f"{self.__class__.__name__}(n_byzantine={self._n_byzantine}, n_selected="
-            f"{self._n_selected})"
-        )
-
-    def __str__(self) -> str:
-        return f"Krum{self._n_byzantine}-{self._n_selected}"
-
-
 class KrumWeighting(Weighting[PSDMatrix]):
     """
     :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
@@ -93,3 +67,31 @@ class KrumWeighting(Weighting[PSDMatrix]):
                 f"Parameter `gramian` should have at least {self.n_selected} rows (n_selected). "
                 f"Found `gramian` with {gramian.shape[0]} rows.",
             )
+
+
+class Krum(GramianWeightedAggregator):
+    """
+    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` for adversarial federated learning,
+    as defined in `Machine Learning with Adversaries: Byzantine Tolerant Gradient Descent
+    <https://proceedings.neurips.cc/paper/2017/file/f4b9ec30ad9f68f89b29639786cb62ef-Paper.pdf>`_.
+
+    :param n_byzantine: The number of rows of the input matrix that can come from an adversarial
+        source.
+    :param n_selected: The number of selected rows in the context of Multi-Krum. Defaults to 1.
+    """
+
+    gramian_weighting: KrumWeighting
+
+    def __init__(self, n_byzantine: int, n_selected: int = 1) -> None:
+        self._n_byzantine = n_byzantine
+        self._n_selected = n_selected
+        super().__init__(KrumWeighting(n_byzantine=n_byzantine, n_selected=n_selected))
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(n_byzantine={self._n_byzantine}, n_selected="
+            f"{self._n_selected})"
+        )
+
+    def __str__(self) -> str:
+        return f"Krum{self._n_byzantine}-{self._n_selected}"
