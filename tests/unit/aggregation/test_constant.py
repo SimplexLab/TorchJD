@@ -63,29 +63,6 @@ def test_weights_shape_check(weights_shape: list[int], expectation: ExceptionCon
         _ = Constant(weights=weights)
 
 
-@mark.parametrize(
-    ["weights_shape", "n_rows", "expectation"],
-    [
-        ([0], 0, does_not_raise()),
-        ([1], 1, does_not_raise()),
-        ([5], 5, does_not_raise()),
-        ([0], 1, raises(ValueError)),
-        ([1], 0, raises(ValueError)),
-        ([4], 5, raises(ValueError)),
-        ([5], 4, raises(ValueError)),
-    ],
-)
-def test_matrix_shape_check(
-    weights_shape: list[int], n_rows: int, expectation: ExceptionContext
-) -> None:
-    matrix = ones_([n_rows, 5])
-    weights = ones_(weights_shape)
-    aggregator = Constant(weights)
-
-    with expectation:
-        _ = aggregator(matrix)
-
-
 def test_representations() -> None:
     A = Constant(weights=torch.tensor([1.0, 2.0], device="cpu"))
     assert repr(A) == "Constant(weights=tensor([1., 2.]))"

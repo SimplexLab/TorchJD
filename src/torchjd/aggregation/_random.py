@@ -2,22 +2,28 @@ import torch
 from torch import Tensor
 from torch.nn import functional as F
 
-from torchjd._linalg import Matrix
+from torchjd._linalg import Structure
+from torchjd.aggregation._weighting_bases import FromStructureWeighting
 
 from ._aggregator_bases import WeightedAggregator
 from ._weighting_bases import Weighting
 
 
-class RandomWeighting(Weighting[Matrix]):
+class _RandomWeighting(Weighting[Structure]):
     """
     :class:`~torchjd.aggregation._weighting_bases.Weighting` that generates positive random weights
     at each call.
     """
 
-    def forward(self, matrix: Tensor, /) -> Tensor:
-        random_vector = torch.randn(matrix.shape[0], device=matrix.device, dtype=matrix.dtype)
+    def forward(self, structure: Structure, /) -> Tensor:
+        random_vector = torch.randn(structure.m, device=structure.device, dtype=structure.dtype)
         weights = F.softmax(random_vector, dim=-1)
         return weights
+
+
+class RandomWeighting(FromStructureWeighting):
+    def __init__(self) -> None:
+        super().__init__(_RandomWeighting())
 
 
 class Random(WeightedAggregator):

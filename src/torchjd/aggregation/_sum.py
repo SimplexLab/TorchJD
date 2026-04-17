@@ -1,23 +1,22 @@
 import torch
 from torch import Tensor
 
-from torchjd._linalg import Matrix
+from torchjd._linalg import Structure
+from torchjd.aggregation._weighting_bases import FromStructureWeighting
 
 from ._aggregator_bases import WeightedAggregator
 from ._weighting_bases import Weighting
 
 
-class SumWeighting(Weighting[Matrix]):
-    r"""
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` that gives the weights
-    :math:`\begin{bmatrix} 1 & \dots & 1 \end{bmatrix}^T \in \mathbb{R}^m`.
-    """
-
-    def forward(self, matrix: Tensor, /) -> Tensor:
-        device = matrix.device
-        dtype = matrix.dtype
-        weights = torch.ones(matrix.shape[0], device=device, dtype=dtype)
+class _SumWeighting(Weighting[Structure]):
+    def forward(self, structure: Structure, /) -> Tensor:
+        weights = torch.ones(structure.m, device=structure.device, dtype=structure.dtype)
         return weights
+
+
+class SumWeighting(FromStructureWeighting):
+    def __init__(self) -> None:
+        super().__init__(_SumWeighting())
 
 
 class Sum(WeightedAggregator):

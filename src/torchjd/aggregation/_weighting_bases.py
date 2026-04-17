@@ -6,11 +6,11 @@ from typing import Generic, TypeVar
 
 from torch import Tensor, nn
 
-from torchjd._linalg import PSDTensor, is_psd_tensor
+from torchjd._linalg import Matrix, PSDTensor, Structure, extract_structure, is_psd_tensor
 
-_T = TypeVar("_T", contravariant=True, bound=Tensor)
-_FnInputT = TypeVar("_FnInputT", bound=Tensor)
-_FnOutputT = TypeVar("_FnOutputT", bound=Tensor)
+_T = TypeVar("_T", contravariant=True)
+_FnInputT = TypeVar("_FnInputT")
+_FnOutputT = TypeVar("_FnOutputT")
 
 
 class Weighting(nn.Module, ABC, Generic[_T]):
@@ -27,11 +27,9 @@ class Weighting(nn.Module, ABC, Generic[_T]):
     def forward(self, stat: _T, /) -> Tensor:
         """Computes the vector of weights from the input stat."""
 
-    def __call__(self, stat: Tensor, /) -> Tensor:
+    def __call__(self, stat: object, /) -> Tensor:
         """Computes the vector of weights from the input stat and applies all registered hooks."""
 
-        # The value of _T (e.g. PSDMatrix) is not public, so we need the user-facing type hint of
-        # stat to be Tensor.
         return super().__call__(stat)
 
     def _compose(self, fn: Callable[[_FnInputT], _T]) -> Weighting[_FnInputT]:
@@ -53,6 +51,32 @@ class _Composition(Weighting[_T]):
 
     def forward(self, stat: _T, /) -> Tensor:
         return self.weighting(self.fn(stat))
+
+
+class FromStructureWeighting(_Composition[Matrix]):
+    """
+    Weighting that extracts the structure of the input matrix before applying a Weighting to it.
+
+    :param structure_weighting: The object responsible for extracting the vector of weights from the
+        structure.
+    """
+
+    def __init__(self, structure_weighting: Weighting[Structure]) -> None:
+        super().__init__(structure_weighting, extract_structure)
+        self.structure_weighting = structure_weighting
+
+
+class FromNothingWeighting(_Composition[Matrix]):
+    """
+    Weighting that extracts nothing from the input matrix before applying a Weighting to it (i.e. to
+    None).
+
+    :param none_weighting: The object responsible for extracting the vector of weights from nothing.
+    """
+
+    def __init__(self, none_weighting: Weighting[None]) -> None:
+        super().__init__(none_weighting, lambda _: None)
+        self.none_weighting = none_weighting
 
 
 class GeneralizedWeighting(nn.Module, ABC):

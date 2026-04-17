@@ -1,13 +1,13 @@
 from torch import Tensor
 
-from torchjd._linalg import Matrix
+from torchjd.aggregation._weighting_bases import FromNothingWeighting
 
 from ._aggregator_bases import WeightedAggregator
 from ._utils.str import vector_to_str
 from ._weighting_bases import Weighting
 
 
-class ConstantWeighting(Weighting[Matrix]):
+class _ConstantWeighting(Weighting[None]):
     """
     :class:`~torchjd.aggregation._weighting_bases.Weighting` that returns constant, pre-determined
     weights.
@@ -25,16 +25,13 @@ class ConstantWeighting(Weighting[Matrix]):
         super().__init__()
         self.weights = weights
 
-    def forward(self, matrix: Tensor, /) -> Tensor:
-        self._check_matrix_shape(matrix)
+    def forward(self, _: None, /) -> Tensor:
         return self.weights
 
-    def _check_matrix_shape(self, matrix: Tensor) -> None:
-        if matrix.shape[0] != len(self.weights):
-            raise ValueError(
-                f"Parameter `matrix` should have {len(self.weights)} rows (the number of specified "
-                f"weights). Found `matrix` with {matrix.shape[0]} rows.",
-            )
+
+class ConstantWeighting(FromNothingWeighting):
+    def __init__(self, weights: Tensor) -> None:
+        super().__init__(_ConstantWeighting(weights))
 
 
 class Constant(WeightedAggregator):
