@@ -48,6 +48,9 @@ def test_non_differentiable(aggregator: NashMTL, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
 
 
+@mark.filterwarnings(
+    "ignore:Solution may be inaccurate.",
+)
 @mark.parametrize(["aggregator", "matrix"], standard_pairs)
 def test_stateful(aggregator: NashMTL, matrix: Tensor) -> None:
     assert_stateful(aggregator, matrix)
