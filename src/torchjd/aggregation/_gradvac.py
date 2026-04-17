@@ -161,6 +161,10 @@ class GradVac(GramianWeightedAggregator, Stochastic):
     :param eps: Small non-negative constant added to denominators.
     :param seed: Seed for the internal random number generator. If ``None``, a seed is drawn from
         the global PyTorch RNG to fork an independent stream.
+
+    .. note::
+        To apply GradVac with the `whole_model`, `enc_dec`, `all_layer` or `all_matrix` grouping
+        strategy, please refer to the :doc:`Grouping </examples/grouping>` examples.
     """
 
     def __init__(self, beta: float = 0.5, eps: float = 1e-8, seed: int | None = None) -> None:
