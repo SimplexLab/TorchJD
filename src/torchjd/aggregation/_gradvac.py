@@ -6,16 +6,16 @@ import torch
 from torch import Tensor
 
 from torchjd._linalg import PSDMatrix
-from torchjd.aggregation._mixins import Stateful
+from torchjd.aggregation._mixins import Stochastic
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
 from ._weighting_bases import Weighting
 
 
-class GradVac(GramianWeightedAggregator, Stateful):
+class GradVac(GramianWeightedAggregator, Stochastic):
     r"""
-    :class:`~torchjd.aggregation._mixins.Stateful`
+    :class:`~torchjd.aggregation._mixins.Stochastic`
     :class:`~torchjd.aggregation._aggregator_bases.Aggregator` implementing the aggregation step of
     Gradient Vaccine (GradVac) from `Gradient Vaccine: Investigating and Improving Multi-task
     Optimization in Massively Multilingual Models (ICLR 2021 Spotlight)
@@ -35,16 +35,14 @@ class GradVac(GramianWeightedAggregator, Stateful):
 
     :param beta: EMA decay for :math:`\hat{\phi}`.
     :param eps: Small non-negative constant added to denominators.
-
-    .. note::
-        For each task :math:`i`, the order of other tasks :math:`j` is shuffled independently
-        using the global PyTorch RNG (``torch.randperm``). Seed it with ``torch.manual_seed`` if
-        you need reproducibility.
+    :param seed: Seed for the internal random number generator. If ``None``, a seed is drawn from
+        the global PyTorch RNG to fork an independent stream.
     """
 
-    def __init__(self, beta: float = 0.5, eps: float = 1e-8) -> None:
-        weighting = GradVacWeighting(beta=beta, eps=eps)
-        super().__init__(weighting)
+    def __init__(self, beta: float = 0.5, eps: float = 1e-8, seed: int | None = None) -> None:
+        weighting = GradVacWeighting(beta=beta, eps=eps, seed=seed)
+        GramianWeightedAggregator.__init__(self, weighting)
+        Stochastic.__init__(self, generator=weighting.generator)
         self._gradvac_weighting = weighting
         self.register_full_backward_pre_hook(raise_non_differentiable_error)
 
@@ -65,17 +63,18 @@ class GradVac(GramianWeightedAggregator, Stateful):
         self._gradvac_weighting.eps = value
 
     def reset(self) -> None:
-        """Clears EMA state so the next forward starts from zero targets."""
+        """Resets the random number generator and clears the EMA state."""
 
+        Stochastic.reset(self)
         self._gradvac_weighting.reset()
 
     def __repr__(self) -> str:
         return f"GradVac(beta={self.beta!r}, eps={self.eps!r})"
 
 
-class GradVacWeighting(Weighting[PSDMatrix], Stateful):
+class GradVacWeighting(Weighting[PSDMatrix], Stochastic):
     r"""
-    :class:`~torchjd.aggregation._mixins.Stateful`
+    :class:`~torchjd.aggregation._mixins.Stochastic`
     :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
     :class:`~torchjd.aggregation.GradVac`.
 
@@ -97,10 +96,13 @@ class GradVacWeighting(Weighting[PSDMatrix], Stateful):
 
     :param beta: EMA decay for :math:`\hat{\phi}`.
     :param eps: Small non-negative constant added to denominators.
+    :param seed: Seed for the internal random number generator. If ``None``, a seed is drawn from
+        the global PyTorch RNG to fork an independent stream.
     """
 
-    def __init__(self, beta: float = 0.5, eps: float = 1e-8) -> None:
-        super().__init__()
+    def __init__(self, beta: float = 0.5, eps: float = 1e-8, seed: int | None = None) -> None:
+        Weighting.__init__(self)
+        Stochastic.__init__(self, seed=seed)
         if not (0.0 <= beta <= 1.0):
             raise ValueError(f"Parameter `beta` must be in [0, 1]. Found beta={beta!r}.")
         if eps < 0.0:
@@ -132,8 +134,9 @@ class GradVacWeighting(Weighting[PSDMatrix], Stateful):
         self._eps = value
 
     def reset(self) -> None:
-        """Clears EMA state so the next forward starts from zero targets."""
+        """Resets the random number generator and clears the EMA state."""
 
+        Stochastic.reset(self)
         self._phi_t = None
         self._state_key = None
 
@@ -161,7 +164,7 @@ class GradVacWeighting(Weighting[PSDMatrix], Stateful):
             cG = C[i] @ G
 
             others = [j for j in range(m) if j != i]
-            perm = torch.randperm(len(others))
+            perm = torch.randperm(len(others), generator=self.generator)
             shuffled_js = [others[idx] for idx in perm.tolist()]
 
             for j in shuffled_js:

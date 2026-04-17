@@ -6,6 +6,7 @@ from torch import Tensor
 from torchjd._linalg import Matrix
 
 from ._aggregator_bases import Aggregator
+from ._mixins import Stochastic
 from ._utils.non_differentiable import raise_non_differentiable_error
 
 
@@ -13,7 +14,7 @@ def _identity(P: Tensor) -> Tensor:
     return P
 
 
-class GradDrop(Aggregator):
+class GradDrop(Aggregator, Stochastic):
     """
     :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that applies the gradient combination
     steps from GradDrop, as defined in lines 10 to 15 of Algorithm 1 of `Just Pick a Sign:
@@ -24,16 +25,21 @@ class GradDrop(Aggregator):
         increasing. Defaults to identity.
     :param leak: The tensor of leak values, determining how much each row is allowed to leak
         through. Defaults to None, which means no leak.
+    :param seed: Seed for the internal random number generator. If ``None``, a seed is drawn from
+        the global PyTorch RNG to fork an independent stream.
     """
 
-    def __init__(self, f: Callable = _identity, leak: Tensor | None = None) -> None:
+    def __init__(
+        self, f: Callable = _identity, leak: Tensor | None = None, seed: int | None = None
+    ) -> None:
         if leak is not None and leak.dim() != 1:
             raise ValueError(
                 "Parameter `leak` should be a 1-dimensional tensor. Found `leak.shape = "
                 f"{leak.shape}`.",
             )
 
-        super().__init__()
+        Aggregator.__init__(self)
+        Stochastic.__init__(self, seed=seed)
         self.f = f
         self.leak = leak
 
@@ -50,7 +56,7 @@ class GradDrop(Aggregator):
 
         P = 0.5 * (torch.ones_like(matrix[0]) + matrix.sum(dim=0) / matrix.abs().sum(dim=0))
         fP = self.f(P)
-        U = torch.rand(P.shape, dtype=matrix.dtype, device=matrix.device)
+        U = torch.rand(P.shape, dtype=matrix.dtype, device=matrix.device, generator=self.generator)
 
         vector = torch.zeros_like(matrix[0])
         for i in range(len(matrix)):
