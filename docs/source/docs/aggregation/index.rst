@@ -16,6 +16,9 @@ Abstract base classes
 .. autoclass:: torchjd.aggregation.Stateful
     :members: reset
 
+.. autoclass:: torchjd.aggregation.Stochastic
+    :members: reset
+
 
 .. toctree::
     :hidden:
