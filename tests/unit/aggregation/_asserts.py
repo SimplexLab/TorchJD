@@ -1,5 +1,4 @@
 import torch
-from numpy.ma.testutils import assert_allclose
 from pytest import raises
 from torch import Tensor
 from torch.testing import assert_close
@@ -126,8 +125,8 @@ def assert_stateful(aggregator: Aggregator, matrix: Tensor) -> None:
     aggregator.reset()
     second_pair = (aggregator(matrix), aggregator(matrix))
 
-    assert_allclose(first_pair[0], second_pair[0], atol=0.0, rtol=0.0)
-    assert_allclose(first_pair[1], second_pair[1], atol=0.0, rtol=0.0)
+    assert_close(first_pair[0], second_pair[0], atol=0.0, rtol=0.0)
+    assert_close(first_pair[1], second_pair[1], atol=0.0, rtol=0.0)
 
 
 def assert_stateless(aggregator: Aggregator, matrix: Tensor) -> None:
@@ -140,4 +139,4 @@ def assert_stateless(aggregator: Aggregator, matrix: Tensor) -> None:
     first = aggregator(matrix)
     second = aggregator(matrix)
 
-    assert_allclose(first, second, atol=0.0, rtol=0.0)
+    assert_close(first, second, atol=0.0, rtol=0.0)
