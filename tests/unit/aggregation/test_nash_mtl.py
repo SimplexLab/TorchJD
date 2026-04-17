@@ -10,7 +10,7 @@ except ImportError:
 
     pytest.skip("NashMTL dependencies not installed", allow_module_level=True)
 
-from ._asserts import assert_expected_structure, assert_non_differentiable
+from ._asserts import assert_expected_structure, assert_non_differentiable, assert_stateful
 from ._inputs import nash_mtl_matrices
 
 
@@ -46,6 +46,11 @@ def test_expected_structure(aggregator: NashMTL, matrix: Tensor) -> None:
 @mark.parametrize(["aggregator", "matrix"], requires_grad_pairs)
 def test_non_differentiable(aggregator: NashMTL, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
+
+
+@mark.parametrize(["aggregator", "matrix"], standard_pairs)
+def test_stateful(aggregator: NashMTL, matrix: Tensor) -> None:
+    assert_stateful(aggregator, matrix)
 
 
 @mark.filterwarnings("ignore: You are solving a parameterized problem that is not DPP.")

@@ -5,7 +5,7 @@ from utils.tensors import ones_
 
 from torchjd.aggregation import AlignedMTL
 
-from ._asserts import assert_expected_structure, assert_permutation_invariant
+from ._asserts import assert_expected_structure, assert_permutation_invariant, assert_stateless
 from ._inputs import scaled_matrices, typical_matrices
 
 aggregators = [
@@ -26,6 +26,11 @@ def test_expected_structure(aggregator: AlignedMTL, matrix: Tensor) -> None:
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
 def test_permutation_invariant(aggregator: AlignedMTL, matrix: Tensor) -> None:
     assert_permutation_invariant(aggregator, matrix)
+
+
+@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+def test_stateless(aggregator: AlignedMTL, matrix: Tensor) -> None:
+    assert_stateless(aggregator, matrix)
 
 
 def test_representations() -> None:

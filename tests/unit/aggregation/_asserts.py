@@ -1,10 +1,11 @@
 import torch
+from numpy.ma.testutils import assert_allclose
 from pytest import raises
 from torch import Tensor
 from torch.testing import assert_close
 from utils.tensors import rand_, randperm_
 
-from torchjd.aggregation import Aggregator
+from torchjd.aggregation import Aggregator, Stateful
 from torchjd.aggregation._utils.non_differentiable import NonDifferentiableError
 
 
@@ -110,3 +111,33 @@ def assert_non_differentiable(aggregator: Aggregator, matrix: Tensor) -> None:
     vector = aggregator(matrix)
     with raises(NonDifferentiableError):
         vector.backward(torch.ones_like(vector))
+
+
+def assert_stateful(aggregator: Aggregator, matrix: Tensor) -> None:
+    """
+    Test that a given `Aggregator` is stateful. Specifically:
+    - For a fixed state, the aggregator is determinist on the matrix
+    - The reset method and the constructor both set the state to the initial state
+    """
+
+    assert isinstance(aggregator, Stateful)
+
+    first_pair = (aggregator(matrix), aggregator(matrix))
+    aggregator.reset()
+    second_pair = (aggregator(matrix), aggregator(matrix))
+
+    assert_allclose(first_pair[0], second_pair[0], atol=0.0, rtol=0.0)
+    assert_allclose(first_pair[1], second_pair[1], atol=0.0, rtol=0.0)
+
+
+def assert_stateless(aggregator: Aggregator, matrix: Tensor) -> None:
+    """
+    Test that a given `Aggregator` is stateless. Specifically, it must be deterministic.
+    """
+
+    assert not isinstance(aggregator, Stateful)
+
+    first = aggregator(matrix)
+    second = aggregator(matrix)
+
+    assert_allclose(first, second, atol=0.0, rtol=0.0)

@@ -12,7 +12,12 @@ except ImportError:
 
     pytest.skip("CAGrad dependencies not installed", allow_module_level=True)
 
-from ._asserts import assert_expected_structure, assert_non_conflicting, assert_non_differentiable
+from ._asserts import (
+    assert_expected_structure,
+    assert_non_conflicting,
+    assert_non_differentiable,
+    assert_stateless,
+)
 from ._inputs import scaled_matrices, typical_matrices
 
 scaled_pairs = [(CAGrad(c=0.5), matrix) for matrix in scaled_matrices]
@@ -36,6 +41,11 @@ def test_non_differentiable(aggregator: CAGrad, matrix: Tensor) -> None:
 def test_non_conflicting(aggregator: CAGrad, matrix: Tensor) -> None:
     """Tests that CAGrad is non-conflicting when c >= 1 (it should not hold when c < 1)."""
     assert_non_conflicting(aggregator, matrix)
+
+
+@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+def test_stateless(aggregator: CAGrad, matrix: Tensor) -> None:
+    assert_stateless(aggregator, matrix)
 
 
 @mark.parametrize(

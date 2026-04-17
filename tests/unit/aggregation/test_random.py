@@ -3,7 +3,7 @@ from torch import Tensor
 
 from torchjd.aggregation import Random
 
-from ._asserts import assert_expected_structure, assert_strongly_stationary
+from ._asserts import assert_expected_structure, assert_stateful, assert_strongly_stationary
 from ._inputs import non_strong_matrices, scaled_matrices, typical_matrices
 
 scaled_pairs = [(Random(), matrix) for matrix in scaled_matrices]
@@ -19,6 +19,11 @@ def test_expected_structure(aggregator: Random, matrix: Tensor) -> None:
 @mark.parametrize(["aggregator", "matrix"], non_strong_pairs)
 def test_strongly_stationary(aggregator: Random, matrix: Tensor) -> None:
     assert_strongly_stationary(aggregator, matrix)
+
+
+@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+def test_stateful(aggregator: Random, matrix: Tensor) -> None:
+    assert_stateful(aggregator, matrix)
 
 
 def test_representations() -> None:

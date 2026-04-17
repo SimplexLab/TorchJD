@@ -11,6 +11,7 @@ from ._asserts import (
     assert_expected_structure,
     assert_non_conflicting,
     assert_permutation_invariant,
+    assert_stateless,
 )
 from ._inputs import scaled_matrices, typical_matrices
 
@@ -31,6 +32,11 @@ def test_non_conflicting(aggregator: MGDA, matrix: Tensor) -> None:
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
 def test_permutation_invariant(aggregator: MGDA, matrix: Tensor) -> None:
     assert_permutation_invariant(aggregator, matrix)
+
+
+@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+def test_stateless(aggregator: MGDA, matrix: Tensor) -> None:
+    assert_stateless(aggregator, matrix)
 
 
 @mark.parametrize(

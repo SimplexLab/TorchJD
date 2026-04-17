@@ -6,7 +6,7 @@ from utils.tensors import ones_, randn_, tensor_
 
 from torchjd.aggregation import GradVac, GradVacWeighting
 
-from ._asserts import assert_expected_structure, assert_non_differentiable
+from ._asserts import assert_expected_structure, assert_non_differentiable, assert_stateful
 from ._inputs import scaled_matrices, typical_matrices, typical_matrices_2_plus_rows
 
 scaled_pairs = [(GradVac(), m) for m in scaled_matrices]
@@ -102,6 +102,11 @@ def test_expected_structure(aggregator: GradVac, matrix: Tensor) -> None:
 @mark.parametrize(["aggregator", "matrix"], requires_grad_pairs)
 def test_non_differentiable(aggregator: GradVac, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
+
+
+@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+def test_stateful(aggregator: GradVac, matrix: Tensor) -> None:
+    assert_stateful(aggregator, matrix)
 
 
 def test_weighting_beta_out_of_range() -> None:

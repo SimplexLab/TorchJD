@@ -7,7 +7,7 @@ from utils.tensors import ones_
 
 from torchjd.aggregation import TrimmedMean
 
-from ._asserts import assert_expected_structure, assert_permutation_invariant
+from ._asserts import assert_expected_structure, assert_permutation_invariant, assert_stateless
 from ._inputs import scaled_matrices_2_plus_rows, typical_matrices_2_plus_rows
 
 scaled_pairs = [(TrimmedMean(trim_number=1), matrix) for matrix in scaled_matrices_2_plus_rows]
@@ -22,6 +22,11 @@ def test_expected_structure(aggregator: TrimmedMean, matrix: Tensor) -> None:
 @mark.parametrize(["aggregator", "matrix"], typical_pairs)
 def test_permutation_invariant(aggregator: TrimmedMean, matrix: Tensor) -> None:
     assert_permutation_invariant(aggregator, matrix)
+
+
+@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+def test_stateless(aggregator: TrimmedMean, matrix: Tensor) -> None:
+    assert_stateless(aggregator, matrix)
 
 
 @mark.parametrize(

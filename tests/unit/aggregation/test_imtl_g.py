@@ -9,6 +9,7 @@ from ._asserts import (
     assert_expected_structure,
     assert_non_differentiable,
     assert_permutation_invariant,
+    assert_stateless,
 )
 from ._inputs import scaled_matrices, typical_matrices
 
@@ -30,6 +31,11 @@ def test_permutation_invariant(aggregator: IMTLG, matrix: Tensor) -> None:
 @mark.parametrize(["aggregator", "matrix"], requires_grad_pairs)
 def test_non_differentiable(aggregator: IMTLG, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
+
+
+@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+def test_stateless(aggregator: IMTLG, matrix: Tensor) -> None:
+    assert_stateless(aggregator, matrix)
 
 
 def test_imtlg_zero() -> None:

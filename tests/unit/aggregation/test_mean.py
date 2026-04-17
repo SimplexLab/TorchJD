@@ -7,6 +7,7 @@ from ._asserts import (
     assert_expected_structure,
     assert_linear_under_scaling,
     assert_permutation_invariant,
+    assert_stateless,
     assert_strongly_stationary,
 )
 from ._inputs import non_strong_matrices, scaled_matrices, typical_matrices
@@ -34,6 +35,11 @@ def test_linear_under_scaling(aggregator: Mean, matrix: Tensor) -> None:
 @mark.parametrize(["aggregator", "matrix"], non_strong_pairs)
 def test_strongly_stationary(aggregator: Mean, matrix: Tensor) -> None:
     assert_strongly_stationary(aggregator, matrix)
+
+
+@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+def test_stateless(aggregator: Mean, matrix: Tensor) -> None:
+    assert_stateless(aggregator, matrix)
 
 
 def test_representations() -> None:

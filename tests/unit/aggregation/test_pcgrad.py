@@ -8,7 +8,7 @@ from torchjd.aggregation import PCGrad
 from torchjd.aggregation._pcgrad import PCGradWeighting
 from torchjd.aggregation._upgrad import UPGradWeighting
 
-from ._asserts import assert_expected_structure, assert_non_differentiable
+from ._asserts import assert_expected_structure, assert_non_differentiable, assert_stateful
 from ._inputs import scaled_matrices, typical_matrices
 
 scaled_pairs = [(PCGrad(), matrix) for matrix in scaled_matrices]
@@ -24,6 +24,11 @@ def test_expected_structure(aggregator: PCGrad, matrix: Tensor) -> None:
 @mark.parametrize(["aggregator", "matrix"], requires_grad_pairs)
 def test_non_differentiable(aggregator: PCGrad, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
+
+
+@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+def test_stateful(aggregator: PCGrad, matrix: Tensor) -> None:
+    assert_stateful(aggregator, matrix)
 
 
 @mark.parametrize(

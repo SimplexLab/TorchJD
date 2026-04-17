@@ -10,6 +10,7 @@ from ._asserts import (
     assert_non_conflicting,
     assert_non_differentiable,
     assert_permutation_invariant,
+    assert_stateless,
     assert_strongly_stationary,
 )
 from ._inputs import non_strong_matrices, scaled_matrices, typical_matrices
@@ -43,6 +44,11 @@ def test_strongly_stationary(aggregator: DualProj, matrix: Tensor) -> None:
 @mark.parametrize(["aggregator", "matrix"], requires_grad_pairs)
 def test_non_differentiable(aggregator: DualProj, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
+
+
+@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+def test_stateless(aggregator: DualProj, matrix: Tensor) -> None:
+    assert_stateless(aggregator, matrix)
 
 
 def test_representations() -> None:

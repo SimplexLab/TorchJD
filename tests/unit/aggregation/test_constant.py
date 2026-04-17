@@ -11,6 +11,7 @@ from torchjd.aggregation import Constant
 from ._asserts import (
     assert_expected_structure,
     assert_linear_under_scaling,
+    assert_stateless,
     assert_strongly_stationary,
 )
 from ._inputs import non_strong_matrices, scaled_matrices, typical_matrices
@@ -40,6 +41,11 @@ def test_linear_under_scaling(aggregator: Constant, matrix: Tensor) -> None:
 @mark.parametrize(["aggregator", "matrix"], non_strong_pairs)
 def test_strongly_stationary(aggregator: Constant, matrix: Tensor) -> None:
     assert_strongly_stationary(aggregator, matrix)
+
+
+@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+def test_stateless(aggregator: Constant, matrix: Tensor) -> None:
+    assert_stateless(aggregator, matrix)
 
 
 @mark.parametrize(

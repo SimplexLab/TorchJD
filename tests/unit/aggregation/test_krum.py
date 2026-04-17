@@ -7,7 +7,7 @@ from utils.tensors import ones_
 
 from torchjd.aggregation import Krum
 
-from ._asserts import assert_expected_structure
+from ._asserts import assert_expected_structure, assert_stateless
 from ._inputs import scaled_matrices_2_plus_rows, typical_matrices_2_plus_rows
 
 scaled_pairs = [(Krum(n_byzantine=1), matrix) for matrix in scaled_matrices_2_plus_rows]
@@ -17,6 +17,11 @@ typical_pairs = [(Krum(n_byzantine=1), matrix) for matrix in typical_matrices_2_
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
 def test_expected_structure(aggregator: Krum, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
+
+
+@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+def test_stateless(aggregator: Krum, matrix: Tensor) -> None:
+    assert_stateless(aggregator, matrix)
 
 
 @mark.parametrize(
