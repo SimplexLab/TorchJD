@@ -1,5 +1,6 @@
+from dataclasses import dataclass
+
 import torch
-from attr import dataclass
 
 from torchjd._linalg import Matrix
 
