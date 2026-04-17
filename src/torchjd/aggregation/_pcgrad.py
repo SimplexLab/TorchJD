@@ -54,16 +54,19 @@ class PCGradWeighting(Weighting[PSDMatrix], Stochastic):
         return weights.to(device)
 
 
-class PCGrad(GramianWeightedAggregator):
+class PCGrad(GramianWeightedAggregator, Stochastic):
     """
     :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as defined in algorithm 1 of
     `Gradient Surgery for Multi-Task Learning <https://arxiv.org/pdf/2001.06782.pdf>`_.
+
+    :param seed: Seed for the internal random number generator. If ``None``, a seed is drawn from
+        the global PyTorch RNG to fork an independent stream.
     """
 
-    gramian_weighting: PCGradWeighting
-
-    def __init__(self) -> None:
-        super().__init__(PCGradWeighting())
+    def __init__(self, seed: int | None = None) -> None:
+        weighting = PCGradWeighting(seed=seed)
+        GramianWeightedAggregator.__init__(self, weighting)
+        Stochastic.__init__(self, generator=weighting.generator)
 
         # This prevents running into a RuntimeError due to modifying stored tensors in place.
         self.register_full_backward_pre_hook(raise_non_differentiable_error)

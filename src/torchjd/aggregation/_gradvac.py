@@ -137,9 +137,9 @@ class GradVacWeighting(Weighting[PSDMatrix], Stochastic):
             self._state_key = key
 
 
-class GradVac(GramianWeightedAggregator, Stateful):
+class GradVac(GramianWeightedAggregator, Stochastic):
     r"""
-    :class:`~torchjd.aggregation._mixins.Stateful`
+    :class:`~torchjd.aggregation._mixins.Stochastic`
     :class:`~torchjd.aggregation._aggregator_bases.Aggregator` implementing the aggregation step of
     Gradient Vaccine (GradVac) from `Gradient Vaccine: Investigating and Improving Multi-task
     Optimization in Massively Multilingual Models (ICLR 2021 Spotlight)
@@ -159,22 +159,14 @@ class GradVac(GramianWeightedAggregator, Stateful):
 
     :param beta: EMA decay for :math:`\hat{\phi}`.
     :param eps: Small non-negative constant added to denominators.
-
-    .. note::
-        For each task :math:`i`, the order of other tasks :math:`j` is shuffled independently
-        using the global PyTorch RNG (``torch.randperm``). Seed it with ``torch.manual_seed`` if
-        you need reproducibility.
-
-    .. note::
-        To apply GradVac with the `whole_model`, `enc_dec`, `all_layer` or `all_matrix` grouping
-        strategy, please refer to the :doc:`Grouping </examples/grouping>` examples.
+    :param seed: Seed for the internal random number generator. If ``None``, a seed is drawn from
+        the global PyTorch RNG to fork an independent stream.
     """
 
-    gramian_weighting: GradVacWeighting
-
-    def __init__(self, beta: float = 0.5, eps: float = 1e-8) -> None:
-        weighting = GradVacWeighting(beta=beta, eps=eps)
-        super().__init__(weighting)
+    def __init__(self, beta: float = 0.5, eps: float = 1e-8, seed: int | None = None) -> None:
+        weighting = GradVacWeighting(beta=beta, eps=eps, seed=seed)
+        GramianWeightedAggregator.__init__(self, weighting)
+        Stochastic.__init__(self, generator=weighting.generator)
         self._gradvac_weighting = weighting
         self.register_full_backward_pre_hook(raise_non_differentiable_error)
 
@@ -195,8 +187,9 @@ class GradVac(GramianWeightedAggregator, Stateful):
         self._gradvac_weighting.eps = value
 
     def reset(self) -> None:
-        """Clears EMA state so the next forward starts from zero targets."""
+        """Resets the random number generator and clears the EMA state."""
 
+        Stochastic.reset(self)
         self._gradvac_weighting.reset()
 
     def __repr__(self) -> str:
