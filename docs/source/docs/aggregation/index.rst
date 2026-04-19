@@ -8,10 +8,13 @@ Abstract base classes
 ---------------------
 
 .. autoclass:: torchjd.aggregation.Aggregator
+    :members: __call__
 
 .. autoclass:: torchjd.aggregation.Weighting
+    :members: __call__
 
 .. autoclass:: torchjd.aggregation.GeneralizedWeighting
+    :members: __call__
 
 .. autoclass:: torchjd.aggregation.Stateful
     :members: reset

@@ -4,7 +4,7 @@ GradVac
 =======
 
 .. autoclass:: torchjd.aggregation.GradVac
-    :members: reset
+    :members: __call__, reset
 
 .. autoclass:: torchjd.aggregation.GradVacWeighting
-    :members: reset
+    :members: __call__, reset

@@ -8,10 +8,10 @@ from ._mean import MeanWeighting
 from ._utils.dual_cone import SUPPORTED_SOLVER, project_weights
 from ._utils.non_differentiable import raise_non_differentiable_error
 from ._utils.pref_vector import pref_vector_to_str_suffix, pref_vector_to_weighting
-from ._weighting_bases import Weighting
+from ._weighting_bases import GramianWeighting
 
 
-class UPGradWeighting(Weighting[PSDMatrix]):
+class UPGradWeighting(GramianWeighting):
     r"""
     :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
     :class:`~torchjd.aggregation.UPGrad`.

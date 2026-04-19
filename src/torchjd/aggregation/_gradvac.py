@@ -10,10 +10,10 @@ from torchjd.aggregation._mixins import Stateful
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
-from ._weighting_bases import Weighting
+from ._weighting_bases import GramianWeighting
 
 
-class GradVacWeighting(Weighting[PSDMatrix], Stateful):
+class GradVacWeighting(GramianWeighting, Stateful):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`
     :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
