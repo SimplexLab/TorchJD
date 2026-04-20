@@ -8,6 +8,7 @@ version = "0.10.0"
 description = "Library for Jacobian Descent with PyTorch."
 readme = "README.md"
 authors = [
+    {name = "SimplexLab", email = "simplexlab0@gmail.com"},
     {name = "Valerian Rey", email = "valerian.rey@gmail.com"},
     {name = "Pierre Quinton", email = "pierre.quinton@gmail.com"}
 ]
