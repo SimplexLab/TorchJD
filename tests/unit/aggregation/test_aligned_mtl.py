@@ -3,7 +3,7 @@ from pytest import mark, raises
 from torch import Tensor
 from utils.tensors import ones_
 
-from torchjd.aggregation import AlignedMTL
+from torchjd.aggregation import AlignedMTL, ConstantWeighting
 
 from ._asserts import assert_expected_structure, assert_permutation_invariant
 from ._inputs import scaled_matrices, typical_matrices
@@ -43,3 +43,18 @@ def test_invalid_scale_mode() -> None:
     matrix = ones_(3, 4)
     with raises(ValueError, match=r"Invalid scale_mode=.*Expected"):
         aggregator(matrix)
+
+
+def test_pref_vector_setter_updates_value() -> None:
+    A = AlignedMTL()
+    new_pref = torch.tensor([1.0, 2.0, 3.0])
+    A.pref_vector = new_pref
+    assert A.pref_vector is new_pref
+    assert isinstance(A.gramian_weighting.weighting, ConstantWeighting)
+    assert A.gramian_weighting.weighting.weights is new_pref
+
+
+def test_scale_mode_setter_updates_value() -> None:
+    A = AlignedMTL()
+    A.scale_mode = "rmse"
+    assert A.scale_mode == "rmse"
