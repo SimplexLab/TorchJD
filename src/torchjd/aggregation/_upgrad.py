@@ -51,8 +51,8 @@ class UPGradWeighting(GramianWeighting):
 
     @pref_vector.setter
     def pref_vector(self, value: Tensor | None) -> None:
-        self._pref_vector = value
         self.weighting = pref_vector_to_weighting(value, default=MeanWeighting())
+        self._pref_vector = value
 
     @property
     def norm_eps(self) -> float:
