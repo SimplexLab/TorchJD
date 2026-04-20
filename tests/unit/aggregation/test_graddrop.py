@@ -83,3 +83,22 @@ def test_representations() -> None:
     A = GradDrop()
     assert re.match(r"GradDrop\(f=<function _identity at 0x[0-9a-fA-F]+>, leak=None\)", repr(A))
     assert str(A) == "GradDrop"
+
+
+def test_leak_setter_updates_value() -> None:
+    A = GradDrop()
+    new_leak = torch.tensor([0.0, 0.5, 1.0])
+    A.leak = new_leak
+    assert A.leak is new_leak
+
+
+def test_leak_setter_accepts_none() -> None:
+    A = GradDrop(leak=torch.tensor([0.0, 1.0]))
+    A.leak = None
+    assert A.leak is None
+
+
+def test_leak_setter_rejects_non_1d() -> None:
+    A = GradDrop()
+    with raises(ValueError, match="leak"):
+        A.leak = torch.tensor([[0.0, 1.0], [1.0, 0.0]])
