@@ -8,6 +8,12 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Added
+
+- Added `pref_vector`, `norm_eps`, and `reg_eps` getters and setters to `UPGrad` and
+  `UPGradWeighting`. The setters for `norm_eps` and `reg_eps` validate that the assigned value is
+  non-negative.
+
 ## [0.10.0] - 2026-04-16
 
 ### Added

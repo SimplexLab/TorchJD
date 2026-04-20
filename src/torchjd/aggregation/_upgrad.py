@@ -34,8 +34,7 @@ class UPGradWeighting(GramianWeighting):
         solver: SUPPORTED_SOLVER = "quadprog",
     ) -> None:
         super().__init__()
-        self._pref_vector = pref_vector
-        self.weighting = pref_vector_to_weighting(pref_vector, default=MeanWeighting())
+        self.pref_vector = pref_vector
         self.norm_eps = norm_eps
         self.reg_eps = reg_eps
         self.solver: SUPPORTED_SOLVER = solver
@@ -45,6 +44,39 @@ class UPGradWeighting(GramianWeighting):
         G = regularize(normalize(gramian, self.norm_eps), self.reg_eps)
         W = project_weights(U, G, self.solver)
         return torch.sum(W, dim=0)
+
+    @property
+    def pref_vector(self) -> Tensor | None:
+        return self._pref_vector
+
+    @pref_vector.setter
+    def pref_vector(self, value: Tensor | None) -> None:
+        self.weighting = pref_vector_to_weighting(value, default=MeanWeighting())
+        self._pref_vector = value
+
+    @property
+    def norm_eps(self) -> float:
+        return self._norm_eps
+
+    @norm_eps.setter
+    def norm_eps(self, value: float) -> None:
+
+        if value < 0:
+            raise ValueError(f"norm_eps must be non-negative, but got {value}.")
+
+        self._norm_eps = value
+
+    @property
+    def reg_eps(self) -> float:
+        return self._reg_eps
+
+    @reg_eps.setter
+    def reg_eps(self, value: float) -> None:
+
+        if value < 0:
+            raise ValueError(f"reg_eps must be non-negative, but got {value}.")
+
+        self._reg_eps = value
 
 
 class UPGrad(GramianWeightedAggregator):
@@ -73,9 +105,6 @@ class UPGrad(GramianWeightedAggregator):
         reg_eps: float = 0.0001,
         solver: SUPPORTED_SOLVER = "quadprog",
     ) -> None:
-        self._pref_vector = pref_vector
-        self._norm_eps = norm_eps
-        self._reg_eps = reg_eps
         self._solver: SUPPORTED_SOLVER = solver
 
         super().__init__(
@@ -85,11 +114,35 @@ class UPGrad(GramianWeightedAggregator):
         # This prevents considering the computed weights as constant w.r.t. the matrix.
         self.register_full_backward_pre_hook(raise_non_differentiable_error)
 
+    @property
+    def pref_vector(self) -> Tensor | None:
+        return self.gramian_weighting.pref_vector
+
+    @pref_vector.setter
+    def pref_vector(self, value: Tensor | None) -> None:
+        self.gramian_weighting.pref_vector = value
+
+    @property
+    def norm_eps(self) -> float:
+        return self.gramian_weighting.norm_eps
+
+    @norm_eps.setter
+    def norm_eps(self, value: float) -> None:
+        self.gramian_weighting.norm_eps = value
+
+    @property
+    def reg_eps(self) -> float:
+        return self.gramian_weighting.reg_eps
+
+    @reg_eps.setter
+    def reg_eps(self, value: float) -> None:
+        self.gramian_weighting.reg_eps = value
+
     def __repr__(self) -> str:
         return (
-            f"{self.__class__.__name__}(pref_vector={repr(self._pref_vector)}, norm_eps="
-            f"{self._norm_eps}, reg_eps={self._reg_eps}, solver={repr(self._solver)})"
+            f"{self.__class__.__name__}(pref_vector={repr(self.pref_vector)}, norm_eps="
+            f"{self.norm_eps}, reg_eps={self.reg_eps}, solver={repr(self._solver)})"
         )
 
     def __str__(self) -> str:
-        return f"UPGrad{pref_vector_to_str_suffix(self._pref_vector)}"
+        return f"UPGrad{pref_vector_to_str_suffix(self.pref_vector)}"
