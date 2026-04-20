@@ -28,11 +28,17 @@ class _NashMTLWeighting(MatrixWeighting, Stateful):
 
     :param n_tasks: The number of tasks, corresponding to the number of rows in the provided
         matrices.
-    :param max_norm: Maximum value of the norm of :math:`J^T w`.
+    :param max_norm: Maximum value of the norm of :math:`J^T w`. A value of ``0`` disables the
+        norm clipping.
     :param update_weights_every: A parameter determining how often the actual weighting should be
         performed. A larger value means that the same weights will be re-used for more calls to the
         weighting.
     :param optim_niter: The number of iterations of the underlying optimization process.
+
+    .. note::
+        Changing any of these parameters after instantiation does not automatically reset the
+        internal state. Call :meth:`reset` if needed (especially after changing ``n_tasks``, which
+        affects the shape of the cached state).
     """
 
     def __init__(
@@ -54,6 +60,52 @@ class _NashMTLWeighting(MatrixWeighting, Stateful):
         self.init_gtg = np.eye(self.n_tasks)
         self.step = 0.0
         self.prvs_alpha = np.ones(self.n_tasks, dtype=np.float32)
+
+    @property
+    def n_tasks(self) -> int:
+        return self._n_tasks
+
+    @n_tasks.setter
+    def n_tasks(self, value: int) -> None:
+        if value <= 0:
+            raise ValueError(f"n_tasks must be a positive integer, but got {value}.")
+
+        self._n_tasks = value
+
+    @property
+    def max_norm(self) -> float:
+        return self._max_norm
+
+    @max_norm.setter
+    def max_norm(self, value: float) -> None:
+        if value < 0:
+            raise ValueError(f"max_norm must be non-negative, but got {value}.")
+
+        self._max_norm = value
+
+    @property
+    def update_weights_every(self) -> int:
+        return self._update_weights_every
+
+    @update_weights_every.setter
+    def update_weights_every(self, value: int) -> None:
+        if value <= 0:
+            raise ValueError(
+                f"update_weights_every must be a positive integer, but got {value}.",
+            )
+
+        self._update_weights_every = value
+
+    @property
+    def optim_niter(self) -> int:
+        return self._optim_niter
+
+    @optim_niter.setter
+    def optim_niter(self, value: int) -> None:
+        if value <= 0:
+            raise ValueError(f"optim_niter must be a positive integer, but got {value}.")
+
+        self._optim_niter = value
 
     def _stop_criteria(self, gtg: np.ndarray, alpha_t: np.ndarray) -> bool:
         return bool(
@@ -156,7 +208,8 @@ class NashMTL(WeightedAggregator, Stateful):
 
     :param n_tasks: The number of tasks, corresponding to the number of rows in the provided
         matrices.
-    :param max_norm: Maximum value of the norm of :math:`J^T w`.
+    :param max_norm: Maximum value of the norm of :math:`J^T w`. A value of ``0`` disables the
+        norm clipping.
     :param update_weights_every: A parameter determining how often the actual weighting should be
         performed. A larger value means that the same weights will be re-used for more calls to the
         aggregator.
@@ -176,6 +229,11 @@ class NashMTL(WeightedAggregator, Stateful):
         This aggregator is stateful. Its output will thus depend not only on the input matrix, but
         also on its state. It thus depends on previously seen matrices. It should be reset between
         experiments.
+
+    .. note::
+        Changing any of these parameters after instantiation does not automatically reset the
+        internal state. Call :meth:`reset` if needed (especially after changing ``n_tasks``, which
+        affects the shape of the cached state).
     """
 
     weighting: _NashMTLWeighting
@@ -195,13 +253,41 @@ class NashMTL(WeightedAggregator, Stateful):
                 optim_niter=optim_niter,
             ),
         )
-        self._n_tasks = n_tasks
-        self._max_norm = max_norm
-        self._update_weights_every = update_weights_every
-        self._optim_niter = optim_niter
 
         # This prevents considering the computed weights as constant w.r.t. the matrix.
         self.register_full_backward_pre_hook(raise_non_differentiable_error)
+
+    @property
+    def n_tasks(self) -> int:
+        return cast(_NashMTLWeighting, self.weighting).n_tasks
+
+    @n_tasks.setter
+    def n_tasks(self, value: int) -> None:
+        cast(_NashMTLWeighting, self.weighting).n_tasks = value
+
+    @property
+    def max_norm(self) -> float:
+        return cast(_NashMTLWeighting, self.weighting).max_norm
+
+    @max_norm.setter
+    def max_norm(self, value: float) -> None:
+        cast(_NashMTLWeighting, self.weighting).max_norm = value
+
+    @property
+    def update_weights_every(self) -> int:
+        return cast(_NashMTLWeighting, self.weighting).update_weights_every
+
+    @update_weights_every.setter
+    def update_weights_every(self, value: int) -> None:
+        cast(_NashMTLWeighting, self.weighting).update_weights_every = value
+
+    @property
+    def optim_niter(self) -> int:
+        return cast(_NashMTLWeighting, self.weighting).optim_niter
+
+    @optim_niter.setter
+    def optim_niter(self, value: int) -> None:
+        cast(_NashMTLWeighting, self.weighting).optim_niter = value
 
     def reset(self) -> None:
         """Resets the internal state of the algorithm."""
@@ -209,6 +295,6 @@ class NashMTL(WeightedAggregator, Stateful):
 
     def __repr__(self) -> str:
         return (
-            f"{self.__class__.__name__}(n_tasks={self._n_tasks}, max_norm={self._max_norm}, "
-            f"update_weights_every={self._update_weights_every}, optim_niter={self._optim_niter})"
+            f"{self.__class__.__name__}(n_tasks={self.n_tasks}, max_norm={self.max_norm}, "
+            f"update_weights_every={self.update_weights_every}, optim_niter={self.optim_niter})"
         )
