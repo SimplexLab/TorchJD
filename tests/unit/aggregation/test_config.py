@@ -3,7 +3,7 @@ from pytest import mark
 from torch import Tensor
 from utils.tensors import ones_
 
-from torchjd.aggregation import ConFIG
+from torchjd.aggregation import ConFIG, ConstantWeighting
 
 from ._asserts import (
     assert_expected_structure,
@@ -47,3 +47,12 @@ def test_representations() -> None:
     A = ConFIG(pref_vector=torch.tensor([1.0, 2.0, 3.0], device="cpu"))
     assert repr(A) == "ConFIG(pref_vector=tensor([1., 2., 3.]))"
     assert str(A) == "ConFIG([1., 2., 3.])"
+
+
+def test_pref_vector_setter_updates_value() -> None:
+    A = ConFIG()
+    new_pref = torch.tensor([1.0, 2.0, 3.0])
+    A.pref_vector = new_pref
+    assert A.pref_vector is new_pref
+    assert isinstance(A.weighting, ConstantWeighting)
+    assert A.weighting.weights is new_pref
