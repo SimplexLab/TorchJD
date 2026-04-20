@@ -3,7 +3,7 @@ from pytest import mark, raises
 from torch import Tensor
 from utils.tensors import ones_
 
-from torchjd.aggregation import UPGrad
+from torchjd.aggregation import ConstantWeighting, UPGrad
 from torchjd.aggregation._upgrad import UPGradWeighting
 
 from ._asserts import (
@@ -75,6 +75,8 @@ def test_pref_vector_setter_updates_value() -> None:
     new_pref = torch.tensor([1.0, 2.0, 3.0])
     A.pref_vector = new_pref
     assert A.pref_vector is new_pref
+    assert isinstance(A.gramian_weighting.weighting, ConstantWeighting)
+    assert A.gramian_weighting.weighting.weights is new_pref
 
 
 def test_norm_eps_setter_updates_value() -> None:
