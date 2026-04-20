@@ -1,9 +1,10 @@
 import torch
-from pytest import mark
+from pytest import mark, raises
 from torch import Tensor
 from utils.tensors import ones_
 
-from torchjd.aggregation import DualProj
+from torchjd.aggregation import ConstantWeighting, DualProj
+from torchjd.aggregation._dualproj import DualProjWeighting
 
 from ._asserts import (
     assert_expected_structure,
@@ -63,3 +64,48 @@ def test_representations() -> None:
         "solver='quadprog')"
     )
     assert str(A) == "DualProj([1., 2., 3.])"
+
+
+def test_pref_vector_setter_updates_value() -> None:
+    A = DualProj()
+    new_pref = torch.tensor([1.0, 2.0, 3.0])
+    A.pref_vector = new_pref
+    assert A.pref_vector is new_pref
+    assert isinstance(A.gramian_weighting.weighting, ConstantWeighting)
+    assert A.gramian_weighting.weighting.weights is new_pref
+
+
+def test_norm_eps_setter_updates_value() -> None:
+    A = DualProj()
+    A.norm_eps = 0.25
+    assert A.norm_eps == 0.25
+
+
+def test_reg_eps_setter_updates_value() -> None:
+    A = DualProj()
+    A.reg_eps = 0.25
+    assert A.reg_eps == 0.25
+
+
+def test_norm_eps_setter_rejects_negative() -> None:
+    A = DualProj()
+    with raises(ValueError, match="norm_eps"):
+        A.norm_eps = -1e-9
+
+
+def test_reg_eps_setter_rejects_negative() -> None:
+    A = DualProj()
+    with raises(ValueError, match="reg_eps"):
+        A.reg_eps = -1e-9
+
+
+def test_weighting_norm_eps_setter_rejects_negative() -> None:
+    W = DualProjWeighting()
+    with raises(ValueError, match="norm_eps"):
+        W.norm_eps = -1e-9
+
+
+def test_weighting_reg_eps_setter_rejects_negative() -> None:
+    W = DualProjWeighting()
+    with raises(ValueError, match="reg_eps"):
+        W.reg_eps = -1e-9
