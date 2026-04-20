@@ -41,7 +41,7 @@ class UPGradWeighting(GramianWeighting):
 
     def forward(self, gramian: PSDMatrix, /) -> Tensor:
         U = torch.diag(self.weighting(gramian))
-        G = regularize(normalize(gramian, self._norm_eps), self._reg_eps)
+        G = regularize(normalize(gramian, self.norm_eps), self.reg_eps)
         W = project_weights(U, G, self.solver)
         return torch.sum(W, dim=0)
 
