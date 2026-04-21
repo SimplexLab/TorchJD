@@ -20,48 +20,6 @@ def test_representations() -> None:
     assert str(A) == "GradVac"
 
 
-def test_beta_out_of_range() -> None:
-    with raises(ValueError, match="beta"):
-        GradVac(beta=-0.1)
-    with raises(ValueError, match="beta"):
-        GradVac(beta=1.1)
-
-
-def test_beta_setter_out_of_range() -> None:
-    A = GradVac()
-    with raises(ValueError, match="beta"):
-        A.beta = -0.1
-    with raises(ValueError, match="beta"):
-        A.beta = 1.1
-
-
-def test_beta_setter_updates_value() -> None:
-    A = GradVac()
-    A.beta = 0.25
-    assert A.beta == 0.25
-
-
-def test_eps_rejects_negative() -> None:
-    with raises(ValueError, match="eps"):
-        GradVac(eps=-1e-9)
-
-
-def test_eps_setter_rejects_negative() -> None:
-    A = GradVac()
-    with raises(ValueError, match="eps"):
-        A.eps = -1e-9
-
-
-def test_eps_can_be_changed_between_steps() -> None:
-    J = tensor_([[1.0, 0.0], [0.0, 1.0]])
-    A = GradVac()
-    A.eps = 1e-6
-    assert A(J).isfinite().all()
-    A.reset()
-    A.eps = 1e-10
-    assert A(J).isfinite().all()
-
-
 def test_zero_rows_returns_zero_vector() -> None:
     out = GradVac()(tensor_([]).reshape(0, 3))
     assert_close(out, tensor_([0.0, 0.0, 0.0]))
@@ -104,18 +62,6 @@ def test_non_differentiable(aggregator: GradVac, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
 
 
-def test_weighting_beta_out_of_range() -> None:
-    with raises(ValueError, match="beta"):
-        GradVacWeighting(beta=-0.1)
-    with raises(ValueError, match="beta"):
-        GradVacWeighting(beta=1.1)
-
-
-def test_weighting_eps_rejects_negative() -> None:
-    with raises(ValueError, match="eps"):
-        GradVacWeighting(eps=-1e-9)
-
-
 def test_weighting_reset_restores_first_step_behavior() -> None:
     J = randn_((3, 8))
     G = J @ J.T
@@ -144,3 +90,45 @@ def test_aggregator_and_weighting_agree() -> None:
     result = weights @ J
 
     assert_close(result, expected, rtol=1e-4, atol=1e-4)
+
+
+def test_beta_setter_updates_value() -> None:
+    A = GradVac()
+    A.beta = 0.25
+    assert A.beta == 0.25
+    assert A.gramian_weighting.beta == 0.25
+
+
+def test_eps_setter_updates_value() -> None:
+    A = GradVac()
+    A.eps = 1e-6
+    assert A.eps == 1e-6
+    assert A.gramian_weighting.eps == 1e-6
+
+
+def test_beta_setter_rejects_out_of_range() -> None:
+    A = GradVac()
+    with raises(ValueError, match="beta"):
+        A.beta = -0.1
+    with raises(ValueError, match="beta"):
+        A.beta = 1.1
+
+
+def test_eps_setter_rejects_negative() -> None:
+    A = GradVac()
+    with raises(ValueError, match="eps"):
+        A.eps = -1e-9
+
+
+def test_weighting_beta_setter_rejects_out_of_range() -> None:
+    W = GradVacWeighting()
+    with raises(ValueError, match="beta"):
+        W.beta = -0.1
+    with raises(ValueError, match="beta"):
+        W.beta = 1.1
+
+
+def test_weighting_eps_setter_rejects_negative() -> None:
+    W = GradVacWeighting()
+    with raises(ValueError, match="eps"):
+        W.eps = -1e-9
