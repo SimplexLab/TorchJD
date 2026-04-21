@@ -85,6 +85,10 @@ def test_setters_update_values() -> None:
     assert A.max_norm == 2.5
     assert A.update_weights_every == 3
     assert A.optim_niter == 7
+    assert A.weighting.n_tasks == 4
+    assert A.weighting.max_norm == 2.5
+    assert A.weighting.update_weights_every == 3
+    assert A.weighting.optim_niter == 7
 
 
 def test_n_tasks_setter_rejects_non_positive() -> None:

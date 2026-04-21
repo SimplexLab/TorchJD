@@ -85,12 +85,14 @@ def test_n_byzantine_setter_updates_value() -> None:
     A = Krum(n_byzantine=1)
     A.n_byzantine = 3
     assert A.n_byzantine == 3
+    assert A.gramian_weighting.n_byzantine == 3
 
 
 def test_n_selected_setter_updates_value() -> None:
     A = Krum(n_byzantine=1)
     A.n_selected = 3
     assert A.n_selected == 3
+    assert A.gramian_weighting.n_selected == 3
 
 
 def test_n_byzantine_setter_rejects_negative() -> None:

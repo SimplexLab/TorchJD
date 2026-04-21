@@ -58,3 +58,4 @@ def test_scale_mode_setter_updates_value() -> None:
     A = AlignedMTL()
     A.scale_mode = "rmse"
     assert A.scale_mode == "rmse"
+    assert A.gramian_weighting.scale_mode == "rmse"

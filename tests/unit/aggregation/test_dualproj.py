@@ -79,12 +79,14 @@ def test_norm_eps_setter_updates_value() -> None:
     A = DualProj()
     A.norm_eps = 0.25
     assert A.norm_eps == 0.25
+    assert A.gramian_weighting.norm_eps == 0.25
 
 
 def test_reg_eps_setter_updates_value() -> None:
     A = DualProj()
     A.reg_eps = 0.25
     assert A.reg_eps == 0.25
+    assert A.gramian_weighting.reg_eps == 0.25
 
 
 def test_norm_eps_setter_rejects_negative() -> None:

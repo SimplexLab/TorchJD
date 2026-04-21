@@ -64,12 +64,14 @@ def test_c_setter_updates_value() -> None:
     A = CAGrad(c=0.5)
     A.c = 1.25
     assert A.c == 1.25
+    assert A.gramian_weighting.c == 1.25
 
 
 def test_norm_eps_setter_updates_value() -> None:
     A = CAGrad(c=0.5)
     A.norm_eps = 0.25
     assert A.norm_eps == 0.25
+    assert A.gramian_weighting.norm_eps == 0.25
 
 
 def test_c_setter_rejects_negative() -> None:

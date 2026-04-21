@@ -76,12 +76,14 @@ def test_epsilon_setter_updates_value() -> None:
     A = MGDA()
     A.epsilon = 0.25
     assert A.epsilon == 0.25
+    assert A.gramian_weighting.epsilon == 0.25
 
 
 def test_max_iters_setter_updates_value() -> None:
     A = MGDA()
     A.max_iters = 42
     assert A.max_iters == 42
+    assert A.gramian_weighting.max_iters == 42
 
 
 def test_epsilon_setter_rejects_non_positive() -> None:
