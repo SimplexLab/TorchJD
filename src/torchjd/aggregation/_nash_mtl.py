@@ -8,8 +8,6 @@ from ._weighting_bases import MatrixWeighting
 
 check_dependencies_are_installed(["cvxpy", "ecos"])
 
-from typing import cast
-
 import cvxpy as cp
 import numpy as np
 import torch
@@ -259,39 +257,39 @@ class NashMTL(WeightedAggregator, Stateful):
 
     @property
     def n_tasks(self) -> int:
-        return cast(_NashMTLWeighting, self.weighting).n_tasks
+        return self.weighting.n_tasks
 
     @n_tasks.setter
     def n_tasks(self, value: int) -> None:
-        cast(_NashMTLWeighting, self.weighting).n_tasks = value
+        self.weighting.n_tasks = value
 
     @property
     def max_norm(self) -> float:
-        return cast(_NashMTLWeighting, self.weighting).max_norm
+        return self.weighting.max_norm
 
     @max_norm.setter
     def max_norm(self, value: float) -> None:
-        cast(_NashMTLWeighting, self.weighting).max_norm = value
+        self.weighting.max_norm = value
 
     @property
     def update_weights_every(self) -> int:
-        return cast(_NashMTLWeighting, self.weighting).update_weights_every
+        return self.weighting.update_weights_every
 
     @update_weights_every.setter
     def update_weights_every(self, value: int) -> None:
-        cast(_NashMTLWeighting, self.weighting).update_weights_every = value
+        self.weighting.update_weights_every = value
 
     @property
     def optim_niter(self) -> int:
-        return cast(_NashMTLWeighting, self.weighting).optim_niter
+        return self.weighting.optim_niter
 
     @optim_niter.setter
     def optim_niter(self, value: int) -> None:
-        cast(_NashMTLWeighting, self.weighting).optim_niter = value
+        self.weighting.optim_niter = value
 
     def reset(self) -> None:
         """Resets the internal state of the algorithm."""
-        cast(_NashMTLWeighting, self.weighting).reset()
+        self.weighting.reset()
 
     def __repr__(self) -> str:
         return (
