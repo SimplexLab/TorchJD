@@ -10,9 +10,15 @@ changelog does not include internal changes that do not affect the user.
 
 ### Added
 
-- Added `pref_vector`, `norm_eps`, and `reg_eps` getters and setters to `UPGrad` and
-  `UPGradWeighting`. The setters for `norm_eps` and `reg_eps` validate that the assigned value is
-  non-negative.
+- Added getters and setters for the constructor parameters of all aggregators and weightings, so
+  that they can be changed after initialization. This includes: `pref_vector`,
+  `norm_eps` and `reg_eps` in `UPGrad`, `UPGradWeighting`, `DualProj` and `DualProjWeighting`;
+  `pref_vector` and `scale_mode` in `AlignedMTL` and `AlignedMTLWeighting`; `c` and `norm_eps` in
+  `CAGrad` and `CAGradWeighting`; `pref_vector` in `ConFIG`; `leak` in `GradDrop`, `n_byzantine` and
+  `n_selected` in `Krum` and `KrumWeighting`; `epsilon` and `max_iters` in `MGDA` and
+  `MGDAWeighting`; `n_tasks`, `max_norm`, `update_weights_every` and `optim_niter` in `NashMTL`;
+  `trim_number` in `TrimmedMean`. Setters validate their inputs matching the existing constructor
+  checks. Note that setters for `GradVac` and `GradVacWeighting` already existed.
 
 ## [0.10.0] - 2026-04-16
 

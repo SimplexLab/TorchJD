@@ -49,6 +49,28 @@ class MGDAWeighting(GramianWeighting):
                 break
         return alpha
 
+    @property
+    def epsilon(self) -> float:
+        return self._epsilon
+
+    @epsilon.setter
+    def epsilon(self, value: float) -> None:
+        if value <= 0:
+            raise ValueError(f"epsilon must be positive, but got {value}.")
+
+        self._epsilon = value
+
+    @property
+    def max_iters(self) -> int:
+        return self._max_iters
+
+    @max_iters.setter
+    def max_iters(self, value: int) -> None:
+        if value <= 0:
+            raise ValueError(f"max_iters must be a positive integer, but got {value}.")
+
+        self._max_iters = value
+
 
 class MGDA(GramianWeightedAggregator):
     r"""
@@ -67,8 +89,22 @@ class MGDA(GramianWeightedAggregator):
 
     def __init__(self, epsilon: float = 0.001, max_iters: int = 100) -> None:
         super().__init__(MGDAWeighting(epsilon=epsilon, max_iters=max_iters))
-        self._epsilon = epsilon
-        self._max_iters = max_iters
+
+    @property
+    def epsilon(self) -> float:
+        return self.gramian_weighting.epsilon
+
+    @epsilon.setter
+    def epsilon(self, value: float) -> None:
+        self.gramian_weighting.epsilon = value
+
+    @property
+    def max_iters(self) -> int:
+        return self.gramian_weighting.max_iters
+
+    @max_iters.setter
+    def max_iters(self, value: int) -> None:
+        self.gramian_weighting.max_iters = value
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(epsilon={self._epsilon}, max_iters={self._max_iters})"
+        return f"{self.__class__.__name__}(epsilon={self.epsilon}, max_iters={self.max_iters})"

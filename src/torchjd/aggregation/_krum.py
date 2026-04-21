@@ -20,18 +20,6 @@ class KrumWeighting(GramianWeighting):
 
     def __init__(self, n_byzantine: int, n_selected: int = 1) -> None:
         super().__init__()
-        if n_byzantine < 0:
-            raise ValueError(
-                "Parameter `n_byzantine` should be a non-negative integer. Found `n_byzantine = "
-                f"{n_byzantine}`.",
-            )
-
-        if n_selected < 1:
-            raise ValueError(
-                "Parameter `n_selected` should be a positive integer. Found `n_selected = "
-                f"{n_selected}`.",
-            )
-
         self.n_byzantine = n_byzantine
         self.n_selected = n_selected
 
@@ -53,6 +41,28 @@ class KrumWeighting(GramianWeighting):
         weights = one_hot_selected_indices.sum(dim=0).to(dtype=gramian.dtype) / self.n_selected
 
         return weights
+
+    @property
+    def n_byzantine(self) -> int:
+        return self._n_byzantine
+
+    @n_byzantine.setter
+    def n_byzantine(self, value: int) -> None:
+        if value < 0:
+            raise ValueError(f"n_byzantine must be non-negative, but got {value}.")
+
+        self._n_byzantine = value
+
+    @property
+    def n_selected(self) -> int:
+        return self._n_selected
+
+    @n_selected.setter
+    def n_selected(self, value: int) -> None:
+        if value < 1:
+            raise ValueError(f"n_selected must be a positive integer, but got {value}.")
+
+        self._n_selected = value
 
     def _check_matrix_shape(self, gramian: PSDMatrix) -> None:
         min_rows = self.n_byzantine + 3
@@ -83,15 +93,29 @@ class Krum(GramianWeightedAggregator):
     gramian_weighting: KrumWeighting
 
     def __init__(self, n_byzantine: int, n_selected: int = 1) -> None:
-        self._n_byzantine = n_byzantine
-        self._n_selected = n_selected
         super().__init__(KrumWeighting(n_byzantine=n_byzantine, n_selected=n_selected))
+
+    @property
+    def n_byzantine(self) -> int:
+        return self.gramian_weighting.n_byzantine
+
+    @n_byzantine.setter
+    def n_byzantine(self, value: int) -> None:
+        self.gramian_weighting.n_byzantine = value
+
+    @property
+    def n_selected(self) -> int:
+        return self.gramian_weighting.n_selected
+
+    @n_selected.setter
+    def n_selected(self, value: int) -> None:
+        self.gramian_weighting.n_selected = value
 
     def __repr__(self) -> str:
         return (
-            f"{self.__class__.__name__}(n_byzantine={self._n_byzantine}, n_selected="
-            f"{self._n_selected})"
+            f"{self.__class__.__name__}(n_byzantine={self.n_byzantine}, n_selected="
+            f"{self.n_selected})"
         )
 
     def __str__(self) -> str:
-        return f"Krum{self._n_byzantine}-{self._n_selected}"
+        return f"Krum{self.n_byzantine}-{self.n_selected}"

@@ -7,6 +7,7 @@ from utils.tensors import ones_
 
 try:
     from torchjd.aggregation import CAGrad
+    from torchjd.aggregation._cagrad import CAGradWeighting
 except ImportError:
     import pytest
 
@@ -57,3 +58,41 @@ def test_representations() -> None:
     A = CAGrad(c=0.5, norm_eps=0.0001)
     assert repr(A) == "CAGrad(c=0.5, norm_eps=0.0001)"
     assert str(A) == "CAGrad0.5"
+
+
+def test_c_setter_updates_value() -> None:
+    A = CAGrad(c=0.5)
+    A.c = 1.25
+    assert A.c == 1.25
+    assert A.gramian_weighting.c == 1.25
+
+
+def test_norm_eps_setter_updates_value() -> None:
+    A = CAGrad(c=0.5)
+    A.norm_eps = 0.25
+    assert A.norm_eps == 0.25
+    assert A.gramian_weighting.norm_eps == 0.25
+
+
+def test_c_setter_rejects_negative() -> None:
+    A = CAGrad(c=0.5)
+    with raises(ValueError, match="c"):
+        A.c = -1e-9
+
+
+def test_norm_eps_setter_rejects_negative() -> None:
+    A = CAGrad(c=0.5)
+    with raises(ValueError, match="norm_eps"):
+        A.norm_eps = -1e-9
+
+
+def test_weighting_c_setter_rejects_negative() -> None:
+    W = CAGradWeighting(c=0.5)
+    with raises(ValueError, match="c"):
+        W.c = -1e-9
+
+
+def test_weighting_norm_eps_setter_rejects_negative() -> None:
+    W = CAGradWeighting(c=0.5)
+    with raises(ValueError, match="norm_eps"):
+        W.norm_eps = -1e-9

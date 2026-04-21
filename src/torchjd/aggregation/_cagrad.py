@@ -37,10 +37,6 @@ class CAGradWeighting(GramianWeighting):
 
     def __init__(self, c: float, norm_eps: float = 0.0001) -> None:
         super().__init__()
-
-        if c < 0.0:
-            raise ValueError(f"Parameter `c` should be a non-negative float. Found `c = {c}`.")
-
         self.c = c
         self.norm_eps = norm_eps
 
@@ -73,6 +69,28 @@ class CAGradWeighting(GramianWeighting):
 
         return weights
 
+    @property
+    def c(self) -> float:
+        return self._c
+
+    @c.setter
+    def c(self, value: float) -> None:
+        if value < 0:
+            raise ValueError(f"c must be non-negative, but got {value}.")
+
+        self._c = value
+
+    @property
+    def norm_eps(self) -> float:
+        return self._norm_eps
+
+    @norm_eps.setter
+    def norm_eps(self, value: float) -> None:
+        if value < 0:
+            raise ValueError(f"norm_eps must be non-negative, but got {value}.")
+
+        self._norm_eps = value
+
 
 class CAGrad(GramianWeightedAggregator):
     """
@@ -94,15 +112,29 @@ class CAGrad(GramianWeightedAggregator):
 
     def __init__(self, c: float, norm_eps: float = 0.0001) -> None:
         super().__init__(CAGradWeighting(c=c, norm_eps=norm_eps))
-        self._c = c
-        self._norm_eps = norm_eps
 
         # This prevents considering the computed weights as constant w.r.t. the matrix.
         self.register_full_backward_pre_hook(raise_non_differentiable_error)
 
+    @property
+    def c(self) -> float:
+        return self.gramian_weighting.c
+
+    @c.setter
+    def c(self, value: float) -> None:
+        self.gramian_weighting.c = value
+
+    @property
+    def norm_eps(self) -> float:
+        return self.gramian_weighting.norm_eps
+
+    @norm_eps.setter
+    def norm_eps(self, value: float) -> None:
+        self.gramian_weighting.norm_eps = value
+
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(c={self._c}, norm_eps={self._norm_eps})"
+        return f"{self.__class__.__name__}(c={self.c}, norm_eps={self.norm_eps})"
 
     def __str__(self) -> str:
-        c_str = str(self._c).rstrip("0")
+        c_str = str(self.c).rstrip("0")
         return f"CAGrad{c_str}"

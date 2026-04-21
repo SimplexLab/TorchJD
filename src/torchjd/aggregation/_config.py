@@ -29,8 +29,7 @@ class ConFIG(Aggregator):
 
     def __init__(self, pref_vector: Tensor | None = None) -> None:
         super().__init__()
-        self.weighting = pref_vector_to_weighting(pref_vector, default=SumWeighting())
-        self._pref_vector = pref_vector
+        self.pref_vector = pref_vector
 
         # This prevents computing gradients that can be very wrong.
         self.register_full_backward_pre_hook(raise_non_differentiable_error)
@@ -46,8 +45,17 @@ class ConFIG(Aggregator):
 
         return length * unit_target_vector
 
+    @property
+    def pref_vector(self) -> Tensor | None:
+        return self._pref_vector
+
+    @pref_vector.setter
+    def pref_vector(self, value: Tensor | None) -> None:
+        self.weighting = pref_vector_to_weighting(value, default=SumWeighting())
+        self._pref_vector = value
+
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(pref_vector={repr(self._pref_vector)})"
+        return f"{self.__class__.__name__}(pref_vector={repr(self.pref_vector)})"
 
     def __str__(self) -> str:
-        return f"ConFIG{pref_vector_to_str_suffix(self._pref_vector)}"
+        return f"ConFIG{pref_vector_to_str_suffix(self.pref_vector)}"

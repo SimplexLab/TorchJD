@@ -41,13 +41,8 @@ class GradVacWeighting(GramianWeighting, Stateful):
 
     def __init__(self, beta: float = 0.5, eps: float = 1e-8) -> None:
         super().__init__()
-        if not (0.0 <= beta <= 1.0):
-            raise ValueError(f"Parameter `beta` must be in [0, 1]. Found beta={beta!r}.")
-        if eps < 0.0:
-            raise ValueError(f"Parameter `eps` must be non-negative. Found eps={eps!r}.")
-
-        self._beta = beta
-        self._eps = eps
+        self.beta = beta
+        self.eps = eps
         self._phi_t: Tensor | None = None
         self._state_key: tuple[int, torch.dtype] | None = None
 

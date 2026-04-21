@@ -17,11 +17,6 @@ class TrimmedMean(Aggregator):
 
     def __init__(self, trim_number: int) -> None:
         super().__init__()
-        if trim_number < 0:
-            raise ValueError(
-                "Parameter `trim_number` should be a non-negative integer. Found `trim_number` = "
-                f"{trim_number}`.",
-            )
         self.trim_number = trim_number
 
     def forward(self, matrix: Tensor, /) -> Tensor:
@@ -34,6 +29,17 @@ class TrimmedMean(Aggregator):
         trimmed = torch.narrow(sorted_matrix, dim=0, start=self.trim_number, length=n_remaining)
         vector = trimmed.mean(dim=0)
         return vector
+
+    @property
+    def trim_number(self) -> int:
+        return self._trim_number
+
+    @trim_number.setter
+    def trim_number(self, value: int) -> None:
+        if value < 0:
+            raise ValueError(f"trim_number must be non-negative, but got {value}.")
+
+        self._trim_number = value
 
     def _check_matrix_has_enough_rows(self, matrix: Tensor) -> None:
         min_rows = 1 + 2 * self.trim_number

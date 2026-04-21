@@ -1,10 +1,11 @@
-from pytest import mark
+from pytest import mark, raises
 from torch import Tensor
 from torch.testing import assert_close
 from utils.tensors import ones_, randn_, tensor_
 
 try:
     from torchjd.aggregation import NashMTL
+    from torchjd.aggregation._nash_mtl import _NashMTLWeighting
 except ImportError:
     import pytest
 
@@ -72,3 +73,57 @@ def test_representations() -> None:
     A = NashMTL(n_tasks=2, max_norm=1.5, update_weights_every=2, optim_niter=5)
     assert repr(A) == "NashMTL(n_tasks=2, max_norm=1.5, update_weights_every=2, optim_niter=5)"
     assert str(A) == "NashMTL"
+
+
+def test_setters_update_values() -> None:
+    A = NashMTL(n_tasks=2)
+    A.n_tasks = 4
+    A.max_norm = 2.5
+    A.update_weights_every = 3
+    A.optim_niter = 7
+    assert A.n_tasks == 4
+    assert A.max_norm == 2.5
+    assert A.update_weights_every == 3
+    assert A.optim_niter == 7
+    assert A.weighting.n_tasks == 4
+    assert A.weighting.max_norm == 2.5
+    assert A.weighting.update_weights_every == 3
+    assert A.weighting.optim_niter == 7
+
+
+def test_n_tasks_setter_rejects_non_positive() -> None:
+    A = NashMTL(n_tasks=2)
+    with raises(ValueError, match="n_tasks"):
+        A.n_tasks = 0
+    with raises(ValueError, match="n_tasks"):
+        A.n_tasks = -1
+
+
+def test_max_norm_setter_rejects_negative() -> None:
+    A = NashMTL(n_tasks=2)
+    with raises(ValueError, match="max_norm"):
+        A.max_norm = -1e-9
+
+
+def test_update_weights_every_setter_rejects_non_positive() -> None:
+    A = NashMTL(n_tasks=2)
+    with raises(ValueError, match="update_weights_every"):
+        A.update_weights_every = 0
+
+
+def test_optim_niter_setter_rejects_non_positive() -> None:
+    A = NashMTL(n_tasks=2)
+    with raises(ValueError, match="optim_niter"):
+        A.optim_niter = 0
+
+
+def test_weighting_setters_validate() -> None:
+    W = _NashMTLWeighting(n_tasks=2, max_norm=1.0, update_weights_every=1, optim_niter=5)
+    with raises(ValueError, match="n_tasks"):
+        W.n_tasks = 0
+    with raises(ValueError, match="max_norm"):
+        W.max_norm = -1.0
+    with raises(ValueError, match="update_weights_every"):
+        W.update_weights_every = 0
+    with raises(ValueError, match="optim_niter"):
+        W.optim_niter = 0

@@ -6,6 +6,7 @@ from utils.contexts import ExceptionContext
 from utils.tensors import ones_
 
 from torchjd.aggregation import Krum
+from torchjd.aggregation._krum import KrumWeighting
 
 from ._asserts import assert_expected_structure
 from ._inputs import scaled_matrices_2_plus_rows, typical_matrices_2_plus_rows
@@ -78,3 +79,43 @@ def test_representations() -> None:
     A = Krum(n_byzantine=1, n_selected=2)
     assert repr(A) == "Krum(n_byzantine=1, n_selected=2)"
     assert str(A) == "Krum1-2"
+
+
+def test_n_byzantine_setter_updates_value() -> None:
+    A = Krum(n_byzantine=1)
+    A.n_byzantine = 3
+    assert A.n_byzantine == 3
+    assert A.gramian_weighting.n_byzantine == 3
+
+
+def test_n_selected_setter_updates_value() -> None:
+    A = Krum(n_byzantine=1)
+    A.n_selected = 3
+    assert A.n_selected == 3
+    assert A.gramian_weighting.n_selected == 3
+
+
+def test_n_byzantine_setter_rejects_negative() -> None:
+    A = Krum(n_byzantine=1)
+    with raises(ValueError, match="n_byzantine"):
+        A.n_byzantine = -1
+
+
+def test_n_selected_setter_rejects_non_positive() -> None:
+    A = Krum(n_byzantine=1)
+    with raises(ValueError, match="n_selected"):
+        A.n_selected = 0
+    with raises(ValueError, match="n_selected"):
+        A.n_selected = -1
+
+
+def test_weighting_n_byzantine_setter_rejects_negative() -> None:
+    W = KrumWeighting(n_byzantine=1)
+    with raises(ValueError, match="n_byzantine"):
+        W.n_byzantine = -1
+
+
+def test_weighting_n_selected_setter_rejects_non_positive() -> None:
+    W = KrumWeighting(n_byzantine=1)
+    with raises(ValueError, match="n_selected"):
+        W.n_selected = 0

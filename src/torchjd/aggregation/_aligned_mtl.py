@@ -35,16 +35,24 @@ class AlignedMTLWeighting(GramianWeighting):
         scale_mode: SUPPORTED_SCALE_MODE = "min",
     ) -> None:
         super().__init__()
-        self._pref_vector = pref_vector
-        self._scale_mode: SUPPORTED_SCALE_MODE = scale_mode
-        self.weighting = pref_vector_to_weighting(pref_vector, default=MeanWeighting())
+        self.pref_vector = pref_vector
+        self.scale_mode: SUPPORTED_SCALE_MODE = scale_mode
 
     def forward(self, gramian: PSDMatrix, /) -> Tensor:
         w = self.weighting(gramian)
-        B = self._compute_balance_transformation(gramian, self._scale_mode)
+        B = self._compute_balance_transformation(gramian, self.scale_mode)
         alpha = B @ w
 
         return alpha
+
+    @property
+    def pref_vector(self) -> Tensor | None:
+        return self._pref_vector
+
+    @pref_vector.setter
+    def pref_vector(self, value: Tensor | None) -> None:
+        self.weighting = pref_vector_to_weighting(value, default=MeanWeighting())
+        self._pref_vector = value
 
     @staticmethod
     def _compute_balance_transformation(
@@ -103,15 +111,29 @@ class AlignedMTL(GramianWeightedAggregator):
         pref_vector: Tensor | None = None,
         scale_mode: SUPPORTED_SCALE_MODE = "min",
     ) -> None:
-        self._pref_vector = pref_vector
-        self._scale_mode: SUPPORTED_SCALE_MODE = scale_mode
         super().__init__(AlignedMTLWeighting(pref_vector, scale_mode=scale_mode))
+
+    @property
+    def pref_vector(self) -> Tensor | None:
+        return self.gramian_weighting.pref_vector
+
+    @pref_vector.setter
+    def pref_vector(self, value: Tensor | None) -> None:
+        self.gramian_weighting.pref_vector = value
+
+    @property
+    def scale_mode(self) -> SUPPORTED_SCALE_MODE:
+        return self.gramian_weighting.scale_mode
+
+    @scale_mode.setter
+    def scale_mode(self, value: SUPPORTED_SCALE_MODE) -> None:
+        self.gramian_weighting.scale_mode = value
 
     def __repr__(self) -> str:
         return (
-            f"{self.__class__.__name__}(pref_vector={repr(self._pref_vector)}, "
-            f"scale_mode={repr(self._scale_mode)})"
+            f"{self.__class__.__name__}(pref_vector={repr(self.pref_vector)}, "
+            f"scale_mode={repr(self.scale_mode)})"
         )
 
     def __str__(self) -> str:
-        return f"AlignedMTL{pref_vector_to_str_suffix(self._pref_vector)}"
+        return f"AlignedMTL{pref_vector_to_str_suffix(self.pref_vector)}"

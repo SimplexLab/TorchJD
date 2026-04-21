@@ -1,4 +1,4 @@
-from pytest import mark
+from pytest import mark, raises
 from torch import Tensor
 from torch.testing import assert_close
 from utils.tensors import ones_, randn_
@@ -70,3 +70,45 @@ def test_representations() -> None:
     A = MGDA(epsilon=0.001, max_iters=100)
     assert repr(A) == "MGDA(epsilon=0.001, max_iters=100)"
     assert str(A) == "MGDA"
+
+
+def test_epsilon_setter_updates_value() -> None:
+    A = MGDA()
+    A.epsilon = 0.25
+    assert A.epsilon == 0.25
+    assert A.gramian_weighting.epsilon == 0.25
+
+
+def test_max_iters_setter_updates_value() -> None:
+    A = MGDA()
+    A.max_iters = 42
+    assert A.max_iters == 42
+    assert A.gramian_weighting.max_iters == 42
+
+
+def test_epsilon_setter_rejects_non_positive() -> None:
+    A = MGDA()
+    with raises(ValueError, match="epsilon"):
+        A.epsilon = 0.0
+    with raises(ValueError, match="epsilon"):
+        A.epsilon = -1e-9
+
+
+def test_max_iters_setter_rejects_non_positive() -> None:
+    A = MGDA()
+    with raises(ValueError, match="max_iters"):
+        A.max_iters = 0
+    with raises(ValueError, match="max_iters"):
+        A.max_iters = -1
+
+
+def test_weighting_epsilon_setter_rejects_non_positive() -> None:
+    W = MGDAWeighting()
+    with raises(ValueError, match="epsilon"):
+        W.epsilon = 0.0
+
+
+def test_weighting_max_iters_setter_rejects_non_positive() -> None:
+    W = MGDAWeighting()
+    with raises(ValueError, match="max_iters"):
+        W.max_iters = 0

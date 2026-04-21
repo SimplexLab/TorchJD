@@ -61,3 +61,15 @@ def test_representations() -> None:
     aggregator = TrimmedMean(trim_number=2)
     assert repr(aggregator) == "TrimmedMean(trim_number=2)"
     assert str(aggregator) == "TM2"
+
+
+def test_trim_number_setter_updates_value() -> None:
+    A = TrimmedMean(trim_number=1)
+    A.trim_number = 3
+    assert A.trim_number == 3
+
+
+def test_trim_number_setter_rejects_negative() -> None:
+    A = TrimmedMean(trim_number=1)
+    with raises(ValueError, match="trim_number"):
+        A.trim_number = -1
