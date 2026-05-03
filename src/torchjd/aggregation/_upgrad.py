@@ -23,7 +23,9 @@ class UPGradWeighting(GramianWeighting):
         numerical errors when computing the gramian, it might not exactly be positive definite.
         This issue can make the optimization fail. Adding ``reg_eps`` to the diagonal of the gramian
         ensures that it is positive definite.
-    :param solver: The solver used to optimize the underlying optimization problem.
+    :param solver: The solver used to optimize the underlying optimization problem. Use
+        ``"quadprog"`` (default) for a CPU-based solver or ``"qpth"`` to solve natively on the
+        device of the input tensors (requires the optional ``qpth`` package).
     """
 
     def __init__(
@@ -93,7 +95,9 @@ class UPGrad(GramianWeightedAggregator):
         numerical errors when computing the gramian, it might not exactly be positive definite.
         This issue can make the optimization fail. Adding ``reg_eps`` to the diagonal of the gramian
         ensures that it is positive definite.
-    :param solver: The solver used to optimize the underlying optimization problem.
+    :param solver: The solver used to optimize the underlying optimization problem. Use
+        ``"quadprog"`` (default) for a CPU-based solver or ``"qpth"`` to solve natively on the
+        device of the input tensors (requires the optional ``qpth`` package).
     """
 
     gramian_weighting: UPGradWeighting

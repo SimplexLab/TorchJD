@@ -1,5 +1,7 @@
+import importlib.util
+
 import torch
-from pytest import mark, raises
+from pytest import mark, param, raises
 from torch import Tensor
 from utils.tensors import ones_
 
@@ -16,33 +18,49 @@ from ._asserts import (
 )
 from ._inputs import non_strong_matrices, scaled_matrices, typical_matrices
 
+_has_qpth = importlib.util.find_spec("qpth") is not None
+_skip_no_qpth = mark.skipif(not _has_qpth, reason="qpth not installed")
+
 scaled_pairs = [(UPGrad(), matrix) for matrix in scaled_matrices]
 typical_pairs = [(UPGrad(), matrix) for matrix in typical_matrices]
 non_strong_pairs = [(UPGrad(), matrix) for matrix in non_strong_matrices]
 requires_grad_pairs = [(UPGrad(), ones_(3, 5, requires_grad=True))]
 
+_qpth_typical_pairs = [
+    param(UPGrad(solver="qpth"), matrix, marks=_skip_no_qpth) for matrix in typical_matrices
+]
+_qpth_non_strong_pairs = [
+    param(UPGrad(solver="qpth"), matrix, marks=_skip_no_qpth) for matrix in non_strong_matrices
+]
+_qpth_scaled_pairs = [
+    param(UPGrad(solver="qpth"), matrix, marks=_skip_no_qpth) for matrix in scaled_matrices
+]
 
-@mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
+
+@mark.parametrize(
+    ["aggregator", "matrix"],
+    scaled_pairs + typical_pairs + _qpth_scaled_pairs + _qpth_typical_pairs,
+)
 def test_expected_structure(aggregator: UPGrad, matrix: Tensor) -> None:
     assert_expected_structure(aggregator, matrix)
 
 
-@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+@mark.parametrize(["aggregator", "matrix"], typical_pairs + _qpth_typical_pairs)
 def test_non_conflicting(aggregator: UPGrad, matrix: Tensor) -> None:
     assert_non_conflicting(aggregator, matrix, atol=4e-04, rtol=4e-04)
 
 
-@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+@mark.parametrize(["aggregator", "matrix"], typical_pairs + _qpth_typical_pairs)
 def test_permutation_invariant(aggregator: UPGrad, matrix: Tensor) -> None:
     assert_permutation_invariant(aggregator, matrix, n_runs=5, atol=5e-07, rtol=5e-07)
 
 
-@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+@mark.parametrize(["aggregator", "matrix"], typical_pairs + _qpth_typical_pairs)
 def test_linear_under_scaling(aggregator: UPGrad, matrix: Tensor) -> None:
     assert_linear_under_scaling(aggregator, matrix, n_runs=5, atol=6e-02, rtol=6e-02)
 
 
-@mark.parametrize(["aggregator", "matrix"], non_strong_pairs)
+@mark.parametrize(["aggregator", "matrix"], non_strong_pairs + _qpth_non_strong_pairs)
 def test_strongly_stationary(aggregator: UPGrad, matrix: Tensor) -> None:
     assert_strongly_stationary(aggregator, matrix, threshold=5e-03)
 
@@ -68,6 +86,13 @@ def test_representations() -> None:
         "solver='quadprog')"
     )
     assert str(A) == "UPGrad([1., 2., 3.])"
+
+
+@_skip_no_qpth
+def test_representations_qpth() -> None:
+    A = UPGrad(pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, solver="qpth")
+    assert repr(A) == "UPGrad(pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, solver='qpth')"
+    assert str(A) == "UPGrad"
 
 
 def test_pref_vector_setter_updates_value() -> None:
