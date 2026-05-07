@@ -12,6 +12,7 @@ changelog does not include internal changes that do not affect the user.
 
 - Made `WeightedAggregator`, `GramianWeightedAggregator`, `MatrixWeighting`, and `GramianWeighting`
   public. These abstract base classes are now importable from `torchjd.aggregation` and documented.
+  They can be extended to easily implement custom `Weighting`s and `Aggregator`s.
 - Added getters and setters for the constructor parameters of all aggregators and weightings, so
   that they can be changed after initialization. This includes: `pref_vector`,
   `norm_eps` and `reg_eps` in `UPGrad`, `UPGradWeighting`, `DualProj` and `DualProjWeighting`;
