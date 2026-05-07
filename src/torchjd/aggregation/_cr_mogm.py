@@ -18,8 +18,7 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
     :class:`~torchjd.aggregation._weighting_bases.Weighting` that wraps another
     :class:`~torchjd.aggregation._weighting_bases.Weighting` and stabilises the weights it
     produces with an exponential moving average (EMA) across calls. This is the weight-smoothing
-    modifier from `Conflict-Reduction Multi-Objective Gradient Methods (NeurIPS 2022)
-    <https://proceedings.neurips.cc/paper_files/paper/2022/hash/4e91f0648fb6e09f0156a7eaf6c4dfdb-Abstract-Conference.html>`_.
+    modifier from Conflict-Reduction Multi-Objective Gradient Methods (NeurIPS 2022).
 
     Let :math:`\hat{\lambda}_k` be the weights returned by the wrapped weighting at step
     :math:`k`. The smoothed weights returned by ``CRMOGMWeighting`` are:

@@ -10,8 +10,7 @@ changelog does not include internal changes that do not affect the user.
 
 ### Added
 
-- Added `CRMOGMWeighting` from
-  [Conflict-Reduction Multi-Objective Gradient Methods](https://proceedings.neurips.cc/paper_files/paper/2022/hash/4e91f0648fb6e09f0156a7eaf6c4dfdb-Abstract-Conference.html).
+- Added `CRMOGMWeighting` from Conflict-Reduction Multi-Objective Gradient Methods (NeurIPS 2022).
   It wraps an existing `Weighting` and stabilises its weights with an exponential moving average
   across calls.
 - Added getters and setters for the constructor parameters of all aggregators and weightings, so
