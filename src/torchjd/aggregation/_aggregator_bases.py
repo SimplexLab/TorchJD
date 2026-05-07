@@ -47,7 +47,7 @@ class Aggregator(nn.Module, ABC):
 
 class WeightedAggregator(Aggregator):
     """
-    Aggregator that combines the rows of the input jacobian matrix with weights given by applying a
+    Aggregator that combines the rows of the input Jacobian matrix with weights given by applying a
     :class:`~torchjd.aggregation.MatrixWeighting` to it.
 
     :param weighting: The object responsible for extracting the vector of weights from the matrix.
@@ -76,7 +76,7 @@ class WeightedAggregator(Aggregator):
 class GramianWeightedAggregator(WeightedAggregator):
     """
     :class:`~torchjd.aggregation.WeightedAggregator` that computes the gramian of the input
-    jacobian matrix before applying a :class:`~torchjd.aggregation.GramianWeighting` to it.
+    Jacobian matrix before applying a :class:`~torchjd.aggregation.GramianWeighting` to it.
 
     :param gramian_weighting: The object responsible for extracting the vector of weights from the
         gramian.
