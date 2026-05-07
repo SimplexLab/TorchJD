@@ -10,6 +10,10 @@ changelog does not include internal changes that do not affect the user.
 
 ### Added
 
+- Added `CRMOGMWeighting` from
+  [Conflict-Reduction Multi-Objective Gradient Methods](https://proceedings.neurips.cc/paper_files/paper/2022/hash/4e91f0648fb6e09f0156a7eaf6c4dfdb-Abstract-Conference.html).
+  It wraps an existing `Weighting` and stabilises its weights with an exponential moving average
+  across calls.
 - Added getters and setters for the constructor parameters of all aggregators and weightings, so
   that they can be changed after initialization. This includes: `pref_vector`,
   `norm_eps` and `reg_eps` in `UPGrad`, `UPGradWeighting`, `DualProj` and `DualProjWeighting`;
@@ -18,7 +22,7 @@ changelog does not include internal changes that do not affect the user.
   `n_selected` in `Krum` and `KrumWeighting`; `epsilon` and `max_iters` in `MGDA` and
   `MGDAWeighting`; `n_tasks`, `max_norm`, `update_weights_every` and `optim_niter` in `NashMTL`;
   `trim_number` in `TrimmedMean`. Setters validate their inputs matching the existing constructor
-  checks. Note that setters for `GradVac` and `GradVacWeighting` already existed.
+  checks.
 
 ## [0.10.0] - 2026-04-16
 
