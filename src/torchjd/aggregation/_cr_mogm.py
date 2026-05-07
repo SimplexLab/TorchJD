@@ -34,9 +34,8 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
     ``device`` of the input changes.
 
     Because ``CRMOGMWeighting`` is generic in the input type ``_T``, it can wrap either a
-    :class:`~torchjd.aggregation._weighting_bases.MatrixWeighting` or a
-    :class:`~torchjd.aggregation._weighting_bases.GramianWeighting`. The user composes it with
-    the appropriate aggregator base:
+    ``MatrixWeighting`` or a ``GramianWeighting``. The user composes it with the appropriate
+    aggregator base:
 
     .. code-block:: python
 
