@@ -15,6 +15,7 @@ from torchjd.aggregation import (
     Constant,
     DualProj,
     GradDrop,
+    GramianWeightedAggregator,
     Krum,
     Mean,
     PCGrad,
@@ -22,8 +23,8 @@ from torchjd.aggregation import (
     Sum,
     TrimmedMean,
     UPGrad,
+    WeightedAggregator,
 )
-from torchjd.aggregation._aggregator_bases import GramianWeightedAggregator, WeightedAggregator
 from torchjd.autojac._jac_to_grad import (
     _can_skip_jacobian_combination,
     _has_forward_hook,

@@ -20,7 +20,7 @@ from ._utils.non_differentiable import raise_non_differentiable_error
 
 class _NashMTLWeighting(MatrixWeighting, Stateful):
     """
-    :class:`~torchjd.aggregation._mixins.Stateful` :class:`~torchjd.aggregation.Weighting` that
+    :class:`~torchjd.aggregation._mixins.Stateful` :class:`~torchjd.aggregation.MatrixWeighting` that
     extracts weights using the step decision of Algorithm 1 of `Multi-Task Learning as a Bargaining
     Game <https://arxiv.org/pdf/2202.01017.pdf>`_.
 
@@ -201,7 +201,7 @@ class _NashMTLWeighting(MatrixWeighting, Stateful):
 class NashMTL(WeightedAggregator, Stateful):
     """
     :class:`~torchjd.aggregation._mixins.Stateful`
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as proposed in Algorithm 1 of
+    :class:`~torchjd.aggregation.WeightedAggregator` as proposed in Algorithm 1 of
     `Multi-Task Learning as a Bargaining Game <https://arxiv.org/pdf/2202.01017.pdf>`_.
 
     :param n_tasks: The number of tasks, corresponding to the number of rows in the provided

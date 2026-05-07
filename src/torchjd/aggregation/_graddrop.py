@@ -15,7 +15,7 @@ def _identity(P: Tensor) -> Tensor:
 
 class GradDrop(Aggregator):
     """
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that applies the gradient combination
+    :class:`~torchjd.aggregation.Aggregator` that applies the gradient combination
     steps from GradDrop, as defined in lines 10 to 15 of Algorithm 1 of `Just Pick a Sign:
     Optimizing Deep Multitask Models with Gradient Sign Dropout
     <https://arxiv.org/pdf/2010.06808.pdf>`_.

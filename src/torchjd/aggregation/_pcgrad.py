@@ -12,7 +12,7 @@ from ._weighting_bases import GramianWeighting
 
 class PCGradWeighting(GramianWeighting):
     """
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
+    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
     :class:`~torchjd.aggregation.PCGrad`.
     """
 
@@ -48,7 +48,7 @@ class PCGradWeighting(GramianWeighting):
 
 class PCGrad(GramianWeightedAggregator):
     """
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as defined in algorithm 1 of
+    :class:`~torchjd.aggregation.GramianWeightedAggregator` as defined in algorithm 1 of
     `Gradient Surgery for Multi-Task Learning <https://arxiv.org/pdf/2001.06782.pdf>`_.
     """
 

@@ -12,7 +12,7 @@ from ._weighting_bases import GramianWeighting
 
 class DualProjWeighting(GramianWeighting):
     r"""
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
+    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
     :class:`~torchjd.aggregation.DualProj`.
 
     :param pref_vector: The preference vector to use. If not provided, defaults to
@@ -78,7 +78,7 @@ class DualProjWeighting(GramianWeighting):
 
 class DualProj(GramianWeightedAggregator):
     r"""
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that averages the rows of the input
+    :class:`~torchjd.aggregation.GramianWeightedAggregator` that averages the rows of the input
     matrix, and projects the result onto the dual cone of the rows of the matrix. This corresponds
     to the solution to Equation 11 of `Gradient Episodic Memory for Continual Learning
     <https://proceedings.neurips.cc/paper/2017/file/f87522788a2be2d171666752f97ddebb-Paper.pdf>`_.

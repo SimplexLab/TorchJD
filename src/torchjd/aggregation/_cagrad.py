@@ -20,7 +20,7 @@ from ._utils.non_differentiable import raise_non_differentiable_error
 
 class CAGradWeighting(GramianWeighting):
     """
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
+    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
     :class:`~torchjd.aggregation.CAGrad`.
 
     :param c: The scale of the radius of the ball constraint.
@@ -94,7 +94,7 @@ class CAGradWeighting(GramianWeighting):
 
 class CAGrad(GramianWeightedAggregator):
     """
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as defined in Algorithm 1 of
+    :class:`~torchjd.aggregation.GramianWeightedAggregator` as defined in Algorithm 1 of
     `Conflict-Averse Gradient Descent for Multi-task Learning
     <https://arxiv.org/pdf/2110.14048.pdf>`_.
 
