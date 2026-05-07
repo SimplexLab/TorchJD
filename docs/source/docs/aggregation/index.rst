@@ -11,7 +11,7 @@ Abstract base classes
     :members: __call__
 
 .. autoclass:: torchjd.aggregation.WeightedAggregator
-    :members: __call__, combine
+    :members: __call__
 
 .. autoclass:: torchjd.aggregation.GramianWeightedAggregator
     :members: __call__

@@ -58,7 +58,7 @@ class WeightedAggregator(Aggregator):
         self.weighting = weighting
 
     @staticmethod
-    def combine(matrix: Matrix, weights: Tensor) -> Tensor:
+    def _combine(matrix: Matrix, weights: Tensor) -> Tensor:
         """
         Aggregates a matrix by making a linear combination of its rows, using the provided vector of
         weights.
@@ -69,7 +69,7 @@ class WeightedAggregator(Aggregator):
 
     def forward(self, matrix: Matrix, /) -> Tensor:
         weights = self.weighting(matrix)
-        vector = self.combine(matrix, weights)
+        vector = self._combine(matrix, weights)
         return vector
 
 
