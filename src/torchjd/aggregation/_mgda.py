@@ -9,7 +9,7 @@ from ._weighting_bases import GramianWeighting
 
 class MGDAWeighting(GramianWeighting):
     r"""
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
+    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
     :class:`~torchjd.aggregation.MGDA`.
 
     :param epsilon: The value of :math:`\hat{\gamma}` below which we stop the optimization.
@@ -74,7 +74,7 @@ class MGDAWeighting(GramianWeighting):
 
 class MGDA(GramianWeightedAggregator):
     r"""
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` performing the gradient aggregation
+    :class:`~torchjd.aggregation.GramianWeightedAggregator` performing the gradient aggregation
     step of `Multiple-gradient descent algorithm (MGDA) for multiobjective optimization
     <https://comptes-rendus.academie-sciences.fr/mathematique/articles/10.1016/j.crma.2012.03.014/>`_.
     The implementation is based on Algorithm 2 of `Multi-Task Learning as Multi-Objective

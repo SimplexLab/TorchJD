@@ -7,7 +7,7 @@ from ._weighting_bases import MatrixWeighting
 
 class ConstantWeighting(MatrixWeighting):
     """
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` that returns constant, pre-determined
+    :class:`~torchjd.aggregation.MatrixWeighting` that returns constant, pre-determined
     weights.
 
     :param weights: The weights to return at each call.
@@ -37,7 +37,7 @@ class ConstantWeighting(MatrixWeighting):
 
 class Constant(WeightedAggregator):
     """
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that makes a linear combination of
+    :class:`~torchjd.aggregation.WeightedAggregator` that makes a linear combination of
     the rows of the provided matrix, with constant, pre-determined weights.
 
     :param weights: The weights associated to the rows of the input matrices.

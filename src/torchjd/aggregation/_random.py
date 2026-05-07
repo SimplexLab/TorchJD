@@ -8,7 +8,7 @@ from ._weighting_bases import MatrixWeighting
 
 class RandomWeighting(MatrixWeighting):
     """
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` that generates positive random weights
+    :class:`~torchjd.aggregation.MatrixWeighting` that generates positive random weights
     at each call.
     """
 
@@ -20,7 +20,7 @@ class RandomWeighting(MatrixWeighting):
 
 class Random(WeightedAggregator):
     """
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that computes a random combination of
+    :class:`~torchjd.aggregation.WeightedAggregator` that computes a random combination of
     the rows of the provided matrices, as defined in algorithm 2 of `Reasonable Effectiveness of
     Random Weighting: A Litmus Test for Multi-Task Learning
     <https://arxiv.org/pdf/2111.10603.pdf>`_.
