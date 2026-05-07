@@ -30,7 +30,7 @@ class DualProjWeighting(GramianWeighting):
         pref_vector: Tensor | None = None,
         norm_eps: float = 0.0001,
         reg_eps: float = 0.0001,
-        solver: SUPPORTED_SOLVER = "quadprog",
+        solver: SUPPORTED_SOLVER = "proxsuite",
     ) -> None:
         super().__init__()
         self.pref_vector = pref_vector
@@ -100,7 +100,7 @@ class DualProj(GramianWeightedAggregator):
         pref_vector: Tensor | None = None,
         norm_eps: float = 0.0001,
         reg_eps: float = 0.0001,
-        solver: SUPPORTED_SOLVER = "quadprog",
+        solver: SUPPORTED_SOLVER = "proxsuite",
     ) -> None:
         self._solver: SUPPORTED_SOLVER = solver
 
