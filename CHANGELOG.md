@@ -10,9 +10,10 @@ changelog does not include internal changes that do not affect the user.
 
 ### Added
 
-- Added `CRMOGMWeighting` from Conflict-Reduction Multi-Objective Gradient Methods (NeurIPS 2022).
-  It wraps an existing `Weighting` and stabilises its weights with an exponential moving average
-  across calls.
+- Added `CRMOGMWeighting` from [On the Convergence of Stochastic Multi-Objective Gradient
+  Manipulation and Beyond](https://proceedings.neurips.cc/paper_files/paper/2022/file/f91bd64a3620aad8e70a27ad9cb3ca57-Paper-Conference.pdf)
+  (NeurIPS 2022). It wraps an existing `Weighting` and stabilises its weights with an exponential
+  moving average across calls.
 - Made `WeightedAggregator`, `GramianWeightedAggregator`, `MatrixWeighting`, and `GramianWeighting`
   public. These abstract base classes are now importable from `torchjd.aggregation` and documented.
   They can be extended to easily implement custom `Weighting`s and `Aggregator`s.
@@ -23,8 +24,7 @@ changelog does not include internal changes that do not affect the user.
   `CAGrad` and `CAGradWeighting`; `pref_vector` in `ConFIG`; `leak` in `GradDrop`, `n_byzantine` and
   `n_selected` in `Krum` and `KrumWeighting`; `epsilon` and `max_iters` in `MGDA` and
   `MGDAWeighting`; `n_tasks`, `max_norm`, `update_weights_every` and `optim_niter` in `NashMTL`;
-  `trim_number` in `TrimmedMean`. Setters validate their inputs matching the existing constructor
-  checks.
+  `trim_number` in `TrimmedMean`. Setters validate their inputs matching the existing constructor checks. Note that setters for `GradVac` and `GradVacWeighting` already existed.
 
 ## [0.10.0] - 2026-04-16
 

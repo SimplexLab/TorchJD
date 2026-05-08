@@ -18,7 +18,9 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
     :class:`~torchjd.aggregation._weighting_bases.Weighting` that wraps another
     :class:`~torchjd.aggregation._weighting_bases.Weighting` and stabilises the weights it
     produces with an exponential moving average (EMA) across calls. This is the weight-smoothing
-    modifier from Conflict-Reduction Multi-Objective Gradient Methods (NeurIPS 2022).
+    modifier from `On the Convergence of Stochastic Multi-Objective Gradient Manipulation and
+    Beyond <https://proceedings.neurips.cc/paper_files/paper/2022/file/f91bd64a3620aad8e70a27ad9cb3ca57-Paper-Conference.pdf>`_
+    (NeurIPS 2022).
 
     Let :math:`\hat{\lambda}_k` be the weights returned by the wrapped weighting at step
     :math:`k`. The smoothed weights returned by ``CRMOGMWeighting`` are:
@@ -76,7 +78,6 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
         self.weighting = weighting
         self.alpha = alpha
         self._lambda: Tensor | None = None
-        self._state_key: tuple[int, torch.dtype, torch.device] | None = None
 
     @property
     def alpha(self) -> float:
@@ -91,31 +92,29 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
     def reset(self) -> None:
         """Clears the EMA state so the next forward starts from uniform weights."""
 
+        if isinstance(self.weighting, Stateful):
+            self.weighting.reset()
         self._lambda = None
-        self._state_key = None
 
     def forward(self, stat: _T, /) -> Tensor:
-        device = stat.device
-        dtype = stat.dtype
-        m = stat.shape[0]
+        lambda_hat = self.weighting(stat)
 
-        self._ensure_state(m, dtype, device)
+        self._ensure_state(lambda_hat.shape[0], lambda_hat.dtype, lambda_hat.device)
         lambda_prev = cast(Tensor, self._lambda)
 
-        lambda_hat = self.weighting(stat)
         lambda_k = self._alpha * lambda_prev + (1.0 - self._alpha) * lambda_hat
 
         self._lambda = lambda_k.detach()
         return lambda_k
 
     def _ensure_state(self, m: int, dtype: torch.dtype, device: torch.device) -> None:
-        key = (m, dtype, device)
-        if self._state_key != key or self._lambda is None:
+        if (
+            self._lambda is None
+            or self._lambda.shape[0] != m
+            or self._lambda.dtype != dtype
+            or self._lambda.device != device
+        ):
             if m > 0:
                 self._lambda = torch.full((m,), 1.0 / m, dtype=dtype, device=device)
             else:
                 self._lambda = torch.zeros(0, dtype=dtype, device=device)
-            self._state_key = key
-
-    def __repr__(self) -> str:
-        return f"CRMOGMWeighting(weighting={self.weighting!r}, alpha={self.alpha!r})"

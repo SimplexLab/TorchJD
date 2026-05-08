@@ -3,7 +3,7 @@ from torch import Tensor
 from torch.testing import assert_close
 from utils.tensors import randn_, tensor_
 
-from torchjd.aggregation import MeanWeighting, SumWeighting, UPGradWeighting
+from torchjd.aggregation import GradVacWeighting, MeanWeighting, SumWeighting, UPGradWeighting
 from torchjd.aggregation._aggregator_bases import (
     GramianWeightedAggregator,
     WeightedAggregator,
@@ -22,14 +22,6 @@ matrix_pairs = [
 gramian_pairs = [
     (GramianWeightedAggregator(CRMOGMWeighting(UPGradWeighting())), m) for m in typical_matrices
 ]
-
-
-def test_representations() -> None:
-    W = CRMOGMWeighting(MeanWeighting(), alpha=0.9)
-    expected = "CRMOGMWeighting(weighting=MeanWeighting(), alpha=0.9)"
-    # Weighting does not define __str__, so it falls back to __repr__.
-    assert repr(W) == expected
-    assert str(W) == expected
 
 
 @mark.parametrize(["aggregator", "matrix"], matrix_pairs)
@@ -56,6 +48,22 @@ def test_reset_restores_first_step_behavior() -> None:
     J = randn_((3, 8))
     G = J @ J.T
     W = CRMOGMWeighting(UPGradWeighting(), alpha=0.5)
+    first = W(G)
+    W(G)
+    W.reset()
+    assert_close(first, W(G))
+
+
+def test_reset_propagates_to_stateful_weighting() -> None:
+    """
+    Verify that ``reset()`` calls the wrapped weighting's ``reset()`` when it is
+    :class:`~torchjd.aggregation.Stateful`. Uses ``GradVacWeighting`` as the inner weighting
+    because it is both stateful and produces weights that depend on its internal state.
+    """
+
+    J = randn_((3, 8))
+    G = J @ J.T
+    W = CRMOGMWeighting(GradVacWeighting(), alpha=0.5)
     first = W(G)
     W(G)
     W.reset()
