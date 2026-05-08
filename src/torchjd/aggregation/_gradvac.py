@@ -10,13 +10,13 @@ from torchjd.aggregation._mixins import Stateful
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
-from ._weighting_bases import GramianWeighting
+from ._weighting_bases import Weighting
 
 
-class GradVacWeighting(GramianWeighting, Stateful):
+class GradVacWeighting(Weighting[PSDMatrix], Stateful):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`
-    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
+    :class:`~torchjd.aggregation.Weighting` ``[PSDMatrix]`` giving the weights of
     :class:`~torchjd.aggregation.GradVac`.
 
     All required quantities (gradient norms, cosine similarities, and their updates after the

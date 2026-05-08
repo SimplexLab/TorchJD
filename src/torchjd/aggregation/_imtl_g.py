@@ -5,12 +5,12 @@ from torchjd._linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
-from ._weighting_bases import GramianWeighting
+from ._weighting_bases import Weighting
 
 
-class IMTLGWeighting(GramianWeighting):
+class IMTLGWeighting(Weighting[PSDMatrix]):
     """
-    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
+    :class:`~torchjd.aggregation.Weighting` ``[PSDMatrix]`` giving the weights of
     :class:`~torchjd.aggregation.IMTLG`.
     """
 

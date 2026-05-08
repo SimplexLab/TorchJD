@@ -4,12 +4,12 @@ from torch import Tensor
 from torchjd._linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
-from ._weighting_bases import GramianWeighting
+from ._weighting_bases import Weighting
 
 
-class MGDAWeighting(GramianWeighting):
+class MGDAWeighting(Weighting[PSDMatrix]):
     r"""
-    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
+    :class:`~torchjd.aggregation.Weighting` ``[PSDMatrix]`` giving the weights of
     :class:`~torchjd.aggregation.MGDA`.
 
     :param epsilon: The value of :math:`\hat{\gamma}` below which we stop the optimization.

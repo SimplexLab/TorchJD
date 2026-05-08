@@ -2,13 +2,15 @@ import torch
 from torch import Tensor
 from torch.nn import functional as F
 
+from torchjd._linalg import Matrix
+
 from ._aggregator_bases import WeightedAggregator
-from ._weighting_bases import MatrixWeighting
+from ._weighting_bases import Weighting
 
 
-class RandomWeighting(MatrixWeighting):
+class RandomWeighting(Weighting[Matrix]):
     """
-    :class:`~torchjd.aggregation.MatrixWeighting` that generates positive random weights
+    :class:`~torchjd.aggregation.Weighting` ``[Matrix]`` that generates positive random weights
     at each call.
     """
 

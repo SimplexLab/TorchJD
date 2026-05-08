@@ -3,7 +3,7 @@ from typing import cast
 from torchjd._linalg import PSDMatrix
 
 from ._utils.check_dependencies import check_dependencies_are_installed
-from ._weighting_bases import GramianWeighting
+from ._weighting_bases import Weighting
 
 check_dependencies_are_installed(["cvxpy", "clarabel"])
 
@@ -18,9 +18,9 @@ from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
 
 
-class CAGradWeighting(GramianWeighting):
+class CAGradWeighting(Weighting[PSDMatrix]):
     """
-    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
+    :class:`~torchjd.aggregation.Weighting` ``[PSDMatrix]`` giving the weights of
     :class:`~torchjd.aggregation.CAGrad`.
 
     :param c: The scale of the radius of the ball constraint.

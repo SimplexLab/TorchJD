@@ -1,10 +1,11 @@
 # Partly adapted from https://github.com/AvivNavon/nash-mtl — MIT License, Copyright (c) 2022 Aviv Navon.
 # See NOTICES for the full license text.
 
+from torchjd._linalg import Matrix
 from torchjd.aggregation._mixins import Stateful
 
 from ._utils.check_dependencies import check_dependencies_are_installed
-from ._weighting_bases import MatrixWeighting
+from ._weighting_bases import Weighting
 
 check_dependencies_are_installed(["cvxpy", "ecos"])
 
@@ -18,9 +19,9 @@ from ._aggregator_bases import WeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
 
 
-class _NashMTLWeighting(MatrixWeighting, Stateful):
+class _NashMTLWeighting(Weighting[Matrix], Stateful):
     """
-    :class:`~torchjd.aggregation._mixins.Stateful` :class:`~torchjd.aggregation.MatrixWeighting` that
+    :class:`~torchjd.aggregation._mixins.Stateful` :class:`~torchjd.aggregation.Weighting` ``[Matrix]`` that
     extracts weights using the step decision of Algorithm 1 of `Multi-Task Learning as a Bargaining
     Game <https://arxiv.org/pdf/2202.01017.pdf>`_.
 

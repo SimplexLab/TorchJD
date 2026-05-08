@@ -12,14 +12,14 @@ from torchjd._linalg import PSDMatrix
 from ._aggregator_bases import GramianWeightedAggregator
 from ._mean import MeanWeighting
 from ._utils.pref_vector import pref_vector_to_str_suffix, pref_vector_to_weighting
-from ._weighting_bases import GramianWeighting
+from ._weighting_bases import Weighting
 
 SUPPORTED_SCALE_MODE: TypeAlias = Literal["min", "median", "rmse"]
 
 
-class AlignedMTLWeighting(GramianWeighting):
+class AlignedMTLWeighting(Weighting[PSDMatrix]):
     r"""
-    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
+    :class:`~torchjd.aggregation.Weighting` ``[PSDMatrix]`` giving the weights of
     :class:`~torchjd.aggregation.AlignedMTL`.
 
     :param pref_vector: The preference vector to use. If not provided, defaults to
