@@ -1,7 +1,8 @@
 from typing import Literal, TypeAlias
 
+import numpy as np
 import torch
-from proxsuite.torch.qplayer import QPFunction
+from proxsuite import proxqp
 from torch import Tensor
 
 SUPPORTED_SOLVER: TypeAlias = Literal["proxsuite"]
@@ -63,17 +64,34 @@ def _project_weight_vector_batch(U: Tensor, G: Tensor, _solver: SUPPORTED_SOLVER
     :return: A tensor of projection weights of shape `[n, m]`.
     """
 
-    _, m = U.shape
+    n, m = U.shape
     device = U.device
     dtype = U.dtype
 
-    Q = G.cpu().to(dtype=torch.float64)
-    p = torch.zeros(m, dtype=torch.float64)
-    C = -torch.eye(m, dtype=torch.float64)
-    lb = torch.full((m,), -1e20, dtype=torch.float64)
-    ub = -U.cpu().to(dtype=torch.float64)
+    Q_np = G.cpu().to(dtype=torch.float64).numpy()
+    p_np = np.zeros(m, dtype=np.float64)
+    C_np = -np.eye(m, dtype=np.float64)
+    lb_np = np.full(m, -1e20, dtype=np.float64)
+    ub_np = (-U.cpu().to(dtype=torch.float64)).numpy()
 
-    solver_fn = QPFunction(structural_feasibility=True)
-    zhats, _, _ = solver_fn(Q, p, torch.Tensor(), torch.Tensor(), C, lb, ub)
+    batch_qps = proxqp.dense.BatchQP()
+    default_rho = 5.0e-5
+
+    for i in range(n):
+        qp = batch_qps.init_qp_in_place(m, 0, m)
+        qp.settings.primal_infeasibility_solving = False
+        qp.settings.max_iter = 1000
+        qp.settings.max_iter_in = 100
+        qp.settings.default_rho = default_rho
+        qp.settings.refactor_rho_threshold = default_rho
+        qp.settings.eps_abs = 1e-9
+        qp.init(H=Q_np, g=p_np, A=None, b=None, C=C_np, l=lb_np, u=ub_np[i], rho=default_rho)
+
+    for i in range(n):
+        batch_qps.get(i).solve()
+
+    zhats = torch.empty((n, m), dtype=torch.float64)
+    for i in range(n):
+        zhats[i] = torch.from_numpy(batch_qps.get(i).results.x)
 
     return zhats.to(device=device, dtype=dtype)
