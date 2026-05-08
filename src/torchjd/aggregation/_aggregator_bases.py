@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import cast
 
 from torch import Tensor, nn
 
@@ -83,5 +82,5 @@ class GramianWeightedAggregator(WeightedAggregator):
     """
 
     def __init__(self, gramian_weighting: Weighting[PSDMatrix]) -> None:
-        super().__init__(cast(Weighting[Matrix], gramian_weighting << compute_gramian))
+        super().__init__(gramian_weighting << compute_gramian)
         self.gramian_weighting = gramian_weighting
