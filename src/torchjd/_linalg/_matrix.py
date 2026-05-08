@@ -8,7 +8,16 @@ from torch import Tensor
 
 
 class Matrix(Tensor):
-    """Tensor with exactly 2 dimensions."""
+    """
+    Tensor with exactly 2 dimensions.
+
+    Common examples include the Jacobian matrix J of shape ``[m, n]``, where m is the number of
+    objectives and n is the number of model parameters, and the Gramian of the Jacobian
+    G = J J^T of shape ``[m, m]``.
+
+    .. note::
+        This class should never be instantiated. It is only used for static type checking.
+    """
 
 
 class PSDTensor(Tensor):
@@ -20,7 +29,15 @@ class PSDTensor(Tensor):
 
 
 class PSDMatrix(PSDTensor, Matrix):
-    """Positive semi-definite matrix."""
+    """
+    Positive semi-definite matrix.
+
+    A common example is the Gramian of the Jacobian G = J J^T of shape ``[m, m]``, where J is a
+    Jacobian matrix of shape ``[m, n]``.
+
+    .. note::
+        This class should never be instantiated. It is only used for static type checking.
+    """
 
 
 def is_matrix(t: Tensor) -> TypeGuard[Matrix]:

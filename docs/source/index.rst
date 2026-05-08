@@ -70,3 +70,4 @@ TorchJD is open-source, under MIT License. The source code is available on
     docs/autogram/index.rst
     docs/autojac/index.rst
     docs/aggregation/index.rst
+    docs/linalg/index.rst
