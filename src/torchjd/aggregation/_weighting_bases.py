@@ -6,7 +6,7 @@ from typing import Generic, TypeVar
 
 from torch import Tensor, nn
 
-from torchjd._linalg import PSDTensor, is_psd_tensor
+from torchjd._linalg import Matrix, PSDMatrix, PSDTensor, is_psd_tensor
 
 _T = TypeVar("_T", contravariant=True, bound=Tensor)
 _FnInputT = TypeVar("_FnInputT", bound=Tensor)
@@ -55,6 +55,26 @@ class _Composition(Weighting[_T]):
 
     def forward(self, stat: _T, /) -> Tensor:
         return self.weighting(self.fn(stat))
+
+
+class _MatrixWeighting(Weighting[Matrix]):
+    def __call__(self, matrix: Tensor, /) -> Tensor:
+        """
+        Computes the vector of weights from the input matrix and applies all registered hooks.
+
+        :param matrix: The matrix from which the weights must be extracted.
+        """
+        return super().__call__(matrix)
+
+
+class _GramianWeighting(Weighting[PSDMatrix]):
+    def __call__(self, gramian: Tensor, /) -> Tensor:
+        """
+        Computes the vector of weights from the input Gramian and applies all registered hooks.
+
+        :param gramian: The Gramian from which the weights must be extracted.
+        """
+        return super().__call__(gramian)
 
 
 class GeneralizedWeighting(nn.Module, ABC):

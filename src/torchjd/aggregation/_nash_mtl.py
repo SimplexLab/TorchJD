@@ -1,11 +1,10 @@
 # Partly adapted from https://github.com/AvivNavon/nash-mtl — MIT License, Copyright (c) 2022 Aviv Navon.
 # See NOTICES for the full license text.
 
-from torchjd._linalg import Matrix
 from torchjd.aggregation._mixins import Stateful
 
 from ._utils.check_dependencies import check_dependencies_are_installed
-from ._weighting_bases import Weighting
+from ._weighting_bases import _MatrixWeighting
 
 check_dependencies_are_installed(["cvxpy", "ecos"])
 
@@ -19,7 +18,7 @@ from ._aggregator_bases import WeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
 
 
-class _NashMTLWeighting(Weighting[Matrix], Stateful):
+class _NashMTLWeighting(_MatrixWeighting, Stateful):
     """
     :class:`~torchjd.aggregation._mixins.Stateful`
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`] that

@@ -5,10 +5,10 @@ from torch.nn import functional as F
 from torchjd._linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
-from ._weighting_bases import Weighting
+from ._weighting_bases import _GramianWeighting
 
 
-class KrumWeighting(Weighting[PSDMatrix]):
+class KrumWeighting(_GramianWeighting):
     """
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
     giving the weights of :class:`~torchjd.aggregation.Krum`.

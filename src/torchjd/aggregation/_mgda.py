@@ -4,10 +4,10 @@ from torch import Tensor
 from torchjd._linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
-from ._weighting_bases import Weighting
+from ._weighting_bases import _GramianWeighting
 
 
-class MGDAWeighting(Weighting[PSDMatrix]):
+class MGDAWeighting(_GramianWeighting):
     r"""
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
     giving the weights of :class:`~torchjd.aggregation.MGDA`.

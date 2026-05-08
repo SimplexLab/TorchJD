@@ -1,13 +1,11 @@
 import torch
 from torch import Tensor
 
-from torchjd._linalg import Matrix
-
 from ._aggregator_bases import WeightedAggregator
-from ._weighting_bases import Weighting
+from ._weighting_bases import _MatrixWeighting
 
 
-class SumWeighting(Weighting[Matrix]):
+class SumWeighting(_MatrixWeighting):
     r"""
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`] that gives the weights
     :math:`\begin{bmatrix} 1 & \dots & 1 \end{bmatrix}^T \in \mathbb{R}^m`.

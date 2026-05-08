@@ -7,10 +7,10 @@ from torchjd._linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
-from ._weighting_bases import Weighting
+from ._weighting_bases import _GramianWeighting
 
 
-class PCGradWeighting(Weighting[PSDMatrix]):
+class PCGradWeighting(_GramianWeighting):
     """
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
     giving the weights of :class:`~torchjd.aggregation.PCGrad`.

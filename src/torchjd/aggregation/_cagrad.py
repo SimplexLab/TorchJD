@@ -3,7 +3,7 @@ from typing import cast
 from torchjd._linalg import PSDMatrix
 
 from ._utils.check_dependencies import check_dependencies_are_installed
-from ._weighting_bases import Weighting
+from ._weighting_bases import _GramianWeighting
 
 check_dependencies_are_installed(["cvxpy", "clarabel"])
 
@@ -18,7 +18,7 @@ from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
 
 
-class CAGradWeighting(Weighting[PSDMatrix]):
+class CAGradWeighting(_GramianWeighting):
     """
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
     giving the weights of :class:`~torchjd.aggregation.CAGrad`.
