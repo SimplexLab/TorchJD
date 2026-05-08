@@ -107,9 +107,11 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
         return lambda_k
 
     def _ensure_state(self, m: int, dtype: torch.dtype, device: torch.device) -> Tensor:
-        if self._lambda is None or self._lambda.shape[0] != m:
-            if m > 0:
-                self._lambda = torch.full((m,), 1.0 / m, dtype=dtype, device=device)
-            else:
-                self._lambda = torch.zeros(0, dtype=dtype, device=device)
+        if self._lambda is None:
+            self._lambda = torch.full((m,), 1.0 / m, dtype=dtype, device=device)
+        elif self._lambda.shape[0] != m:
+            raise ValueError(
+                f"The number of objectives changed from {self._lambda.shape[0]} to {m}. Call "
+                f"`reset()` before changing the number of objectives."
+            )
         return self._lambda

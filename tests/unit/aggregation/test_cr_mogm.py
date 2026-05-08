@@ -3,7 +3,7 @@ from torch import Tensor
 from torch.testing import assert_close
 from utils.tensors import randn_, tensor_
 
-from torchjd.aggregation import GradVacWeighting, MeanWeighting, SumWeighting, UPGradWeighting
+from torchjd.aggregation import GradVacWeighting, MeanWeighting, UPGradWeighting
 from torchjd.aggregation._aggregator_bases import (
     GramianWeightedAggregator,
     WeightedAggregator,
@@ -154,15 +154,3 @@ def test_zero_columns() -> None:
     aggregator = WeightedAggregator(CRMOGMWeighting(MeanWeighting()))
     out = aggregator(tensor_([]).reshape(2, 0))
     assert out.shape == (0,)
-
-
-def test_zero_rows() -> None:
-    """
-    Exercises the ``m=0`` branch of ``_ensure_state``. ``SumWeighting`` is used because it
-    handles zero-row matrices cleanly (``torch.ones(0)``), unlike ``MeanWeighting`` which
-    would raise ``ZeroDivisionError``.
-    """
-
-    W = CRMOGMWeighting(SumWeighting())
-    weights = W(tensor_([]).reshape(0, 8))
-    assert weights.shape == (0,)
