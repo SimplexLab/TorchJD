@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TypeVar, cast
+from typing import TypeVar
 
 import torch
 from torch import Tensor
@@ -31,11 +31,10 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
 
     with :math:`\lambda_0 = \begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^\top
     \in \mathbb{R}^m`. The state :math:`\lambda_{k-1}` is initialised lazily on the first
-    forward call once :math:`m` is known and is reset automatically when ``m``, ``dtype`` or
-    ``device`` of the input changes.
+    forward call once :math:`m` is known and is reset automatically when ``m`` changes.
 
     Because ``CRMOGMWeighting`` is generic in the input type ``_T``, it can wrap either a
-    ``MatrixWeighting`` or a ``GramianWeighting``. The user composes it with the appropriate
+    ``MatrixWeighting`` or a ``GramianWeighting``. Creating a corresponding :class:`~torchjd.aggregation.Aggregator` can be done by composing it with the appropriate
     aggregator base:
 
     .. code-block:: python
@@ -50,7 +49,8 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
         gramian_aggregator = GramianWeightedAggregator(CRMOGMWeighting(UPGradWeighting()))
 
     This weighting is stateful: it keeps :math:`\lambda_{k-1}` across calls. Use :meth:`reset`
-    when restarting the smoothing from uniform weights.
+    when restarting the smoothing from uniform weights. Note that calling :meth:`reset` will also
+    reset the wrapped weighting if it is :class:`~torchjd.aggregation.Stateful`.
 
     :param weighting: The wrapped weighting whose output is smoothed.
     :param alpha: EMA coefficient on the previous weights. ``alpha=0`` disables smoothing
@@ -99,22 +99,17 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
     def forward(self, stat: _T, /) -> Tensor:
         lambda_hat = self.weighting(stat)
 
-        self._ensure_state(lambda_hat.shape[0], lambda_hat.dtype, lambda_hat.device)
-        lambda_prev = cast(Tensor, self._lambda)
+        lambda_prev = self._ensure_state(lambda_hat.shape[0], lambda_hat.dtype, lambda_hat.device)
 
         lambda_k = self._alpha * lambda_prev + (1.0 - self._alpha) * lambda_hat
 
         self._lambda = lambda_k.detach()
         return lambda_k
 
-    def _ensure_state(self, m: int, dtype: torch.dtype, device: torch.device) -> None:
-        if (
-            self._lambda is None
-            or self._lambda.shape[0] != m
-            or self._lambda.dtype != dtype
-            or self._lambda.device != device
-        ):
+    def _ensure_state(self, m: int, dtype: torch.dtype, device: torch.device) -> Tensor:
+        if self._lambda is None or self._lambda.shape[0] != m:
             if m > 0:
                 self._lambda = torch.full((m,), 1.0 / m, dtype=dtype, device=device)
             else:
                 self._lambda = torch.zeros(0, dtype=dtype, device=device)
+        return self._lambda
