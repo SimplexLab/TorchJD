@@ -7,7 +7,7 @@ from ._weighting_bases import MatrixWeighting
 
 class MeanWeighting(MatrixWeighting):
     r"""
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` that gives the weights
+    :class:`~torchjd.aggregation.MatrixWeighting` that gives the weights
     :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in
     \mathbb{R}^m`.
     """
@@ -22,7 +22,7 @@ class MeanWeighting(MatrixWeighting):
 
 class Mean(WeightedAggregator):
     """
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that averages the rows of the input
+    :class:`~torchjd.aggregation.WeightedAggregator` that averages the rows of the input
     matrices.
     """
 

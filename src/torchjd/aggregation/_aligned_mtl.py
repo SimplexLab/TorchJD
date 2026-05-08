@@ -19,7 +19,7 @@ SUPPORTED_SCALE_MODE: TypeAlias = Literal["min", "median", "rmse"]
 
 class AlignedMTLWeighting(GramianWeighting):
     r"""
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
+    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
     :class:`~torchjd.aggregation.AlignedMTL`.
 
     :param pref_vector: The preference vector to use. If not provided, defaults to
@@ -89,7 +89,7 @@ class AlignedMTLWeighting(GramianWeighting):
 
 class AlignedMTL(GramianWeightedAggregator):
     r"""
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as defined in Algorithm 1 of
+    :class:`~torchjd.aggregation.GramianWeightedAggregator` as defined in Algorithm 1 of
     `Independent Component Alignment for Multi-Task Learning
     <https://openaccess.thecvf.com/content/CVPR2023/papers/Senushkin_Independent_Component_Alignment_for_Multi-Task_Learning_CVPR_2023_paper.pdf>`_.
 

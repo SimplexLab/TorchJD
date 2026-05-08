@@ -16,7 +16,7 @@ from ._weighting_bases import GramianWeighting
 class GradVacWeighting(GramianWeighting, Stateful):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
+    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
     :class:`~torchjd.aggregation.GradVac`.
 
     All required quantities (gradient norms, cosine similarities, and their updates after the
@@ -131,7 +131,7 @@ class GradVacWeighting(GramianWeighting, Stateful):
 class GradVac(GramianWeightedAggregator, Stateful):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` implementing the aggregation step of
+    :class:`~torchjd.aggregation.GramianWeightedAggregator` implementing the aggregation step of
     Gradient Vaccine (GradVac) from `Gradient Vaccine: Investigating and Improving Multi-task
     Optimization in Massively Multilingual Models (ICLR 2021 Spotlight)
     <https://openreview.net/forum?id=F1vEjWK-lH_>`_.

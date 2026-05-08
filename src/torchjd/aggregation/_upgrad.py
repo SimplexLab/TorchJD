@@ -13,7 +13,7 @@ from ._weighting_bases import GramianWeighting
 
 class UPGradWeighting(GramianWeighting):
     r"""
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
+    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
     :class:`~torchjd.aggregation.UPGrad`.
 
     :param pref_vector: The preference vector to use. If not provided, defaults to
@@ -81,7 +81,7 @@ class UPGradWeighting(GramianWeighting):
 
 class UPGrad(GramianWeightedAggregator):
     r"""
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` that projects each row of the input
+    :class:`~torchjd.aggregation.GramianWeightedAggregator` that projects each row of the input
     matrix onto the dual cone of all rows of this matrix, and that combines the result, as proposed
     in `Jacobian Descent For Multi-Objective Optimization <https://arxiv.org/pdf/2406.16232>`_.
 
