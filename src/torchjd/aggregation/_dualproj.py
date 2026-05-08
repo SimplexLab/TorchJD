@@ -1,6 +1,7 @@
 from torch import Tensor
 
-from torchjd._linalg import PSDMatrix, normalize, regularize
+from torchjd._linalg import normalize, regularize
+from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._mean import MeanWeighting

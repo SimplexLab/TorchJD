@@ -4,7 +4,8 @@ import torch
 from torch import Tensor, nn, vmap
 from torch.autograd.graph import get_gradient_edge
 
-from torchjd._linalg import PSDMatrix, movedim, reshape
+from torchjd._linalg import movedim, reshape
+from torchjd.linalg import PSDMatrix
 
 from ._edge_registry import EdgeRegistry
 from ._gramian_accumulator import GramianAccumulator

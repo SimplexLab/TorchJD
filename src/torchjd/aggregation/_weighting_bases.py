@@ -6,7 +6,8 @@ from typing import Generic, TypeVar
 
 from torch import Tensor, nn
 
-from torchjd._linalg import Matrix, PSDMatrix, PSDTensor, is_psd_tensor
+from torchjd._linalg import PSDTensor, is_psd_tensor
+from torchjd.linalg import Matrix, PSDMatrix
 
 _T = TypeVar("_T", contravariant=True, bound=Tensor)
 _FnInputT = TypeVar("_FnInputT", bound=Tensor)

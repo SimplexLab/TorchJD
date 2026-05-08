@@ -1,6 +1,6 @@
 from typing import cast
 
-from torchjd._linalg import PSDMatrix
+from torchjd.linalg import PSDMatrix
 
 from ._utils.check_dependencies import check_dependencies_are_installed
 from ._weighting_bases import _GramianWeighting

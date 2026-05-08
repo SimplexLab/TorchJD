@@ -5,8 +5,8 @@ from typing import cast
 import torch
 from torch import Tensor
 
-from torchjd._linalg import PSDMatrix
 from torchjd.aggregation._mixins import Stateful
+from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error

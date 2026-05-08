@@ -7,7 +7,7 @@ from typing import Literal, TypeAlias
 import torch
 from torch import Tensor
 
-from torchjd._linalg import PSDMatrix
+from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._mean import MeanWeighting

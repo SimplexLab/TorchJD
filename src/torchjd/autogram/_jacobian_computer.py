@@ -8,7 +8,7 @@ from torch.nn import Parameter
 from torch.overrides import is_tensor_like
 from torch.utils._pytree import PyTree, tree_flatten, tree_map, tree_map_only
 
-from torchjd._linalg import Matrix
+from torchjd.linalg import Matrix
 
 # Note about import from protected _pytree module:
 # PyTorch maintainers plan to make pytree public (see

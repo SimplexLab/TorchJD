@@ -1,4 +1,4 @@
-from torchjd._linalg import PSDMatrix
+from torchjd.linalg import PSDMatrix
 
 
 class GramianAccumulator:
