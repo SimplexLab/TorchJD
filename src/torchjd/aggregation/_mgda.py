@@ -9,8 +9,8 @@ from ._weighting_bases import Weighting
 
 class MGDAWeighting(Weighting[PSDMatrix]):
     r"""
-    :class:`~torchjd.aggregation.Weighting` ``[PSDMatrix]`` giving the weights of
-    :class:`~torchjd.aggregation.MGDA`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.MGDA`.
 
     :param epsilon: The value of :math:`\hat{\gamma}` below which we stop the optimization.
     :param max_iters: The maximum number of iterations of the optimization loop.

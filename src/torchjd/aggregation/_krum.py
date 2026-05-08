@@ -10,8 +10,8 @@ from ._weighting_bases import Weighting
 
 class KrumWeighting(Weighting[PSDMatrix]):
     """
-    :class:`~torchjd.aggregation.Weighting` ``[PSDMatrix]`` giving the weights of
-    :class:`~torchjd.aggregation.Krum`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.Krum`.
 
     :param n_byzantine: The number of rows of the input matrix that can come from an adversarial
         source.

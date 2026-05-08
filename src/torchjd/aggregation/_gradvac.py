@@ -16,8 +16,8 @@ from ._weighting_bases import Weighting
 class GradVacWeighting(Weighting[PSDMatrix], Stateful):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`
-    :class:`~torchjd.aggregation.Weighting` ``[PSDMatrix]`` giving the weights of
-    :class:`~torchjd.aggregation.GradVac`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.GradVac`.
 
     All required quantities (gradient norms, cosine similarities, and their updates after the
     vaccine correction) are derived purely from the Gramian, without needing the full Jacobian.

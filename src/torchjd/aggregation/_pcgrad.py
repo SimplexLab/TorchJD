@@ -12,8 +12,8 @@ from ._weighting_bases import Weighting
 
 class PCGradWeighting(Weighting[PSDMatrix]):
     """
-    :class:`~torchjd.aggregation.Weighting` ``[PSDMatrix]`` giving the weights of
-    :class:`~torchjd.aggregation.PCGrad`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.PCGrad`.
     """
 
     def forward(self, gramian: PSDMatrix, /) -> Tensor:

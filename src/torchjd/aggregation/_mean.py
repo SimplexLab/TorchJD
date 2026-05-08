@@ -9,7 +9,7 @@ from ._weighting_bases import Weighting
 
 class MeanWeighting(Weighting[Matrix]):
     r"""
-    :class:`~torchjd.aggregation.Weighting` ``[Matrix]`` that gives the weights
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`] that gives the weights
     :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in
     \mathbb{R}^m`.
     """

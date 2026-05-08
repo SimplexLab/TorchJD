@@ -10,8 +10,8 @@ from ._weighting_bases import Weighting
 
 class RandomWeighting(Weighting[Matrix]):
     """
-    :class:`~torchjd.aggregation.Weighting` ``[Matrix]`` that generates positive random weights
-    at each call.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`]
+    that generates positive random weights at each call.
     """
 
     def forward(self, matrix: Tensor, /) -> Tensor:

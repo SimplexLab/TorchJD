@@ -13,8 +13,8 @@ from ._weighting_bases import Weighting
 
 class UPGradWeighting(Weighting[PSDMatrix]):
     r"""
-    :class:`~torchjd.aggregation.Weighting` ``[PSDMatrix]`` giving the weights of
-    :class:`~torchjd.aggregation.UPGrad`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.UPGrad`.
 
     :param pref_vector: The preference vector to use. If not provided, defaults to
         :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in \mathbb{R}^m`.

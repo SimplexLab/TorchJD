@@ -10,8 +10,8 @@ from ._weighting_bases import Weighting
 
 class IMTLGWeighting(Weighting[PSDMatrix]):
     """
-    :class:`~torchjd.aggregation.Weighting` ``[PSDMatrix]`` giving the weights of
-    :class:`~torchjd.aggregation.IMTLG`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.IMTLG`.
     """
 
     def forward(self, gramian: PSDMatrix, /) -> Tensor:

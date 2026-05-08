@@ -9,8 +9,8 @@ from ._weighting_bases import Weighting
 
 class ConstantWeighting(Weighting[Matrix]):
     """
-    :class:`~torchjd.aggregation.Weighting` ``[Matrix]`` that returns constant, pre-determined
-    weights.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`]
+    that returns constant, pre-determined weights.
 
     :param weights: The weights to return at each call.
     """

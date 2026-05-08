@@ -20,8 +20,8 @@ from ._utils.non_differentiable import raise_non_differentiable_error
 
 class CAGradWeighting(Weighting[PSDMatrix]):
     """
-    :class:`~torchjd.aggregation.Weighting` ``[PSDMatrix]`` giving the weights of
-    :class:`~torchjd.aggregation.CAGrad`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.CAGrad`.
 
     :param c: The scale of the radius of the ball constraint.
     :param norm_eps: A small value to avoid division by zero when normalizing.

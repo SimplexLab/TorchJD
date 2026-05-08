@@ -9,8 +9,9 @@ of weights from the Gramian of the Jacobian. The
 
 .. note::
     Most aggregators rely on computing the Gramian of the Jacobian, extracting a vector of weights
-    from this Gramian using a :class:`~torchjd.aggregation.Weighting` ``[PSDMatrix]``, and then combining the
-    rows of the Jacobian using these weights. For all of them, we provide both the
+    from this Gramian using a :class:`~torchjd.aggregation.Weighting`
+    [:class:`~torchjd.linalg.PSDMatrix`], and then combining the rows of the Jacobian using these
+    weights. For all of them, we provide both the
     :class:`~torchjd.aggregation.Aggregator` interface (to be used in autojac) and the
     :class:`~torchjd.aggregation.Weighting` interface (to be used in autogram).
     For the rest, we only provide the :class:`~torchjd.aggregation.Aggregator`
