@@ -57,17 +57,26 @@ def test_reset_restores_first_step_behavior() -> None:
 def test_reset_propagates_to_stateful_weighting() -> None:
     """
     Verify that ``reset()`` calls the wrapped weighting's ``reset()`` when it is
-    :class:`~torchjd.aggregation.Stateful`. Uses ``GradVacWeighting`` as the inner weighting
-    because it is both stateful and produces weights that depend on its internal state.
+    :class:`~torchjd.aggregation.Stateful`. Checks that ``GradVacWeighting``'s internal
+    state is cleared after ``reset()``.
     """
 
+    inner = GradVacWeighting()
+    W = CRMOGMWeighting(inner, alpha=0.5)
     J = randn_((3, 8))
-    G = J @ J.T
-    W = CRMOGMWeighting(GradVacWeighting(), alpha=0.5)
-    first = W(G)
-    W(G)
+    W(J @ J.T)
+    assert inner._phi_t is not None
     W.reset()
-    assert_close(first, W(G))
+    assert inner._phi_t is None
+
+
+def test_changing_m_raises() -> None:
+    """Verify that changing the number of objectives after the first call raises a ValueError."""
+
+    W = CRMOGMWeighting(MeanWeighting())
+    W(randn_((3, 8)) @ randn_((3, 8)).T)
+    with raises(ValueError, match="number of objectives"):
+        W(randn_((2, 8)) @ randn_((2, 8)).T)
 
 
 def test_alpha_setter_accepts_valid() -> None:
