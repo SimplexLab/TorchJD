@@ -6,21 +6,21 @@ The aggregation can be made independently on groups of parameters, at different 
 the parameters:
 
 1. **Together** (baseline): one group covering all parameters. Corresponds to the `whole_model`
-   stategy in the paper.
+   strategy in the paper.
 
 2. **Per network**: one group per top-level sub-network (e.g. encoder and decoder separately).
-   Corresponds to the `enc_dec` stategy in the paper.
+   Corresponds to the `enc_dec` strategy in the paper.
 
-3. **Per layer**: one group per leaf module of the network. Corresponds to the `all_layer` stategy
+3. **Per layer**: one group per leaf module of the network. Corresponds to the `all_layer` strategy
    in the paper.
 
 4. **Per tensor**: one group per individual parameter tensor. Corresponds to the `all_matrix`
-   stategy in the paper.
+   strategy in the paper.
 
 In TorchJD, grouping is achieved by calling :func:`~torchjd.autojac.jac_to_grad` once per group
 after :func:`~torchjd.autojac.backward` or :func:`~torchjd.autojac.mtl_backward`, with a dedicated
 aggregator instance per group. For :class:`~torchjd.aggregation.Stateful` aggregators, each instance
-should independently maintains its own state (e.g. the EMA :math:`\hat{\phi}` state in
+should independently maintain its own state (e.g. the EMA :math:`\hat{\phi}` state in
 :class:`~torchjd.aggregation.GradVac`, matching the per-block targets from the original paper).
 
 .. note::

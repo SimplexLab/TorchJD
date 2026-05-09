@@ -2,8 +2,8 @@ from typing import TypeGuard
 
 from torch import Tensor
 
-# Note: we're using classes and inherittance instead of NewType because it's possible to have
-# multiple inherittance but there is no type intersection. However, these classes should never be
+# Note: we're using classes and inheritance instead of NewType because it's possible to have
+# multiple inheritance but there is no type intersection. However, these classes should never be
 # instantiated: they're only used for static type checking.
 
 
