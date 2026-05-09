@@ -8,7 +8,7 @@ from torch.nn import Parameter
 from torch.overrides import is_tensor_like
 from torch.utils._pytree import PyTree, tree_flatten, tree_map, tree_map_only
 
-from torchjd._linalg import Matrix
+from torchjd.linalg import Matrix
 
 # Note about import from protected _pytree module:
 # PyTorch maintainers plan to make pytree public (see
@@ -120,7 +120,7 @@ class FunctionalJacobianComputer(JacobianComputer):
 
         vjp_func = torch.func.vjp(functional_model_call, self.rg_params)[1]
 
-        # vjp_func is a function that computes the vjp w.r.t. to the primals (tuple). Here the
+        # vjp_func is a function that computes the vjp w.r.t. the primals (tuple). Here the
         # functional has a single primal which is dict(module.named_parameters()). We therefore take
         # the 0'th element to obtain the dict of gradients w.r.t. the module's named_parameters.
         gradients = vjp_func(grad_outputs_j_)[0]

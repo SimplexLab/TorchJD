@@ -5,13 +5,14 @@ from typing import TypeGuard, cast, overload
 import torch
 from torch import Tensor, nn
 
-from torchjd._linalg import Matrix, PSDMatrix, compute_gramian
+from torchjd._linalg import compute_gramian
 from torchjd.aggregation import (
     Aggregator,
     GramianWeightedAggregator,
     WeightedAggregator,
     Weighting,
 )
+from torchjd.linalg import Matrix, PSDMatrix
 
 from ._accumulation import TensorWithJac, accumulate_grads, is_tensor_with_jac
 from ._utils import check_consistent_first_dimension

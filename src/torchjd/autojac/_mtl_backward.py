@@ -204,7 +204,7 @@ def _create_task_transform(
     backpropagate = Select(features)
 
     # Transform that accumulates the gradient of the tensor w.r.t. the task-specific parameters into
-    # their .grad fields and backpropagates the gradient of the tensor w.r.t. to the features.
+    # their .grad fields and backpropagates the gradient of the tensor w.r.t. the features.
     backward_task = (backpropagate | accumulate) << grad << Select(tensor)
     return backward_task
 

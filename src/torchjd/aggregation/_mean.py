@@ -2,12 +2,12 @@ import torch
 from torch import Tensor
 
 from ._aggregator_bases import WeightedAggregator
-from ._weighting_bases import MatrixWeighting
+from ._weighting_bases import _MatrixWeighting
 
 
-class MeanWeighting(MatrixWeighting):
+class MeanWeighting(_MatrixWeighting):
     r"""
-    :class:`~torchjd.aggregation.MatrixWeighting` that gives the weights
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`] that gives the weights
     :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in
     \mathbb{R}^m`.
     """

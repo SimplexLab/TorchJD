@@ -3,7 +3,7 @@ from collections.abc import Callable
 import torch
 from torch import Tensor
 
-from torchjd._linalg import Matrix
+from torchjd.linalg import Matrix
 
 from ._aggregator_bases import Aggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
@@ -20,7 +20,7 @@ class GradDrop(Aggregator):
     Optimizing Deep Multitask Models with Gradient Sign Dropout
     <https://arxiv.org/pdf/2010.06808.pdf>`_.
 
-    :param f: The function to apply to the Gradient Positive Sign Purity. It should be monotically
+    :param f: The function to apply to the Gradient Positive Sign Purity. It should be monotonically
         increasing. Defaults to identity.
     :param leak: The tensor of leak values, determining how much each row is allowed to leak
         through. Defaults to None, which means no leak.

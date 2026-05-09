@@ -14,9 +14,12 @@ changelog does not include internal changes that do not affect the user.
   Manipulation and Beyond](https://proceedings.neurips.cc/paper_files/paper/2022/file/f91bd64a3620aad8e70a27ad9cb3ca57-Paper-Conference.pdf)
   (NeurIPS 2022). It wraps an existing `Weighting` and stabilises its weights with an exponential
   moving average across calls.
-- Made `WeightedAggregator`, `GramianWeightedAggregator`, `MatrixWeighting`, and `GramianWeighting`
-  public. These abstract base classes are now importable from `torchjd.aggregation` and documented.
-  They can be extended to easily implement custom `Weighting`s and `Aggregator`s.
+- Made `WeightedAggregator` and `GramianWeightedAggregator` public. These abstract base classes are
+  now importable from `torchjd.aggregation` and documented. They can be extended to easily implement
+  custom `Aggregator`s.
+- Made `Matrix` and `PSDMatrix` public. These type annotation classes are now importable from
+  `torchjd.linalg` and documented. Users can now subclass `Weighting[Matrix]` or
+  `Weighting[PSDMatrix]` to implement custom `Weighting`s.
 - Added getters and setters for the constructor parameters of all aggregators and weightings, so
   that they can be changed after initialization. This includes: `pref_vector`,
   `norm_eps` and `reg_eps` in `UPGrad`, `UPGradWeighting`, `DualProj` and `DualProjWeighting`;
@@ -24,7 +27,8 @@ changelog does not include internal changes that do not affect the user.
   `CAGrad` and `CAGradWeighting`; `pref_vector` in `ConFIG`; `leak` in `GradDrop`, `n_byzantine` and
   `n_selected` in `Krum` and `KrumWeighting`; `epsilon` and `max_iters` in `MGDA` and
   `MGDAWeighting`; `n_tasks`, `max_norm`, `update_weights_every` and `optim_niter` in `NashMTL`;
-  `trim_number` in `TrimmedMean`. Setters validate their inputs matching the existing constructor checks. Note that setters for `GradVac` and `GradVacWeighting` already existed.
+  `trim_number` in `TrimmedMean`. Setters validate their inputs matching the existing constructor checks.
+  Note that setters for `GradVac` and `GradVacWeighting` already existed.
 
 ## [0.10.0] - 2026-04-16
 
@@ -94,7 +98,7 @@ changelog does not include internal changes that do not affect the user.
     Suggested change: `mtl_backward(losses=losses, features=features)` =>
     `mtl_backward(losses, features=features)`. The `features` parameter remains usable as positional
     or keyword. All other parameters are now keyword-only.
-  - `Aggregator.__call__`: The `matrix` parameter is now positonal-only. Suggested change:
+  - `Aggregator.__call__`: The `matrix` parameter is now positional-only. Suggested change:
     `aggregator(matrix=matrix)` => `aggregator(matrix)`.
   - `Weighting.__call__`: The `stat` parameter is now positional-only. Suggested change:
     `weighting(stat=gramian)` => `weighting(gramian)`.
@@ -180,7 +184,7 @@ changelog does not include internal changes that do not affect the user.
 
 - Made some aggregators (`CAGrad`, `ConFIG`, `DualProj`, `GradDrop`, `IMTLG`, `NashMTL`, `PCGrad`
   and `UPGrad`) raise a `NonDifferentiableError` whenever one tries to differentiate through them.
-  Before this change, trying to differentiate through them leaded to wrong gradients or unclear
+  Before this change, trying to differentiate through them led to wrong gradients or unclear
   errors.
 
 ### Added

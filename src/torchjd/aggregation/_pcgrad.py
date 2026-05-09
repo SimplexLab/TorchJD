@@ -3,17 +3,17 @@ from typing import cast
 import torch
 from torch import Tensor
 
-from torchjd._linalg import PSDMatrix
+from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
-from ._weighting_bases import GramianWeighting
+from ._weighting_bases import _GramianWeighting
 
 
-class PCGradWeighting(GramianWeighting):
+class PCGradWeighting(_GramianWeighting):
     """
-    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
-    :class:`~torchjd.aggregation.PCGrad`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.PCGrad`.
     """
 
     def forward(self, gramian: PSDMatrix, /) -> Tensor:
@@ -48,7 +48,7 @@ class PCGradWeighting(GramianWeighting):
 
 class PCGrad(GramianWeightedAggregator):
     """
-    :class:`~torchjd.aggregation.GramianWeightedAggregator` as defined in algorithm 1 of
+    :class:`~torchjd.aggregation.GramianWeightedAggregator` as defined in Algorithm 1 of
     `Gradient Surgery for Multi-Task Learning <https://arxiv.org/pdf/2001.06782.pdf>`_.
     """
 

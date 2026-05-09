@@ -294,7 +294,7 @@ TorchJD provides many existing aggregators from the literature, listed in the fo
 
 ## Release Methodology
 
-We try to make a release whenever have something worth sharing to users (bug fix, minor or large
+We try to make a release whenever we have something worth sharing to users (bug fix, minor or large
 feature, etc.). TorchJD follows [semantic versioning](https://semver.org/). Since the library is
 still in beta (`0.x.y`), we sometimes make interface changes in minor versions. We prioritize the
 long-term quality of the library, which occasionally means introducing breaking changes. Whenever a
