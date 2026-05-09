@@ -3,7 +3,7 @@ from collections.abc import Callable
 import torch
 from torch import Tensor
 
-from torchjd._linalg import Matrix
+from torchjd.linalg import Matrix
 
 from ._aggregator_bases import Aggregator
 from ._utils.non_differentiable import raise_non_differentiable_error

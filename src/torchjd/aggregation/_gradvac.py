@@ -5,19 +5,19 @@ from typing import cast
 import torch
 from torch import Tensor
 
-from torchjd._linalg import PSDMatrix
 from torchjd.aggregation._mixins import Stateful
+from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
-from ._weighting_bases import GramianWeighting
+from ._weighting_bases import _GramianWeighting
 
 
-class GradVacWeighting(GramianWeighting, Stateful):
+class GradVacWeighting(_GramianWeighting, Stateful):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`
-    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
-    :class:`~torchjd.aggregation.GradVac`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.GradVac`.
 
     All required quantities (gradient norms, cosine similarities, and their updates after the
     vaccine correction) are derived purely from the Gramian, without needing the full Jacobian.

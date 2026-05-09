@@ -1,17 +1,17 @@
 import torch
 from torch import Tensor
 
-from torchjd._linalg import PSDMatrix
+from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
-from ._weighting_bases import GramianWeighting
+from ._weighting_bases import _GramianWeighting
 
 
-class IMTLGWeighting(GramianWeighting):
+class IMTLGWeighting(_GramianWeighting):
     """
-    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
-    :class:`~torchjd.aggregation.IMTLG`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.IMTLG`.
     """
 
     def forward(self, gramian: PSDMatrix, /) -> Tensor:
