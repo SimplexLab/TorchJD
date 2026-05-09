@@ -21,7 +21,7 @@ class RandomWeighting(_MatrixWeighting):
 class Random(WeightedAggregator):
     """
     :class:`~torchjd.aggregation.WeightedAggregator` that computes a random combination of
-    the rows of the provided matrices, as defined in algorithm 2 of `Reasonable Effectiveness of
+    the rows of the provided matrices, as defined in Algorithm 2 of `Reasonable Effectiveness of
     Random Weighting: A Litmus Test for Multi-Task Learning
     <https://arxiv.org/pdf/2111.10603.pdf>`_.
     """

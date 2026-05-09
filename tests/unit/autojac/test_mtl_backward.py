@@ -691,7 +691,7 @@ def test_repeated_task_params() -> None:
 
 def test_grad_tensors_value_is_correct() -> None:
     """
-    Tests that mtl_ackward correctly computes the element-wise product of grad_tensors and the
+    Tests that mtl_backward correctly computes the element-wise product of grad_tensors and the
     tensors.
     """
 
