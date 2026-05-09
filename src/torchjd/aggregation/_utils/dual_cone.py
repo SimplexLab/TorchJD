@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from typing import Literal, TypeAlias
 
 import numpy as np
@@ -8,7 +9,12 @@ from torch import Tensor
 SUPPORTED_SOLVER: TypeAlias = Literal["quadprog"]
 
 
-def project_weights(U: Tensor, G: Tensor, solver: SUPPORTED_SOLVER) -> Tensor:
+project_weights: dict[str, Callable[[Tensor, Tensor], Tensor]] = {
+    "quadprog": lambda U, G: project_weights_qp_solvers(U, G, "quadprog")
+}
+
+
+def project_weights_qp_solvers(U: Tensor, G: Tensor, solver: SUPPORTED_SOLVER) -> Tensor:
     """
     Computes the tensor of weights corresponding to the projection of the vectors in `U` onto the
     rows of a matrix whose Gramian is provided.
@@ -22,12 +28,16 @@ def project_weights(U: Tensor, G: Tensor, solver: SUPPORTED_SOLVER) -> Tensor:
     G_ = _to_array(G)
     U_ = _to_array(U)
 
-    W = np.apply_along_axis(lambda u: _project_weight_vector(u, G_, solver), axis=-1, arr=U_)
+    W = np.apply_along_axis(
+        lambda u: _project_weight_vector_qp_solvers(u, G_, solver), axis=-1, arr=U_
+    )
 
     return torch.as_tensor(W, device=G.device, dtype=G.dtype)
 
 
-def _project_weight_vector(u: np.ndarray, G: np.ndarray, solver: SUPPORTED_SOLVER) -> np.ndarray:
+def _project_weight_vector_qp_solvers(
+    u: np.ndarray, G: np.ndarray, solver: SUPPORTED_SOLVER
+) -> np.ndarray:
     r"""
     Computes the weights `w` of the projection of `J^T u` onto the dual cone of the rows of `J`,
     given `G = J J^T` and `u`. In other words, this computes the `w` that satisfies

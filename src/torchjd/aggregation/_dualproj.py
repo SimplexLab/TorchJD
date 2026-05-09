@@ -41,7 +41,7 @@ class DualProjWeighting(GramianWeighting):
     def forward(self, gramian: PSDMatrix, /) -> Tensor:
         u = self.weighting(gramian)
         G = regularize(normalize(gramian, self.norm_eps), self.reg_eps)
-        w = project_weights(u, G, self.solver)
+        w = project_weights[self.solver](u, G)
         return w
 
     @property
