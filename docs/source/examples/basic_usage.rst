@@ -69,7 +69,7 @@ Perform the Jacobian descent backward pass:
 
 The first function will populate the ``.jac`` field of each model parameter with the corresponding
 Jacobian, and the second one will aggregate these Jacobians and store the result in the ``.grad``
-field of the parameters. It also deletes the ``.jac`` fields save some memory.
+field of the parameters. It also deletes the ``.jac`` fields to save some memory.
 
 Update each parameter based on its ``.grad`` field, using the ``optimizer``:
 
