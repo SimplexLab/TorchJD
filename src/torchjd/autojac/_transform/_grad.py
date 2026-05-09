@@ -10,7 +10,8 @@ from ._ordered_set import OrderedSet
 class Grad(Differentiate):
     """
     Transform from Gradients to Gradients, computing the gradient of each output element with
-    respect to each input tensor, and applying the linear transformations represented by the grad_outputs to the results.
+    respect to each input tensor, and applying the linear transformations represented by the
+    grad_outputs to the results.
 
     :param outputs: Tensors to differentiate.
     :param inputs: Tensors with respect to which we differentiate.
