@@ -17,6 +17,8 @@ changelog does not include internal changes that do not affect the user.
 
 ### Added
 
+- Added `MoCo` and `MoCoWeighting` from
+  [Mitigating Gradient Bias in Multi-objective Learning: A Provably Convergent Approach (ICLR 2023)](https://openreview.net/forum?id=dLAYGdKTi2).
 - Made `WeightedAggregator` and `GramianWeightedAggregator` public. These abstract base classes are
   now importable from `torchjd.aggregation` and documented. They can be extended to easily implement
   custom `Aggregator`s.
