@@ -12,6 +12,7 @@ from ._utils.pref_vector import pref_vector_to_str_suffix, pref_vector_to_weight
 from ._weighting_bases import _GramianWeighting
 
 
+# Non-differentiable: the QP solver operates on numpy arrays, breaking the autograd graph.
 class UPGradWeighting(_NonDifferentiable, _GramianWeighting):
     r"""
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]

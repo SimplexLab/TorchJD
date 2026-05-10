@@ -12,6 +12,7 @@ from ._aggregator_bases import GramianWeightedAggregator
 from ._weighting_bases import _GramianWeighting
 
 
+# Non-differentiable: weights are modified in-place during the gradient correction loop.
 class GradVacWeighting(_NonDifferentiable, Stateful, _GramianWeighting):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`

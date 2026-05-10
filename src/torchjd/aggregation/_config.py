@@ -13,6 +13,7 @@ from ._sum import SumWeighting
 from ._utils.pref_vector import pref_vector_to_str_suffix, pref_vector_to_weighting
 
 
+# Non-differentiable: the pseudoinverse and the normalization are not differentiable in this context.
 class ConFIG(_NonDifferentiable, Aggregator):
     """
     :class:`~torchjd.aggregation.Aggregator` as defined in Equation 2 of `ConFIG:

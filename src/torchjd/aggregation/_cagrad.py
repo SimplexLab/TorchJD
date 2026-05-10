@@ -18,6 +18,7 @@ from torchjd._linalg import normalize
 from ._aggregator_bases import GramianWeightedAggregator
 
 
+# Non-differentiable: the cvxpy solver operates on numpy arrays, breaking the autograd graph.
 class CAGradWeighting(_NonDifferentiable, _GramianWeighting):
     """
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]

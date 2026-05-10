@@ -10,6 +10,7 @@ from ._mixins import _NonDifferentiable
 from ._weighting_bases import _GramianWeighting
 
 
+# Non-differentiable: weights are modified in-place during the gradient projection loop.
 class PCGradWeighting(_NonDifferentiable, _GramianWeighting):
     """
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]

@@ -17,6 +17,7 @@ from torch import Tensor
 from ._aggregator_bases import WeightedAggregator
 
 
+# Non-differentiable: the cvxpy solver operates on numpy arrays, breaking the autograd graph.
 class _NashMTLWeighting(_NonDifferentiable, Stateful, _MatrixWeighting):
     """
     :class:`~torchjd.aggregation._mixins.Stateful`

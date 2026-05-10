@@ -8,6 +8,7 @@ from ._mixins import _NonDifferentiable
 from ._weighting_bases import _GramianWeighting
 
 
+# Non-differentiable: differentiating through pinv(gramian) would give incorrect gradients.
 class IMTLGWeighting(_NonDifferentiable, _GramianWeighting):
     """
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]

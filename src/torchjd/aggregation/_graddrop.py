@@ -13,6 +13,7 @@ def _identity(P: Tensor) -> Tensor:
     return P
 
 
+# Non-differentiable: the sign-based random masking is not differentiable.
 class GradDrop(_NonDifferentiable, Aggregator):
     """
     :class:`~torchjd.aggregation.Aggregator` that applies the gradient combination
