@@ -2,16 +2,16 @@ import torch
 from torch import Tensor
 from torch.nn import functional as F
 
-from torchjd._linalg import PSDMatrix
+from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
-from ._weighting_bases import GramianWeighting
+from ._weighting_bases import _GramianWeighting
 
 
-class KrumWeighting(GramianWeighting):
+class KrumWeighting(_GramianWeighting):
     """
-    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
-    :class:`~torchjd.aggregation.Krum`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.Krum`.
 
     :param n_byzantine: The number of rows of the input matrix that can come from an adversarial
         source.

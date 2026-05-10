@@ -1,19 +1,21 @@
 from torch import Tensor
 
-from torchjd._linalg import PSDMatrix, normalize, regularize
+from torchjd._linalg import normalize, regularize
+from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._mean import MeanWeighting
+from ._mixins import _NonDifferentiable
 from ._utils.dual_cone import SUPPORTED_SOLVER, project_weights
-from ._utils.non_differentiable import raise_non_differentiable_error
 from ._utils.pref_vector import pref_vector_to_str_suffix, pref_vector_to_weighting
-from ._weighting_bases import GramianWeighting
+from ._weighting_bases import _GramianWeighting
 
 
-class DualProjWeighting(GramianWeighting):
+# Non-differentiable: the QP solver operates on numpy arrays, breaking the autograd graph.
+class DualProjWeighting(_NonDifferentiable, _GramianWeighting):
     r"""
-    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
-    :class:`~torchjd.aggregation.DualProj`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.DualProj`.
 
     :param pref_vector: The preference vector to use. If not provided, defaults to
         :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in \mathbb{R}^m`.
@@ -76,7 +78,7 @@ class DualProjWeighting(GramianWeighting):
         self._reg_eps = value
 
 
-class DualProj(GramianWeightedAggregator):
+class DualProj(_NonDifferentiable, GramianWeightedAggregator):
     r"""
     :class:`~torchjd.aggregation.GramianWeightedAggregator` that averages the rows of the input
     matrix, and projects the result onto the dual cone of the rows of the matrix. This corresponds
@@ -107,9 +109,6 @@ class DualProj(GramianWeightedAggregator):
         super().__init__(
             DualProjWeighting(pref_vector, norm_eps=norm_eps, reg_eps=reg_eps, solver=solver),
         )
-
-        # This prevents considering the computed weights as constant w.r.t. the matrix.
-        self.register_full_backward_pre_hook(raise_non_differentiable_error)
 
     @property
     def pref_vector(self) -> Tensor | None:

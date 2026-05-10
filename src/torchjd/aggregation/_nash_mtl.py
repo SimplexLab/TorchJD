@@ -1,10 +1,10 @@
 # Partly adapted from https://github.com/AvivNavon/nash-mtl — MIT License, Copyright (c) 2022 Aviv Navon.
 # See NOTICES for the full license text.
 
-from torchjd.aggregation._mixins import Stateful
+from torchjd.aggregation._mixins import Stateful, _NonDifferentiable
 
 from ._utils.check_dependencies import check_dependencies_are_installed
-from ._weighting_bases import MatrixWeighting
+from ._weighting_bases import _MatrixWeighting
 
 check_dependencies_are_installed(["cvxpy", "ecos"])
 
@@ -15,12 +15,13 @@ from cvxpy import Expression, SolverError
 from torch import Tensor
 
 from ._aggregator_bases import WeightedAggregator
-from ._utils.non_differentiable import raise_non_differentiable_error
 
 
-class _NashMTLWeighting(MatrixWeighting, Stateful):
+# Non-differentiable: the cvxpy solver operates on numpy arrays, breaking the autograd graph.
+class _NashMTLWeighting(_NonDifferentiable, Stateful, _MatrixWeighting):
     """
-    :class:`~torchjd.aggregation._mixins.Stateful` :class:`~torchjd.aggregation.MatrixWeighting` that
+    :class:`~torchjd.aggregation._mixins.Stateful`
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`] that
     extracts weights using the step decision of Algorithm 1 of `Multi-Task Learning as a Bargaining
     Game <https://arxiv.org/pdf/2202.01017.pdf>`_.
 
@@ -198,7 +199,7 @@ class _NashMTLWeighting(MatrixWeighting, Stateful):
         self.prvs_alpha = np.ones(self.n_tasks, dtype=np.float32)
 
 
-class NashMTL(WeightedAggregator, Stateful):
+class NashMTL(_NonDifferentiable, Stateful, WeightedAggregator):
     """
     :class:`~torchjd.aggregation._mixins.Stateful`
     :class:`~torchjd.aggregation.WeightedAggregator` as proposed in Algorithm 1 of
@@ -251,9 +252,6 @@ class NashMTL(WeightedAggregator, Stateful):
                 optim_niter=optim_niter,
             ),
         )
-
-        # This prevents considering the computed weights as constant w.r.t. the matrix.
-        self.register_full_backward_pre_hook(raise_non_differentiable_error)
 
     @property
     def n_tasks(self) -> int:

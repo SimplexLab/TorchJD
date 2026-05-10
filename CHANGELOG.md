@@ -8,11 +8,21 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Changed
+
+- Non-differentiable aggregators and weightings (UPGrad, DualProj, PCGrad, GradVac, IMTLG,
+  GradDrop, ConFIG, CAGrad, NashMTL) no longer build a computation graph when called on tensors
+  that require gradients. Their forward pass is now wrapped in `torch.no_grad()`, so attempting to
+  differentiate through them is not possible anymore (while before, it raised a `NonDifferentiableError`).
+
 ### Added
 
-- Made `WeightedAggregator`, `GramianWeightedAggregator`, `MatrixWeighting`, and `GramianWeighting`
-  public. These abstract base classes are now importable from `torchjd.aggregation` and documented.
-  They can be extended to easily implement custom `Weighting`s and `Aggregator`s.
+- Made `WeightedAggregator` and `GramianWeightedAggregator` public. These abstract base classes are
+  now importable from `torchjd.aggregation` and documented. They can be extended to easily implement
+  custom `Aggregator`s.
+- Made `Matrix` and `PSDMatrix` public. These type annotation classes are now importable from
+  `torchjd.linalg` and documented. Users can now subclass `Weighting[Matrix]` or
+  `Weighting[PSDMatrix]` to implement custom `Weighting`s.
 - Added getters and setters for the constructor parameters of all aggregators and weightings, so
   that they can be changed after initialization. This includes: `pref_vector`,
   `norm_eps` and `reg_eps` in `UPGrad`, `UPGradWeighting`, `DualProj` and `DualProjWeighting`;

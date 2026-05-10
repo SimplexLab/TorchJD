@@ -9,8 +9,9 @@ of weights from the Gramian of the Jacobian. The
 
 .. note::
     Most aggregators rely on computing the Gramian of the Jacobian, extracting a vector of weights
-    from this Gramian using a :class:`~torchjd.aggregation.GramianWeighting`, and then combining the
-    rows of the Jacobian using these weights. For all of them, we provide both the
+    from this Gramian using a :class:`~torchjd.aggregation.Weighting`
+    [:class:`~torchjd.linalg.PSDMatrix`], and then combining the rows of the Jacobian using these
+    weights. For all of them, we provide both the
     :class:`~torchjd.aggregation.Aggregator` interface (to be used in autojac) and the
     :class:`~torchjd.aggregation.Weighting` interface (to be used in autogram).
     For the rest, we only provide the :class:`~torchjd.aggregation.Aggregator`
@@ -80,7 +81,7 @@ from ._upgrad import UPGrad, UPGradWeighting
 from ._utils.check_dependencies import (
     OptionalDepsNotInstalledError as _OptionalDepsNotInstalledError,
 )
-from ._weighting_bases import GeneralizedWeighting, GramianWeighting, MatrixWeighting, Weighting
+from ._weighting_bases import GeneralizedWeighting, Weighting
 
 __all__ = [
     "Aggregator",
@@ -97,12 +98,10 @@ __all__ = [
     "GradVac",
     "GradVacWeighting",
     "GramianWeightedAggregator",
-    "GramianWeighting",
     "IMTLG",
     "IMTLGWeighting",
     "Krum",
     "KrumWeighting",
-    "MatrixWeighting",
     "Mean",
     "MeanWeighting",
     "MGDA",

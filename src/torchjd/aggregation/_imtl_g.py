@@ -1,17 +1,18 @@
 import torch
 from torch import Tensor
 
-from torchjd._linalg import PSDMatrix
+from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
-from ._utils.non_differentiable import raise_non_differentiable_error
-from ._weighting_bases import GramianWeighting
+from ._mixins import _NonDifferentiable
+from ._weighting_bases import _GramianWeighting
 
 
-class IMTLGWeighting(GramianWeighting):
+# Non-differentiable: differentiating through pinv(gramian) would give incorrect gradients.
+class IMTLGWeighting(_NonDifferentiable, _GramianWeighting):
     """
-    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
-    :class:`~torchjd.aggregation.IMTLG`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.IMTLG`.
     """
 
     def forward(self, gramian: PSDMatrix, /) -> Tensor:
@@ -24,7 +25,7 @@ class IMTLGWeighting(GramianWeighting):
         return weights
 
 
-class IMTLG(GramianWeightedAggregator):
+class IMTLG(_NonDifferentiable, GramianWeightedAggregator):
     """
     :class:`~torchjd.aggregation.GramianWeightedAggregator` generalizing the method described in
     `Towards Impartial Multi-task Learning <https://discovery.ucl.ac.uk/id/eprint/10120667/>`_.
@@ -36,6 +37,3 @@ class IMTLG(GramianWeightedAggregator):
 
     def __init__(self) -> None:
         super().__init__(IMTLGWeighting())
-
-        # This prevents computing gradients that can be very wrong.
-        self.register_full_backward_pre_hook(raise_non_differentiable_error)

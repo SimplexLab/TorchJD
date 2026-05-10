@@ -7,20 +7,20 @@ from typing import Literal, TypeAlias
 import torch
 from torch import Tensor
 
-from torchjd._linalg import PSDMatrix
+from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._mean import MeanWeighting
 from ._utils.pref_vector import pref_vector_to_str_suffix, pref_vector_to_weighting
-from ._weighting_bases import GramianWeighting
+from ._weighting_bases import _GramianWeighting
 
 SUPPORTED_SCALE_MODE: TypeAlias = Literal["min", "median", "rmse"]
 
 
-class AlignedMTLWeighting(GramianWeighting):
+class AlignedMTLWeighting(_GramianWeighting):
     r"""
-    :class:`~torchjd.aggregation.GramianWeighting` giving the weights of
-    :class:`~torchjd.aggregation.AlignedMTL`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.AlignedMTL`.
 
     :param pref_vector: The preference vector to use. If not provided, defaults to
         :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in \mathbb{R}^m`.
