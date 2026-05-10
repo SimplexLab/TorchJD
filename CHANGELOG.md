@@ -8,6 +8,14 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Changed
+
+- Non-differentiable aggregators and weightings (UPGrad, DualProj, PCGrad, GradVac, IMTLG,
+  GradDrop, ConFIG, CAGrad, NashMTL) no longer build a computation graph when called on tensors
+  that require gradients. Their forward pass is now wrapped in `torch.no_grad()`, so attempting to
+  differentiate through them will simply yield no gradients rather than raising a
+  `NonDifferentiableError`.
+
 ### Added
 
 - Made `WeightedAggregator` and `GramianWeightedAggregator` public. These abstract base classes are

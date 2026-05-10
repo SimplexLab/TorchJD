@@ -12,7 +12,7 @@ from ._aggregator_bases import GramianWeightedAggregator
 from ._weighting_bases import _GramianWeighting
 
 
-class GradVacWeighting(_NonDifferentiable, _GramianWeighting, Stateful):
+class GradVacWeighting(_NonDifferentiable, Stateful, _GramianWeighting):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
@@ -127,7 +127,7 @@ class GradVacWeighting(_NonDifferentiable, _GramianWeighting, Stateful):
             self._state_key = key
 
 
-class GradVac(_NonDifferentiable, GramianWeightedAggregator, Stateful):
+class GradVac(_NonDifferentiable, Stateful, GramianWeightedAggregator):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`
     :class:`~torchjd.aggregation.GramianWeightedAggregator` implementing the aggregation step of

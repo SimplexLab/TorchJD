@@ -17,7 +17,7 @@ from torch import Tensor
 from ._aggregator_bases import WeightedAggregator
 
 
-class _NashMTLWeighting(_NonDifferentiable, _MatrixWeighting, Stateful):
+class _NashMTLWeighting(_NonDifferentiable, Stateful, _MatrixWeighting):
     """
     :class:`~torchjd.aggregation._mixins.Stateful`
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`] that
@@ -198,7 +198,7 @@ class _NashMTLWeighting(_NonDifferentiable, _MatrixWeighting, Stateful):
         self.prvs_alpha = np.ones(self.n_tasks, dtype=np.float32)
 
 
-class NashMTL(_NonDifferentiable, WeightedAggregator, Stateful):
+class NashMTL(_NonDifferentiable, Stateful, WeightedAggregator):
     """
     :class:`~torchjd.aggregation._mixins.Stateful`
     :class:`~torchjd.aggregation.WeightedAggregator` as proposed in Algorithm 1 of
