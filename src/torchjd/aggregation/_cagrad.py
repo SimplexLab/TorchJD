@@ -2,6 +2,7 @@ from typing import cast
 
 from torchjd.linalg import PSDMatrix
 
+from ._mixins import _NonDifferentiable
 from ._utils.check_dependencies import check_dependencies_are_installed
 from ._weighting_bases import _GramianWeighting
 
@@ -15,10 +16,9 @@ from torch import Tensor
 from torchjd._linalg import normalize
 
 from ._aggregator_bases import GramianWeightedAggregator
-from ._utils.non_differentiable import raise_non_differentiable_error
 
 
-class CAGradWeighting(_GramianWeighting):
+class CAGradWeighting(_NonDifferentiable, _GramianWeighting):
     """
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
     giving the weights of :class:`~torchjd.aggregation.CAGrad`.
@@ -92,7 +92,7 @@ class CAGradWeighting(_GramianWeighting):
         self._norm_eps = value
 
 
-class CAGrad(GramianWeightedAggregator):
+class CAGrad(_NonDifferentiable, GramianWeightedAggregator):
     """
     :class:`~torchjd.aggregation.GramianWeightedAggregator` as defined in Algorithm 1 of
     `Conflict-Averse Gradient Descent for Multi-task Learning
@@ -112,9 +112,6 @@ class CAGrad(GramianWeightedAggregator):
 
     def __init__(self, c: float, norm_eps: float = 0.0001) -> None:
         super().__init__(CAGradWeighting(c=c, norm_eps=norm_eps))
-
-        # This prevents considering the computed weights as constant w.r.t. the matrix.
-        self.register_full_backward_pre_hook(raise_non_differentiable_error)
 
     @property
     def c(self) -> float:
