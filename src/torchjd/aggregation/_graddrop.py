@@ -6,14 +6,15 @@ from torch import Tensor
 from torchjd.linalg import Matrix
 
 from ._aggregator_bases import Aggregator
-from ._utils.non_differentiable import raise_non_differentiable_error
+from ._mixins import _NonDifferentiable
 
 
 def _identity(P: Tensor) -> Tensor:
     return P
 
 
-class GradDrop(Aggregator):
+# Non-differentiable: the sign-based random masking is not differentiable.
+class GradDrop(_NonDifferentiable, Aggregator):
     """
     :class:`~torchjd.aggregation.Aggregator` that applies the gradient combination
     steps from GradDrop, as defined in lines 10 to 15 of Algorithm 1 of `Just Pick a Sign:
@@ -30,9 +31,6 @@ class GradDrop(Aggregator):
         super().__init__()
         self.f = f
         self.leak = leak
-
-        # This prevents computing gradients that can be very wrong.
-        self.register_full_backward_pre_hook(raise_non_differentiable_error)
 
     def forward(self, matrix: Matrix, /) -> Tensor:
         self._check_matrix_has_enough_rows(matrix)
