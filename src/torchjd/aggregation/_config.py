@@ -8,12 +8,13 @@ from torch import Tensor
 from torchjd.linalg import Matrix
 
 from ._aggregator_bases import Aggregator
+from ._mixins import _NonDifferentiable
 from ._sum import SumWeighting
-from ._utils.non_differentiable import raise_non_differentiable_error
 from ._utils.pref_vector import pref_vector_to_str_suffix, pref_vector_to_weighting
 
 
-class ConFIG(Aggregator):
+# Non-differentiable: the pseudoinverse and the normalization are not differentiable in this context.
+class ConFIG(_NonDifferentiable, Aggregator):
     """
     :class:`~torchjd.aggregation.Aggregator` as defined in Equation 2 of `ConFIG:
     Towards Conflict-free Training of Physics Informed Neural Networks
@@ -30,9 +31,6 @@ class ConFIG(Aggregator):
     def __init__(self, pref_vector: Tensor | None = None) -> None:
         super().__init__()
         self.pref_vector = pref_vector
-
-        # This prevents computing gradients that can be very wrong.
-        self.register_full_backward_pre_hook(raise_non_differentiable_error)
 
     def forward(self, matrix: Matrix, /) -> Tensor:
         weights = self.weighting(matrix)
