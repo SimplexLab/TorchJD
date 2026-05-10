@@ -1,3 +1,4 @@
+import os
 from typing import Literal, TypeAlias
 
 import numpy as np
@@ -87,11 +88,11 @@ def _project_weight_vector_batch(U: Tensor, G: Tensor, _solver: SUPPORTED_SOLVER
         qp.settings.eps_abs = 1e-9
         qp.init(H=Q_np, g=p_np, A=None, b=None, C=C_np, l=lb_np, u=ub_np[i], rho=default_rho)
 
-    for i in range(n):
-        batch_qps.get(i).solve()
+    num_threads = max(1, (os.cpu_count() or 2) // 2)
+    proxqp.dense.solve_in_parallel(num_threads=num_threads, qps=batch_qps)
 
-    zhats = torch.empty((n, m), dtype=torch.float64)
+    zhats_np = np.empty((n, m), dtype=np.float64)
     for i in range(n):
-        zhats[i] = torch.from_numpy(batch_qps.get(i).results.x)
+        zhats_np[i] = batch_qps.get(i).results.x
 
-    return zhats.to(device=device, dtype=dtype)
+    return torch.from_numpy(zhats_np).to(device=device, dtype=dtype)
