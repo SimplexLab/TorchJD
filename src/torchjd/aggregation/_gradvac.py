@@ -5,19 +5,19 @@ from typing import cast
 import torch
 from torch import Tensor
 
-from torchjd._linalg import PSDMatrix
 from torchjd.aggregation._mixins import Stateful
+from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
-from ._weighting_bases import GramianWeighting
+from ._weighting_bases import _GramianWeighting
 
 
-class GradVacWeighting(GramianWeighting, Stateful):
+class GradVacWeighting(_GramianWeighting, Stateful):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
-    :class:`~torchjd.aggregation.GradVac`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.GradVac`.
 
     All required quantities (gradient norms, cosine similarities, and their updates after the
     vaccine correction) are derived purely from the Gramian, without needing the full Jacobian.
@@ -131,7 +131,7 @@ class GradVacWeighting(GramianWeighting, Stateful):
 class GradVac(GramianWeightedAggregator, Stateful):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` implementing the aggregation step of
+    :class:`~torchjd.aggregation.GramianWeightedAggregator` implementing the aggregation step of
     Gradient Vaccine (GradVac) from `Gradient Vaccine: Investigating and Improving Multi-task
     Optimization in Massively Multilingual Models (ICLR 2021 Spotlight)
     <https://openreview.net/forum?id=F1vEjWK-lH_>`_.

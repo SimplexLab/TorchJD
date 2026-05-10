@@ -1,9 +1,9 @@
 from typing import cast
 
-from torchjd._linalg import PSDMatrix
+from torchjd.linalg import PSDMatrix
 
 from ._utils.check_dependencies import check_dependencies_are_installed
-from ._weighting_bases import GramianWeighting
+from ._weighting_bases import _GramianWeighting
 
 check_dependencies_are_installed(["cvxpy", "clarabel"])
 
@@ -18,10 +18,10 @@ from ._aggregator_bases import GramianWeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
 
 
-class CAGradWeighting(GramianWeighting):
+class CAGradWeighting(_GramianWeighting):
     """
-    :class:`~torchjd.aggregation._weighting_bases.Weighting` giving the weights of
-    :class:`~torchjd.aggregation.CAGrad`.
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
+    giving the weights of :class:`~torchjd.aggregation.CAGrad`.
 
     :param c: The scale of the radius of the ball constraint.
     :param norm_eps: A small value to avoid division by zero when normalizing.
@@ -94,7 +94,7 @@ class CAGradWeighting(GramianWeighting):
 
 class CAGrad(GramianWeightedAggregator):
     """
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as defined in Algorithm 1 of
+    :class:`~torchjd.aggregation.GramianWeightedAggregator` as defined in Algorithm 1 of
     `Conflict-Averse Gradient Descent for Multi-task Learning
     <https://arxiv.org/pdf/2110.14048.pdf>`_.
 

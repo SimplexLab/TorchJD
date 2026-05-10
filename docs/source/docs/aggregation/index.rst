@@ -10,6 +10,12 @@ Abstract base classes
 .. autoclass:: torchjd.aggregation.Aggregator
     :members: __call__
 
+.. autoclass:: torchjd.aggregation.WeightedAggregator
+    :members: __call__
+
+.. autoclass:: torchjd.aggregation.GramianWeightedAggregator
+    :members: __call__
+
 .. autoclass:: torchjd.aggregation.Weighting
     :members: __call__
 

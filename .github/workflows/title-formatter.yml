@@ -53,16 +53,16 @@ jobs:
             if (isBreaking) newTitle += '!';
             newTitle += `: ${description}`;
 
-            if (rawTitle === newTitle) {
-              console.log("Title is already correctly formatted. Skipping update.");
-              return;
-            }
-
             const displayTitle = `${newTitle} (#${pr_number})`;
             if (displayTitle.length > 72) {
               core.setFailed(
                 `Formatted title is too long by ${displayTitle.length - 72} characters: "${displayTitle}"`
               );
+              return;
+            }
+
+            if (rawTitle === newTitle) {
+              console.log("Title is already correctly formatted. Skipping update.");
               return;
             }
 

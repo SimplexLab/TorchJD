@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 
 from torch import Tensor, nn
 
-from torchjd._linalg import Matrix, PSDMatrix, compute_gramian, is_matrix
+from torchjd._linalg import compute_gramian, is_matrix
+from torchjd.linalg import Matrix, PSDMatrix
 
 from ._weighting_bases import Weighting
 
@@ -46,8 +47,8 @@ class Aggregator(nn.Module, ABC):
 
 class WeightedAggregator(Aggregator):
     """
-    Aggregator that combines the rows of the input jacobian matrix with weights given by applying a
-    Weighting to it.
+    Aggregator that combines the rows of the input Jacobian matrix with weights given by applying a
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`] to it.
 
     :param weighting: The object responsible for extracting the vector of weights from the matrix.
     """
@@ -57,7 +58,7 @@ class WeightedAggregator(Aggregator):
         self.weighting = weighting
 
     @staticmethod
-    def combine(matrix: Matrix, weights: Tensor) -> Tensor:
+    def _combine(matrix: Matrix, weights: Tensor) -> Tensor:
         """
         Aggregates a matrix by making a linear combination of its rows, using the provided vector of
         weights.
@@ -68,14 +69,15 @@ class WeightedAggregator(Aggregator):
 
     def forward(self, matrix: Matrix, /) -> Tensor:
         weights = self.weighting(matrix)
-        vector = self.combine(matrix, weights)
+        vector = self._combine(matrix, weights)
         return vector
 
 
 class GramianWeightedAggregator(WeightedAggregator):
     """
-    WeightedAggregator that computes the gramian of the input jacobian matrix before applying a
-    Weighting to it.
+    :class:`~torchjd.aggregation.WeightedAggregator` that computes the gramian of the input
+    Jacobian matrix before applying a :class:`~torchjd.aggregation.Weighting`
+    [:class:`~torchjd.linalg.PSDMatrix`] to it.
 
     :param gramian_weighting: The object responsible for extracting the vector of weights from the
         gramian.

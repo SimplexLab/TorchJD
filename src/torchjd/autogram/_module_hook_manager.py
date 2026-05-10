@@ -23,7 +23,7 @@ from ._gramian_computer import GramianComputer
 
 class ModuleHookManager:
     """
-    Class responsible for handling hooks and Nodes that computes the Gramian reverse accumulation.
+    Class responsible for handling hooks and Nodes that compute the Gramian reverse accumulation.
 
     :param target_edges: Registry for tracking gradient edges that serve as targets for the first
         differentiation.

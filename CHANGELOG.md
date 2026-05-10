@@ -10,6 +10,12 @@ changelog does not include internal changes that do not affect the user.
 
 ### Added
 
+- Made `WeightedAggregator` and `GramianWeightedAggregator` public. These abstract base classes are
+  now importable from `torchjd.aggregation` and documented. They can be extended to easily implement
+  custom `Aggregator`s.
+- Made `Matrix` and `PSDMatrix` public. These type annotation classes are now importable from
+  `torchjd.linalg` and documented. Users can now subclass `Weighting[Matrix]` or
+  `Weighting[PSDMatrix]` to implement custom `Weighting`s.
 - Added getters and setters for the constructor parameters of all aggregators and weightings, so
   that they can be changed after initialization. This includes: `pref_vector`,
   `norm_eps` and `reg_eps` in `UPGrad`, `UPGradWeighting`, `DualProj` and `DualProjWeighting`;
@@ -88,7 +94,7 @@ changelog does not include internal changes that do not affect the user.
     Suggested change: `mtl_backward(losses=losses, features=features)` =>
     `mtl_backward(losses, features=features)`. The `features` parameter remains usable as positional
     or keyword. All other parameters are now keyword-only.
-  - `Aggregator.__call__`: The `matrix` parameter is now positonal-only. Suggested change:
+  - `Aggregator.__call__`: The `matrix` parameter is now positional-only. Suggested change:
     `aggregator(matrix=matrix)` => `aggregator(matrix)`.
   - `Weighting.__call__`: The `stat` parameter is now positional-only. Suggested change:
     `weighting(stat=gramian)` => `weighting(gramian)`.
@@ -174,7 +180,7 @@ changelog does not include internal changes that do not affect the user.
 
 - Made some aggregators (`CAGrad`, `ConFIG`, `DualProj`, `GradDrop`, `IMTLG`, `NashMTL`, `PCGrad`
   and `UPGrad`) raise a `NonDifferentiableError` whenever one tries to differentiate through them.
-  Before this change, trying to differentiate through them leaded to wrong gradients or unclear
+  Before this change, trying to differentiate through them led to wrong gradients or unclear
   errors.
 
 ### Added

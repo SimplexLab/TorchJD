@@ -5,9 +5,14 @@ from typing import TypeGuard, cast, overload
 import torch
 from torch import Tensor, nn
 
-from torchjd._linalg import Matrix, PSDMatrix, compute_gramian
-from torchjd.aggregation import Aggregator, Weighting
-from torchjd.aggregation._aggregator_bases import GramianWeightedAggregator, WeightedAggregator
+from torchjd._linalg import compute_gramian
+from torchjd.aggregation import (
+    Aggregator,
+    GramianWeightedAggregator,
+    WeightedAggregator,
+    Weighting,
+)
+from torchjd.linalg import Matrix, PSDMatrix
 
 from ._accumulation import TensorWithJac, accumulate_grads, is_tensor_with_jac
 from ._utils import check_consistent_first_dimension
@@ -59,8 +64,8 @@ def jac_to_grad(
     :param tensors: The tensors whose ``.jac`` fields should be aggregated. All Jacobians must
         have the same first dimension (e.g. number of losses).
     :param aggregator: The aggregator used to reduce the Jacobians into gradients. If it uses a
-        :class:`Weighting <torchjd.aggregation._weighting_bases.Weighting>` to combine the rows of
-        the Jacobians, ``jac_to_grad`` will also return the computed weights.
+        :class:`~torchjd.aggregation.Weighting` to combine the rows of the Jacobians,
+        ``jac_to_grad`` will also return the computed weights.
     :param retain_jac: Whether to preserve the ``.jac`` fields of the tensors after they have been
         used. Defaults to ``False``.
     :param optimize_gramian_computation: When the ``aggregator`` computes weights based on the

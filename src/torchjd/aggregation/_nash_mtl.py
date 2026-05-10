@@ -4,7 +4,7 @@
 from torchjd.aggregation._mixins import Stateful
 
 from ._utils.check_dependencies import check_dependencies_are_installed
-from ._weighting_bases import MatrixWeighting
+from ._weighting_bases import _MatrixWeighting
 
 check_dependencies_are_installed(["cvxpy", "ecos"])
 
@@ -18,9 +18,10 @@ from ._aggregator_bases import WeightedAggregator
 from ._utils.non_differentiable import raise_non_differentiable_error
 
 
-class _NashMTLWeighting(MatrixWeighting, Stateful):
+class _NashMTLWeighting(_MatrixWeighting, Stateful):
     """
-    :class:`~torchjd.aggregation._mixins.Stateful` :class:`~torchjd.aggregation.Weighting` that
+    :class:`~torchjd.aggregation._mixins.Stateful`
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`] that
     extracts weights using the step decision of Algorithm 1 of `Multi-Task Learning as a Bargaining
     Game <https://arxiv.org/pdf/2202.01017.pdf>`_.
 
@@ -201,7 +202,7 @@ class _NashMTLWeighting(MatrixWeighting, Stateful):
 class NashMTL(WeightedAggregator, Stateful):
     """
     :class:`~torchjd.aggregation._mixins.Stateful`
-    :class:`~torchjd.aggregation._aggregator_bases.Aggregator` as proposed in Algorithm 1 of
+    :class:`~torchjd.aggregation.WeightedAggregator` as proposed in Algorithm 1 of
     `Multi-Task Learning as a Bargaining Game <https://arxiv.org/pdf/2202.01017.pdf>`_.
 
     :param n_tasks: The number of tasks, corresponding to the number of rows in the provided
