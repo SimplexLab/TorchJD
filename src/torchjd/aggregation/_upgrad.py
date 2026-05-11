@@ -6,13 +6,14 @@ from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._mean import MeanWeighting
+from ._mixins import _NonDifferentiable
 from ._utils.dual_cone import SUPPORTED_SOLVER, project_weights
-from ._utils.non_differentiable import raise_non_differentiable_error
 from ._utils.pref_vector import pref_vector_to_str_suffix, pref_vector_to_weighting
 from ._weighting_bases import _GramianWeighting
 
 
-class UPGradWeighting(_GramianWeighting):
+# Non-differentiable: the QP solver operates on numpy arrays, breaking the autograd graph.
+class UPGradWeighting(_NonDifferentiable, _GramianWeighting):
     r"""
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
     giving the weights of :class:`~torchjd.aggregation.UPGrad`.
@@ -80,7 +81,7 @@ class UPGradWeighting(_GramianWeighting):
         self._reg_eps = value
 
 
-class UPGrad(GramianWeightedAggregator):
+class UPGrad(_NonDifferentiable, GramianWeightedAggregator):
     r"""
     :class:`~torchjd.aggregation.GramianWeightedAggregator` that projects each row of the input
     matrix onto the dual cone of all rows of this matrix, and that combines the result, as proposed
@@ -111,9 +112,6 @@ class UPGrad(GramianWeightedAggregator):
         super().__init__(
             UPGradWeighting(pref_vector, norm_eps=norm_eps, reg_eps=reg_eps, solver=solver),
         )
-
-        # This prevents considering the computed weights as constant w.r.t. the matrix.
-        self.register_full_backward_pre_hook(raise_non_differentiable_error)
 
     @property
     def pref_vector(self) -> Tensor | None:
