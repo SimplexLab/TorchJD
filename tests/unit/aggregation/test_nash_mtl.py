@@ -1,15 +1,15 @@
+import pytest
+
+pytest.importorskip("cvxpy")
+pytest.importorskip("ecos")
+
 from pytest import mark, raises
 from torch import Tensor
 from torch.testing import assert_close
 from utils.tensors import ones_, randn_, tensor_
 
-try:
-    from torchjd.aggregation import NashMTL
-    from torchjd.aggregation._nash_mtl import _NashMTLWeighting
-except ImportError:
-    import pytest
-
-    pytest.skip("NashMTL dependencies not installed", allow_module_level=True)
+from torchjd.aggregation import NashMTL
+from torchjd.aggregation._nash_mtl import _NashMTLWeighting
 
 from ._asserts import assert_expected_structure, assert_non_differentiable
 from ._inputs import nash_mtl_matrices
