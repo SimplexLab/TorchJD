@@ -1,10 +1,12 @@
+from typing import cast
+
 import numpy as np
 import torch
 from pytest import mark, raises
 from torch.testing import assert_close
 from utils.tensors import rand_, randn_
 
-from torchjd._linalg import DualConeProjector, QPSolverBased
+from torchjd._linalg import DualConeProjector, PSDMatrix, QPSolverBased, compute_gramian
 
 
 @mark.parametrize("projector", [QPSolverBased("quadprog")])
@@ -32,7 +34,7 @@ def test_solution_weights(projector: DualConeProjector, shape: tuple[int, int]) 
     """
 
     J = randn_(shape)
-    G = J @ J.T
+    G = compute_gramian(J)
     u = rand_(shape[0])
 
     w = projector.project_weights(u, G)
@@ -64,11 +66,12 @@ def test_scale_invariant(
     """
 
     J = randn_(shape)
-    G = J @ J.T
+    G = compute_gramian(J)
+    scaled_G = cast(PSDMatrix, scaling * G)
     u = rand_(shape[0])
 
     w = projector.project_weights(u, G)
-    w_scaled = projector.project_weights(u, scaling * G)
+    w_scaled = projector.project_weights(u, scaled_G)
 
     assert_close(w_scaled, w)
 
@@ -85,7 +88,7 @@ def test_tensorization_shape(projector: DualConeProjector, shape: tuple[int, ...
     U_tensor = randn_(shape)
     U_matrix = U_tensor.reshape([-1, shape[-1]])
 
-    G = matrix @ matrix.T
+    G = compute_gramian(matrix)
 
     W_tensor = projector.project_weights(U_tensor, G)
     W_matrix = projector.project_weights(U_matrix, G)
