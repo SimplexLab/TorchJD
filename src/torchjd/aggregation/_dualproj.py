@@ -1,12 +1,11 @@
 from torch import Tensor
 
-from torchjd._linalg import normalize, regularize
+from torchjd._linalg import DualConeProjector, normalize, projector_or_default, regularize
 from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._mean import MeanWeighting
 from ._mixins import _NonDifferentiable
-from ._utils.dual_cone import SUPPORTED_SOLVER, project_weights
 from ._utils.pref_vector import pref_vector_to_str_suffix, pref_vector_to_weighting
 from ._weighting_bases import _GramianWeighting
 
@@ -32,18 +31,18 @@ class DualProjWeighting(_NonDifferentiable, _GramianWeighting):
         pref_vector: Tensor | None = None,
         norm_eps: float = 0.0001,
         reg_eps: float = 0.0001,
-        solver: SUPPORTED_SOLVER = "quadprog",
+        projector: DualConeProjector | None = None,
     ) -> None:
         super().__init__()
         self.pref_vector = pref_vector
         self.norm_eps = norm_eps
         self.reg_eps = reg_eps
-        self.solver: SUPPORTED_SOLVER = solver
+        self.projector = projector_or_default(projector)
 
     def forward(self, gramian: PSDMatrix, /) -> Tensor:
         u = self.weighting(gramian)
         G = regularize(normalize(gramian, self.norm_eps), self.reg_eps)
-        w = project_weights(u, G, self.solver)
+        w = self.projector.project_weights(u, G)
         return w
 
     @property
@@ -102,12 +101,10 @@ class DualProj(_NonDifferentiable, GramianWeightedAggregator):
         pref_vector: Tensor | None = None,
         norm_eps: float = 0.0001,
         reg_eps: float = 0.0001,
-        solver: SUPPORTED_SOLVER = "quadprog",
+        projector: DualConeProjector | None = None,
     ) -> None:
-        self._solver: SUPPORTED_SOLVER = solver
-
         super().__init__(
-            DualProjWeighting(pref_vector, norm_eps=norm_eps, reg_eps=reg_eps, solver=solver),
+            DualProjWeighting(pref_vector, norm_eps=norm_eps, reg_eps=reg_eps, projector=projector),
         )
 
     @property
@@ -137,7 +134,7 @@ class DualProj(_NonDifferentiable, GramianWeightedAggregator):
     def __repr__(self) -> str:
         return (
             f"{self.__class__.__name__}(pref_vector={repr(self.pref_vector)}, norm_eps="
-            f"{self.norm_eps}, reg_eps={self.reg_eps}, solver={repr(self._solver)})"
+            f"{self.norm_eps}, reg_eps={self.reg_eps}, solver={repr(self.projector)})"
         )
 
     def __str__(self) -> str:

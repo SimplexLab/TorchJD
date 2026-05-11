@@ -3,6 +3,7 @@ from pytest import mark, raises
 from torch import Tensor
 from utils.tensors import ones_
 
+from torchjd._linalg import QPSolverBased
 from torchjd.aggregation import ConstantWeighting, DualProj
 from torchjd.aggregation._dualproj import DualProjWeighting
 
@@ -47,9 +48,12 @@ def test_non_differentiable(aggregator: DualProj, matrix: Tensor) -> None:
 
 
 def test_representations() -> None:
-    A = DualProj(pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, solver="quadprog")
+    A = DualProj(
+        pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, projector=QPSolverBased("quadprog")
+    )
     assert (
-        repr(A) == "DualProj(pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, solver='quadprog')"
+        repr(A) == "DualProj(pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, projector="
+        "QPSolverBased('quadprog'))"
     )
     assert str(A) == "DualProj"
 
@@ -57,11 +61,11 @@ def test_representations() -> None:
         pref_vector=torch.tensor([1.0, 2.0, 3.0], device="cpu"),
         norm_eps=0.0001,
         reg_eps=0.0001,
-        solver="quadprog",
+        projector=QPSolverBased("quadprog"),
     )
     assert (
         repr(A) == "DualProj(pref_vector=tensor([1., 2., 3.]), norm_eps=0.0001, reg_eps=0.0001, "
-        "solver='quadprog')"
+        "projector=QPSolverBased('quadprog'))"
     )
     assert str(A) == "DualProj([1., 2., 3.])"
 
