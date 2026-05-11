@@ -76,6 +76,14 @@ class DualProjWeighting(_NonDifferentiable, _GramianWeighting):
 
         self._reg_eps = value
 
+    @property
+    def projector(self) -> DualConeProjector:
+        return self._projector
+
+    @projector.setter
+    def projector(self, value: DualConeProjector | None) -> None:
+        self._projector = projector_or_default(value)
+
 
 class DualProj(_NonDifferentiable, GramianWeightedAggregator):
     r"""
@@ -131,10 +139,18 @@ class DualProj(_NonDifferentiable, GramianWeightedAggregator):
     def reg_eps(self, value: float) -> None:
         self.gramian_weighting.reg_eps = value
 
+    @property
+    def projector(self) -> DualConeProjector:
+        return self.gramian_weighting.projector
+
+    @projector.setter
+    def projector(self, value: DualConeProjector | None) -> None:
+        self.gramian_weighting.projector = value
+
     def __repr__(self) -> str:
         return (
             f"{self.__class__.__name__}(pref_vector={repr(self.pref_vector)}, norm_eps="
-            f"{self.norm_eps}, reg_eps={self.reg_eps}, solver={repr(self.projector)})"
+            f"{self.norm_eps}, reg_eps={self.reg_eps}, projector={repr(self.projector)})"
         )
 
     def __str__(self) -> str:

@@ -43,6 +43,9 @@ class QPSolverBased(DualConeProjector):
     def __init__(self, solver: SUPPORTED_SOLVER) -> None:
         self.solver = solver
 
+    def __repr__(self) -> str:
+        return f"QPSolverBased({repr(self.solver)})"
+
     def project_weights(self, U: Tensor, G: Tensor) -> Tensor:
 
         G_ = _to_array(G)
