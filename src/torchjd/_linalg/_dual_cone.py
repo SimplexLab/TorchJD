@@ -38,7 +38,9 @@ def projector_or_default(projector: DualConeProjector | None) -> DualConeProject
 
 
 class QuadprogProjector(DualConeProjector):
-    """
+    r"""
+    Solves the quadratic program defined in :meth:`DualConeProjector.__call__` using the
+    ``quadprog`` QP solver.
 
     :param norm_eps: A small value to avoid division by zero when normalizing.
     :param reg_eps: A small value to add to the diagonal of the gramian of the matrix. Due to
