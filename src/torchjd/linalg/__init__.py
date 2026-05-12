@@ -1,6 +1,6 @@
 """
-This module provides type annotation classes representing tensors with specific structural
-properties.
+This module provides utilitary linear algebra methods as well as types to represent specific
+structural properties.
 """
 
 from torchjd._linalg import (

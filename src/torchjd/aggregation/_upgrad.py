@@ -19,7 +19,7 @@ class UPGradWeighting(_NonDifferentiable, _GramianWeighting):
 
     :param pref_vector: The preference vector to use. If not provided, defaults to
         :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in \mathbb{R}^m`.
-    :param solver: The solver used to optimize the underlying optimization problem.
+    :param projector: The :class:`~torchjd.linalg.DualConeProjector` used tocompute the projection.
     """
 
     def __init__(
@@ -87,7 +87,7 @@ class UPGrad(_NonDifferentiable, GramianWeightedAggregator):
     :param pref_vector: The preference vector used to combine the projected rows.  If not provided,
         defaults to :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in
         \mathbb{R}^m`.
-    :param solver: The solver used to optimize the underlying optimization problem.
+    :param projector: The :class:`~torchjd.linalg.DualConeProjector` used tocompute the projection.
     """
 
     gramian_weighting: UPGradWeighting
