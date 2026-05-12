@@ -10,3 +10,4 @@ linalg
 
     matrix.rst
     psd_matrix.rst
+    dual_cone.rst
