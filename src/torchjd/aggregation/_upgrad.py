@@ -135,8 +135,8 @@ class UPGrad(_NonDifferentiable, GramianWeightedAggregator):
 
     def __repr__(self) -> str:
         return (
-            f"{self.__class__.__name__}(pref_vector={repr(self.pref_vector)}, norm_eps="
-            f"{self.norm_eps}, reg_eps={self.reg_eps}, projector={repr(self.projector)})"
+            f"{self.__class__.__name__}(pref_vector={repr(self.pref_vector)}, projector="
+            f"{repr(self.projector)})"
         )
 
     def __str__(self) -> str:
