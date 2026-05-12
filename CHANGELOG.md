@@ -10,6 +10,22 @@ changelog does not include internal changes that do not affect the user.
 
 ### Changed
 
+- **BREAKING**: Moved normalization, regularization, and QP solver configuration from `UPGrad`,
+  `UPGradWeighting`, `DualProj`, and `DualProjWeighting` to a new `projector` parameter accepting a
+  `DualConeProjector`. The `norm_eps`, `reg_eps`, and `solver` constructor parameters of these
+  classes have been removed. The default projector is `QuadprogProjector`, which accepts `norm_eps`
+  and `reg_eps` as keyword-only arguments. To update:
+  ```python
+  # Before
+  from torchjd.aggregation import UPGrad
+  aggregator = UPGrad(pref_vector=torch.tensor([0.7, 0.3]), norm_eps=0.001, reg_eps=0.001, solver="quadprog")
+
+  # After
+  from torchjd.aggregation import UPGrad
+  from torchjd.linalg import QuadprogProjector
+  aggregator = UPGrad(pref_vector=torch.tensor([0.7, 0.3]), projector=QuadprogProjector(norm_eps=0.001, reg_eps=0.001))
+  ```
+  The `solver` parameter has been removed; the default projector uses `quadprog` internally.
 - `CAGrad`, `CAGradWeighting`, and `NashMTL` are now always importable from `torchjd.aggregation`,
   even when their optional dependencies are not installed. Attempting to instantiate them without the
   required dependencies now raises an `ImportError` with installation instructions, instead of
