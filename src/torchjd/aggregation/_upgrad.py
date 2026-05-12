@@ -46,30 +46,6 @@ class UPGradWeighting(_NonDifferentiable, _GramianWeighting):
         self._pref_vector = value
 
     @property
-    def norm_eps(self) -> float:
-        return self._norm_eps
-
-    @norm_eps.setter
-    def norm_eps(self, value: float) -> None:
-
-        if value < 0:
-            raise ValueError(f"norm_eps must be non-negative, but got {value}.")
-
-        self._norm_eps = value
-
-    @property
-    def reg_eps(self) -> float:
-        return self._reg_eps
-
-    @reg_eps.setter
-    def reg_eps(self, value: float) -> None:
-
-        if value < 0:
-            raise ValueError(f"reg_eps must be non-negative, but got {value}.")
-
-        self._reg_eps = value
-
-    @property
     def projector(self) -> DualConeProjector:
         return self._projector
 
@@ -108,22 +84,6 @@ class UPGrad(_NonDifferentiable, GramianWeightedAggregator):
     @pref_vector.setter
     def pref_vector(self, value: Tensor | None) -> None:
         self.gramian_weighting.pref_vector = value
-
-    @property
-    def norm_eps(self) -> float:
-        return self.gramian_weighting.norm_eps
-
-    @norm_eps.setter
-    def norm_eps(self, value: float) -> None:
-        self.gramian_weighting.norm_eps = value
-
-    @property
-    def reg_eps(self) -> float:
-        return self.gramian_weighting.reg_eps
-
-    @reg_eps.setter
-    def reg_eps(self, value: float) -> None:
-        self.gramian_weighting.reg_eps = value
 
     @property
     def projector(self) -> DualConeProjector:
