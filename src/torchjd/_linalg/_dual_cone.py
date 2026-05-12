@@ -11,7 +11,7 @@ from ._matrix import PSDMatrix
 
 class DualConeProjector(ABC):
     @abstractmethod
-    def project_weights(self, U: Tensor, G: PSDMatrix) -> Tensor:
+    def __call__(self, U: Tensor, G: PSDMatrix) -> Tensor:
         r"""
         Computes the weights `w` of the projection of `J^T u` onto the dual cone of
         the rows of `J`, provided `G = J J^T` and `u`. In other words, this computes the `w` that
@@ -46,7 +46,7 @@ class QPSolverBased(DualConeProjector):
     def __repr__(self) -> str:
         return f"QPSolverBased({repr(self.solver)})"
 
-    def project_weights(self, U: Tensor, G: Tensor) -> Tensor:
+    def __call__(self, U: Tensor, G: Tensor) -> Tensor:
 
         G_ = _to_array(G)
         U_ = _to_array(U)

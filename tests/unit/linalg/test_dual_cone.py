@@ -37,7 +37,7 @@ def test_solution_weights(projector: DualConeProjector, shape: tuple[int, int]) 
     G = compute_gramian(J)
     u = rand_(shape[0])
 
-    w = projector.project_weights(u, G)
+    w = projector(u, G)
     dual_gap = w - u
 
     # Dual feasibility
@@ -70,8 +70,8 @@ def test_scale_invariant(
     scaled_G = cast(PSDMatrix, scaling * G)
     u = rand_(shape[0])
 
-    w = projector.project_weights(u, G)
-    w_scaled = projector.project_weights(u, scaled_G)
+    w = projector(u, G)
+    w_scaled = projector(u, scaled_G)
 
     assert_close(w_scaled, w)
 
@@ -90,8 +90,8 @@ def test_tensorization_shape(projector: DualConeProjector, shape: tuple[int, ...
 
     G = compute_gramian(matrix)
 
-    W_tensor = projector.project_weights(U_tensor, G)
-    W_matrix = projector.project_weights(U_matrix, G)
+    W_tensor = projector(U_tensor, G)
+    W_matrix = projector(U_matrix, G)
 
     assert_close(W_matrix.reshape(shape), W_tensor)
 
