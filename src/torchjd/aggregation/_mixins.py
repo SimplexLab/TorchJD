@@ -24,7 +24,7 @@ class _WithOptionalDeps:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         missing = [name for name in self._REQUIRED_DEPS if find_spec(name) is None]
-        if missing:
+        if len(missing) != 0:
             raise ImportError(
                 f"{self.__class__.__name__} requires {missing} to be installed. "
                 f"{self._INSTALL_HINT}"
