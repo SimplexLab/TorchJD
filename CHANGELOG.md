@@ -10,6 +10,10 @@ changelog does not include internal changes that do not affect the user.
 
 ### Changed
 
+- `CAGrad`, `CAGradWeighting`, and `NashMTL` are now always importable from `torchjd.aggregation`,
+  even when their optional dependencies are not installed. Attempting to instantiate them without the
+  required dependencies now raises an `ImportError` with installation instructions, instead of
+  raising an `ImportError` at import time.
 - Non-differentiable aggregators and weightings (UPGrad, DualProj, PCGrad, GradVac, IMTLG,
   GradDrop, ConFIG, CAGrad, NashMTL) no longer build a computation graph when called on tensors
   that require gradients. Their forward pass is now wrapped in `torch.no_grad()`, so attempting to
