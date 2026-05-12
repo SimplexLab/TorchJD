@@ -48,24 +48,16 @@ def test_non_differentiable(aggregator: DualProj, matrix: Tensor) -> None:
 
 
 def test_representations() -> None:
-    A = DualProj(
-        pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, projector=QPSolverBased("quadprog")
-    )
-    assert (
-        repr(A) == "DualProj(pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, projector="
-        "QPSolverBased('quadprog'))"
-    )
+    A = DualProj(pref_vector=None, projector=QPSolverBased())
+    assert repr(A) == "DualProj(pref_vector=None, projector=QPSolverBased('quadprog'))"
     assert str(A) == "DualProj"
 
     A = DualProj(
         pref_vector=torch.tensor([1.0, 2.0, 3.0], device="cpu"),
-        norm_eps=0.0001,
-        reg_eps=0.0001,
-        projector=QPSolverBased("quadprog"),
+        projector=QPSolverBased(),
     )
     assert (
-        repr(A) == "DualProj(pref_vector=tensor([1., 2., 3.]), norm_eps=0.0001, reg_eps=0.0001, "
-        "projector=QPSolverBased('quadprog'))"
+        repr(A) == "DualProj(pref_vector=tensor([1., 2., 3.]), projector=QPSolverBased('quadprog'))"
     )
     assert str(A) == "DualProj([1., 2., 3.])"
 

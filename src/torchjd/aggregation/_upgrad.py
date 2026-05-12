@@ -1,7 +1,7 @@
 import torch
 from torch import Tensor
 
-from torchjd._linalg import DualConeProjector, normalize, projector_or_default, regularize
+from torchjd._linalg import DualConeProjector, projector_or_default
 from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
@@ -19,31 +19,21 @@ class UPGradWeighting(_NonDifferentiable, _GramianWeighting):
 
     :param pref_vector: The preference vector to use. If not provided, defaults to
         :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in \mathbb{R}^m`.
-    :param norm_eps: A small value to avoid division by zero when normalizing.
-    :param reg_eps: A small value to add to the diagonal of the gramian of the matrix. Due to
-        numerical errors when computing the gramian, it might not exactly be positive definite.
-        This issue can make the optimization fail. Adding ``reg_eps`` to the diagonal of the gramian
-        ensures that it is positive definite.
     :param solver: The solver used to optimize the underlying optimization problem.
     """
 
     def __init__(
         self,
         pref_vector: Tensor | None = None,
-        norm_eps: float = 0.0001,
-        reg_eps: float = 0.0001,
         projector: DualConeProjector | None = None,
     ) -> None:
         super().__init__()
         self.pref_vector = pref_vector
-        self.norm_eps = norm_eps
-        self.reg_eps = reg_eps
         self.projector = projector_or_default(projector)
 
     def forward(self, gramian: PSDMatrix, /) -> Tensor:
         U = torch.diag(self.weighting(gramian))
-        G = regularize(normalize(gramian, self.norm_eps), self.reg_eps)
-        W = self.projector(U, G)
+        W = self.projector(U, gramian)
         return torch.sum(W, dim=0)
 
     @property
@@ -97,11 +87,6 @@ class UPGrad(_NonDifferentiable, GramianWeightedAggregator):
     :param pref_vector: The preference vector used to combine the projected rows.  If not provided,
         defaults to :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in
         \mathbb{R}^m`.
-    :param norm_eps: A small value to avoid division by zero when normalizing.
-    :param reg_eps: A small value to add to the diagonal of the gramian of the matrix. Due to
-        numerical errors when computing the gramian, it might not exactly be positive definite.
-        This issue can make the optimization fail. Adding ``reg_eps`` to the diagonal of the gramian
-        ensures that it is positive definite.
     :param solver: The solver used to optimize the underlying optimization problem.
     """
 
@@ -110,12 +95,10 @@ class UPGrad(_NonDifferentiable, GramianWeightedAggregator):
     def __init__(
         self,
         pref_vector: Tensor | None = None,
-        norm_eps: float = 0.0001,
-        reg_eps: float = 0.0001,
         projector: DualConeProjector | None = None,
     ) -> None:
         super().__init__(
-            UPGradWeighting(pref_vector, norm_eps=norm_eps, reg_eps=reg_eps, projector=projector),
+            UPGradWeighting(pref_vector, projector=projector),
         )
 
     @property

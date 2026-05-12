@@ -54,24 +54,16 @@ def test_non_differentiable(aggregator: UPGrad, matrix: Tensor) -> None:
 
 
 def test_representations() -> None:
-    A = UPGrad(
-        pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, projector=QPSolverBased("quadprog")
-    )
-    assert (
-        repr(A)
-        == "UPGrad(pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, projector=QPSolverBased('quadprog'))"
-    )
+    A = UPGrad(pref_vector=None, projector=QPSolverBased())
+    assert repr(A) == "UPGrad(pref_vector=None, projector=QPSolverBased('quadprog'))"
     assert str(A) == "UPGrad"
 
     A = UPGrad(
         pref_vector=torch.tensor([1.0, 2.0, 3.0], device="cpu"),
-        norm_eps=0.0001,
-        reg_eps=0.0001,
-        projector=QPSolverBased("quadprog"),
+        projector=QPSolverBased(),
     )
     assert (
-        repr(A) == "UPGrad(pref_vector=tensor([1., 2., 3.]), norm_eps=0.0001, reg_eps=0.0001, "
-        "projector=QPSolverBased('quadprog'))"
+        repr(A) == "UPGrad(pref_vector=tensor([1., 2., 3.]), projector=QPSolverBased('quadprog'))"
     )
     assert str(A) == "UPGrad([1., 2., 3.])"
 

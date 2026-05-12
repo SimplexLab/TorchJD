@@ -6,6 +6,7 @@ import torch
 from qpsolvers import solve_qp
 from torch import Tensor
 
+from ._gramian import normalize, regularize
 from ._matrix import PSDMatrix
 
 
@@ -33,20 +34,39 @@ class DualConeProjector(ABC):
 
 def projector_or_default(projector: DualConeProjector | None) -> DualConeProjector:
     if projector is None:
-        return QPSolverBased("quadprog")
+        return QPSolverBased(solver="quadprog")
     return projector
 
 
 class QPSolverBased(DualConeProjector):
+    """
+
+    :param norm_eps: A small value to avoid division by zero when normalizing.
+    :param reg_eps: A small value to add to the diagonal of the gramian of the matrix. Due to
+        numerical errors when computing the gramian, it might not exactly be positive definite.
+        This issue can make the optimization fail. Adding ``reg_eps`` to the diagonal of the gramian
+        ensures that it is positive definite.
+    """
+
     SUPPORTED_SOLVER: TypeAlias = Literal["quadprog"]
 
-    def __init__(self, solver: SUPPORTED_SOLVER) -> None:
+    def __init__(
+        self,
+        *,
+        norm_eps: float = 0.0001,
+        reg_eps: float = 0.0001,
+        solver: SUPPORTED_SOLVER = "quadprog",
+    ) -> None:
+        self.norm_eps = norm_eps
+        self.reg_eps = reg_eps
         self.solver = solver
 
     def __repr__(self) -> str:
         return f"QPSolverBased({repr(self.solver)})"
 
-    def __call__(self, U: Tensor, G: Tensor) -> Tensor:
+    def __call__(self, U: Tensor, G: PSDMatrix) -> Tensor:
+
+        G = regularize(normalize(G, self.norm_eps), self.reg_eps)
 
         G_ = _to_array(G)
         U_ = _to_array(U)
