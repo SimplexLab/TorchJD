@@ -78,3 +78,16 @@ def test_pref_vector_setter_updates_value() -> None:
     assert A.pref_vector is new_pref
     assert isinstance(A.gramian_weighting.weighting, ConstantWeighting)
     assert A.gramian_weighting.weighting.weights is new_pref
+
+
+def test_projector_getter_returns_default() -> None:
+    A = UPGrad()
+    assert isinstance(A.projector, QuadprogProjector)
+
+
+def test_projector_setter_updates_value() -> None:
+    A = UPGrad()
+    new_projector = QuadprogProjector(norm_eps=0.001, reg_eps=0.01)
+    A.projector = new_projector
+    assert A.projector is new_projector
+    assert A.gramian_weighting.projector is new_projector
