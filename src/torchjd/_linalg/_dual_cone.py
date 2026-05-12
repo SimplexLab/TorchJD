@@ -10,6 +10,12 @@ from ._matrix import PSDMatrix
 
 
 class DualConeProjector(ABC):
+    """
+    Abstract class whose instances are responsible for projecting vectors onto the dual cone of the
+    rows of a matrix, or rather the dual form of this problem. The current default
+    :class:`~torchjd.linalg.DualConeProjector` is :class:`~torchjd.linalg.QuadprogProjector`.
+    """
+
     @abstractmethod
     def __call__(self, U: Tensor, G: PSDMatrix) -> Tensor:
         r"""
