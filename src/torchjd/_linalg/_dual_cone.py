@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Literal, TypeAlias
 
 import numpy as np
 import torch
@@ -34,11 +33,11 @@ class DualConeProjector(ABC):
 
 def projector_or_default(projector: DualConeProjector | None) -> DualConeProjector:
     if projector is None:
-        return QPSolverBased(solver="quadprog")
+        return QuadprogProjector()
     return projector
 
 
-class QPSolverBased(DualConeProjector):
+class QuadprogProjector(DualConeProjector):
     """
 
     :param norm_eps: A small value to avoid division by zero when normalizing.
@@ -48,21 +47,17 @@ class QPSolverBased(DualConeProjector):
         ensures that it is positive definite.
     """
 
-    SUPPORTED_SOLVER: TypeAlias = Literal["quadprog"]
-
     def __init__(
         self,
         *,
         norm_eps: float = 0.0001,
         reg_eps: float = 0.0001,
-        solver: SUPPORTED_SOLVER = "quadprog",
     ) -> None:
         self.norm_eps = norm_eps
         self.reg_eps = reg_eps
-        self.solver = solver
 
     def __repr__(self) -> str:
-        return f"QPSolverBased({repr(self.solver)})"
+        return "QuadprogProjector()"
 
     def __call__(self, U: Tensor, G: PSDMatrix) -> Tensor:
 
@@ -78,7 +73,7 @@ class QPSolverBased(DualConeProjector):
     def _project_weight_vector(self, u: np.ndarray, G: np.ndarray) -> np.ndarray:
 
         m = G.shape[0]
-        w = solve_qp(G, np.zeros(m), -np.eye(m), -u, solver=self.solver)
+        w = solve_qp(G, np.zeros(m), -np.eye(m), -u, solver="quadprog")
 
         if w is None:  # This may happen when G has large values.
             raise ValueError("Failed to solve the quadratic programming problem.")

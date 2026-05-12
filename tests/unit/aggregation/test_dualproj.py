@@ -3,7 +3,7 @@ from pytest import mark, raises
 from torch import Tensor
 from utils.tensors import ones_
 
-from torchjd._linalg import QPSolverBased
+from torchjd._linalg import QuadprogProjector
 from torchjd.aggregation import ConstantWeighting, DualProj
 from torchjd.aggregation._dualproj import DualProjWeighting
 
@@ -48,13 +48,13 @@ def test_non_differentiable(aggregator: DualProj, matrix: Tensor) -> None:
 
 
 def test_representations() -> None:
-    A = DualProj(pref_vector=None, projector=QPSolverBased())
+    A = DualProj(pref_vector=None, projector=QuadprogProjector())
     assert repr(A) == "DualProj(pref_vector=None, projector=QPSolverBased('quadprog'))"
     assert str(A) == "DualProj"
 
     A = DualProj(
         pref_vector=torch.tensor([1.0, 2.0, 3.0], device="cpu"),
-        projector=QPSolverBased(),
+        projector=QuadprogProjector(),
     )
     assert (
         repr(A) == "DualProj(pref_vector=tensor([1., 2., 3.]), projector=QPSolverBased('quadprog'))"

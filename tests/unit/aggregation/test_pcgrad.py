@@ -3,7 +3,7 @@ from torch import Tensor
 from torch.testing import assert_close
 from utils.tensors import ones_, randn_
 
-from torchjd._linalg import QPSolverBased, compute_gramian
+from torchjd._linalg import QuadprogProjector, compute_gramian
 from torchjd.aggregation import PCGrad
 from torchjd.aggregation._pcgrad import PCGradWeighting
 from torchjd.aggregation._upgrad import UPGradWeighting
@@ -53,7 +53,7 @@ def test_equivalence_upgrad_sum_two_rows(shape: tuple[int, int]) -> None:
     pc_grad_weighting = PCGradWeighting()
     upgrad_sum_weighting = UPGradWeighting(
         ones_((2,)),
-        projector=QPSolverBased(norm_eps=0.0, reg_eps=0.0),
+        projector=QuadprogProjector(norm_eps=0.0, reg_eps=0.0),
     )
 
     result = pc_grad_weighting(gramian)
