@@ -154,8 +154,6 @@ class AutogramNode(torch.autograd.Function):
     of the gramian on backward.
     """
 
-    generate_vmap_rule = True
-
     @staticmethod
     def forward(
         _gramian_accumulation_phase: BoolRef,
