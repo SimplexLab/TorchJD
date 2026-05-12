@@ -1,24 +1,28 @@
 # Partly adapted from https://github.com/AvivNavon/nash-mtl — MIT License, Copyright (c) 2022 Aviv Navon.
 # See NOTICES for the full license text.
 
-from torchjd.aggregation._mixins import Stateful, _NonDifferentiable
+from __future__ import annotations
 
-from ._utils.check_dependencies import check_dependencies_are_installed
-from ._weighting_bases import _MatrixWeighting
+import contextlib
 
-check_dependencies_are_installed(["cvxpy", "ecos"])
-
-import cvxpy as cp
 import numpy as np
 import torch
-from cvxpy import Expression, SolverError
 from torch import Tensor
 
+from torchjd.aggregation._mixins import Stateful, _NonDifferentiable, _WithOptionalDeps
+
 from ._aggregator_bases import WeightedAggregator
+from ._weighting_bases import _MatrixWeighting
+
+with contextlib.suppress(ImportError):
+    import cvxpy as cp
+    from cvxpy import Expression, SolverError
 
 
 # Non-differentiable: the cvxpy solver operates on numpy arrays, breaking the autograd graph.
-class _NashMTLWeighting(_NonDifferentiable, Stateful, _MatrixWeighting):
+class _NashMTLWeighting(_WithOptionalDeps, _NonDifferentiable, Stateful, _MatrixWeighting):
+    _REQUIRED_DEPS = ["cvxpy", "ecos"]
+    _INSTALL_HINT = 'Install them with: pip install "torchjd[nash_mtl]"'
     """
     :class:`~torchjd.aggregation._mixins.Stateful`
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`] that
@@ -215,10 +219,9 @@ class NashMTL(_NonDifferentiable, Stateful, WeightedAggregator):
     :param optim_niter: The number of iterations of the underlying optimization process.
 
     .. note::
-        This aggregator is not installed by default. When not installed, trying to import it should
-        result in the following error:
-        ``ImportError: cannot import name 'NashMTL' from 'torchjd.aggregation'``.
-        To install it, use ``pip install "torchjd[nash_mtl]"``.
+        This aggregator requires optional dependencies. When they are not installed, instantiating
+        it raises an :class:`ImportError` with installation instructions.
+        To install them, use ``pip install "torchjd[nash_mtl]"``.
 
     .. warning::
         This implementation was adapted from the `official implementation
