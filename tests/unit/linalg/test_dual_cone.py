@@ -96,6 +96,40 @@ def test_tensorization_shape(projector: DualConeProjector, shape: tuple[int, ...
     assert_close(W_matrix.reshape(shape), W_tensor)
 
 
+def test_norm_eps_default() -> None:
+    projector = QuadprogProjector()
+    assert projector.norm_eps == 0.0001
+
+
+def test_norm_eps_setter_updates_value() -> None:
+    projector = QuadprogProjector()
+    projector.norm_eps = 0.25
+    assert projector.norm_eps == 0.25
+
+
+def test_norm_eps_setter_rejects_negative() -> None:
+    projector = QuadprogProjector()
+    with raises(ValueError, match="norm_eps"):
+        projector.norm_eps = -1e-9
+
+
+def test_reg_eps_default() -> None:
+    projector = QuadprogProjector()
+    assert projector.reg_eps == 0.0001
+
+
+def test_reg_eps_setter_updates_value() -> None:
+    projector = QuadprogProjector()
+    projector.reg_eps = 0.25
+    assert projector.reg_eps == 0.25
+
+
+def test_reg_eps_setter_rejects_negative() -> None:
+    projector = QuadprogProjector()
+    with raises(ValueError, match="reg_eps"):
+        projector.reg_eps = -1e-9
+
+
 def test_qp_solver_based_failure() -> None:
     """
     Tests that `QPSolverBased._project_weight_vector` raises an error when the input G has too large

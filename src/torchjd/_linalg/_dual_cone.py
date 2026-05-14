@@ -70,6 +70,26 @@ class QuadprogProjector(DualConeProjector):
         self.norm_eps = norm_eps
         self.reg_eps = reg_eps
 
+    @property
+    def norm_eps(self) -> float:
+        return self._norm_eps
+
+    @norm_eps.setter
+    def norm_eps(self, value: float) -> None:
+        if value < 0.0:
+            raise ValueError(f"norm_eps must be non-negative, but got {value}.")
+        self._norm_eps = value
+
+    @property
+    def reg_eps(self) -> float:
+        return self._reg_eps
+
+    @reg_eps.setter
+    def reg_eps(self, value: float) -> None:
+        if value < 0.0:
+            raise ValueError(f"reg_eps must be non-negative, but got {value}.")
+        self._reg_eps = value
+
     def __repr__(self) -> str:
         return f"QuadprogProjector(norm_eps={self.norm_eps}, reg_eps={self.reg_eps})"
 
