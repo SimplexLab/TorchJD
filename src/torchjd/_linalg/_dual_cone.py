@@ -12,14 +12,14 @@ from ._matrix import PSDMatrix
 class DualConeProjector(ABC):
     """
     Abstract class whose instances are responsible for projecting vectors onto the dual cone of the
-    rows of a matrix, or rather the dual form of this problem. The current default
-    :class:`~torchjd.linalg.DualConeProjector` is :class:`~torchjd.linalg.QuadprogProjector`.
+    rows of a matrix, or rather the dual form of this problem.
     """
 
     @abstractmethod
     def __call__(self, U: Tensor, G: PSDMatrix) -> Tensor:
         r"""
-        Computes the weights :math:`w` of the projection of :math:`J^\top u` onto the dual cone of
+        Computes for each vector :math:`u` in the provided tensor ``U``
+        the weights :math:`w` of the projection of :math:`J^\top u` onto the dual cone of
         the rows of :math:`J`, provided :math:`G = J J^\top` and :math:`u`. In other words, this
         computes the :math:`w` that satisfies :math:`\pi_J(J^\top u) = J^\top w`, with
         :math:`\pi_J` defined in Equation 3 of [1].
@@ -38,7 +38,7 @@ class DualConeProjector(ABC):
         :param U: The tensor of weights corresponding to the vectors to project, of shape
             ``[..., m]``.
         :param G: The Gramian matrix of shape ``[m, m]``. It must be symmetric and positive
-            definite.
+            semi-definite.
         :return: A tensor of projection weights with the same shape as ``U``.
         """
 
