@@ -1,8 +1,18 @@
 """
-This module provides type annotation classes representing tensors with specific structural
-properties.
+This module provides utilitary linear algebra methods as well as types to represent specific
+structural properties.
 """
 
-from torchjd._linalg._matrix import Matrix, PSDMatrix
+from torchjd._linalg import (
+    DualConeProjector,
+    Matrix,
+    PSDMatrix,
+    QuadprogProjector,
+)
 
-__all__ = ["Matrix", "PSDMatrix"]
+__all__ = [
+    "DualConeProjector",
+    "Matrix",
+    "PSDMatrix",
+    "QuadprogProjector",
+]
