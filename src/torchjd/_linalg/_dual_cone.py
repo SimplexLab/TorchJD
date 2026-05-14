@@ -67,8 +67,8 @@ class QuadprogProjector(DualConeProjector):
         norm_eps: float = 0.0001,
         reg_eps: float = 0.0001,
     ) -> None:
-        self.norm_eps = norm_eps
-        self.reg_eps = reg_eps
+        self._norm_eps = norm_eps
+        self._reg_eps = reg_eps
 
     @property
     def norm_eps(self) -> float:
@@ -91,11 +91,11 @@ class QuadprogProjector(DualConeProjector):
         self._reg_eps = value
 
     def __repr__(self) -> str:
-        return f"QuadprogProjector(norm_eps={self.norm_eps}, reg_eps={self.reg_eps})"
+        return f"QuadprogProjector(norm_eps={self._norm_eps}, reg_eps={self._reg_eps})"
 
     def __call__(self, U: Tensor, G: PSDMatrix) -> Tensor:
 
-        G = regularize(normalize(G, self.norm_eps), self.reg_eps)
+        G = regularize(normalize(G, self._norm_eps), self._reg_eps)
 
         G_ = _to_array(G)
         U_ = _to_array(U)
