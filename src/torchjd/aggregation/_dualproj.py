@@ -1,12 +1,11 @@
 from torch import Tensor
 
-from torchjd._linalg import normalize, regularize
+from torchjd._linalg import DualConeProjector, projector_or_default
 from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._mean import MeanWeighting
 from ._mixins import _NonDifferentiable
-from ._utils.dual_cone import SUPPORTED_SOLVER, project_weights
 from ._utils.pref_vector import pref_vector_to_str_suffix, pref_vector_to_weighting
 from ._weighting_bases import _GramianWeighting
 
@@ -19,31 +18,21 @@ class DualProjWeighting(_NonDifferentiable, _GramianWeighting):
 
     :param pref_vector: The preference vector to use. If not provided, defaults to
         :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in \mathbb{R}^m`.
-    :param norm_eps: A small value to avoid division by zero when normalizing.
-    :param reg_eps: A small value to add to the diagonal of the gramian of the matrix. Due to
-        numerical errors when computing the gramian, it might not exactly be positive definite.
-        This issue can make the optimization fail. Adding ``reg_eps`` to the diagonal of the gramian
-        ensures that it is positive definite.
-    :param solver: The solver used to optimize the underlying optimization problem.
+    :param projector: The :class:`~torchjd.linalg.DualConeProjector` used to compute the projection.
     """
 
     def __init__(
         self,
         pref_vector: Tensor | None = None,
-        norm_eps: float = 0.0001,
-        reg_eps: float = 0.0001,
-        solver: SUPPORTED_SOLVER = "proxsuite",
+        projector: DualConeProjector | None = None,
     ) -> None:
         super().__init__()
         self.pref_vector = pref_vector
-        self.norm_eps = norm_eps
-        self.reg_eps = reg_eps
-        self.solver: SUPPORTED_SOLVER = solver
+        self.projector = projector_or_default(projector)
 
     def forward(self, gramian: PSDMatrix, /) -> Tensor:
         u = self.weighting(gramian)
-        G = regularize(normalize(gramian, self.norm_eps), self.reg_eps)
-        w = project_weights(u, G, self.solver)
+        w = self.projector(u, gramian)
         return w
 
     @property
@@ -56,26 +45,12 @@ class DualProjWeighting(_NonDifferentiable, _GramianWeighting):
         self._pref_vector = value
 
     @property
-    def norm_eps(self) -> float:
-        return self._norm_eps
+    def projector(self) -> DualConeProjector:
+        return self._projector
 
-    @norm_eps.setter
-    def norm_eps(self, value: float) -> None:
-        if value < 0:
-            raise ValueError(f"norm_eps must be non-negative, but got {value}.")
-
-        self._norm_eps = value
-
-    @property
-    def reg_eps(self) -> float:
-        return self._reg_eps
-
-    @reg_eps.setter
-    def reg_eps(self, value: float) -> None:
-        if value < 0:
-            raise ValueError(f"reg_eps must be non-negative, but got {value}.")
-
-        self._reg_eps = value
+    @projector.setter
+    def projector(self, value: DualConeProjector | None) -> None:
+        self._projector = projector_or_default(value)
 
 
 class DualProj(_NonDifferentiable, GramianWeightedAggregator):
@@ -87,12 +62,7 @@ class DualProj(_NonDifferentiable, GramianWeightedAggregator):
 
     :param pref_vector: The preference vector used to combine the rows. If not provided, defaults to
         :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in \mathbb{R}^m`.
-    :param norm_eps: A small value to avoid division by zero when normalizing.
-    :param reg_eps: A small value to add to the diagonal of the gramian of the matrix. Due to
-        numerical errors when computing the gramian, it might not exactly be positive definite.
-        This issue can make the optimization fail. Adding ``reg_eps`` to the diagonal of the gramian
-        ensures that it is positive definite.
-    :param solver: The solver used to optimize the underlying optimization problem.
+    :param projector: The :class:`~torchjd.linalg.DualConeProjector` used to compute the projection.
     """
 
     gramian_weighting: DualProjWeighting
@@ -100,14 +70,10 @@ class DualProj(_NonDifferentiable, GramianWeightedAggregator):
     def __init__(
         self,
         pref_vector: Tensor | None = None,
-        norm_eps: float = 0.0001,
-        reg_eps: float = 0.0001,
-        solver: SUPPORTED_SOLVER = "proxsuite",
+        projector: DualConeProjector | None = None,
     ) -> None:
-        self._solver: SUPPORTED_SOLVER = solver
-
         super().__init__(
-            DualProjWeighting(pref_vector, norm_eps=norm_eps, reg_eps=reg_eps, solver=solver),
+            DualProjWeighting(pref_vector, projector=projector),
         )
 
     @property
@@ -119,25 +85,17 @@ class DualProj(_NonDifferentiable, GramianWeightedAggregator):
         self.gramian_weighting.pref_vector = value
 
     @property
-    def norm_eps(self) -> float:
-        return self.gramian_weighting.norm_eps
+    def projector(self) -> DualConeProjector:
+        return self.gramian_weighting.projector
 
-    @norm_eps.setter
-    def norm_eps(self, value: float) -> None:
-        self.gramian_weighting.norm_eps = value
-
-    @property
-    def reg_eps(self) -> float:
-        return self.gramian_weighting.reg_eps
-
-    @reg_eps.setter
-    def reg_eps(self, value: float) -> None:
-        self.gramian_weighting.reg_eps = value
+    @projector.setter
+    def projector(self, value: DualConeProjector | None) -> None:
+        self.gramian_weighting.projector = value
 
     def __repr__(self) -> str:
         return (
-            f"{self.__class__.__name__}(pref_vector={repr(self.pref_vector)}, norm_eps="
-            f"{self.norm_eps}, reg_eps={self.reg_eps}, solver={repr(self._solver)})"
+            f"{self.__class__.__name__}(pref_vector={repr(self.pref_vector)}, projector="
+            f"{repr(self.projector)})"
         )
 
     def __str__(self) -> str:
