@@ -3,7 +3,7 @@ from pytest import mark
 from torch import Tensor
 from utils.tensors import ones_
 
-from torchjd._linalg import QuadprogProjector
+from torchjd._linalg import ProxsuiteProjector, QuadprogProjector
 from torchjd.aggregation import ConstantWeighting, UPGrad
 
 from ._asserts import (
@@ -16,10 +16,22 @@ from ._asserts import (
 )
 from ._inputs import non_strong_matrices, scaled_matrices, typical_matrices
 
-scaled_pairs = [(UPGrad(), matrix) for matrix in scaled_matrices]
-typical_pairs = [(UPGrad(), matrix) for matrix in typical_matrices]
-non_strong_pairs = [(UPGrad(), matrix) for matrix in non_strong_matrices]
-requires_grad_pairs = [(UPGrad(), ones_(3, 5, requires_grad=True))]
+projectors = [QuadprogProjector(), ProxsuiteProjector()]
+
+scaled_pairs = [
+    (UPGrad(projector=projector), matrix) for matrix in scaled_matrices for projector in projectors
+]
+typical_pairs = [
+    (UPGrad(projector=projector), matrix) for matrix in typical_matrices for projector in projectors
+]
+non_strong_pairs = [
+    (UPGrad(projector=projector), matrix)
+    for matrix in non_strong_matrices
+    for projector in projectors
+]
+requires_grad_pairs = [
+    (UPGrad(projector=projector), ones_(3, 5, requires_grad=True)) for projector in projectors
+]
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
