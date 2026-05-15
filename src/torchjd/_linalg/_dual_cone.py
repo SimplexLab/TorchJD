@@ -1,7 +1,9 @@
+import os
 from abc import ABC, abstractmethod
 
 import numpy as np
 import torch
+from proxsuite import proxqp
 from qpsolvers import solve_qp
 from torch import Tensor
 
@@ -113,6 +115,63 @@ class QuadprogProjector(DualConeProjector):
             raise ValueError("Failed to solve the quadratic programming problem.")
 
         return w
+
+
+class ProxsuiteProjector(DualConeProjector):
+    r"""
+    Solves the quadratic program defined in :meth:`DualConeProjector.__call__` using the
+    `proxsuite <https://github.com/Simple-Robotics/proxsuite>`_ QP solver.
+    """
+
+    def __init__(self) -> None:
+        pass
+
+    def __repr__(self) -> str:
+        return "ProxsuiteProjector()"
+
+    def __call__(self, U: Tensor, G: PSDMatrix) -> Tensor:
+        original_shape = U.shape
+        m = G.shape[0]
+        U_flat = U.reshape(-1, m)  # [nBatch, m]
+
+        W = self._project_weight_vector_batch(U_flat, G)
+
+        return W.reshape(original_shape)
+
+    @torch.no_grad()
+    def _project_weight_vector_batch(self, U: Tensor, G: Tensor) -> Tensor:
+
+        n, m = U.shape
+        device = U.device
+        dtype = U.dtype
+
+        Q_np = _to_array(G)
+        p_np = np.zeros(m, dtype=np.float64)
+        C_np = -np.eye(m, dtype=np.float64)
+        lb_np = np.full(m, -1e20, dtype=np.float64)
+        ub_np = _to_array(U)
+
+        batch_qps = proxqp.dense.BatchQP()
+        default_rho = 5.0e-5
+
+        for i in range(n):
+            qp = batch_qps.init_qp_in_place(m, 0, m)
+            qp.settings.primal_infeasibility_solving = False
+            qp.settings.max_iter = 1000
+            qp.settings.max_iter_in = 100
+            qp.settings.default_rho = default_rho
+            qp.settings.refactor_rho_threshold = default_rho
+            qp.settings.eps_abs = 1e-9
+            qp.init(H=Q_np, g=p_np, A=None, b=None, C=C_np, l=lb_np, u=-ub_np[i], rho=default_rho)
+
+        num_threads = max(1, (os.cpu_count() or 2) // 2)
+        proxqp.dense.solve_in_parallel(num_threads=num_threads, qps=batch_qps)
+
+        zhats_np = np.empty((n, m), dtype=np.float64)
+        for i in range(n):
+            zhats_np[i] = batch_qps.get(i).results.x
+
+        return torch.from_numpy(zhats_np).to(device=device, dtype=dtype)
 
 
 def _to_array(tensor: Tensor) -> np.ndarray:

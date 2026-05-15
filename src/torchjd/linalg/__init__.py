@@ -6,6 +6,7 @@ structural properties.
 from torchjd._linalg import (
     DualConeProjector,
     Matrix,
+    ProxsuiteProjector,
     PSDMatrix,
     QuadprogProjector,
 )
@@ -15,4 +16,5 @@ __all__ = [
     "Matrix",
     "PSDMatrix",
     "QuadprogProjector",
+    "ProxsuiteProjector",
 ]
