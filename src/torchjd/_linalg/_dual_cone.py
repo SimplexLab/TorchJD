@@ -132,24 +132,23 @@ class ProxsuiteProjector(DualConeProjector):
     def __call__(self, U: Tensor, G: PSDMatrix) -> Tensor:
         original_shape = U.shape
         m = G.shape[0]
-        U_flat = U.reshape(-1, m)  # [nBatch, m]
+        G_ = _to_array(G)
+        U_flat = _to_array(U.reshape(-1, m))  # [nBatch, m]
 
-        W = self._project_weight_vector_batch(U_flat, G)
+        W = self._project_weight_vector_batch(U_flat, G_)
 
-        return W.reshape(original_shape)
+        return torch.as_tensor(W, device=G.device, dtype=G.dtype).reshape(original_shape)
 
     @torch.no_grad()
-    def _project_weight_vector_batch(self, U: Tensor, G: Tensor) -> Tensor:
+    def _project_weight_vector_batch(self, U: np.ndarray, G: np.ndarray) -> np.ndarray:
 
         n, m = U.shape
-        device = U.device
-        dtype = U.dtype
 
-        Q_np = _to_array(G)
+        Q_np = G
         p_np = np.zeros(m, dtype=np.float64)
         C_np = -np.eye(m, dtype=np.float64)
         lb_np = np.full(m, -1e20, dtype=np.float64)
-        ub_np = _to_array(U)
+        ub_np = U
 
         batch_qps = proxqp.dense.BatchQP()
         default_rho = 5.0e-5
@@ -171,7 +170,7 @@ class ProxsuiteProjector(DualConeProjector):
         for i in range(n):
             zhats_np[i] = batch_qps.get(i).results.x
 
-        return torch.from_numpy(zhats_np).to(device=device, dtype=dtype)
+        return zhats_np
 
 
 def _to_array(tensor: Tensor) -> np.ndarray:
