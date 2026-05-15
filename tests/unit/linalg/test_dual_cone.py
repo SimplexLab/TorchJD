@@ -138,6 +138,18 @@ def test_reg_eps_setter_rejects_negative() -> None:
         projector.reg_eps = -1e-9
 
 
+def test_quadprog_repr() -> None:
+    A = QuadprogProjector(norm_eps=0.001, reg_eps=0.01)
+    assert repr(A) == "QuadprogProjector(norm_eps=0.001, reg_eps=0.01)"
+    assert str(A) == "QuadprogProjector(norm_eps=0.001, reg_eps=0.01)"
+
+
+def test_proxsuite_repr() -> None:
+    A = ProxsuiteProjector()
+    assert repr(A) == "ProxsuiteProjector()"
+    assert str(A) == "ProxsuiteProjector()"
+
+
 def test_qp_solver_based_failure() -> None:
     """
     Tests that `QPSolverBased._project_weight_vector` raises an error when the input G has too large
