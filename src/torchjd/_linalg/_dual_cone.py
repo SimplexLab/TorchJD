@@ -1,9 +1,14 @@
+import contextlib
 from abc import ABC, abstractmethod
 
-import numpy as np
 import torch
-from qpsolvers import solve_qp
 from torch import Tensor
+
+from torchjd._mixins import _WithOptionalDeps
+
+with contextlib.suppress(ImportError):
+    import numpy as np
+    from qpsolvers import solve_qp
 
 from ._gramian import normalize, regularize
 from ._matrix import PSDMatrix
@@ -49,7 +54,7 @@ def projector_or_default(projector: DualConeProjector | None) -> DualConeProject
     return projector
 
 
-class QuadprogProjector(DualConeProjector):
+class QuadprogProjector(_WithOptionalDeps, DualConeProjector):
     r"""
     Solves the quadratic program defined in :meth:`DualConeProjector.__call__` using the
     `quadprog <https://github.com/quadprog/quadprog>`_ QP solver.
@@ -61,12 +66,16 @@ class QuadprogProjector(DualConeProjector):
         ensures that it is positive definite.
     """
 
+    _REQUIRED_DEPS = ["numpy", "qpsolvers", "quadprog"]
+    _INSTALL_HINT = 'Install them with: pip install "torchjd[quadprog_projector]"'
+
     def __init__(
         self,
         *,
         norm_eps: float = 0.0001,
         reg_eps: float = 0.0001,
     ) -> None:
+        super().__init__()
         self._norm_eps = norm_eps
         self._reg_eps = reg_eps
 

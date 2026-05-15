@@ -6,10 +6,11 @@ import torch
 from torch import Tensor
 
 from torchjd._linalg import normalize
+from torchjd._mixins import _WithOptionalDeps
 from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
-from ._mixins import _NonDifferentiable, _WithOptionalDeps
+from ._mixins import _NonDifferentiable
 from ._weighting_bases import _GramianWeighting
 
 with contextlib.suppress(ImportError):
@@ -18,7 +19,7 @@ with contextlib.suppress(ImportError):
 
 # Non-differentiable: the cvxpy solver operates on numpy arrays, breaking the autograd graph.
 class CAGradWeighting(_WithOptionalDeps, _NonDifferentiable, _GramianWeighting):
-    _REQUIRED_DEPS = ["cvxpy", "clarabel"]
+    _REQUIRED_DEPS = ["numpy", "cvxpy", "clarabel"]
     _INSTALL_HINT = 'Install them with: pip install "torchjd[cagrad]"'
     """
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
