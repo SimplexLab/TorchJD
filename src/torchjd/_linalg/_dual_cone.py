@@ -160,7 +160,7 @@ class ProxsuiteProjector(DualConeProjector):
             qp.settings.max_iter_in = 100
             qp.settings.default_rho = default_rho
             qp.settings.refactor_rho_threshold = default_rho
-            qp.settings.eps_abs = 1e-9
+            qp.settings.eps_abs = 1e-6
 
             u = -ub_np[i]
 
