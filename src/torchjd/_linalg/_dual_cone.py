@@ -161,7 +161,23 @@ class ProxsuiteProjector(DualConeProjector):
             qp.settings.default_rho = default_rho
             qp.settings.refactor_rho_threshold = default_rho
             qp.settings.eps_abs = 1e-9
-            qp.init(H=Q_np, g=p_np, A=None, b=None, C=C_np, l=lb_np, u=-ub_np[i], rho=default_rho)
+
+            u = -ub_np[i]
+
+            qp.init(
+                H=Q_np,
+                g=p_np,
+                A=None,
+                b=None,
+                C=C_np,
+                l=lb_np,
+                u=u,
+                rho=default_rho,
+            )
+
+            # Initial guess
+            qp.results.x = u.copy()
+            qp.results.z = np.maximum(0.0, Q_np @ u)
 
         num_threads = max(1, (os.cpu_count() or 2) // 2)
         proxqp.dense.solve_in_parallel(num_threads=num_threads, qps=batch_qps)
