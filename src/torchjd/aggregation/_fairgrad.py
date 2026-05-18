@@ -62,12 +62,8 @@ class FairGradWeighting(_WithOptionalDeps, _NonDifferentiable, _GramianWeighting
             def objective(x: np.ndarray) -> np.ndarray:
                 return np.dot(gramian_array, x) - np.power(1 / x, 1 / self.alpha)
 
-            try:
-                res = least_squares(objective, x_start, bounds=(0, np.inf), max_nfev=self.max_iters)
-            except ValueError:  # can happen when the matrix has huge values
-                weight_array = x_start
-            else:
-                weight_array = res.x
+            res = least_squares(objective, x_start, bounds=(0, np.inf), max_nfev=self.max_iters)
+            weight_array = res.x
 
         return torch.tensor(weight_array).to(device=gramian.device, dtype=gramian.dtype)
 
