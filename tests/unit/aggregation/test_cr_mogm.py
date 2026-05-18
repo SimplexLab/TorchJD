@@ -116,17 +116,17 @@ def test_alpha_zero_reduces_to_bare_weighting() -> None:
 def test_alpha_one_freezes_weights() -> None:
     """
     With ``alpha=1`` the fresh weights are multiplied by zero, so the smoothed weights stay at
-    their initial uniform value forever. Note: the equality with uniform weights is a
-    consequence of the uniform initialisation, not a general property of CR-MOGM.
+    their initial value forever. When ``initial_weights`` is ``None``, the initial value is
+    :math:`\\hat{\\lambda}_1`, so the output is frozen at the first step's bare weights.
     """
 
     J = randn_((3, 8))
-    m = J.shape[0]
+    G = J @ J.T
     W = CRMOGMWeighting(UPGradWeighting(), alpha=1.0)
-    uniform = tensor_([1.0 / m] * m)
+    first = W(G)
 
-    assert_close(W(J @ J.T), uniform)
-    assert_close(W(J @ J.T), uniform)
+    assert_close(W(G), first)
+    assert_close(W(G), first)
 
 
 def test_ema_is_applied() -> None:
@@ -137,20 +137,59 @@ def test_ema_is_applied() -> None:
     J2 = randn_((3, 8))
     G1 = J1 @ J1.T
     G2 = J2 @ J2.T
-    m = J1.shape[0]
 
     bare = UPGradWeighting()
     smoothed = CRMOGMWeighting(UPGradWeighting(), alpha=alpha)
 
     lambda_hat_1 = bare(G1)
     lambda_hat_2 = bare(G2)
-    uniform = tensor_([1.0 / m] * m)
 
-    expected_1 = alpha * uniform + (1.0 - alpha) * lambda_hat_1
-    expected_2 = alpha * expected_1 + (1.0 - alpha) * lambda_hat_2
+    # lambda_0 = lambda_hat_1, so lambda_1 = lambda_hat_1 regardless of alpha
+    expected_1 = lambda_hat_1
+    expected_2 = alpha * lambda_hat_1 + (1.0 - alpha) * lambda_hat_2
 
     assert_close(smoothed(G1), expected_1)
     assert_close(smoothed(G2), expected_2)
+
+
+def test_initial_weights_used_as_lambda_0() -> None:
+    """Verify that when ``initial_weights`` is provided it acts as :math:`\\lambda_0`."""
+
+    alpha = 0.5
+    J = randn_((3, 8))
+    G = J @ J.T
+    initial = tensor_([0.5, 0.3, 0.2])
+
+    bare = UPGradWeighting()
+    W = CRMOGMWeighting(UPGradWeighting(), alpha=alpha, initial_weights=initial)
+
+    lambda_hat_1 = bare(G)
+    expected_1 = alpha * initial + (1.0 - alpha) * lambda_hat_1
+
+    assert_close(W(G), expected_1)
+
+
+def test_reset_restores_initial_weights() -> None:
+    """Verify that ``reset()`` restores the user-provided ``initial_weights`` as :math:`\\lambda_0`."""
+
+    alpha = 0.5
+    J = randn_((3, 8))
+    G = J @ J.T
+    initial = tensor_([0.5, 0.3, 0.2])
+
+    W = CRMOGMWeighting(UPGradWeighting(), alpha=alpha, initial_weights=initial)
+    first = W(G)
+    W(G)
+    W.reset()
+    assert_close(W(G), first)
+
+
+def test_initial_weights_shape_mismatch_raises() -> None:
+    """Verify that mismatched ``initial_weights`` shape raises a ``ValueError``."""
+
+    W = CRMOGMWeighting(MeanWeighting(), initial_weights=tensor_([0.5, 0.5]))
+    with raises(ValueError, match="initial_weights"):
+        W(randn_((3, 8)) @ randn_((3, 8)).T)
 
 
 def test_zero_columns() -> None:

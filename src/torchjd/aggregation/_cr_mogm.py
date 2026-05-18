@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TypeVar
 
-import torch
 from torch import Tensor
 
 from torchjd.aggregation._mixins import Stateful
@@ -29,8 +28,9 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
 
         \lambda_k = \alpha \, \lambda_{k-1} + (1 - \alpha) \, \hat{\lambda}_k
 
-    with :math:`\lambda_0 = \begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^\top
-    \in \mathbb{R}^m`.
+    where :math:`\lambda_0` is ``initial_weights`` if provided, otherwise
+    :math:`\lambda_0 = \hat{\lambda}_1` (so that the first smoothed output equals
+    :math:`\hat{\lambda}_1` regardless of :math:`\alpha`).
 
     Creating the corresponding :class:`~torchjd.aggregation.Aggregator` from a wrapped weighting can
     be done by composing it with the appropriate aggregator subclass
@@ -60,14 +60,17 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
     themselves, so wrapping by ``CRMOGMWeighting`` will have no effect.
 
     This weighting is stateful: it keeps :math:`\lambda_{k-1}` across calls. Use :meth:`reset`
-    to restart the smoothing from uniform weights. Note that calling :meth:`reset` will also
+    to restart the smoothing from the initial state. Note that calling :meth:`reset` will also
     reset the wrapped weighting if it is :class:`~torchjd.aggregation.Stateful`.
 
     :param weighting: The wrapped weighting whose output is smoothed.
     :param alpha: EMA coefficient on the previous weights. ``alpha=0`` disables smoothing
         (``CRMOGMWeighting`` returns ``weighting``'s output verbatim) and ``alpha=1`` freezes
-        the weights at their initial uniform value. The default of ``0.9`` follows the usual
-        EMA convention (analogous to Adam's :math:`\beta_1`).
+        the weights at their initial value. The default of ``0.9`` follows the usual EMA
+        convention (analogous to Adam's :math:`\beta_1`).
+    :param initial_weights: Optional tensor to use as :math:`\lambda_0`. If ``None`` (default),
+        :math:`\lambda_0` is set to :math:`\hat{\lambda}_1` on the first forward call, making
+        the first smoothed output equal to :math:`\hat{\lambda}_1`.
 
     .. note::
         ``alpha`` is a fixed ``float`` for simplicity. Corollary 1 of the paper recommends a
@@ -95,10 +98,13 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
             cr_mogm.alpha = 1 - current_lr / initial_lr
     """
 
-    def __init__(self, weighting: Weighting[_T], alpha: float = 0.9) -> None:
+    def __init__(
+        self, weighting: Weighting[_T], alpha: float = 0.9, initial_weights: Tensor | None = None
+    ) -> None:
         super().__init__()
         self.weighting = weighting
         self.alpha = alpha
+        self._initial_weights = initial_weights
         self._lambda: Tensor | None = None
 
     @property
@@ -112,8 +118,8 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
         self._alpha = value
 
     def reset(self) -> None:
-        """
-        Clears the EMA state so the next forward starts from uniform weights. Also resets the
+        r"""
+        Clears the EMA state so the next forward restarts from the initial state. Also resets the
         wrapped weighting if it is :class:`~torchjd.aggregation._mixins.Stateful`.
         """
 
@@ -124,16 +130,27 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
     def forward(self, stat: _T, /) -> Tensor:
         lambda_hat = self.weighting(stat)
 
-        lambda_prev = self._ensure_state(lambda_hat.shape[0], lambda_hat.dtype, lambda_hat.device)
+        lambda_prev = self._ensure_state(lambda_hat)
 
         lambda_k = self._alpha * lambda_prev + (1.0 - self._alpha) * lambda_hat
 
         self._lambda = lambda_k.detach()
         return lambda_k
 
-    def _ensure_state(self, m: int, dtype: torch.dtype, device: torch.device) -> Tensor:
+    def _ensure_state(self, lambda_hat: Tensor) -> Tensor:
+        m = lambda_hat.shape[0]
         if self._lambda is None:
-            self._lambda = torch.full((m,), 1.0 / m, dtype=dtype, device=device)
+            if self._initial_weights is not None:
+                if self._initial_weights.shape != (m,):
+                    raise ValueError(
+                        f"`initial_weights` has shape {tuple(self._initial_weights.shape)}, "
+                        f"expected ({m},)."
+                    )
+                self._lambda = self._initial_weights.to(
+                    dtype=lambda_hat.dtype, device=lambda_hat.device
+                )
+            else:
+                self._lambda = lambda_hat
         elif self._lambda.shape[0] != m:
             raise ValueError(
                 f"The number of objectives changed from {self._lambda.shape[0]} to {m}. Call "
