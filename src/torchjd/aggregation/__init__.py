@@ -67,6 +67,7 @@ from ._config import ConFIG
 from ._constant import Constant, ConstantWeighting
 from ._cr_mogm import CRMOGMWeighting
 from ._dualproj import DualProj, DualProjWeighting
+from ._fairgrad import FairGrad, FairGradWeighting
 from ._flattening import Flattening
 from ._graddrop import GradDrop
 from ._gradvac import GradVac, GradVacWeighting
@@ -95,6 +96,8 @@ __all__ = [
     "CRMOGMWeighting",
     "DualProj",
     "DualProjWeighting",
+    "FairGrad",
+    "FairGradWeighting",
     "Flattening",
     "GeneralizedWeighting",
     "GradDrop",

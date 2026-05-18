@@ -8,6 +8,11 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Added
+
+- Added `FairGrad` and `FairGradWeighting` from [Fair Resource Allocation in Multi-Task
+  Learning](https://arxiv.org/pdf/2402.15638).
+
 ## [0.11.0] - 2026-05-18
 
 ### Changed
