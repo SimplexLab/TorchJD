@@ -95,7 +95,7 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
             cr_mogm.alpha = 1 - current_lr / initial_lr
     """
 
-    def __init__(self, weighting: Weighting[_T], alpha: float = 0.1) -> None:
+    def __init__(self, weighting: Weighting[_T], alpha: float = 0.9) -> None:
         super().__init__()
         self.weighting = weighting
         self.alpha = alpha
