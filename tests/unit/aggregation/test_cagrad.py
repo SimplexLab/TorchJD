@@ -1,8 +1,8 @@
-from conftest import pytest_skip_if_deps_not_installed
+from conftest import skip_if_deps_not_installed
 
 from torchjd.aggregation import CAGrad, CAGradWeighting
 
-pytest_skip_if_deps_not_installed(CAGradWeighting)
+skip_if_deps_not_installed(CAGradWeighting)
 
 from contextlib import nullcontext as does_not_raise
 

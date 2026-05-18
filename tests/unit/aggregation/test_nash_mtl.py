@@ -1,9 +1,9 @@
-from conftest import pytest_skip_if_deps_not_installed
+from conftest import skip_if_deps_not_installed
 
 from torchjd.aggregation import NashMTL
 from torchjd.aggregation._nash_mtl import _NashMTLWeighting
 
-pytest_skip_if_deps_not_installed(_NashMTLWeighting)
+skip_if_deps_not_installed(_NashMTLWeighting)
 
 from pytest import mark, raises
 from torch import Tensor

@@ -75,7 +75,7 @@ def pytest_make_parametrize_id(config: pytest.Config, val: object, argname: str)
     return optional_string
 
 
-def pytest_skip_if_deps_not_installed(cls: type[_WithOptionalDeps]) -> None:
+def skip_if_deps_not_installed(cls: type[_WithOptionalDeps]) -> None:
     """Skip the tests following this call if not all dependencies of object are installed."""
 
     for dependency_name in cls._REQUIRED_DEPS:
