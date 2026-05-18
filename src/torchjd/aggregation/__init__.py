@@ -62,6 +62,7 @@ tensor([[0.1667, 0.1667, 0.1667],
 
 from ._aggregator_bases import Aggregator, GramianWeightedAggregator, WeightedAggregator
 from ._aligned_mtl import AlignedMTL, AlignedMTLWeighting
+from ._cagrad import CAGrad, CAGradWeighting
 from ._config import ConFIG
 from ._constant import Constant, ConstantWeighting
 from ._cr_mogm import CRMOGMWeighting
@@ -74,20 +75,20 @@ from ._krum import Krum, KrumWeighting
 from ._mean import Mean, MeanWeighting
 from ._mgda import MGDA, MGDAWeighting
 from ._mixins import Stateful
+from ._nash_mtl import NashMTL
 from ._pcgrad import PCGrad, PCGradWeighting
 from ._random import Random, RandomWeighting
 from ._sum import Sum, SumWeighting
 from ._trimmed_mean import TrimmedMean
 from ._upgrad import UPGrad, UPGradWeighting
-from ._utils.check_dependencies import (
-    OptionalDepsNotInstalledError as _OptionalDepsNotInstalledError,
-)
 from ._weighting_bases import GeneralizedWeighting, Weighting
 
 __all__ = [
     "Aggregator",
     "AlignedMTL",
     "AlignedMTLWeighting",
+    "CAGrad",
+    "CAGradWeighting",
     "ConFIG",
     "Constant",
     "ConstantWeighting",
@@ -108,6 +109,7 @@ __all__ = [
     "MeanWeighting",
     "MGDA",
     "MGDAWeighting",
+    "NashMTL",
     "PCGrad",
     "PCGradWeighting",
     "Random",
@@ -121,17 +123,3 @@ __all__ = [
     "WeightedAggregator",
     "Weighting",
 ]
-
-try:
-    from ._cagrad import CAGrad, CAGradWeighting
-
-    __all__ += ["CAGrad", "CAGradWeighting"]
-except _OptionalDepsNotInstalledError:  # The required dependencies are not installed
-    pass
-
-try:
-    from ._nash_mtl import NashMTL
-
-    __all__ += ["NashMTL"]
-except _OptionalDepsNotInstalledError:  # The required dependencies are not installed
-    pass

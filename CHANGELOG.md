@@ -10,6 +10,25 @@ changelog does not include internal changes that do not affect the user.
 
 ### Changed
 
+- **BREAKING**: Removed `norm_eps`, `rep_eps` and `solver` parameters from the `__init__` of
+  `UPGrad`, `UPGradWeighting`, `DualProj` and `DualProjWeighting` in favor of a `projector`
+  parameter of type `DualConeProjector`. To update:
+  ```python
+  # Before
+  from torchjd.aggregation import UPGrad
+  aggregator = UPGrad(norm_eps=1e-6, reg_eps=1e-6, solver="quadprog")
+
+  # After
+  from torchjd.aggregation import UPGrad
+  from torchjd.linalg import QuadprogProjector
+  aggregator = UPGrad(projector=QuadprogProjector(norm_eps=1e-6, reg_eps=1e-6))
+  ```
+  If you used the default `norm_eps`, `reg_eps` and `solver`, you don't have to change anything and
+  you will get the same results.
+- `CAGrad`, `CAGradWeighting`, and `NashMTL` are now always importable from `torchjd.aggregation`,
+  even when their optional dependencies are not installed. Attempting to instantiate them without the
+  required dependencies now raises an `ImportError` with installation instructions, instead of
+  raising an `ImportError` at import time.
 - Non-differentiable aggregators and weightings (UPGrad, DualProj, PCGrad, GradVac, IMTLG,
   GradDrop, ConFIG, CAGrad, NashMTL) no longer build a computation graph when called on tensors
   that require gradients. Their forward pass is now wrapped in `torch.no_grad()`, so attempting to
@@ -21,6 +40,9 @@ changelog does not include internal changes that do not affect the user.
   Manipulation and Beyond](https://proceedings.neurips.cc/paper_files/paper/2022/file/f91bd64a3620aad8e70a27ad9cb3ca57-Paper-Conference.pdf)
   (NeurIPS 2022). It wraps an existing `Weighting` and stabilises its weights with an exponential
   moving average across calls.
+- Added a new abstraction: the `DualConeProjector` abstract base class and its concrete
+  `QuadprogProjector` implementation, to do the projection of the gradients onto the dual cone, as
+  required in `UPGrad`, and `DualProj`. These classes can be found in `torchjd.linalg`.
 - Made `WeightedAggregator` and `GramianWeightedAggregator` public. These abstract base classes are
   now importable from `torchjd.aggregation` and documented. They can be extended to easily implement
   custom `Aggregator`s.

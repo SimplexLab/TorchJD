@@ -11,6 +11,7 @@ from plotly.graph_objs import Figure
 from typing_extensions import Unpack
 
 from plots._utils import Plotter, angle_to_coord, coord_to_angle
+from torchjd._linalg import QuadprogProjector
 from torchjd.aggregation import (
     IMTLG,
     MGDA,
@@ -61,7 +62,7 @@ def main() -> None:
         "AlignedMTL-RMSE": lambda: AlignedMTL(scale_mode="rmse"),
         str(CAGrad(c=0.5)): lambda: CAGrad(c=0.5),
         str(ConFIG()): lambda: ConFIG(),
-        str(DualProj()): lambda: DualProj(reg_eps=1e-7),
+        str(DualProj()): lambda: DualProj(projector=QuadprogProjector(reg_eps=1e-7)),
         str(GradDrop()): lambda: GradDrop(),
         str(GradVac()): lambda: GradVac(),
         str(IMTLG()): lambda: IMTLG(),
@@ -72,7 +73,7 @@ def main() -> None:
         str(Random()): lambda: Random(),
         str(Sum()): lambda: Sum(),
         str(TrimmedMean(trim_number=1)): lambda: TrimmedMean(trim_number=1),
-        str(UPGrad()): lambda: UPGrad(reg_eps=1e-7),
+        str(UPGrad()): lambda: UPGrad(projector=QuadprogProjector(reg_eps=1e-7)),
     }
 
     aggregator_strings = list(aggregator_factories.keys())

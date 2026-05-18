@@ -1,25 +1,25 @@
+import contextlib
 from typing import cast
 
-from torchjd.linalg import PSDMatrix
-
-from ._mixins import _NonDifferentiable
-from ._utils.check_dependencies import check_dependencies_are_installed
-from ._weighting_bases import _GramianWeighting
-
-check_dependencies_are_installed(["cvxpy", "clarabel"])
-
-import cvxpy as cp
 import numpy as np
 import torch
 from torch import Tensor
 
 from torchjd._linalg import normalize
+from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
+from ._mixins import _NonDifferentiable, _WithOptionalDeps
+from ._weighting_bases import _GramianWeighting
+
+with contextlib.suppress(ImportError):
+    import cvxpy as cp
 
 
 # Non-differentiable: the cvxpy solver operates on numpy arrays, breaking the autograd graph.
-class CAGradWeighting(_NonDifferentiable, _GramianWeighting):
+class CAGradWeighting(_WithOptionalDeps, _NonDifferentiable, _GramianWeighting):
+    _REQUIRED_DEPS = ["cvxpy", "clarabel"]
+    _INSTALL_HINT = 'Install them with: pip install "torchjd[cagrad]"'
     """
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
     giving the weights of :class:`~torchjd.aggregation.CAGrad`.
@@ -103,10 +103,9 @@ class CAGrad(_NonDifferentiable, GramianWeightedAggregator):
     :param norm_eps: A small value to avoid division by zero when normalizing.
 
     .. note::
-        This aggregator is not installed by default. When not installed, trying to import it should
-        result in the following error:
-        ``ImportError: cannot import name 'CAGrad' from 'torchjd.aggregation'``.
-        To install it, use ``pip install "torchjd[cagrad]"``.
+        This aggregator requires optional dependencies. When they are not installed, instantiating
+        it raises an :class:`ImportError` with installation instructions.
+        To install them, use ``pip install "torchjd[cagrad]"``.
     """
 
     gramian_weighting: CAGradWeighting

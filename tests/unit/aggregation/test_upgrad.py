@@ -1,10 +1,10 @@
 import torch
-from pytest import mark, raises
+from pytest import mark
 from torch import Tensor
 from utils.tensors import ones_
 
+from torchjd._linalg import QuadprogProjector
 from torchjd.aggregation import ConstantWeighting, UPGrad
-from torchjd.aggregation._upgrad import UPGradWeighting
 
 from ._asserts import (
     assert_expected_structure,
@@ -53,19 +53,20 @@ def test_non_differentiable(aggregator: UPGrad, matrix: Tensor) -> None:
 
 
 def test_representations() -> None:
-    A = UPGrad(pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, solver="quadprog")
-    assert repr(A) == "UPGrad(pref_vector=None, norm_eps=0.0001, reg_eps=0.0001, solver='quadprog')"
+    A = UPGrad(pref_vector=None, projector=QuadprogProjector(norm_eps=0.001, reg_eps=0.01))
+    assert (
+        repr(A) == "UPGrad(pref_vector=None, projector=QuadprogProjector(norm_eps=0.001, "
+        "reg_eps=0.01))"
+    )
     assert str(A) == "UPGrad"
 
     A = UPGrad(
         pref_vector=torch.tensor([1.0, 2.0, 3.0], device="cpu"),
-        norm_eps=0.0001,
-        reg_eps=0.0001,
-        solver="quadprog",
+        projector=QuadprogProjector(norm_eps=0.001, reg_eps=0.01),
     )
     assert (
-        repr(A) == "UPGrad(pref_vector=tensor([1., 2., 3.]), norm_eps=0.0001, reg_eps=0.0001, "
-        "solver='quadprog')"
+        repr(A) == "UPGrad(pref_vector=tensor([1., 2., 3.]), projector=QuadprogProjector("
+        "norm_eps=0.001, reg_eps=0.01))"
     )
     assert str(A) == "UPGrad([1., 2., 3.])"
 
@@ -79,37 +80,14 @@ def test_pref_vector_setter_updates_value() -> None:
     assert A.gramian_weighting.weighting.weights is new_pref
 
 
-def test_norm_eps_setter_updates_value() -> None:
+def test_projector_getter_returns_default() -> None:
     A = UPGrad()
-    A.norm_eps = 0.25
-    assert A.norm_eps == 0.25
+    assert isinstance(A.projector, QuadprogProjector)
 
 
-def test_reg_eps_setter_updates_value() -> None:
+def test_projector_setter_updates_value() -> None:
     A = UPGrad()
-    A.reg_eps = 0.25
-    assert A.reg_eps == 0.25
-
-
-def test_norm_eps_setter_rejects_negative() -> None:
-    A = UPGrad()
-    with raises(ValueError, match="norm_eps"):
-        A.norm_eps = -1e-9
-
-
-def test_reg_eps_setter_rejects_negative() -> None:
-    A = UPGrad()
-    with raises(ValueError, match="reg_eps"):
-        A.reg_eps = -1e-9
-
-
-def test_weighting_norm_eps_setter_rejects_negative() -> None:
-    W = UPGradWeighting()
-    with raises(ValueError, match="norm_eps"):
-        W.norm_eps = -1e-9
-
-
-def test_weighting_reg_eps_setter_rejects_negative() -> None:
-    W = UPGradWeighting()
-    with raises(ValueError, match="reg_eps"):
-        W.reg_eps = -1e-9
+    new_projector = QuadprogProjector(norm_eps=0.001, reg_eps=0.01)
+    A.projector = new_projector
+    assert A.projector is new_projector
+    assert A.gramian_weighting.projector is new_projector
