@@ -1,7 +1,6 @@
 import contextlib
 from typing import cast
 
-import numpy as np
 import torch
 from torch import Tensor
 
@@ -15,6 +14,7 @@ from ._weighting_bases import _GramianWeighting
 
 with contextlib.suppress(ImportError):
     import cvxpy as cp
+    import numpy as np
 
 
 # Non-differentiable: the cvxpy solver operates on numpy arrays, breaking the autograd graph.

@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import contextlib
 
-import numpy as np
 import torch
 from torch import Tensor
 
@@ -17,6 +16,7 @@ from ._weighting_bases import _MatrixWeighting
 
 with contextlib.suppress(ImportError):
     import cvxpy as cp
+    import numpy as np
     from cvxpy import Expression, SolverError
 
 
