@@ -129,13 +129,9 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
 
     def forward(self, stat: _T, /) -> Tensor:
         lambda_hat = self.weighting(stat)
-
         lambda_prev = self._ensure_state(lambda_hat)
-
-        lambda_k = self._alpha * lambda_prev + (1.0 - self._alpha) * lambda_hat
-
-        self._lambda = lambda_k
-        return lambda_k
+        self._lambda = self._alpha * lambda_prev + (1.0 - self._alpha) * lambda_hat
+        return self._lambda
 
     def _ensure_state(self, lambda_hat: Tensor) -> Tensor:
         m = lambda_hat.shape[0]
