@@ -134,7 +134,7 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
 
         lambda_k = self._alpha * lambda_prev + (1.0 - self._alpha) * lambda_hat
 
-        self._lambda = lambda_k.detach()
+        self._lambda = lambda_k
         return lambda_k
 
     def _ensure_state(self, lambda_hat: Tensor) -> Tensor:
