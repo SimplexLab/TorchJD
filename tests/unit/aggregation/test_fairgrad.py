@@ -12,10 +12,14 @@ from torchjd.aggregation._fairgrad import FairGradWeighting
 from ._asserts import assert_expected_structure, assert_non_conflicting, assert_non_differentiable
 from ._inputs import scaled_matrices, typical_matrices
 
-scaled_pairs = [(FairGrad(alpha=1.0), matrix) for matrix in scaled_matrices]
-typical_pairs = [(FairGrad(alpha=1.0), matrix) for matrix in typical_matrices]
-requires_grad_pairs = [(FairGrad(alpha=1.0), ones_(3, 5, requires_grad=True))]
-non_conflicting_pairs = [(FairGrad(alpha=0.1), matrix) for matrix in typical_matrices]
+# max_iters=1 is enough to produce a finite output for structure tests.
+scaled_pairs = [(FairGrad(alpha=1.0, max_iters=1), matrix) for matrix in scaled_matrices]
+typical_pairs = [(FairGrad(alpha=1.0, max_iters=1), matrix) for matrix in typical_matrices]
+requires_grad_pairs = [(FairGrad(alpha=1.0, max_iters=1), ones_(3, 5, requires_grad=True))]
+# max_iters=100 is sufficient for convergence on the base matrices.
+non_conflicting_pairs = [
+    (FairGrad(alpha=0.1, max_iters=100), matrix) for matrix in typical_matrices
+]
 
 
 @mark.parametrize(["aggregator", "matrix"], scaled_pairs + typical_pairs)
