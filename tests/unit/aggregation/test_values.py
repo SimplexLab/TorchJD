@@ -90,6 +90,18 @@ WEIGHTING_PARAMETRIZATIONS: list[tuple] = [
 ]
 
 try:
+    from torchjd.aggregation import FairGrad, FairGradWeighting
+
+    AGGREGATOR_PARAMETRIZATIONS.append(
+        (FairGrad(alpha=1.0), J_base, tensor([0.0766, 0.9985, 0.9985]))
+    )
+    WEIGHTING_PARAMETRIZATIONS.append(
+        (FairGradWeighting(alpha=1.0), G_base, tensor([0.5915, 0.4071]))
+    )
+except ImportError:
+    pass
+
+try:
     from torchjd.aggregation import CAGrad, CAGradWeighting
 
     AGGREGATOR_PARAMETRIZATIONS.append((CAGrad(c=0.5), J_base, tensor([0.1835, 1.2041, 1.2041])))
