@@ -12,9 +12,9 @@ Some aggregators have additional dependencies that are not included by default w
 
 | Group | Classes | Dependencies | Install command |
 |-------|---------|--------------|-----------------|
-| `quadprog_projector` | QuadprogProjector (used in UPGrad and DualProj) | `numpy` (BSD-3-Clause), `quadprog` (GPL-2.0+), `qpsolvers` (LGPL-3.0) | `pip install "torchjd[quadprog_projector]"` |
-| `cagrad` | CAGrad | `numpy` (BSD-3-Clause), `cvxpy` (Apache-2.0) | `pip install "torchjd[cagrad]"` |
-| `nash_mtl` | NashMTL | `numpy` (BSD-3-Clause), `cvxpy` (Apache-2.0), `ecos` (GPL-3.0) | `pip install "torchjd[nash_mtl]"` |
+| `quadprog_projector` | QuadprogProjector (used in UPGrad and DualProj) | `numpy`, `quadprog`, `qpsolvers` | `pip install "torchjd[quadprog_projector]"` |
+| `cagrad` | CAGrad | `numpy`, `cvxpy` | `pip install "torchjd[cagrad]"` |
+| `nash_mtl` | NashMTL | `numpy`, `cvxpy`, `ecos` | `pip install "torchjd[nash_mtl]"` |
 
 To install `torchjd` with all of its optional dependencies, you can also use:
 ```
