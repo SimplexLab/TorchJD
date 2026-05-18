@@ -36,6 +36,10 @@ changelog does not include internal changes that do not affect the user.
 
 ### Added
 
+- Added `CRMOGMWeighting` from [On the Convergence of Stochastic Multi-Objective Gradient
+  Manipulation and Beyond](https://proceedings.neurips.cc/paper_files/paper/2022/file/f91bd64a3620aad8e70a27ad9cb3ca57-Paper-Conference.pdf)
+  (NeurIPS 2022). It wraps an existing `Weighting` and stabilises its weights with an exponential
+  moving average across calls.
 - Added a new abstraction: the `DualConeProjector` abstract base class and its concrete
   `QuadprogProjector` implementation, to do the projection of the gradients onto the dual cone, as
   required in `UPGrad`, and `DualProj`. These classes can be found in `torchjd.linalg`.
