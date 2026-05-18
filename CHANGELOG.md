@@ -8,6 +8,8 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-05-18
+
 ### Changed
 
 - **BREAKING**: Removed `norm_eps`, `rep_eps` and `solver` parameters from the `__init__` of
