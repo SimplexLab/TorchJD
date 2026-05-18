@@ -1,7 +1,8 @@
-import pytest
+from conftest import pytest_skip_if_deps_not_installed
 
-pytest.importorskip("cvxpy")
-pytest.importorskip("clarabel")
+from torchjd.aggregation import CAGrad, CAGradWeighting
+
+pytest_skip_if_deps_not_installed(CAGradWeighting)
 
 from contextlib import nullcontext as does_not_raise
 
@@ -9,9 +10,6 @@ from pytest import mark, raises
 from torch import Tensor
 from utils.contexts import ExceptionContext
 from utils.tensors import ones_
-
-from torchjd.aggregation import CAGrad
-from torchjd.aggregation._cagrad import CAGradWeighting
 
 from ._asserts import assert_expected_structure, assert_non_conflicting, assert_non_differentiable
 from ._inputs import scaled_matrices, typical_matrices

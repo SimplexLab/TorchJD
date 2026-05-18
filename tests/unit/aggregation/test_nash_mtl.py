@@ -1,15 +1,14 @@
-import pytest
+from conftest import pytest_skip_if_deps_not_installed
 
-pytest.importorskip("cvxpy")
-pytest.importorskip("ecos")
+from torchjd.aggregation import NashMTL
+from torchjd.aggregation._nash_mtl import _NashMTLWeighting
+
+pytest_skip_if_deps_not_installed(_NashMTLWeighting)
 
 from pytest import mark, raises
 from torch import Tensor
 from torch.testing import assert_close
 from utils.tensors import ones_, randn_, tensor_
-
-from torchjd.aggregation import NashMTL
-from torchjd.aggregation._nash_mtl import _NashMTLWeighting
 
 from ._asserts import assert_expected_structure, assert_non_differentiable
 from ._inputs import nash_mtl_matrices
