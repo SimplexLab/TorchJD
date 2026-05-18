@@ -30,26 +30,37 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
         \lambda_k = \alpha \, \lambda_{k-1} + (1 - \alpha) \, \hat{\lambda}_k
 
     with :math:`\lambda_0 = \begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^\top
-    \in \mathbb{R}^m`. The state :math:`\lambda_{k-1}` is initialised lazily on the first
-    forward call once :math:`m` is known and is reset automatically when ``m`` changes.
+    \in \mathbb{R}^m`.
 
-    Because ``CRMOGMWeighting`` is generic in the input type ``_T``, it can wrap either a
-    ``MatrixWeighting`` or a ``GramianWeighting``. Creating a corresponding :class:`~torchjd.aggregation.Aggregator` can be done by composing it with the appropriate
-    aggregator base:
+    Creating the corresponding :class:`~torchjd.aggregation.Aggregator` from a wrapped weighting can
+    be done by composing it with the appropriate aggregator subclass
+    (:class:`~torchjd.aggregation.WeightedAggregator` or
+    :class:`~torchjd.aggregation.GramianWeightedAggregator`)
 
-    .. code-block:: python
+    The following example shows how to instantiate a Gramian-based weighted aggregator whose
+    Gramian weighting is wrapped by CR-MOGM.
 
-        from torchjd.aggregation import MeanWeighting, UPGradWeighting
-        from torchjd.aggregation._aggregator_bases import (
-            GramianWeightedAggregator, WeightedAggregator,
-        )
-        from torchjd.aggregation._cr_mogm import CRMOGMWeighting
+    .. testcode:: python
 
-        matrix_aggregator = WeightedAggregator(CRMOGMWeighting(MeanWeighting()))
-        gramian_aggregator = GramianWeightedAggregator(CRMOGMWeighting(UPGradWeighting()))
+        from torchjd.aggregation import CRMOGMWeighting, GramianWeightedAggregator, UPGradWeighting
+
+        aggregator = GramianWeightedAggregator(CRMOGMWeighting(UPGradWeighting()))
+
+    The following example shows how to instantiate a Matrix-based weighted aggregator whose
+    weighting is wrapped by CR-MOGM.
+
+    .. testcode:: python
+
+        from torchjd.aggregation import CRMOGMWeighting, MeanWeighting, WeightedAggregator
+
+        aggregator = WeightedAggregator(CRMOGMWeighting(MeanWeighting()))
+
+    Note that here, :class:`~torchjd.aggregation.MeanWeighting` is used just for the sake of the
+    example: the exponential moving average of constant weights will always be equal to the weights
+    themselves, so wrapping by ``CRMOGMWeighting`` will have no effect.
 
     This weighting is stateful: it keeps :math:`\lambda_{k-1}` across calls. Use :meth:`reset`
-    when restarting the smoothing from uniform weights. Note that calling :meth:`reset` will also
+    to restart the smoothing from uniform weights. Note that calling :meth:`reset` will also
     reset the wrapped weighting if it is :class:`~torchjd.aggregation.Stateful`.
 
     :param weighting: The wrapped weighting whose output is smoothed.
@@ -61,16 +72,27 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
     .. note::
         ``alpha`` is a fixed ``float`` for simplicity. Corollary 1 of the paper recommends a
         schedule where :math:`\alpha_k` starts near 0 and increases toward 1 as the learning
-        rate decays. Update ``alpha`` between forward calls via the public attribute on the
-        wrapping aggregator:
+        rate decays. Update ``alpha`` between forward calls via the setter.
 
-        .. code-block:: python
+        The following example shows how to update alpha with the suggested scheme from the paper,
+        when the aggregator is a Gramian-based weighted aggregator whose Gramian weighting is
+        wrapped by CR-MOGM:
 
-            # With WeightedAggregator
-            aggregator.weighting.alpha = 1 - current_lr / initial_lr
+        .. testcode:: python
 
-            # With GramianWeightedAggregator
-            aggregator.gramian_weighting.alpha = 1 - current_lr / initial_lr
+            from torchjd.aggregation import (
+                CRMOGMWeighting,
+                GramianWeightedAggregator,
+                UPGradWeighting,
+            )
+
+            aggregator = GramianWeightedAggregator(CRMOGMWeighting(UPGradWeighting()))
+
+            initial_lr = 0.1
+            current_lr = 0.05  # e.g. obtained from lr_scheduler.get_lr()[0]
+
+            cr_mogm = aggregator.gramian_weighting
+            cr_mogm.alpha = 1 - current_lr / initial_lr
     """
 
     def __init__(self, weighting: Weighting[_T], alpha: float = 0.1) -> None:
@@ -90,7 +112,10 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
         self._alpha = value
 
     def reset(self) -> None:
-        """Clears the EMA state so the next forward starts from uniform weights."""
+        """
+        Clears the EMA state so the next forward starts from uniform weights. Also resets the
+        wrapped weighting if it is :class:`~torchjd.aggregation._mixins.Stateful`.
+        """
 
         if isinstance(self.weighting, Stateful):
             self.weighting.reset()
