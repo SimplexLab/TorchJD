@@ -95,7 +95,8 @@ plot = [
     "dash>=2.16.0",  # Recent version to avoid problems, could be relaxed
     "matplotlib>=3.10.0",  # Recent version to avoid problems, could be relaxed
 ]
-# Dependency group allowing to easily resolve version of the optional dependencies to the lower bound.
+# Dependency group allowing to easily resolve version of the recommended dependencies to the lower
+# bound.
 lower_bounds = [
     "torch==2.3.0",
     "numpy==1.21.2",
