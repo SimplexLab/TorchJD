@@ -34,8 +34,8 @@ changelog does not include internal changes that do not affect the user.
   `CAGrad` and `CAGradWeighting`; `pref_vector` in `ConFIG`; `leak` in `GradDrop`, `n_byzantine` and
   `n_selected` in `Krum` and `KrumWeighting`; `epsilon` and `max_iters` in `MGDA` and
   `MGDAWeighting`; `n_tasks`, `max_norm`, `update_weights_every` and `optim_niter` in `NashMTL`;
-  `trim_number` in `TrimmedMean`. Setters validate their inputs matching the existing constructor checks.
-  Note that setters for `GradVac` and `GradVacWeighting` already existed.
+  `trim_number` in `TrimmedMean`. Setters validate their inputs matching the existing constructor
+  checks. Note that setters for `GradVac` and `GradVacWeighting` already existed.
 
 ## [0.10.0] - 2026-04-16
 
