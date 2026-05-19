@@ -18,6 +18,7 @@ dependencies = [
     "quadprog>=0.1.9, != 0.1.10",  # Doesn't work before 0.1.9, 0.1.10 is yanked
     "numpy>=1.21.2",  # Does not work before 1.21. No python 3.10 wheel before 1.21.2.
     "qpsolvers>=1.0.1",  # Does not work before 1.0.1
+    "proxsuite>=0.7.2",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -101,6 +102,7 @@ plot = [
 lower_bounds = [
     "torch==2.3.0",
     "numpy==1.21.2",
+    "proxsuite==0.7.2",
     "quadprog==0.1.9",
     "qpsolvers==1.0.1",
 ]
