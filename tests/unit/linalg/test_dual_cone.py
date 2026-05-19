@@ -6,10 +6,18 @@ from pytest import mark, raises
 from torch.testing import assert_close
 from utils.tensors import rand_, randn_
 
-from torchjd._linalg import DualConeProjector, PSDMatrix, QuadprogProjector, compute_gramian
+from torchjd._linalg import (
+    DualConeProjector,
+    ProxsuiteProjector,
+    PSDMatrix,
+    QuadprogProjector,
+    compute_gramian,
+)
+
+projectors = [QuadprogProjector(reg_eps=0.0, norm_eps=0.0), ProxsuiteProjector()]
 
 
-@mark.parametrize("projector", [QuadprogProjector(reg_eps=0.0, norm_eps=0.0)])
+@mark.parametrize("projector", projectors)
 @mark.parametrize("shape", [(5, 7), (9, 37), (2, 14), (32, 114), (50, 100)])
 def test_solution_weights(projector: DualConeProjector, shape: tuple[int, int]) -> None:
     r"""
@@ -128,6 +136,18 @@ def test_reg_eps_setter_rejects_negative() -> None:
     projector = QuadprogProjector()
     with raises(ValueError, match="reg_eps"):
         projector.reg_eps = -1e-9
+
+
+def test_quadprog_repr() -> None:
+    A = QuadprogProjector(norm_eps=0.001, reg_eps=0.01)
+    assert repr(A) == "QuadprogProjector(norm_eps=0.001, reg_eps=0.01)"
+    assert str(A) == "QuadprogProjector(norm_eps=0.001, reg_eps=0.01)"
+
+
+def test_proxsuite_repr() -> None:
+    A = ProxsuiteProjector()
+    assert repr(A) == "ProxsuiteProjector()"
+    assert str(A) == "ProxsuiteProjector()"
 
 
 def test_qp_solver_based_failure() -> None:

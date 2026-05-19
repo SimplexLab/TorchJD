@@ -7,3 +7,5 @@ Dual Cone Projectors
     :members: __call__
 
 .. autoclass:: torchjd.linalg.QuadprogProjector
+
+.. autoclass:: torchjd.linalg.ProxsuiteProjector
