@@ -27,7 +27,7 @@ def test_non_differentiable(aggregator: PCGrad, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
 
 
-@mark.skipif(not IS_QUADPROG_PROJ_AVAILABLE, reason="QuadprogProj not available.")
+@mark.skipif(not IS_QUADPROG_PROJ_AVAILABLE, reason="QuadprogProjector not available.")
 @mark.parametrize(
     "shape",
     [
