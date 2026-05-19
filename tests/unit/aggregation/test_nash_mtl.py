@@ -1,15 +1,6 @@
-from pytest import mark
-from utils.optional_deps import IS_NASH_MTL_AVAILABLE, skip_if_deps_not_installed
+from utils.optional_deps import skip_if_deps_not_installed
 
-from torchjd.aggregation import NashMTL
 from torchjd.aggregation._nash_mtl import _NashMTLWeighting
-
-
-@mark.skipif(IS_NASH_MTL_AVAILABLE, reason="NashMTL deps are available.")
-def test_import_error_at_init() -> None:
-    with raises(ImportError):
-        _ = NashMTL(n_tasks=2)
-
 
 skip_if_deps_not_installed(_NashMTLWeighting)
 
@@ -17,6 +8,8 @@ from pytest import mark, raises
 from torch import Tensor
 from torch.testing import assert_close
 from utils.tensors import ones_, randn_, tensor_
+
+from torchjd.aggregation import NashMTL
 
 from ._asserts import assert_expected_structure, assert_non_differentiable
 from ._inputs import nash_mtl_matrices

@@ -1,14 +1,6 @@
-from pytest import mark
-from utils.optional_deps import IS_CAGRAD_AVAILABLE, skip_if_deps_not_installed
+from utils.optional_deps import skip_if_deps_not_installed
 
-from torchjd.aggregation import CAGrad, CAGradWeighting
-
-
-@mark.skipif(IS_CAGRAD_AVAILABLE, reason="CAGrad deps are available.")
-def test_import_error_at_init() -> None:
-    with raises(ImportError):
-        _ = CAGrad(c=0.5)
-
+from torchjd.aggregation import CAGradWeighting
 
 skip_if_deps_not_installed(CAGradWeighting)
 
@@ -18,6 +10,8 @@ from pytest import mark, raises
 from torch import Tensor
 from utils.contexts import ExceptionContext
 from utils.tensors import ones_
+
+from torchjd.aggregation import CAGrad
 
 from ._asserts import assert_expected_structure, assert_non_conflicting, assert_non_differentiable
 from ._inputs import scaled_matrices, typical_matrices

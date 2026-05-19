@@ -28,7 +28,7 @@ IS_NASH_MTL_AVAILABLE = deps_are_installed(_NashMTLWeighting)
 
 
 def skip_if_deps_not_installed(cls: type[_WithOptionalDeps]) -> None:
-    """Skip the tests following this call if not all dependencies of cls are installed."""
+    """Skip the tests in the file of this call if not all dependencies of cls are installed."""
 
     for dependency_name in cls._REQUIRED_DEPS:
         pytest.importorskip(dependency_name)
