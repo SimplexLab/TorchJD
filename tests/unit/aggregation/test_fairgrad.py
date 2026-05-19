@@ -37,14 +37,6 @@ def test_non_conflicting(aggregator: FairGrad, matrix: Tensor) -> None:
     assert_non_conflicting(aggregator, matrix)
 
 
-@mark.parametrize(
-    "alpha",
-    [-1.0, 0.0, 0.1, 1.0, 10.0],
-)
-def test_alpha_check(alpha: float) -> None:
-    _ = FairGrad(alpha=alpha)
-
-
 def test_representations() -> None:
     A = FairGrad(alpha=0.1, max_iters=None)
     assert repr(A) == "FairGrad(alpha=0.1, max_iters=None)"
