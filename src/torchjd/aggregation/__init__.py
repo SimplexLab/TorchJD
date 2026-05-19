@@ -65,6 +65,7 @@ from ._aligned_mtl import AlignedMTL, AlignedMTLWeighting
 from ._cagrad import CAGrad, CAGradWeighting
 from ._config import ConFIG
 from ._constant import Constant, ConstantWeighting
+from ._cr_mogm import CRMOGMWeighting
 from ._dualproj import DualProj, DualProjWeighting
 from ._flattening import Flattening
 from ._graddrop import GradDrop
@@ -91,6 +92,7 @@ __all__ = [
     "ConFIG",
     "Constant",
     "ConstantWeighting",
+    "CRMOGMWeighting",
     "DualProj",
     "DualProjWeighting",
     "Flattening",
