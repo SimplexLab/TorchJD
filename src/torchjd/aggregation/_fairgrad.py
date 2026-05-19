@@ -60,7 +60,7 @@ class FairGradWeighting(_WithOptionalDeps, _NonDifferentiable, _GramianWeighting
             gramian_array = gramian.detach().cpu().numpy()
 
             def objective(x: np.ndarray) -> np.ndarray:
-                return np.dot(gramian_array, x) - np.power(1 / x, 1 / self.alpha)
+                return np.dot(gramian_array, x) - np.power(x, -1.0 / self.alpha)
 
             res = least_squares(objective, uniform, bounds=(0, np.inf), max_nfev=self.max_iters)
             weight_array = res.x
