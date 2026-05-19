@@ -9,8 +9,6 @@ from settings import DEVICE
 from torch import Tensor
 from utils.architectures import ModuleFactory
 
-from torchjd._mixins import _WithOptionalDeps
-
 # Because of a SyntaxWarning raised when compiling highspy, we have to filter SyntaxWarning here.
 # It seems that the standard ways of ignoring warnings in pytest do not work, because the problem
 # is already triggered in the conftest.py itself. This line could be removed when
@@ -73,10 +71,3 @@ def pytest_make_parametrize_id(config: pytest.Config, val: object, argname: str)
             optional_string = optional_string[: MAX_SIZE - 3] + "+++"  # Can't use dots with pytest
 
     return optional_string
-
-
-def skip_if_deps_not_installed(cls: type[_WithOptionalDeps]) -> None:
-    """Skip the tests following this call if not all dependencies of object are installed."""
-
-    for dependency_name in cls._REQUIRED_DEPS:
-        pytest.importorskip(dependency_name)

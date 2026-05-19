@@ -4,6 +4,12 @@ from pytest import mark, raises
 from torch import Tensor
 from torch.testing import assert_close
 from utils.asserts import assert_grad_close, assert_has_jac, assert_has_no_jac
+from utils.optional_deps import (
+    IS_CAGRAD_AVAILABLE,
+    IS_NASH_MTL_AVAILABLE,
+    IS_QUADPROG_PROJ_AVAILABLE,
+    base_agg,
+)
 from utils.tensors import tensor_
 
 from torchjd.aggregation import (
@@ -11,6 +17,7 @@ from torchjd.aggregation import (
     MGDA,
     Aggregator,
     AlignedMTL,
+    CAGrad,
     ConFIG,
     Constant,
     DualProj,
@@ -18,6 +25,7 @@ from torchjd.aggregation import (
     GramianWeightedAggregator,
     Krum,
     Mean,
+    NashMTL,
     PCGrad,
     Random,
     Sum,
@@ -34,7 +42,7 @@ from torchjd.autojac._jac_to_grad import (
 
 @mark.parametrize(
     ["aggregator", "optimize"],
-    [(Mean(), False), (UPGrad(), True), (UPGrad(), False), (PCGrad(), True), (ConFIG(), False)],
+    [(Mean(), False), (base_agg(), True), (base_agg(), False), (PCGrad(), True), (ConFIG(), False)],
 )
 def test_various_aggregators(aggregator: Aggregator, optimize: bool) -> None:
     """
@@ -71,7 +79,7 @@ def test_various_aggregators(aggregator: Aggregator, optimize: bool) -> None:
 def test_single_tensor() -> None:
     """Tests that jac_to_grad works when a single tensor is provided."""
 
-    aggregator = UPGrad()
+    aggregator = base_agg()
     t = tensor_([2.0, 3.0, 4.0], requires_grad=True)
     jac = tensor_([[-4.0, 1.0, 1.0], [6.0, 1.0, 1.0]])
     t.__setattr__("jac", jac)
@@ -85,7 +93,7 @@ def test_single_tensor() -> None:
 def test_no_jac_field() -> None:
     """Tests that jac_to_grad fails when a tensor does not have a jac field."""
 
-    aggregator = UPGrad()
+    aggregator = base_agg()
     t1 = tensor_(1.0, requires_grad=True)
     t2 = tensor_([2.0, 3.0], requires_grad=True)
     jac = tensor_([[-4.0, 1.0, 1.0], [6.0, 1.0, 1.0]])
@@ -98,7 +106,7 @@ def test_no_jac_field() -> None:
 def test_no_requires_grad() -> None:
     """Tests that jac_to_grad fails when a tensor does not require grad."""
 
-    aggregator = UPGrad()
+    aggregator = base_agg()
     t1 = tensor_(1.0, requires_grad=True)
     t2 = tensor_([2.0, 3.0], requires_grad=False)
     jac = tensor_([[-4.0, 1.0, 1.0], [6.0, 1.0, 1.0]])
@@ -112,7 +120,7 @@ def test_no_requires_grad() -> None:
 def test_row_mismatch() -> None:
     """Tests that jac_to_grad fails when the number of rows of the .jac is not constant."""
 
-    aggregator = UPGrad()
+    aggregator = base_agg()
     t1 = tensor_(1.0, requires_grad=True)
     t2 = tensor_([2.0, 3.0], requires_grad=True)
     t1.__setattr__("jac", tensor_([5.0, 6.0, 7.0]))  # 3 rows
@@ -126,14 +134,14 @@ def test_no_tensors() -> None:
     """Tests that jac_to_grad correctly raises when an empty list of tensors is provided."""
 
     with raises(ValueError):
-        jac_to_grad([], UPGrad())
+        jac_to_grad([], base_agg())
 
 
 @mark.parametrize("retain_jac", [True, False])
 def test_jacs_are_freed(retain_jac: bool) -> None:
     """Tests that jac_to_grad frees the jac fields if an only if retain_jac is False."""
 
-    aggregator = UPGrad()
+    aggregator = base_agg()
     t1 = tensor_(1.0, requires_grad=True)
     t2 = tensor_([2.0, 3.0], requires_grad=True)
     jac = tensor_([[-4.0, 1.0, 1.0], [6.0, 1.0, 1.0]])
@@ -150,7 +158,7 @@ def test_jacs_are_freed(retain_jac: bool) -> None:
 def test_has_forward_hook() -> None:
     """Tests that _has_forward_hook correctly detects the presence of forward hooks."""
 
-    module = UPGrad()
+    module = base_agg()
 
     def dummy_forward_hook(_module, _input, _output) -> Tensor:
         return _output
@@ -194,12 +202,10 @@ def test_has_forward_hook() -> None:
 
 _PARAMETRIZATIONS: list[tuple] = [
     (AlignedMTL(), True),
-    (DualProj(), True),
     (IMTLG(), True),
     (Krum(n_byzantine=1), True),
     (MGDA(), True),
     (PCGrad(), True),
-    (UPGrad(), True),
     (ConFIG(), False),
     (Constant(tensor_([0.5, 0.5])), False),
     (GradDrop(), False),
@@ -208,20 +214,15 @@ _PARAMETRIZATIONS: list[tuple] = [
     (Sum(), False),
     (TrimmedMean(trim_number=1), False),
 ]
+if IS_QUADPROG_PROJ_AVAILABLE:
+    _PARAMETRIZATIONS.append((UPGrad(), True))
+    _PARAMETRIZATIONS.append((DualProj(), True))
 
-try:
-    from torchjd.aggregation import CAGrad
-
+if IS_CAGRAD_AVAILABLE:
     _PARAMETRIZATIONS.append((CAGrad(c=0.5), True))
-except ImportError:
-    pass
 
-try:
-    from torchjd.aggregation import NashMTL
-
+if IS_NASH_MTL_AVAILABLE:
     _PARAMETRIZATIONS.append((NashMTL(n_tasks=2), False))
-except ImportError:
-    pass
 
 
 @mark.parametrize("aggregator, expected", _PARAMETRIZATIONS)
@@ -254,7 +255,7 @@ def test_can_skip_jacobian_combination(aggregator: Aggregator, expected: bool) -
 def test_noncontiguous_jac() -> None:
     """Tests that jac_to_grad works when the .jac field is non-contiguous."""
 
-    aggregator = UPGrad()
+    aggregator = base_agg()
     t = tensor_([2.0, 3.0, 4.0], requires_grad=True)
     jac_T = tensor_([[-4.0, 1.0], [1.0, 6.0], [1.0, 1.0]])
     jac = jac_T.T
@@ -265,11 +266,11 @@ def test_noncontiguous_jac() -> None:
     assert_grad_close(t, g)
 
 
-@mark.parametrize("aggregator", [UPGrad(), ConFIG()])
+@mark.parametrize("aggregator", [base_agg(), ConFIG()])
 def test_aggregator_hook_is_run(aggregator: Aggregator) -> None:
     """
     Tests that jac_to_grad runs forward hooks registered on the aggregator, for both
-    WeightedAggregator (UPGrad) and plain Aggregator (ConFIG) paths.
+    WeightedAggregator (base_agg) and plain Aggregator (ConFIG) paths.
     """
 
     call_count = [0]  # Pointer to int
@@ -300,7 +301,7 @@ def test_with_hooks() -> None:
     def hook_inner(_module: Any, _input: Any, weights: Tensor) -> Tensor:
         return weights * 5  # should affect the weights returned by jac_to_grad
 
-    aggregator = UPGrad()
+    aggregator = base_agg()
     aggregator.register_forward_hook(hook_aggregator)
     aggregator.weighting.register_forward_hook(hook_outer)
     aggregator.gramian_weighting.register_forward_hook(hook_inner)

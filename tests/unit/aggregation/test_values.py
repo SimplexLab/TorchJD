@@ -1,6 +1,11 @@
 from pytest import mark, param
 from torch import Tensor, tensor
 from torch.testing import assert_close
+from utils.optional_deps import (
+    IS_CAGRAD_AVAILABLE,
+    IS_NASH_MTL_AVAILABLE,
+    IS_QUADPROG_PROJ_AVAILABLE,
+)
 
 from torchjd.aggregation import (
     IMTLG,
@@ -8,9 +13,13 @@ from torchjd.aggregation import (
     Aggregator,
     AlignedMTL,
     AlignedMTLWeighting,
+    CAGrad,
+    CAGradWeighting,
     ConFIG,
     Constant,
     ConstantWeighting,
+    DualProj,
+    DualProjWeighting,
     GradDrop,
     GradVac,
     GradVacWeighting,
@@ -20,6 +29,7 @@ from torchjd.aggregation import (
     Mean,
     MeanWeighting,
     MGDAWeighting,
+    NashMTL,
     PCGrad,
     PCGradWeighting,
     Random,
@@ -27,6 +37,8 @@ from torchjd.aggregation import (
     Sum,
     SumWeighting,
     TrimmedMean,
+    UPGrad,
+    UPGradWeighting,
     Weighting,
 )
 
@@ -81,27 +93,18 @@ WEIGHTING_PARAMETRIZATIONS: list[tuple] = [
     (SumWeighting(), G_base, tensor([1.0, 1.0])),
 ]
 
-try:
-    from torchjd.aggregation import DualProj, DualProjWeighting, UPGrad, UPGradWeighting
 
+if IS_QUADPROG_PROJ_AVAILABLE:
     AGGREGATOR_PARAMETRIZATIONS.append((DualProj(), J_base, tensor([0.5563, 1.1109, 1.1109])))
     AGGREGATOR_PARAMETRIZATIONS.append((UPGrad(), J_base, tensor([0.2929, 1.9004, 1.9004])))
     WEIGHTING_PARAMETRIZATIONS.append((DualProjWeighting(), G_base, tensor([0.6109, 0.5000])))
     WEIGHTING_PARAMETRIZATIONS.append((UPGradWeighting(), G_base, tensor([1.1109, 0.7894])))
-except ImportError:
-    pass
 
-try:
-    from torchjd.aggregation import CAGrad, CAGradWeighting
-
+if IS_CAGRAD_AVAILABLE:
     AGGREGATOR_PARAMETRIZATIONS.append((CAGrad(c=0.5), J_base, tensor([0.1835, 1.2041, 1.2041])))
     WEIGHTING_PARAMETRIZATIONS.append((CAGradWeighting(c=0.5), G_base, tensor([0.7041, 0.5000])))
-except ImportError:
-    pass
 
-try:
-    from torchjd.aggregation import NashMTL
-
+if IS_NASH_MTL_AVAILABLE:
     AGGREGATOR_PARAMETRIZATIONS.append(
         param(
             NashMTL(n_tasks=2),
@@ -110,9 +113,6 @@ try:
             marks=mark.filterwarnings("ignore::UserWarning"),
         ),
     )
-
-except ImportError:
-    pass
 
 
 @mark.parametrize(["A", "J", "expected_output"], AGGREGATOR_PARAMETRIZATIONS)

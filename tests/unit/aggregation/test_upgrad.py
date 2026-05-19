@@ -1,4 +1,4 @@
-from conftest import skip_if_deps_not_installed
+from utils.optional_deps import skip_if_deps_not_installed
 
 from torchjd.aggregation import ConstantWeighting, UPGrad
 from torchjd.linalg import QuadprogProjector

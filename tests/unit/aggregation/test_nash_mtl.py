@@ -1,4 +1,4 @@
-from conftest import skip_if_deps_not_installed
+from utils.optional_deps import skip_if_deps_not_installed
 
 from torchjd.aggregation import NashMTL
 from torchjd.aggregation._nash_mtl import _NashMTLWeighting
