@@ -23,7 +23,8 @@ with contextlib.suppress(ImportError):
 class FairGradWeighting(_WithOptionalDeps, _NonDifferentiable, _GramianWeighting):
     r"""
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`] giving the
-    weights of :class:`~torchjd.aggregation.FairGrad`.
+    weights of :class:`~torchjd.aggregation.FairGrad`, as defined in Equation 4 of `Fair Resource
+    Allocation in Multi-Task Learning <https://arxiv.org/pdf/2402.15638>`_.
 
     :param alpha: The parameter controlling the type of fairness in the alpha-fairness
         formulation.
