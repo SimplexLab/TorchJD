@@ -50,19 +50,19 @@ class FairGradWeighting(_WithOptionalDeps, _NonDifferentiable, _GramianWeighting
 
     def forward(self, gramian: PSDMatrix, /) -> Tensor:
         m = gramian.shape[0]
-        x_start = np.ones(m) / m
+        uniform = np.ones(m) / m
 
         if self.alpha == 0:
             # When alpha=0, the alpha-fairness formulation reduces to linear scalarization with
             # uniform weights (see Section 3 of https://arxiv.org/pdf/2402.15638).
-            weight_array = x_start
+            weight_array = uniform
         else:
             gramian_array = gramian.detach().cpu().numpy()
 
             def objective(x: np.ndarray) -> np.ndarray:
                 return np.dot(gramian_array, x) - np.power(1 / x, 1 / self.alpha)
 
-            res = least_squares(objective, x_start, bounds=(0, np.inf), max_nfev=self.max_iters)
+            res = least_squares(objective, uniform, bounds=(0, np.inf), max_nfev=self.max_iters)
             weight_array = res.x
 
         return torch.tensor(weight_array).to(device=gramian.device, dtype=gramian.dtype)
