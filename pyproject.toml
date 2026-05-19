@@ -15,9 +15,6 @@ authors = [
 requires-python = ">=3.10"
 dependencies = [
     "torch>=2.3.0",  # Problems before 2.4.0, especially with autogram.
-    "quadprog>=0.1.9, != 0.1.10",  # Doesn't work before 0.1.9, 0.1.10 is yanked
-    "numpy>=1.21.2",  # Does not work before 1.21. No python 3.10 wheel before 1.21.2.
-    "qpsolvers>=1.0.1",  # Does not work before 1.0.1
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -93,11 +90,13 @@ test = [
 ]
 
 plot = [
+    "numpy>=1.21.2",  # Does not work before 1.21. No python 3.10 wheel before 1.21.2.
     "plotly[kaleido]>=5.19.0",  # Recent version to avoid problems, could be relaxed
     "dash>=2.16.0",  # Recent version to avoid problems, could be relaxed
     "matplotlib>=3.10.0",  # Recent version to avoid problems, could be relaxed
 ]
-# Dependency group allowing to easily resolve version of the core dependencies to the lower bound.
+# Dependency group allowing to easily resolve version of the recommended dependencies to the lower
+# bound.
 lower_bounds = [
     "torch==2.3.0",
     "numpy==1.21.2",
@@ -106,14 +105,24 @@ lower_bounds = [
 ]
 
 [project.optional-dependencies]
+quadprog_projector = [
+    "numpy>=1.21.2",  # Does not work before 1.21. No python 3.10 wheel before 1.21.2.
+    "quadprog>=0.1.9, != 0.1.10",  # Doesn't work before 0.1.9, 0.1.10 is yanked
+    "qpsolvers>=1.0.1",  # Does not work before 1.0.1
+]
 nash_mtl = [
+    "numpy>=1.21.2",  # Does not work before 1.21. No python 3.10 wheel before 1.21.2.
     "cvxpy>=1.3.0",  # Could be relaxed
     "ecos>=2.0.14",  # Does not work before 2.0.14
 ]
 cagrad = [
+    "numpy>=1.21.2",  # Does not work before 1.21. No python 3.10 wheel before 1.21.2.
     "cvxpy>=1.3.0",  # No Clarabel solver before 1.3.0
 ]
 full = [
+    "numpy>=1.21.2",  # Does not work before 1.21. No python 3.10 wheel before 1.21.2.
+    "quadprog>=0.1.9, != 0.1.10",  # Doesn't work before 0.1.9, 0.1.10 is yanked
+    "qpsolvers>=1.0.1",  # Does not work before 1.0.1
     "cvxpy>=1.3.0",  # No Clarabel solver before 1.3.0
     "ecos>=2.0.14",  # Does not work before 2.0.14
 ]

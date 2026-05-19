@@ -1,9 +1,10 @@
 from pytest import mark, raises
 from torch import Tensor
 from torch.testing import assert_close
+from utils.optional_deps import base_weighting
 from utils.tensors import randn_, tensor_
 
-from torchjd.aggregation import GradVacWeighting, MeanWeighting, UPGradWeighting
+from torchjd.aggregation import GradVacWeighting, MeanWeighting
 from torchjd.aggregation._aggregator_bases import (
     GramianWeightedAggregator,
     WeightedAggregator,
@@ -15,12 +16,10 @@ from ._inputs import scaled_matrices, typical_matrices
 
 # UPGradWeighting uses a QP solver that can fail on the extreme scales (0.0, 1e15) found in
 # scaled_matrices, so the gramian-path structural test only uses typical_matrices.
-matrix_pairs = [
-    (WeightedAggregator(CRMOGMWeighting(MeanWeighting())), m)
-    for m in typical_matrices + scaled_matrices
-]
+matrix_pairs = [(WeightedAggregator(CRMOGMWeighting(MeanWeighting())), m) for m in typical_matrices]
 gramian_pairs = [
-    (GramianWeightedAggregator(CRMOGMWeighting(UPGradWeighting())), m) for m in typical_matrices
+    (GramianWeightedAggregator(CRMOGMWeighting(base_weighting())), m)
+    for m in typical_matrices + scaled_matrices
 ]
 
 
@@ -40,14 +39,14 @@ def test_expected_structure_gramian_weighting(
 
 def test_reset_restores_first_step_behavior() -> None:
     """
-    Use ``UPGradWeighting`` so the weights actually depend on the input — with
+    Use ``base_weighting`` so the weights actually depend on the input — with
     ``MeanWeighting`` the EMA would be a fixed point at the uniform weights and the test would
     be trivial.
     """
 
     J = randn_((3, 8))
     G = J @ J.T
-    W = CRMOGMWeighting(UPGradWeighting(), alpha=0.5)
+    W = CRMOGMWeighting(base_weighting(), alpha=0.5)
     first = W(G)
     W(G)
     W.reset()
@@ -105,8 +104,8 @@ def test_alpha_zero_reduces_to_bare_weighting() -> None:
 
     J = randn_((3, 8))
     G = J @ J.T
-    bare = UPGradWeighting()
-    smoothed = CRMOGMWeighting(UPGradWeighting(), alpha=0.0)
+    bare = base_weighting()
+    smoothed = CRMOGMWeighting(base_weighting(), alpha=0.0)
 
     expected = bare(G)
     assert_close(smoothed(G), expected)
@@ -122,7 +121,7 @@ def test_alpha_one_freezes_weights() -> None:
 
     J = randn_((3, 8))
     G = J @ J.T
-    W = CRMOGMWeighting(UPGradWeighting(), alpha=1.0)
+    W = CRMOGMWeighting(base_weighting(), alpha=1.0)
     first = W(G)
 
     assert_close(W(G), first)
@@ -138,8 +137,8 @@ def test_ema_is_applied() -> None:
     G1 = J1 @ J1.T
     G2 = J2 @ J2.T
 
-    bare = UPGradWeighting()
-    smoothed = CRMOGMWeighting(UPGradWeighting(), alpha=alpha)
+    bare = base_weighting()
+    smoothed = CRMOGMWeighting(base_weighting(), alpha=alpha)
 
     lambda_hat_1 = bare(G1)
     lambda_hat_2 = bare(G2)
@@ -160,8 +159,8 @@ def test_initial_weights_used_as_lambda_0() -> None:
     G = J @ J.T
     initial = tensor_([0.5, 0.3, 0.2])
 
-    bare = UPGradWeighting()
-    W = CRMOGMWeighting(UPGradWeighting(), alpha=alpha, initial_weights=initial)
+    bare = base_weighting()
+    W = CRMOGMWeighting(base_weighting(), alpha=alpha, initial_weights=initial)
 
     lambda_hat_1 = bare(G)
     expected_1 = alpha * initial + (1.0 - alpha) * lambda_hat_1
@@ -177,7 +176,7 @@ def test_reset_restores_initial_weights() -> None:
     G = J @ J.T
     initial = tensor_([0.5, 0.3, 0.2])
 
-    W = CRMOGMWeighting(UPGradWeighting(), alpha=alpha, initial_weights=initial)
+    W = CRMOGMWeighting(base_weighting(), alpha=alpha, initial_weights=initial)
     first = W(G)
     W(G)
     W.reset()
