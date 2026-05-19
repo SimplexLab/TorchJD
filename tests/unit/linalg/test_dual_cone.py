@@ -1,6 +1,14 @@
-from utils.optional_deps import skip_if_deps_not_installed
+from pytest import mark
+from utils.optional_deps import IS_QUADPROG_PROJ_AVAILABLE, skip_if_deps_not_installed
 
 from torchjd.linalg import QuadprogProjector
+
+
+@mark.skipif(IS_QUADPROG_PROJ_AVAILABLE, reason="QuadprogProjector deps are available.")
+def test_import_error_at_init() -> None:
+    with raises(ImportError):
+        _ = QuadprogProjector()
+
 
 skip_if_deps_not_installed(QuadprogProjector)
 

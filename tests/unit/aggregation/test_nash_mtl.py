@@ -1,7 +1,15 @@
-from utils.optional_deps import skip_if_deps_not_installed
+from pytest import mark
+from utils.optional_deps import IS_NASH_MTL_AVAILABLE, skip_if_deps_not_installed
 
 from torchjd.aggregation import NashMTL
 from torchjd.aggregation._nash_mtl import _NashMTLWeighting
+
+
+@mark.skipif(IS_NASH_MTL_AVAILABLE, reason="NashMTL deps are available.")
+def test_import_error_at_init() -> None:
+    with raises(ImportError):
+        _ = NashMTL(n_tasks=2)
+
 
 skip_if_deps_not_installed(_NashMTLWeighting)
 
