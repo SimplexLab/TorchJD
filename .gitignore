@@ -4,6 +4,9 @@ CLAUDE.md
 # Profiling results
 traces/
 
+# Trajectories results
+tests/trajectories/results/
+
 # uv
 uv.lock
 
