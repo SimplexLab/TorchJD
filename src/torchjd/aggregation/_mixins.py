@@ -19,9 +19,8 @@ class _NonDifferentiable(nn.Module):
     the call in :func:`torch.no_grad`.
 
     .. warning::
-        This mixin must appear **before** any :class:`torch.nn.Module` base class in the inheritance
-        list. Placing it after will silently have no effect, because :meth:`__call__` would be
-        resolved to :class:`torch.nn.Module` before reaching this mixin.
+        Placing this mixin *before* the primary base will cause it to shadow the primary class's
+        :meth:`__call__` signature in generated documentation.
     """
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:

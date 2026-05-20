@@ -18,7 +18,7 @@ with contextlib.suppress(ImportError):
 
 
 # Non-differentiable: the cvxpy solver operates on numpy arrays, breaking the autograd graph.
-class CAGradWeighting(_WithOptionalDeps, _NonDifferentiable, _GramianWeighting):
+class CAGradWeighting(_WithOptionalDeps, _GramianWeighting, _NonDifferentiable):
     _REQUIRED_DEPS = ["numpy", "cvxpy", "clarabel"]
     _INSTALL_HINT = 'Install them with: pip install "torchjd[cagrad]"'
     """
@@ -94,7 +94,7 @@ class CAGradWeighting(_WithOptionalDeps, _NonDifferentiable, _GramianWeighting):
         self._norm_eps = value
 
 
-class CAGrad(_NonDifferentiable, GramianWeightedAggregator):
+class CAGrad(GramianWeightedAggregator, _NonDifferentiable):
     """
     :class:`~torchjd.aggregation.GramianWeightedAggregator` as defined in Algorithm 1 of
     `Conflict-Averse Gradient Descent for Multi-task Learning
