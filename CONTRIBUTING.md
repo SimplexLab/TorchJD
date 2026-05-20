@@ -253,6 +253,23 @@ uv run python tests/trajectories/plot_values.py EWQ
 uv run python tests/trajectories/plot_distance_to_pf.py EWQ
 ```
 
+To run everything:
+```bash
+export MPLBACKEND=Agg
+uv run python tests/trajectories/optimize.py EWQ upgrad mean mgda cagrad dualproj graddrop imtl_g aligned_mtl nashmtl random
+uv run python tests/trajectories/plot_params.py EWQ
+uv run python tests/trajectories/plot_values.py EWQ
+uv run python tests/trajectories/plot_distance_to_pf.py EWQ
+uv run python tests/trajectories/optimize.py CQF upgrad mean mgda cagrad dualproj graddrop imtl_g aligned_mtl nashmtl random
+uv run python tests/trajectories/plot_params.py CQF
+uv run python tests/trajectories/plot_values.py CQF
+uv run python tests/trajectories/plot_distance_to_pf.py CQF
+uv run python tests/trajectories/optimize.py HQF upgrad mean mgda cagrad dualproj graddrop imtl_g aligned_mtl nashmtl random
+uv run python tests/trajectories/plot_params.py HQF
+uv run python tests/trajectories/plot_values.py HQF
+uv run python tests/trajectories/plot_distance_to_pf.py HQF
+```
+
 Replace `EWQ` with any other objective key. The three plot scripts produce PDFs saved to
 `tests/trajectories/results/<objective>/`.
 
