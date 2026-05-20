@@ -21,7 +21,7 @@ with contextlib.suppress(ImportError):
 
 
 # Non-differentiable: the scipy solver operates on numpy arrays, breaking the autograd graph.
-class FairGradWeighting(_WithOptionalDeps, _NonDifferentiable, _GramianWeighting):
+class FairGradWeighting(_WithOptionalDeps, _GramianWeighting, _NonDifferentiable):
     r"""
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`] giving the
     weights of :class:`~torchjd.aggregation.FairGrad`, as defined in Equation 4 of `Fair Resource
@@ -78,7 +78,7 @@ class FairGradWeighting(_WithOptionalDeps, _NonDifferentiable, _GramianWeighting
         self._alpha = value
 
 
-class FairGrad(_NonDifferentiable, GramianWeightedAggregator):
+class FairGrad(GramianWeightedAggregator, _NonDifferentiable):
     r"""
     :class:`~torchjd.aggregation.GramianWeightedAggregator` using the step decision of Algorithm 1
     of `Fair Resource Allocation in Multi-Task Learning

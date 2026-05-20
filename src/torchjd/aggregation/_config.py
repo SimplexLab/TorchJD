@@ -14,7 +14,7 @@ from ._utils.pref_vector import pref_vector_to_str_suffix, pref_vector_to_weight
 
 
 # Non-differentiable: the pseudoinverse and the normalization are not differentiable in this context.
-class ConFIG(_NonDifferentiable, Aggregator):
+class ConFIG(Aggregator, _NonDifferentiable):
     """
     :class:`~torchjd.aggregation.Aggregator` as defined in Equation 2 of `ConFIG:
     Towards Conflict-free Training of Physics Informed Neural Networks

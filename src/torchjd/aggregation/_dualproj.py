@@ -11,7 +11,7 @@ from ._weighting_bases import _GramianWeighting
 
 
 # Non-differentiable: the QP solver operates on numpy arrays, breaking the autograd graph.
-class DualProjWeighting(_NonDifferentiable, _GramianWeighting):
+class DualProjWeighting(_GramianWeighting, _NonDifferentiable):
     r"""
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
     giving the weights of :class:`~torchjd.aggregation.DualProj`.
@@ -53,7 +53,7 @@ class DualProjWeighting(_NonDifferentiable, _GramianWeighting):
         self._projector = projector_or_default(value)
 
 
-class DualProj(_NonDifferentiable, GramianWeightedAggregator):
+class DualProj(GramianWeightedAggregator, _NonDifferentiable):
     r"""
     :class:`~torchjd.aggregation.GramianWeightedAggregator` that averages the rows of the input
     matrix, and projects the result onto the dual cone of the rows of the matrix. This corresponds
