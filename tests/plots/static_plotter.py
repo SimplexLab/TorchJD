@@ -1,6 +1,5 @@
-from pathlib import Path
-
 import torch
+from paths import PLOTS_RESULTS_DIR
 from plotly import graph_objects as go
 
 from plots._utils import (
@@ -268,9 +267,8 @@ def main(
     )
     fig.update_yaxes(range=[-0.1, 2.1], showgrid=False, zeroline=False, visible=False)
 
-    results_dir = Path(__file__).parent / "results"
-    results_dir.mkdir(exist_ok=True)
-    fig.write_image(results_dir / f"{filename}.pdf")
+    PLOTS_RESULTS_DIR.mkdir(exist_ok=True)
+    fig.write_image(PLOTS_RESULTS_DIR / f"{filename}.pdf")
     # Alternative: use .svg here and then convert to pdf using rsvg-convert. Install
     # [rsvg-convert](https://manpages.ubuntu.com/manpages/bionic/man1/rsvg-convert.1.html) and run:
     # `rsvg-convert -f pdf -o filename.pdf filename.svg`

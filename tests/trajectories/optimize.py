@@ -18,6 +18,7 @@ import warnings
 import numpy as np
 import torch
 
+from tests.paths import TRAJECTORIES_RESULTS_DIR
 from torchjd.aggregation import Stateful
 from trajectories._constants import (
     AGGREGATORS,
@@ -29,7 +30,7 @@ from trajectories._constants import (
     OBJECTIVES,
 )
 from trajectories._optimization import optimize
-from trajectories._paths import RESULTS_DIR, get_params_dir, get_values_dir
+from trajectories._paths import get_params_dir, get_values_dir
 
 warnings.filterwarnings("ignore")
 
@@ -88,7 +89,7 @@ def main() -> None:
         "learning_rates": learning_rates,
         "initial_points": initial_points,
     }
-    with open(RESULTS_DIR / objective_key / "metadata.json", "w") as f:
+    with open(TRAJECTORIES_RESULTS_DIR / objective_key / "metadata.json", "w") as f:
         json.dump(metadata, f)
 
     for aggregator_key in aggregator_keys:
