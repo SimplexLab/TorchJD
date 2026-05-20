@@ -21,13 +21,11 @@
 - Prefix protected functions and modules with '_'.
 - Always follow SOLID principles when implementing stuff, and in particular the single
   responsibility principle and the Liskov substitution principle.
-- When creating a pull request:
-  - Add the `cc: <type>` label that best describes the change. Available types: `feat`,
-    `fix`, `docs`, `test`, `refactor`, `chore`, `ci`, `style`, `typing`, `perf`. The CI
-    will use this label to prepend the conventional commit type to the title.
+- When creating a pull request, run `gh label list` to discover available labels, then:
+  - Add the `cc: <type>` label that best describes the change. The CI will use it to
+    prepend the conventional commit type to the title.
   - If the change targets a specific package, also add the matching `package: <scope>`
-    label. Available packages: `aggregation`, `autojac`, `autogram`, `sparse`, `linalg`,
-    `scalarization`.
+    label.
   - If the change introduces a breaking API change, add the `breaking-change` label.
   - Keep the title short enough that once the CI prepends `<type>[(<scope>)][!]: ` and
     GitHub appends ` (#NNN)` on merge, the total stays under 72 characters.
