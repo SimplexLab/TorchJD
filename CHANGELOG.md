@@ -14,7 +14,7 @@ changelog does not include internal changes that do not affect the user.
   and `Flattening`. The `Engine.compute_gramian` method now always returns a square matrix of shape
   `[m, m]`, where `m` is the total number of elements of the ``output`` tensor (treating all
   dimensions uniformly). Previously, an output of shape `[m_1, m_2]` would return a 4D generalized
-  Gramian of shape `[m_1, m_2, m_2, m_1]`; it now returns a `[m_1 m_2, m_1 m_2]` matrix. To
+  Gramian of shape `[m_1, m_2, m_2, m_1]`; it now returns a `[m_1 * m_2, m_1 * m_2]` matrix. To
   update, replace `Flattening(weighting)` with a standard `Weighting` and reshape the resulting
   weight vector yourself:
   ```python
@@ -28,7 +28,7 @@ changelog does not include internal changes that do not affect the user.
   # After
   from torchjd.aggregation import UPGradWeighting
   weighting = UPGradWeighting()
-  gramian = engine.compute_gramian(losses)           # shape: [m1*m2, m1*m2]
+  gramian = engine.compute_gramian(losses)           # shape: [m1 * m2, m1 * m2]
   weights = weighting(gramian).reshape(losses.shape) # shape: [m1, m2]
   losses.backward(weights)
   ```

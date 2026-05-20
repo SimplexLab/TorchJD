@@ -260,7 +260,7 @@ class Engine:
                   compute the squared norm of the gradient of ``output``).
                 - 1D (vector) ``output`` of length :math:`m`: :math:`[m, m]` Gramian (this is the
                   standard setting of Jacobian descent).
-                - 2D (matrix) ``output`` of shape :math:`[m_1, m_2]`: :math:`[m_1 m_2, m_1 m_2]`
+                - 2D (matrix) ``output`` of shape :math:`[m_1, m_2]`: :math:`[m_1 * m_2, m_1 * m_2]`
                   Gramian (this can be used for :doc:`Instance-Wise Multi-Task Learning (IWMTL)
                   <../../examples/iwmtl>`, as each sample in the batch has one loss per task).
         """
