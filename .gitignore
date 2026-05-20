@@ -2,7 +2,7 @@
 CLAUDE.md
 
 # Profiling results
-traces/
+tests/profiling/results/
 
 # Trajectories results
 tests/trajectories/results/
@@ -17,7 +17,7 @@ uv.lock
 .idea/
 
 # Generated images
-images/
+tests/plots/results/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,4 +1,5 @@
 from pathlib import Path
 
 TORCHJD_DIR = Path(__file__).parent.parent
-TRACES_DIR = TORCHJD_DIR / "traces"
+TESTS_DIR = Path(__file__).parent
+PROFILING_RESULTS_DIR = TESTS_DIR / "profiling" / "results"
