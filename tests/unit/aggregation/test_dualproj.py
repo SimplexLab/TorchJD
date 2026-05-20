@@ -1,10 +1,14 @@
+from utils.optional_deps import skip_if_deps_not_installed
+
+from torchjd.aggregation import ConstantWeighting, DualProj
+from torchjd.linalg import QuadprogProjector
+
+skip_if_deps_not_installed(QuadprogProjector)
+
 import torch
 from pytest import mark
 from torch import Tensor
 from utils.tensors import ones_
-
-from torchjd._linalg import QuadprogProjector
-from torchjd.aggregation import ConstantWeighting, DualProj
 
 from ._asserts import (
     assert_expected_structure,

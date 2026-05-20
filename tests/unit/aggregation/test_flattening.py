@@ -1,9 +1,10 @@
 from pytest import mark
 from torch.testing import assert_close
+from utils.optional_deps import base_weighting
 from utils.tensors import randn_
 
 from torchjd._linalg import PSDMatrix, compute_gramian, flatten
-from torchjd.aggregation import Flattening, MeanWeighting, SumWeighting, UPGradWeighting, Weighting
+from torchjd.aggregation import Flattening, MeanWeighting, SumWeighting, Weighting
 
 
 @mark.parametrize(
@@ -20,7 +21,7 @@ from torchjd.aggregation import Flattening, MeanWeighting, SumWeighting, UPGradW
     [
         SumWeighting(),
         MeanWeighting(),
-        UPGradWeighting(),
+        base_weighting(),
     ],
 )
 def test_flattening(half_shape: list[int], weighting: Weighting[PSDMatrix]) -> None:

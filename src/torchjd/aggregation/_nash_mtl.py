@@ -5,23 +5,24 @@ from __future__ import annotations
 
 import contextlib
 
-import numpy as np
 import torch
 from torch import Tensor
 
-from torchjd.aggregation._mixins import Stateful, _NonDifferentiable, _WithOptionalDeps
+from torchjd._mixins import _WithOptionalDeps
+from torchjd.aggregation._mixins import Stateful, _NonDifferentiable
 
 from ._aggregator_bases import WeightedAggregator
 from ._weighting_bases import _MatrixWeighting
 
 with contextlib.suppress(ImportError):
     import cvxpy as cp
+    import numpy as np
     from cvxpy import Expression, SolverError
 
 
 # Non-differentiable: the cvxpy solver operates on numpy arrays, breaking the autograd graph.
 class _NashMTLWeighting(_WithOptionalDeps, _NonDifferentiable, Stateful, _MatrixWeighting):
-    _REQUIRED_DEPS = ["cvxpy", "ecos"]
+    _REQUIRED_DEPS = ["numpy", "cvxpy", "ecos"]
     _INSTALL_HINT = 'Install them with: pip install "torchjd[nash_mtl]"'
     """
     :class:`~torchjd.aggregation._mixins.Stateful`
