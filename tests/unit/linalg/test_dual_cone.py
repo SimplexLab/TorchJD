@@ -1,3 +1,9 @@
+from utils.optional_deps import skip_if_deps_not_installed
+
+from torchjd.linalg import QuadprogProjector
+
+skip_if_deps_not_installed(QuadprogProjector)
+
 from typing import cast
 
 import numpy as np
@@ -6,7 +12,7 @@ from pytest import mark, raises
 from torch.testing import assert_close
 from utils.tensors import rand_, randn_
 
-from torchjd._linalg import DualConeProjector, PSDMatrix, QuadprogProjector, compute_gramian
+from torchjd._linalg import DualConeProjector, PSDMatrix, compute_gramian
 
 
 @mark.parametrize("projector", [QuadprogProjector(reg_eps=0.0, norm_eps=0.0)])
