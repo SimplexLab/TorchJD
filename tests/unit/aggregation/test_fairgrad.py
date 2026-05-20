@@ -1,12 +1,12 @@
-import pytest
+from utils.optional_deps import skip_if_deps_not_installed
 
-pytest.importorskip("scipy")
+from torchjd.aggregation import FairGrad, FairGradWeighting, Mean
+
+skip_if_deps_not_installed(FairGradWeighting)
 
 from pytest import mark
 from torch import Tensor
 from utils.tensors import ones_
-
-from torchjd.aggregation import FairGrad, Mean
 
 from ._asserts import assert_expected_structure, assert_non_conflicting, assert_non_differentiable
 from ._inputs import scaled_matrices, typical_matrices
