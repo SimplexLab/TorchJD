@@ -234,9 +234,9 @@ The `tests/trajectories/` directory contains scripts to generate and visualize o
 trajectories using various aggregators on simple multi-objective problems. They require the `plot`
 dependency group.
 
-Available objective keys: `EWQ`, `CQF`, `CQF2`, `HQF`, `MN2`, `MN20`.
+Available objective keys: `EWQ`, `CQF`, `HQF`.
 
-Available aggregator keys: `upgrad`, `mgda`, `cagrad`, `nashmtl`, `nashmtl20`, `graddrop`,
+Available aggregator keys: `upgrad`, `mgda`, `cagrad`, `nashmtl`, `graddrop`,
 `imtl_g`, `aligned_mtl`, `dualproj`, `pcgrad`, `random`, `mean`.
 
 **Step 1 — Optimize:** run the optimization for an objective and a selection of aggregators:
@@ -253,8 +253,24 @@ uv run python tests/trajectories/plot_values.py EWQ
 uv run python tests/trajectories/plot_distance_to_pf.py EWQ
 ```
 
-Replace `EWQ` with any other objective key. The three plot scripts produce PDFs saved to
-`tests/trajectories/results/<objective>/`.
+To run everything:
+```bash
+export MPLBACKEND=Agg
+uv run python tests/trajectories/optimize.py EWQ upgrad mean mgda cagrad dualproj graddrop imtl_g aligned_mtl nashmtl random
+uv run python tests/trajectories/plot_params.py EWQ
+uv run python tests/trajectories/plot_values.py EWQ
+uv run python tests/trajectories/plot_distance_to_pf.py EWQ
+uv run python tests/trajectories/optimize.py CQF upgrad mean mgda cagrad dualproj graddrop imtl_g aligned_mtl nashmtl random
+uv run python tests/trajectories/plot_params.py CQF
+uv run python tests/trajectories/plot_values.py CQF
+uv run python tests/trajectories/plot_distance_to_pf.py CQF
+uv run python tests/trajectories/optimize.py HQF upgrad mean mgda cagrad dualproj graddrop imtl_g aligned_mtl nashmtl random
+uv run python tests/trajectories/plot_params.py HQF
+uv run python tests/trajectories/plot_values.py HQF
+uv run python tests/trajectories/plot_distance_to_pf.py HQF
+```
+
+The three plot scripts produce PDFs saved to `tests/trajectories/results/<objective>/`.
 
 > [!NOTE]
 > The plot scripts require a LaTeX installation for rendering:
