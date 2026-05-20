@@ -228,6 +228,39 @@ implementation of a mathematical aggregator.
 To deprecate some public functionality, make it raise a `DeprecationWarning`. A test should also be
 added in `tests/unit/test_deprecations.py`, ensuring that this warning is issued.
 
+## Trajectories
+
+The `tests/trajectories/` directory contains scripts to generate and visualize optimization
+trajectories using various aggregators on simple multi-objective problems. They require the `plot`
+dependency group.
+
+Available objective keys: `EWQ`, `CQF`, `CQF2`, `HQF`, `MN2`, `MN20`.
+
+Available aggregator keys: `upgrad`, `mgda`, `cagrad`, `nashmtl`, `nashmtl20`, `graddrop`,
+`imtl_g`, `aligned_mtl`, `dualproj`, `pcgrad`, `random`, `mean`.
+
+**Step 1 — Optimize:** run the optimization for an objective and a selection of aggregators:
+```bash
+uv run python tests/trajectories/optimize.py EWQ upgrad mean mgda cagrad dualproj graddrop imtl_g aligned_mtl nashmtl random
+```
+This saves trajectory data under `tests/trajectories/results/` (gitignored).
+
+**Step 2 — Plot:** generate the plots from the saved trajectories:
+```bash
+export MPLBACKEND=Agg
+uv run python tests/trajectories/plot_params.py EWQ
+uv run python tests/trajectories/plot_values.py EWQ
+uv run python tests/trajectories/plot_distance_to_pf.py EWQ
+```
+
+Replace `EWQ` with any other objective key. The three plot scripts produce PDFs saved to
+`tests/trajectories/results/<objective>/`.
+
+> [!NOTE]
+> The plot scripts require a LaTeX installation for rendering:
+> `sudo apt-get install texlive-latex-extra texlive-fonts-recommended dvipng cm-super`
+
+
 ## Release
 
 *This section is addressed to maintainers.*
