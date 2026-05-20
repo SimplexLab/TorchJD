@@ -5,17 +5,18 @@ from __future__ import annotations
 
 import contextlib
 
-import numpy as np
 import torch
 from torch import Tensor
 
+from torchjd._mixins import _WithOptionalDeps
 from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
-from ._mixins import _NonDifferentiable, _WithOptionalDeps
+from ._mixins import _NonDifferentiable
 from ._weighting_bases import _GramianWeighting
 
 with contextlib.suppress(ImportError):
+    import numpy as np
     from scipy.optimize import least_squares
 
 
@@ -41,7 +42,7 @@ class FairGradWeighting(_WithOptionalDeps, _NonDifferentiable, _GramianWeighting
         To install them, use ``pip install "torchjd[fairgrad]"``.
     """
 
-    _REQUIRED_DEPS = ["scipy"]
+    _REQUIRED_DEPS = ["numpy", "scipy"]
     _INSTALL_HINT = 'Install it with: pip install "torchjd[fairgrad]"'
 
     def __init__(self, alpha: float, max_iters: int | None = None) -> None:

@@ -120,6 +120,7 @@ cagrad = [
     "cvxpy>=1.3.0",  # No Clarabel solver before 1.3.0
 ]
 fairgrad = [
+    "numpy>=1.21.2",  # Does not work before 1.21. No python 3.10 wheel before 1.21.2.
     "scipy",
 ]
 full = [

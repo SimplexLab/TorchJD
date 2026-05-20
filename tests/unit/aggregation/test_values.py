@@ -3,6 +3,7 @@ from torch import Tensor, tensor
 from torch.testing import assert_close
 from utils.optional_deps import (
     IS_CAGRAD_AVAILABLE,
+    IS_FAIRGRAD_AVAILABLE,
     IS_NASH_MTL_AVAILABLE,
     IS_QUADPROG_PROJ_AVAILABLE,
 )
@@ -20,6 +21,8 @@ from torchjd.aggregation import (
     ConstantWeighting,
     DualProj,
     DualProjWeighting,
+    FairGrad,
+    FairGradWeighting,
     GradDrop,
     GradVac,
     GradVacWeighting,
@@ -100,9 +103,13 @@ if IS_QUADPROG_PROJ_AVAILABLE:
     WEIGHTING_PARAMETRIZATIONS.append((UPGradWeighting(), G_base, tensor([1.1109, 0.7894])))
 
 if IS_FAIRGRAD_AVAILABLE:
-    AGGREGATOR_PARAMETRIZATIONS.append((FairGrad(alpha=1.0), J_base, tensor([0.0766, 0.9985, 0.9985])))
-    WEIGHTING_PARAMETRIZATIONS.append((FairGradWeighting(alpha=1.0), G_base, tensor([0.5915, 0.4071])))
-    
+    AGGREGATOR_PARAMETRIZATIONS.append(
+        (FairGrad(alpha=1.0), J_base, tensor([0.0766, 0.9985, 0.9985]))
+    )
+    WEIGHTING_PARAMETRIZATIONS.append(
+        (FairGradWeighting(alpha=1.0), G_base, tensor([0.5915, 0.4071]))
+    )
+
 if IS_CAGRAD_AVAILABLE:
     AGGREGATOR_PARAMETRIZATIONS.append((CAGrad(c=0.5), J_base, tensor([0.1835, 1.2041, 1.2041])))
     WEIGHTING_PARAMETRIZATIONS.append((CAGradWeighting(c=0.5), G_base, tensor([0.7041, 0.5000])))
