@@ -6,6 +6,7 @@ from torchjd._mixins import _WithOptionalDeps
 from torchjd.aggregation import (
     IMTLG,
     CAGradWeighting,
+    FairGradWeighting,
     GramianWeightedAggregator,
     IMTLGWeighting,
     UPGrad,
@@ -23,6 +24,7 @@ def deps_are_installed(cls: type[_WithOptionalDeps]) -> bool:
 
 
 IS_QUADPROG_PROJ_AVAILABLE = deps_are_installed(QuadprogProjector)
+IS_FAIRGRAD_AVAILABLE = deps_are_installed(FairGradWeighting)
 IS_CAGRAD_AVAILABLE = deps_are_installed(CAGradWeighting)
 IS_NASH_MTL_AVAILABLE = deps_are_installed(_NashMTLWeighting)
 
