@@ -6,7 +6,7 @@ Usage:
     uv run python tests/trajectories/optimize.py <objective> <aggregator>...
 
 Arguments:
-    <objective>        The key of the objective function (e.g., EWQ, CQF, HQF, MN2, MN20).
+    <objective>        The key of the objective function (e.g., EWQ, CQF2, HQF).
     <aggregator>...    The keys of the aggregators to use (e.g., upgrad, mean, mgda).
 """
 

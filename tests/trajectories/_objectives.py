@@ -101,15 +101,6 @@ class HomogenousQuadraticFunction(QuadraticFunction):
         return f"{self.__class__.__name__}(A={self.A}, scales={self.scales}, us={self.us})"
 
 
-class ConvexQuadraticFunction(QuadraticFunction):
-    def __init__(self, Bs: list[Tensor], us: list[Tensor]) -> None:
-        self.Bs = Bs
-        super().__init__(As=[B @ B.T for B in self.Bs], us=us)
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(Bs={self.Bs}, us={self.us})"
-
-
 class ElementWiseQuadratic(Objective, WithSPSMappingMixin):
     def __init__(self, n_dim: int) -> None:
         super().__init__(n_params=n_dim, n_values=n_dim)
@@ -132,31 +123,3 @@ class ElementWiseQuadratic(Objective, WithSPSMappingMixin):
     @property
     def sps_mapping(self) -> "ElementWiseQuadratic.SPSMapping":
         return self.SPSMapping(self.n_values)
-
-
-class Multinorm(Objective, WithSPSMappingMixin):
-    def __init__(self, a: Tensor) -> None:
-        n = len(a)
-        super().__init__(n_params=n, n_values=n)
-        self.a = a
-
-    def __call__(self, x: Tensor) -> Tensor:
-        if len(x) != self.n_values:
-            raise ValueError("x must have the same length as the number of values.")
-
-        # f_i(x) = a_i * || x - a_i * e_i  ||²
-        return self.a * torch.norm(x.expand(len(x), len(x)) - torch.diag(self.a), dim=1) ** 2
-
-    def jacobian(self, x: Tensor) -> Tensor:
-        return self.a * 2 * (x.expand(len(x), len(x)) - torch.diag(self.a))
-
-    class SPSMapping(WithSPSMappingMixin.SPSMapping):
-        def __init__(self, a: Tensor) -> None:
-            self.a = a
-
-        def __call__(self, w: Tensor) -> Tensor:
-            return w * self.a
-
-    @property
-    def sps_mapping(self) -> "Multinorm.SPSMapping":
-        return self.SPSMapping(self.a)
