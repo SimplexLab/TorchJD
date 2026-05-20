@@ -234,7 +234,7 @@ The `tests/trajectories/` directory contains scripts to generate and visualize o
 trajectories using various aggregators on simple multi-objective problems. They require the `plot`
 dependency group.
 
-Available objective keys: `EWQ`, `CQF2`, `HQF`.
+Available objective keys: `EWQ`, `CQF`, `HQF`.
 
 Available aggregator keys: `upgrad`, `mgda`, `cagrad`, `nashmtl`, `graddrop`,
 `imtl_g`, `aligned_mtl`, `dualproj`, `pcgrad`, `random`, `mean`.

@@ -5,7 +5,7 @@ Usage:
     uv run python tests/trajectories/plot_values.py <objective>
 
 Arguments:
-    <objective>    The key of the objective function (e.g., EWQ, CQF2, HQF).
+    <objective>    The key of the objective function (e.g., EWQ, CQF, HQF).
 """
 
 import argparse

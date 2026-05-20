@@ -53,7 +53,7 @@ LR_MULTIPLIER_OVERRIDES = {
         "nashmtl": 20.0,
         "imtl_g": 2.0,
     },
-    "CQF2": {"nashmtl": 0.5},
+    "CQF": {"nashmtl": 0.5},
 }
 AGGREGATOR_ORDER = {
     "upgrad": 9,
@@ -84,7 +84,7 @@ LATEX_NAMES = {
 
 # Sometimes we need to override the xlim and ylim of the value plot to zoom enough
 PLOT_VALUES_LIMS = {
-    "CQF2": {
+    "CQF": {
         "xlim": (-0.125, 2.625),
         "ylim": (-0.425, 8.925),
     },
@@ -92,7 +92,7 @@ PLOT_VALUES_LIMS = {
 
 OBJECTIVES = {
     "EWQ": ElementWiseQuadratic(2),
-    "CQF2": QuadraticFunction(
+    "CQF": QuadraticFunction(
         As=[torch.tensor([[1.0, 0.2], [0.2, 0.05]]), torch.tensor([[3.0, -0.6], [-0.6, 0.2]])],
         us=[torch.tensor([1.0, 0.0]), torch.tensor([-1.0, 0.0])],
     ),
@@ -104,7 +104,7 @@ OBJECTIVES = {
 }
 BASE_LEARNING_RATES = {
     "EWQ": 0.075,
-    "CQF2": 0.125,
+    "CQF": 0.125,
     "HQF": 0.005,
 }
 INITIAL_POINTS = {
@@ -115,7 +115,7 @@ INITIAL_POINTS = {
         [-3.0, 4.0],
         [-3.5, -0.75],
     ],
-    "CQF2": [
+    "CQF": [
         [0.5, 0.5],
         [-0.3, 7.0],
         [0.0, 0.0],
@@ -129,6 +129,6 @@ INITIAL_POINTS = {
 }
 N_ITERS = {
     "EWQ": 50,
-    "CQF2": 200,
+    "CQF": 200,
     "HQF": 100,
 }
