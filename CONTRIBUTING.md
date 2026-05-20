@@ -270,8 +270,7 @@ uv run python tests/trajectories/plot_values.py HQF
 uv run python tests/trajectories/plot_distance_to_pf.py HQF
 ```
 
-Replace `EWQ` with any other objective key. The three plot scripts produce PDFs saved to
-`tests/trajectories/results/<objective>/`.
+The three plot scripts produce PDFs saved to `tests/trajectories/results/<objective>/`.
 
 > [!NOTE]
 > The plot scripts require a LaTeX installation for rendering:
