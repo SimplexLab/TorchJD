@@ -18,11 +18,11 @@ from torchjd.aggregation import (
     UPGrad,
 )
 from trajectories._objectives import (
-    ConvexQuadraticForm,
+    ConvexQuadraticFunction,
     ElementWiseQuadratic,
-    HomogenousQuadraticForm,
+    HomogenousQuadraticFunction,
     Multinorm,
-    QuadraticForm,
+    QuadraticFunction,
 )
 
 AGGREGATORS = {
@@ -108,7 +108,7 @@ THETA = np.pi / 16
 
 OBJECTIVES = {
     "EWQ": ElementWiseQuadratic(2),
-    "CQF": ConvexQuadraticForm(
+    "CQF": ConvexQuadraticFunction(
         Bs=[
             torch.tensor([[cos(THETA), -sin(THETA)], [sin(THETA), cos(THETA)]])
             @ torch.diag(torch.tensor([1.0, 0.1])),
@@ -117,11 +117,11 @@ OBJECTIVES = {
         ],
         us=[torch.tensor([1.0, 0.0]), torch.tensor([-1.0, 0.0])],
     ),
-    "CQF2": QuadraticForm(
+    "CQF2": QuadraticFunction(
         As=[torch.tensor([[1.0, 0.2], [0.2, 0.05]]), torch.tensor([[3.0, -0.6], [-0.6, 0.2]])],
         us=[torch.tensor([1.0, 0.0]), torch.tensor([-1.0, 0.0])],
     ),
-    "HQF": HomogenousQuadraticForm(
+    "HQF": HomogenousQuadraticFunction(
         A=torch.tensor([[2.0, -1.0], [-1.0, 2.0]]),
         scales=torch.tensor([1.0, 10.0]),
         us=[torch.tensor([1.0, 0.0]), torch.tensor([-10.0, 0.0])],

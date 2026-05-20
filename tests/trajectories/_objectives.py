@@ -45,7 +45,7 @@ class WithSPSMappingMixin(ABC):
         pass
 
 
-class QuadraticForm(Objective, WithSPSMappingMixin):
+class QuadraticFunction(Objective, WithSPSMappingMixin):
     def __init__(self, As: list[Tensor], us: list[Tensor]) -> None:
         if len(As) != len(us):
             raise ValueError("As and us must have the same length.")
@@ -86,11 +86,11 @@ class QuadraticForm(Objective, WithSPSMappingMixin):
             return torch.linalg.lstsq(G, b, driver="gelsd").solution
 
     @property
-    def sps_mapping(self) -> "QuadraticForm.SPSMapping":
+    def sps_mapping(self) -> "QuadraticFunction.SPSMapping":
         return self.SPSMapping(self.As, self.us)
 
 
-class HomogenousQuadraticForm(QuadraticForm):
+class HomogenousQuadraticFunction(QuadraticFunction):
     def __init__(self, A: Tensor, scales: Tensor, us: list[Tensor]) -> None:
         self.A = A
         self.scales = scales
@@ -101,7 +101,7 @@ class HomogenousQuadraticForm(QuadraticForm):
         return f"{self.__class__.__name__}(A={self.A}, scales={self.scales}, us={self.us})"
 
 
-class ConvexQuadraticForm(QuadraticForm):
+class ConvexQuadraticFunction(QuadraticFunction):
     def __init__(self, Bs: list[Tensor], us: list[Tensor]) -> None:
         self.Bs = Bs
         super().__init__(As=[B @ B.T for B in self.Bs], us=us)
