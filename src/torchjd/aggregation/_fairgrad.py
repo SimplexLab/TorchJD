@@ -77,12 +77,6 @@ class FairGradWeighting(_WithOptionalDeps, _NonDifferentiable, _GramianWeighting
     def alpha(self, value: float) -> None:
         self._alpha = value
 
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(alpha={self.alpha}, max_iters={self.max_iters})"
-
-    def __str__(self) -> str:
-        return f"{self.alpha}-FairGradWeighting"
-
 
 class FairGrad(_NonDifferentiable, GramianWeightedAggregator):
     r"""

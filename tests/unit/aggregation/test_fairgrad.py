@@ -7,7 +7,6 @@ from torch import Tensor
 from utils.tensors import ones_
 
 from torchjd.aggregation import FairGrad, Mean
-from torchjd.aggregation._fairgrad import FairGradWeighting
 
 from ._asserts import assert_expected_structure, assert_non_conflicting, assert_non_differentiable
 from ._inputs import scaled_matrices, typical_matrices
@@ -41,10 +40,6 @@ def test_representations() -> None:
     A = FairGrad(alpha=0.1, max_iters=None)
     assert repr(A) == "FairGrad(alpha=0.1, max_iters=None)"
     assert str(A) == "0.1-FairGrad"
-
-    W = FairGradWeighting(alpha=0.1, max_iters=None)
-    assert repr(W) == "FairGradWeighting(alpha=0.1, max_iters=None)"
-    assert str(W) == "0.1-FairGradWeighting"
 
 
 def test_alpha_setter_updates_value() -> None:
