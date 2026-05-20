@@ -7,7 +7,6 @@ from torch.nn.functional import mse_loss
 from torch.utils._pytree import PyTree, tree_flatten, tree_map
 from torch.utils.hooks import RemovableHandle
 
-from torchjd._linalg import PSDTensor
 from torchjd.aggregation import Aggregator, Weighting
 from torchjd.autogram import Engine
 from torchjd.autojac import backward
@@ -119,10 +118,14 @@ def compute_gramian_with_autograd(
     output: Tensor,
     params: list[nn.Parameter],
     retain_graph: bool = False,
-) -> PSDTensor:
+) -> Tensor:
     """
     Computes the Gramian of the Jacobian of the outputs with respect to the params using vmapped
     calls to the autograd engine.
+
+    :param output: 1D tensor of objectives.
+    :param params: Parameters to differentiate with respect to.
+    :param retain_graph: Whether to retain the computation graph.
     """
 
     rg_params = [p for p in params if p.requires_grad]
@@ -142,7 +145,7 @@ def compute_gramian_with_autograd(
     products = [jacobian @ jacobian.T for jacobian in jacobian_matrices]
     gramian = torch.stack(products).sum(dim=0)
 
-    return PSDTensor(gramian)
+    return gramian
 
 
 class CloneParams:

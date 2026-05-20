@@ -19,9 +19,6 @@ Abstract base classes
 .. autoclass:: torchjd.aggregation.Weighting
     :members: __call__
 
-.. autoclass:: torchjd.aggregation.GeneralizedWeighting
-    :members: __call__
-
 .. autoclass:: torchjd.aggregation.Stateful
     :members: reset
 
@@ -37,7 +34,6 @@ Abstract base classes
     constant.rst
     cr_mogm.rst
     dualproj.rst
-    flattening.rst
     graddrop.rst
     gradvac.rst
     imtl_g.rst
