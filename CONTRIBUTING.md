@@ -110,7 +110,7 @@ uv run pre-commit install
 
    - If you have access to a cuda-enabled GPU, you should also check that the unit tests pass on it:
      ```bash
-     CUBLAS_WORKSPACE_CONFIG=:4096:8 PYTEST_TORCH_DEVICE=cuda:0 uv run pytest tests/unit
+     PYTEST_TORCH_DEVICE=cuda:0 uv run pytest tests/unit
      ```
 
    - To check that the usage examples from docstrings and `.rst` files are correct, run:
