@@ -29,3 +29,4 @@
   - If the change introduces a breaking API change, add the `breaking-change` label.
   - Keep the title short enough that once the CI prepends `<type>[(<scope>)][!]: ` and
     GitHub appends ` (#NNN)` on merge, the total stays under 72 characters.
+  - The PR message should be short and efficient.
