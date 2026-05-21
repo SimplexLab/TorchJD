@@ -23,8 +23,8 @@ changelog does not include internal changes that do not affect the user.
 - **BREAKING**: Removed entirely the concept of generalized Gramians. The `Engine.compute_gramian`
   method now always returns a square matrix of shape `[m, m]`, where `m` is the total number of
   elements of the ``output`` tensor (treating all dimensions uniformly). Previously, an output of
-  shape `[m_1, m_2]` would return a 4D generalized Gramian of shape `[m_1, m_2, m_2, m_1]`; it now
-  returns a `[m_1 * m_2, m_1 * m_2]` matrix.
+  shape `[m1, m2]` would return a 4D generalized Gramian of shape `[m1, m2, m2, m1]`; it now
+  returns a `[m1 * m2, m1 * m2]` matrix.
   This also removes `GeneralizedWeighting` and `Flattening`.
   To update, replace `Flattening(weighting)` with a standard `Weighting` and reshape the resulting
   weight vector yourself:
