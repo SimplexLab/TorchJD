@@ -452,10 +452,10 @@ def test_compute_gramian_manual() -> None:
         [1],
     ],
 )
-def test_reshape_equivariance(shape: list[int]) -> None:
+def test_reshape_invariance(shape: list[int]) -> None:
     """
     Test that compute_gramian returns the same flat [m, m] gramian regardless of how the output is
-    shaped (as long as it has the same total number of elements m).
+    shaped.
     """
 
     input_size = shape[0]
