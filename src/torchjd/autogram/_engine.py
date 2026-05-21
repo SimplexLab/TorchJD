@@ -4,6 +4,7 @@ import torch
 from torch import Tensor, nn, vmap
 from torch.autograd.graph import get_gradient_edge
 
+from torchjd._linalg import flatten, movedim, reshape
 from torchjd.linalg import PSDMatrix
 
 from ._edge_registry import EdgeRegistry
@@ -268,12 +269,14 @@ class Engine:
         if self._batch_dim is not None:
             # move batched dim to the end
             ordered_output = output.movedim(self._batch_dim, -1)
-            batch_size = ordered_output.shape[-1]
-            has_non_batch_dim = ordered_output.ndim > 1
+            ordered_shape = list(ordered_output.shape)
+            batch_size = ordered_shape[-1]
+            has_non_batch_dim = len(ordered_shape) > 1
             target_shape = [batch_size]
         else:
             ordered_output = output
-            has_non_batch_dim = ordered_output.ndim > 0
+            ordered_shape = list(ordered_output.shape)
+            has_non_batch_dim = len(ordered_shape) > 0
             target_shape = []
 
         if has_non_batch_dim:
@@ -298,13 +301,9 @@ class Engine:
             for gramian_computer in self._gramian_computers.values():
                 gramian_computer.reset()
 
-        if self._batch_dim is not None and has_non_batch_dim:
-            # The square gramian is computed in (non_batch x batch) ordering due to the movedim above.
-            # Reorder to match the user's row-major ordering of the original output.
-            m = square_gramian.shape[0]
-            internal_indices = torch.arange(m, device=output.device).reshape(ordered_output.shape)
-            perm = internal_indices.movedim(-1, self._batch_dim).reshape(-1)
-            gramian = cast(PSDMatrix, square_gramian[perm, :][:, perm])
+        if self._batch_dim is not None:
+            unordered_gramian = reshape(square_gramian, ordered_shape)
+            gramian = flatten(movedim(unordered_gramian, [-1], [self._batch_dim]))
         else:
             gramian = square_gramian
 

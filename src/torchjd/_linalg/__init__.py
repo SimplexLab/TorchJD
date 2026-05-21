@@ -1,6 +1,7 @@
 from ._dual_cone import DualConeProjector, QuadprogProjector, projector_or_default
+from ._generalized_gramian import flatten, movedim, reshape
 from ._gramian import compute_gramian, normalize, regularize
-from ._matrix import Matrix, PSDMatrix, is_matrix, is_psd_matrix
+from ._matrix import Matrix, PSDMatrix, PSDTensor, is_matrix, is_psd_matrix, is_psd_tensor
 
 __all__ = [
     "compute_gramian",
@@ -8,8 +9,13 @@ __all__ = [
     "regularize",
     "Matrix",
     "PSDMatrix",
+    "PSDTensor",
     "is_matrix",
     "is_psd_matrix",
+    "is_psd_tensor",
+    "flatten",
+    "reshape",
+    "movedim",
     "DualConeProjector",
     "QuadprogProjector",
     "projector_or_default",
