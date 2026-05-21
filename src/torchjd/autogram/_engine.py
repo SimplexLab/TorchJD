@@ -250,12 +250,6 @@ class Engine:
             :math:`m` objectives (where :math:`m` is the total number of elements of ``output``),
             so the returned Gramian always has shape :math:`[m, m]`.
 
-        .. note::
-            When ``output`` has more than one dimension, its elements are treated as if ``output``
-            were flattened into a 1D vector of :math:`m` objectives. For example, if ``output`` is
-            a matrix of shape :math:`[m_1, m_2]`, then :math:`m = m_1 \times m_2` and the returned
-            Gramian has shape :math:`[m, m]`.
-
             A few examples:
                 - 0D (scalar) ``output``: :math:`[1, 1]` Gramian (this can be used to efficiently
                   compute the squared norm of the gradient of ``output``).
