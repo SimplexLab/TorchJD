@@ -136,6 +136,6 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    # To test this on cuda, add the following environment variables when running this:
-    # CUBLAS_WORKSPACE_CONFIG=:4096:8;PYTEST_TORCH_DEVICE=cuda:0
+    # To test this on cuda, set the following environment variable when running this:
+    # PYTEST_TORCH_DEVICE=cuda:0
     main()
