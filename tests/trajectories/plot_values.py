@@ -14,6 +14,7 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 
+from tests.paths import TRAJECTORIES_RESULTS_DIR
 from trajectories._constants import (
     AGGREGATOR_ORDER,
     AGGREGATORS,
@@ -23,7 +24,7 @@ from trajectories._constants import (
 )
 from trajectories._objectives import WithSPSMappingMixin
 from trajectories._pareto_utils import compute_normalized_2d_pf_distances, sample_2d_pf
-from trajectories._paths import RESULTS_DIR, get_value_plots_dir, get_values_dir
+from trajectories._paths import get_value_plots_dir, get_values_dir
 from trajectories._plotters import (
     ContentLimAdjuster,
     HeatmapPlotter,
@@ -58,7 +59,7 @@ def main() -> None:
     args = parser.parse_args()
     objective_key = args.objective
 
-    with open(RESULTS_DIR / objective_key / "metadata.json") as f:
+    with open(TRAJECTORIES_RESULTS_DIR / objective_key / "metadata.json") as f:
         metadata = json.load(f)
 
     values_dir = get_values_dir(objective_key)

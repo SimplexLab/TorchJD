@@ -23,7 +23,7 @@ from utils.forward_backwards import (
 )
 from utils.tensors import make_inputs_and_targets
 
-from tests.paths import TRACES_DIR
+from tests.paths import PROFILING_RESULTS_DIR
 from torchjd.aggregation import UPGrad, UPGradWeighting
 from torchjd.autogram import Engine
 
@@ -98,7 +98,7 @@ def _save_and_print_trace(
     batch_size: int,
 ) -> None:
     filename = f"{factory}-bs{batch_size}-{DEVICE.type}.json"
-    output_dir = TRACES_DIR / method_name
+    output_dir = PROFILING_RESULTS_DIR / method_name
     output_dir.mkdir(parents=True, exist_ok=True)
     trace_path = output_dir / filename
 
