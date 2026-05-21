@@ -1,6 +1,7 @@
 from pytest import mark
 from torch import Tensor
 from torch.testing import assert_close
+from utils.optional_deps import IS_QUADPROG_PROJ_AVAILABLE
 from utils.tensors import ones_, randn_
 
 from torchjd._linalg import QuadprogProjector, compute_gramian
@@ -26,6 +27,7 @@ def test_non_differentiable(aggregator: PCGrad, matrix: Tensor) -> None:
     assert_non_differentiable(aggregator, matrix)
 
 
+@mark.skipif(not IS_QUADPROG_PROJ_AVAILABLE, reason="QuadprogProjector not available.")
 @mark.parametrize(
     "shape",
     [

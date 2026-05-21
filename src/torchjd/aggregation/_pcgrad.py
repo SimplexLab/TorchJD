@@ -11,7 +11,7 @@ from ._weighting_bases import _GramianWeighting
 
 
 # Non-differentiable: weights are modified in-place during the gradient projection loop.
-class PCGradWeighting(_NonDifferentiable, _GramianWeighting):
+class PCGradWeighting(_GramianWeighting, _NonDifferentiable):
     """
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
     giving the weights of :class:`~torchjd.aggregation.PCGrad`.
@@ -47,7 +47,7 @@ class PCGradWeighting(_NonDifferentiable, _GramianWeighting):
         return weights.to(device)
 
 
-class PCGrad(_NonDifferentiable, GramianWeightedAggregator):
+class PCGrad(GramianWeightedAggregator, _NonDifferentiable):
     """
     :class:`~torchjd.aggregation.GramianWeightedAggregator` as defined in Algorithm 1 of
     `Gradient Surgery for Multi-Task Learning <https://arxiv.org/pdf/2001.06782.pdf>`_.

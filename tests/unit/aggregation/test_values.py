@@ -1,6 +1,12 @@
 from pytest import mark, param
 from torch import Tensor, tensor
 from torch.testing import assert_close
+from utils.optional_deps import (
+    IS_CAGRAD_AVAILABLE,
+    IS_FAIRGRAD_AVAILABLE,
+    IS_NASH_MTL_AVAILABLE,
+    IS_QUADPROG_PROJ_AVAILABLE,
+)
 
 from torchjd.aggregation import (
     IMTLG,
@@ -8,11 +14,15 @@ from torchjd.aggregation import (
     Aggregator,
     AlignedMTL,
     AlignedMTLWeighting,
+    CAGrad,
+    CAGradWeighting,
     ConFIG,
     Constant,
     ConstantWeighting,
     DualProj,
     DualProjWeighting,
+    FairGrad,
+    FairGradWeighting,
     GradDrop,
     GradVac,
     GradVacWeighting,
@@ -22,6 +32,7 @@ from torchjd.aggregation import (
     Mean,
     MeanWeighting,
     MGDAWeighting,
+    NashMTL,
     PCGrad,
     PCGradWeighting,
     Random,
@@ -57,7 +68,6 @@ AGGREGATOR_PARAMETRIZATIONS: list[tuple] = [
     (AlignedMTL(), J_base, tensor([0.2133, 0.9673, 0.9673])),
     (ConFIG(), J_base, tensor([0.1588, 2.0706, 2.0706])),
     (Constant(tensor([1.0, 2.0])), J_base, tensor([8.0, 3.0, 3.0])),
-    (DualProj(), J_base, tensor([0.5563, 1.1109, 1.1109])),
     (GradDrop(), J_base, tensor([6.0, 2.0, 2.0])),
     (GradVac(), J_base, tensor([0.5848, 3.8012, 3.8012])),
     (IMTLG(), J_base, tensor([0.0767, 1.0000, 1.0000])),
@@ -68,7 +78,6 @@ AGGREGATOR_PARAMETRIZATIONS: list[tuple] = [
     (Random(), J_base, tensor([-2.6229, 1.0000, 1.0000])),
     (Sum(), J_base, tensor([2.0, 2.0, 2.0])),
     (TrimmedMean(trim_number=1), J_TrimmedMean, tensor([1.5000, 2.5000])),
-    (UPGrad(), J_base, tensor([0.2929, 1.9004, 1.9004])),
 ]
 
 G_base = J_base @ J_base.T
@@ -77,7 +86,6 @@ G_Krum = J_Krum @ J_Krum.T
 WEIGHTING_PARAMETRIZATIONS: list[tuple] = [
     (AlignedMTLWeighting(), G_base, tensor([0.5591, 0.4083])),
     (ConstantWeighting(tensor([1.0, 2.0])), G_base, tensor([1.0, 2.0])),
-    (DualProjWeighting(), G_base, tensor([0.6109, 0.5000])),
     (IMTLGWeighting(), G_base, tensor([0.5923, 0.4077])),
     (KrumWeighting(1, 4), G_Krum, tensor([0.2500, 0.2500, 0.0000, 0.2500, 0.2500])),
     (GradVacWeighting(), G_base, tensor([2.2222, 1.5789])),
@@ -86,20 +94,27 @@ WEIGHTING_PARAMETRIZATIONS: list[tuple] = [
     (PCGradWeighting(), G_base, tensor([2.2222, 1.5789])),
     (RandomWeighting(), G_base, tensor([0.8623, 0.1377])),
     (SumWeighting(), G_base, tensor([1.0, 1.0])),
-    (UPGradWeighting(), G_base, tensor([1.1109, 0.7894])),
 ]
 
-try:
-    from torchjd.aggregation import CAGrad, CAGradWeighting
+if IS_QUADPROG_PROJ_AVAILABLE:
+    AGGREGATOR_PARAMETRIZATIONS.append((DualProj(), J_base, tensor([0.5563, 1.1109, 1.1109])))
+    AGGREGATOR_PARAMETRIZATIONS.append((UPGrad(), J_base, tensor([0.2929, 1.9004, 1.9004])))
+    WEIGHTING_PARAMETRIZATIONS.append((DualProjWeighting(), G_base, tensor([0.6109, 0.5000])))
+    WEIGHTING_PARAMETRIZATIONS.append((UPGradWeighting(), G_base, tensor([1.1109, 0.7894])))
 
+if IS_FAIRGRAD_AVAILABLE:
+    AGGREGATOR_PARAMETRIZATIONS.append(
+        (FairGrad(alpha=1.0), J_base, tensor([0.0766, 0.9985, 0.9985]))
+    )
+    WEIGHTING_PARAMETRIZATIONS.append(
+        (FairGradWeighting(alpha=1.0), G_base, tensor([0.5915, 0.4071]))
+    )
+
+if IS_CAGRAD_AVAILABLE:
     AGGREGATOR_PARAMETRIZATIONS.append((CAGrad(c=0.5), J_base, tensor([0.1835, 1.2041, 1.2041])))
     WEIGHTING_PARAMETRIZATIONS.append((CAGradWeighting(c=0.5), G_base, tensor([0.7041, 0.5000])))
-except ImportError:
-    pass
 
-try:
-    from torchjd.aggregation import NashMTL
-
+if IS_NASH_MTL_AVAILABLE:
     AGGREGATOR_PARAMETRIZATIONS.append(
         param(
             NashMTL(n_tasks=2),
@@ -108,9 +123,6 @@ try:
             marks=mark.filterwarnings("ignore::UserWarning"),
         ),
     )
-
-except ImportError:
-    pass
 
 
 @mark.parametrize(["A", "J", "expected_output"], AGGREGATOR_PARAMETRIZATIONS)

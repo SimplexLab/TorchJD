@@ -55,10 +55,11 @@ size). In addition to $\mathcal A_{\text{UPGrad}}$, TorchJD supports
 <!-- start installation -->
 TorchJD can be installed directly with pip:
 ```bash
-pip install torchjd
+pip install "torchjd[quadprog_projector]"
 ```
 <!-- end installation -->
-Some aggregators may have additional dependencies. Please refer to the
+This includes the dependencies required by UPGrad and DualProj. Some other aggregators may have
+additional dependencies. Please refer to the
 [installation documentation](https://torchjd.org/stable/installation) for them.
 
 ## Usage

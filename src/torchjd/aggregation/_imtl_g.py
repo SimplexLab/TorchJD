@@ -9,7 +9,7 @@ from ._weighting_bases import _GramianWeighting
 
 
 # Non-differentiable: differentiating through pinv(gramian) would give incorrect gradients.
-class IMTLGWeighting(_NonDifferentiable, _GramianWeighting):
+class IMTLGWeighting(_GramianWeighting, _NonDifferentiable):
     """
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
     giving the weights of :class:`~torchjd.aggregation.IMTLG`.
@@ -25,7 +25,7 @@ class IMTLGWeighting(_NonDifferentiable, _GramianWeighting):
         return weights
 
 
-class IMTLG(_NonDifferentiable, GramianWeightedAggregator):
+class IMTLG(GramianWeightedAggregator, _NonDifferentiable):
     """
     :class:`~torchjd.aggregation.GramianWeightedAggregator` generalizing the method described in
     `Towards Impartial Multi-task Learning <https://discovery.ucl.ac.uk/id/eprint/10120667/>`_.

@@ -76,10 +76,10 @@ from utils.forward_backwards import (
     reduce_to_scalar,
     reduce_to_vector,
 )
+from utils.optional_deps import base_weighting
 from utils.tensors import make_inputs_and_targets, ones_, randn_, zeros_
 
 from torchjd._linalg import compute_gramian
-from torchjd.aggregation import UPGradWeighting
 from torchjd.autogram._engine import Engine
 
 PARAMETRIZATIONS = [
@@ -343,7 +343,7 @@ def test_iwrm_steps_with_autogram(
 
     n_iter = 3
     model = factory()
-    weighting = UPGradWeighting()
+    weighting = base_weighting()
     engine = Engine(model, batch_dim=batch_dim)
     optimizer = SGD(model.parameters(), lr=1e-7)
 

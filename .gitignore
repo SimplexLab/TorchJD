@@ -1,8 +1,12 @@
 # Claude (see https://github.com/anthropics/claude-code/issues/6235)
 CLAUDE.md
+.claude/
 
 # Profiling results
 traces/
+
+# Trajectories results
+tests/trajectories/results/
 
 # uv
 uv.lock

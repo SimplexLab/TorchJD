@@ -12,7 +12,7 @@ from ._weighting_bases import _GramianWeighting
 
 
 # Non-differentiable: the QP solver operates on numpy arrays, breaking the autograd graph.
-class UPGradWeighting(_NonDifferentiable, _GramianWeighting):
+class UPGradWeighting(_GramianWeighting, _NonDifferentiable):
     r"""
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
     giving the weights of :class:`~torchjd.aggregation.UPGrad`.
@@ -54,7 +54,7 @@ class UPGradWeighting(_NonDifferentiable, _GramianWeighting):
         self._projector = projector_or_default(value)
 
 
-class UPGrad(_NonDifferentiable, GramianWeightedAggregator):
+class UPGrad(GramianWeightedAggregator, _NonDifferentiable):
     r"""
     :class:`~torchjd.aggregation.GramianWeightedAggregator` that projects each row of the input
     matrix onto the dual cone of all rows of this matrix, and that combines the result, as proposed

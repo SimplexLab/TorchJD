@@ -13,7 +13,7 @@ from ._weighting_bases import _GramianWeighting
 
 
 # Non-differentiable: weights are modified in-place during the gradient correction loop.
-class GradVacWeighting(_NonDifferentiable, Stateful, _GramianWeighting):
+class GradVacWeighting(_GramianWeighting, Stateful, _NonDifferentiable):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
@@ -128,7 +128,7 @@ class GradVacWeighting(_NonDifferentiable, Stateful, _GramianWeighting):
             self._state_key = key
 
 
-class GradVac(_NonDifferentiable, Stateful, GramianWeightedAggregator):
+class GradVac(GramianWeightedAggregator, Stateful, _NonDifferentiable):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`
     :class:`~torchjd.aggregation.GramianWeightedAggregator` implementing the aggregation step of

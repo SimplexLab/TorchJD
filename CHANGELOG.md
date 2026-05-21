@@ -8,8 +8,18 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Added
+
+- Added `FairGrad` and `FairGradWeighting` from [Fair Resource Allocation in Multi-Task
+  Learning](https://arxiv.org/pdf/2402.15638).
+
 ### Changed
 
+- **BREAKING**: Removed `numpy`, `quadprog` and `qpsolvers` from the main dependencies of `torchjd`,
+  (which now only has `torch` as its main dependency). This makes the base version of `torchjd`
+  (installed with `pip install torchjd`) much lighter, but it means that users of `UPGrad` and
+  `DualProj` now have to install the new optional dependency group `quadprog_projector` explicitly
+  (with e.g. `pip install "torchjd[quadprog_projector]"`).
 - **BREAKING**: Removed entirely the concept of generalized Gramians. The `Engine.compute_gramian`
   method now always returns a square matrix of shape `[m, m]`, where `m` is the total number of
   elements of the ``output`` tensor (treating all dimensions uniformly). Previously, an output of
