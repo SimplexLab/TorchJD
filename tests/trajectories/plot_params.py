@@ -14,6 +14,7 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 
+from tests.paths import TRAJECTORIES_RESULTS_DIR
 from trajectories._constants import (
     AGGREGATOR_ORDER,
     AGGREGATORS,
@@ -24,7 +25,7 @@ from trajectories._constants import (
 from trajectories._objectives import ElementWiseQuadratic, WithSPSMappingMixin
 from trajectories._optimization import compute_gradient_cosine_similarities
 from trajectories._pareto_utils import sample_2d_spss
-from trajectories._paths import RESULTS_DIR, get_param_plots_dir, get_params_dir
+from trajectories._paths import get_param_plots_dir, get_params_dir
 from trajectories._plotters import (
     AxesPlotter,
     ContentLimAdjuster,
@@ -61,7 +62,7 @@ def main() -> None:
     args = parser.parse_args()
     objective_key = args.objective
 
-    with open(RESULTS_DIR / objective_key / "metadata.json") as f:
+    with open(TRAJECTORIES_RESULTS_DIR / objective_key / "metadata.json") as f:
         metadata = json.load(f)
 
     params_dir = get_params_dir(objective_key)
