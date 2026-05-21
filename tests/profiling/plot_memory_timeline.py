@@ -13,7 +13,7 @@ import matplotlib
 matplotlib.use("Agg")  # Use non-GUI backend to avoid tkinter dependency
 import matplotlib.pyplot as plt
 import numpy as np
-from paths import TRACES_DIR
+from paths import PROFILING_RESULTS_DIR
 
 
 @dataclass
@@ -63,7 +63,7 @@ def plot_memory_timelines(experiment: str, folders: list[str]) -> None:
     cpu_timelines = []
     cuda_timelines = []
     for folder in folders:
-        path = TRACES_DIR / folder / f"{experiment}.json"
+        path = PROFILING_RESULTS_DIR / folder / f"{experiment}.json"
         cpu_timeline, cuda_timeline = extract_memory_timelines(path)
         cpu_timelines.append(cpu_timeline)
         cuda_timelines.append(cuda_timeline)
@@ -104,7 +104,7 @@ def plot_memory_timelines(experiment: str, folders: list[str]) -> None:
 
     fig.tight_layout()
 
-    output_dir = Path(TRACES_DIR / "memory_timelines")
+    output_dir = Path(PROFILING_RESULTS_DIR / "memory_timelines")
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / f"{experiment}.png"
     print(f"\nSaving plot to: {output_path}")

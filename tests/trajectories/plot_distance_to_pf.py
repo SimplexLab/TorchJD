@@ -15,9 +15,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
+from tests.paths import TRAJECTORIES_RESULTS_DIR
 from trajectories._constants import AGGREGATOR_ORDER, AGGREGATORS, LATEX_NAMES, OBJECTIVES
 from trajectories._pareto_utils import make_2d_pf_distance_fn
-from trajectories._paths import RESULTS_DIR, get_distance_to_pf_plots_dir, get_values_dir
+from trajectories._paths import get_distance_to_pf_plots_dir, get_values_dir
 from trajectories._plotters import (
     MultiEvolutionPlotter,
     SquareBoxAspectSetter,
@@ -51,7 +52,7 @@ def main() -> None:
     args = parser.parse_args()
     objective_key = args.objective
 
-    with open(RESULTS_DIR / objective_key / "metadata.json") as f:
+    with open(TRAJECTORIES_RESULTS_DIR / objective_key / "metadata.json") as f:
         metadata = json.load(f)
 
     values_dir = get_values_dir(objective_key)
