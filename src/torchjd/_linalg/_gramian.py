@@ -7,19 +7,23 @@ from ._matrix import Matrix, PSDMatrix, PSDTensor
 
 
 @overload
-def compute_gramian(t: Tensor) -> PSDMatrix: ...
+def compute_gramian(t: Tensor) -> PSDMatrix:
+    pass
 
 
 @overload
-def compute_gramian(t: Tensor, contracted_dims: Literal[-1]) -> PSDMatrix: ...
+def compute_gramian(t: Tensor, contracted_dims: Literal[-1]) -> PSDMatrix:
+    pass
 
 
 @overload
-def compute_gramian(t: Matrix, contracted_dims: Literal[1]) -> PSDMatrix: ...
+def compute_gramian(t: Matrix, contracted_dims: Literal[1]) -> PSDMatrix:
+    pass
 
 
 @overload
-def compute_gramian(t: Tensor, contracted_dims: int) -> PSDTensor: ...
+def compute_gramian(t: Tensor, contracted_dims: int) -> PSDTensor:
+    pass
 
 
 def compute_gramian(t: Tensor, contracted_dims: int = -1) -> PSDTensor:
