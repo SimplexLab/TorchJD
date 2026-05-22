@@ -251,11 +251,11 @@ class Engine:
             so the returned Gramian always has shape :math:`[m, m]`.
 
             A few examples:
-                - 0D (scalar) ``output``: :math:`[1, 1]` Gramian (this can be used to efficiently
+                - Scalar ``output``: :math:`1\times 1` Gramian (this can be used to efficiently
                   compute the squared norm of the gradient of ``output``).
-                - 1D (vector) ``output`` of length :math:`m`: :math:`[m, m]` Gramian (this is the
+                - Vector ``output`` of dimension :math:`m`: :math:`m \times m` Gramian (this is the
                   standard setting of Jacobian descent).
-                - 2D (matrix) ``output`` of shape :math:`[m_1, m_2]`: :math:`[m_1 * m_2, m_1 * m_2]`
+                - Matrix ``output`` of dimension :math:`m_1\times m_2`: :math:`m_1 m_2 \times m_1 m_2`
                   Gramian (this can be used for :doc:`Instance-Wise Multi-Task Learning (IWMTL)
                   <../../examples/iwmtl>`, as each sample in the batch has one loss per task).
         """
