@@ -4,7 +4,7 @@ import torch
 from torch import Tensor, nn, vmap
 from torch.autograd.graph import get_gradient_edge
 
-from torchjd._linalg import movedim, reshape
+from torchjd._linalg import flatten, movedim, reshape
 from torchjd.linalg import PSDMatrix
 
 from ._edge_registry import EdgeRegistry
@@ -246,28 +246,18 @@ class Engine:
         Computes the Gramian of the Jacobian of ``output`` with respect to the direct parameters of
         all ``modules``.
 
-        :param output: The tensor of arbitrary shape to differentiate. The shape of the returned
-            Gramian depends on the shape of this output.
-
-        .. note::
-            This function doesn't require ``output`` to be a vector. For example, if ``output`` is
-            a matrix of shape :math:`[m_1, m_2]`, its Jacobian :math:`J` with respect to the
-            parameters will be of shape :math:`[m_1, m_2, n]`, where :math:`n` is the number of
-            parameters in the model. This is what we call a `generalized Jacobian`. The
-            corresponding Gramian :math:`G = J J^\top` will be of shape
-            :math:`[m_1, m_2, m_2, m_1]`. This is what we call a `generalized Gramian`. The number
-            of dimensions of the returned generalized Gramian will always be twice that of the
-            ``output``.
+        :param output: The tensor to differentiate. Its elements are treated as a flat vector of
+            :math:`m` objectives (where :math:`m` is the total number of elements of ``output``),
+            so the returned Gramian always has shape :math:`[m, m]`.
 
             A few examples:
-                - 0D (scalar) ``output``: 0D Gramian (this can be used to efficiently compute the
-                  squared norm of the gradient of ``output``).
-                - 1D (vector) ``output``: 2D Gramian (this is the standard setting of Jacobian
-                  descent).
-                - 2D (matrix) ``output``: 4D Gramian (this can be used for :doc:`Instance-Wise
-                  Multi-Task Learning (IWMTL) <../../examples/iwmtl>`, as each sample in the batch
-                  has one loss per task).
-                - etc.
+                - Scalar ``output``: :math:`1\times 1` Gramian (this can be used to efficiently
+                  compute the squared norm of the gradient of ``output``).
+                - Vector ``output`` of dimension :math:`m`: :math:`m \times m` Gramian (this is the
+                  standard setting of Jacobian descent).
+                - Matrix ``output`` of dimension :math:`m_1\times m_2`: :math:`m_1 m_2 \times m_1 m_2`
+                  Gramian (this can be used for :doc:`Instance-Wise Multi-Task Learning (IWMTL)
+                  <../../examples/iwmtl>`, as each sample in the batch has one loss per task).
         """
 
         if self._batch_dim is not None:
@@ -305,12 +295,11 @@ class Engine:
             for gramian_computer in self._gramian_computers.values():
                 gramian_computer.reset()
 
-        unordered_gramian = reshape(square_gramian, ordered_shape)
-
         if self._batch_dim is not None:
-            gramian = movedim(unordered_gramian, [-1], [self._batch_dim])
+            unordered_gramian = reshape(square_gramian, ordered_shape)
+            gramian = flatten(movedim(unordered_gramian, [-1], [self._batch_dim]))
         else:
-            gramian = unordered_gramian
+            gramian = square_gramian
 
         return gramian
 

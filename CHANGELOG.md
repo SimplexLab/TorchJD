@@ -20,6 +20,29 @@ changelog does not include internal changes that do not affect the user.
   (installed with `pip install torchjd`) much lighter, but it means that users of `UPGrad` and
   `DualProj` now have to install the new optional dependency group `quadprog_projector` explicitly
   (with e.g. `pip install "torchjd[quadprog_projector]"`).
+- **BREAKING**: Removed entirely the concept of generalized Gramians. The `Engine.compute_gramian`
+  method now always returns a square matrix of shape `[m, m]`, where `m` is the total number of
+  elements of the ``output`` tensor (treating all dimensions uniformly). Previously, an output of
+  shape `[m1, m2]` would return a 4D generalized Gramian of shape `[m1, m2, m2, m1]`; it now
+  returns a `[m1 * m2, m1 * m2]` matrix.
+  This also removes `GeneralizedWeighting` and `Flattening`.
+  To update, replace `Flattening(weighting)` with a standard `Weighting` and reshape the resulting
+  weight vector yourself:
+  ```python
+  # Before
+  from torchjd.aggregation import Flattening, UPGradWeighting
+  weighting = Flattening(UPGradWeighting())
+  gramian = engine.compute_gramian(losses)  # shape: [m1, m2, m2, m1]
+  weights = weighting(gramian)              # shape: [m1, m2]
+  losses.backward(weights)
+
+  # After
+  from torchjd.aggregation import UPGradWeighting
+  weighting = UPGradWeighting()
+  gramian = engine.compute_gramian(losses)           # shape: [m1 * m2, m1 * m2]
+  weights = weighting(gramian).reshape(losses.shape) # shape: [m1, m2]
+  losses.backward(weights)
+  ```
 
 ## [0.11.0] - 2026-05-18
 

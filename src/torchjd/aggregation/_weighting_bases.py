@@ -6,7 +6,6 @@ from typing import Generic, TypeVar
 
 from torch import Tensor, nn
 
-from torchjd._linalg import PSDTensor, is_psd_tensor
 from torchjd.linalg import Matrix, PSDMatrix
 
 _T = TypeVar("_T", contravariant=True, bound=Tensor)
@@ -76,30 +75,3 @@ class _GramianWeighting(Weighting[PSDMatrix]):
         :param gramian: The Gramian from which the weights must be extracted.
         """
         return super().__call__(gramian)
-
-
-class GeneralizedWeighting(nn.Module, ABC):
-    r"""
-    Abstract base class for all weightings that operate on generalized Gramians. It has the role of
-    extracting a tensor of weights of dimension :math:`m_1 \times \dots \times m_k` from a
-    generalized Gramian of dimension
-    :math:`m_1 \times \dots \times m_k \times m_k \times \dots \times m_1`.
-    """
-
-    def __init__(self) -> None:
-        super().__init__()
-
-    @abstractmethod
-    def forward(self, generalized_gramian: PSDTensor, /) -> Tensor:
-        """Computes the vector of weights from the input generalized Gramian."""
-
-    def __call__(self, generalized_gramian: Tensor, /) -> Tensor:
-        """
-        Computes the tensor of weights from the input generalized Gramian and applies all registered
-        hooks.
-
-        :param generalized_gramian: The tensor from which the weights must be extracted.
-        """
-
-        assert is_psd_tensor(generalized_gramian)
-        return super().__call__(generalized_gramian)
