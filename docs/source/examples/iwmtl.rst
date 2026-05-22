@@ -16,7 +16,7 @@ The following example shows how to do that.
     from torch.nn import Linear, MSELoss, ReLU, Sequential
     from torch.optim import SGD
 
-    from torchjd.aggregation import Flattening, UPGradWeighting
+    from torchjd.aggregation import UPGradWeighting
     from torchjd.autogram import Engine
 
     shared_module = Sequential(Linear(10, 5), ReLU(), Linear(5, 3), ReLU())
@@ -30,7 +30,7 @@ The following example shows how to do that.
 
     optimizer = SGD(params, lr=0.1)
     mse = MSELoss(reduction="none")
-    weighting = Flattening(UPGradWeighting())
+    weighting = UPGradWeighting()
     engine = Engine(shared_module, batch_dim=0)
 
     inputs = torch.randn(8, 16, 10)  # 8 batches of 16 random input vectors of length 10
@@ -46,20 +46,19 @@ The following example shows how to do that.
         losses = torch.stack([mse(out1, target1), mse(out2, target2)], dim=1)  # shape: [16, 2]
 
         # Compute the gramian (inner products between pairs of gradients of the losses)
-        gramian = engine.compute_gramian(losses)  # shape: [16, 2, 2, 16]
+        gramian = engine.compute_gramian(losses)  # shape: [32, 32]
 
         # Obtain the weights that lead to no conflict between reweighted gradients
-        weights = weighting(gramian)  # shape: [16, 2]
+        weights = weighting(gramian)  # shape: [32]
 
         # Do the standard backward pass, but weighted using the obtained weights
-        losses.backward(weights)
+        losses.backward(weights.reshape(losses.shape))
         optimizer.step()
         optimizer.zero_grad()
 
 .. note::
-    In this example, the tensor of losses is a matrix rather than a vector. The gramian is thus a
-    4D tensor rather than a matrix, and a
-    :class:`~torchjd.aggregation._weighting_bases.GeneralizedWeighting`, such as
-    :class:`~torchjd.aggregation._flattening.Flattening`, has to be used to extract a matrix of
-    weights from it. More information about ``GeneralizedWeighting`` can be found in the
-    :doc:`../../docs/aggregation/index` page.
+    In this example, the tensor of losses is a matrix of shape ``[16, 2]`` (16 samples, 2 tasks).
+    The autogram engine flattens this into a vector of ``m = 16 × 2 = 32`` objectives, so the
+    Gramian has shape ``[32, 32]``. A standard :class:`~torchjd.aggregation.Weighting` is then used
+    to extract a vector of 32 weights, which is reshaped back to ``[16, 2]`` before being passed to
+    :meth:`~torch.Tensor.backward`.

@@ -1,7 +1,6 @@
 from collections.abc import Callable
 from itertools import combinations
 from math import prod
-from typing import cast
 
 import pytest
 import torch
@@ -80,7 +79,7 @@ from utils.forward_backwards import (
 from utils.optional_deps import base_weighting
 from utils.tensors import make_inputs_and_targets, ones_, randn_, zeros_
 
-from torchjd._linalg import PSDMatrix, compute_gramian, movedim, reshape
+from torchjd._linalg import compute_gramian
 from torchjd.autogram._engine import Engine
 
 PARAMETRIZATIONS = [
@@ -287,10 +286,8 @@ def test_compute_gramian_various_output_shapes(
 
     losses, params = _get_losses_and_params(model_autograd, inputs, loss_fn, reduction)
     reshaped_losses = torch.movedim(losses, movedim_source, movedim_destination)
-    # Go back to a vector so that compute_gramian_with_autograd works
     loss_vector = reshaped_losses.reshape([-1])
-    autograd_gramian = compute_gramian_with_autograd(loss_vector, params)
-    expected_gramian = reshape(autograd_gramian, list(reshaped_losses.shape))
+    expected_gramian = compute_gramian_with_autograd(loss_vector, params)
 
     engine = Engine(model_autogram, batch_dim=batch_dim)
     losses = forward_pass(model_autogram, inputs, loss_fn, reduction)
@@ -455,11 +452,10 @@ def test_compute_gramian_manual() -> None:
         [1],
     ],
 )
-def test_reshape_equivariance(shape: list[int]) -> None:
+def test_reshape_invariance(shape: list[int]) -> None:
     """
-    Test equivariance of `compute_gramian` under reshape operation. More precisely, if we reshape
-    the `output` to some `shape`, then the result is the same as reshaping the Gramian to the
-    corresponding shape.
+    Test that compute_gramian returns the same flat [m, m] gramian regardless of how the output is
+    shaped.
     """
 
     input_size = shape[0]
@@ -470,52 +466,45 @@ def test_reshape_equivariance(shape: list[int]) -> None:
 
     engine1 = Engine(model1, batch_dim=None)
     output = model1(input)
-    gramian = cast(PSDMatrix, engine1.compute_gramian(output))
-    expected_reshaped_gramian = reshape(gramian, shape[1:])
+    gramian = engine1.compute_gramian(output)
 
     engine2 = Engine(model2, batch_dim=None)
     reshaped_output = model2(input).reshape(shape[1:])
     reshaped_gramian = engine2.compute_gramian(reshaped_output)
 
-    assert_close(reshaped_gramian, expected_reshaped_gramian)
+    assert_close(reshaped_gramian, gramian)
 
 
 @mark.parametrize(
-    ["shape", "source", "destination"],
+    "shape",
     [
-        ([50, 2, 2, 3], [0, 2], [1, 0]),
-        ([60, 3, 2, 5], [1], [2]),
-        ([30, 6, 7], [0, 1], [1, 0]),
-        ([3, 2], [0], [0]),
-        ([3], [], []),
-        ([3, 2, 1], [1, 0], [0, 1]),
-        ([4, 3, 2], [], []),
-        ([1, 1, 1], [1, 0], [0, 1]),
+        [50, 2, 2, 3],
+        [60, 3, 2, 5],
+        [30, 6, 7],
+        [3, 2],
+        [3],
+        [3, 2, 1],
+        [4, 3, 2],
+        [1, 1, 1],
     ],
 )
-def test_movedim_equivariance(shape: list[int], source: list[int], destination: list[int]) -> None:
+def test_gramian_has_correct_shape(shape: list[int]) -> None:
     """
-    Test equivariance of `compute_gramian` under movedim operation. More precisely, if we movedim
-    the `output` on some dimensions, then the result is the same as movedim on the Gramian with the
-    corresponding dimensions.
+    Test that compute_gramian always returns a [m, m] matrix where m is the total number of
+    elements of the output tensor, regardless of how the output is shaped.
     """
 
     input_size = shape[0]
     output_size = prod(shape[1:])
     factory = ModuleFactory(Linear, input_size, output_size)
-    model1, model2 = factory(), factory()
+    model = factory()
     input = randn_([input_size])
 
-    engine1 = Engine(model1, batch_dim=None)
-    output = model1(input).reshape(shape[1:])
-    gramian = cast(PSDMatrix, engine1.compute_gramian(output))
-    expected_moved_gramian = movedim(gramian, source, destination)
+    engine = Engine(model, batch_dim=None)
+    output = model(input).reshape(shape[1:])
+    gramian = engine.compute_gramian(output)
 
-    engine2 = Engine(model2, batch_dim=None)
-    moved_output = model2(input).reshape(shape[1:]).movedim(source, destination)
-    moved_gramian = engine2.compute_gramian(moved_output)
-
-    assert_close(moved_gramian, expected_moved_gramian)
+    assert gramian.shape == (output_size, output_size)
 
 
 @mark.parametrize(
