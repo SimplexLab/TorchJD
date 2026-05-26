@@ -1,0 +1,41 @@
+name: Check Links
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '41 16 * * 1'  # Every Monday at 16:41 UTC (to avoid high load at exact hour values).
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-links:
+    name: Link correctness
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      # This will restore the cache for the current commit if it exists, or the most recent lychee
+      # cache otherwise (including those saved for the main branch). It will also save the cache for
+      # the current commit if none existed for it, and only if the link check succeeded. We don't
+      # want to save a cache when the action failed, because the reason for failure might be
+      # temporary (rate limiting, network issue, etc.), and we always want to retry those links
+      # everytime this action is run.
+      - name: Restore lychee cache
+        uses: actions/cache@v5
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose --no-progress --cache --max-cache-age 1d "." --exclude-path "docs/source/_templates/page.html"
+          fail: true
+        env:
+          # This reduces false positives due to rate limits
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
