@@ -5,10 +5,10 @@ from ._scalarizer_base import Scalarizer
 
 class Constant(Scalarizer):
     """
-    :class:`~torchjd.scalarization.Scalarizer` that combines the input tensor of losses with
+    class:`~torchjd.scalarization.Scalarizer` that combines the input tensor of losses with
     constant, pre-determined weights.
 
-    :param weights: The weights to apply to the losses. Must have the same shape as the losses
+    param weights: The weights to apply to the losses. Must have the same shape as the losses
         passed at call time.
     """
 

@@ -5,7 +5,7 @@ from ._scalarizer_base import Scalarizer
 
 class Mean(Scalarizer):
     """
-    :class:`~torchjd.scalarization.Scalarizer` that returns the mean of the input tensor of losses.
+    class:`~torchjd.scalarization.Scalarizer` that returns the mean of the input tensor of losses.
     """
 
     def forward(self, losses: Tensor, /) -> Tensor:

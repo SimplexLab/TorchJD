@@ -6,7 +6,7 @@ from torchjd.scalarization import Scalarizer
 
 def test_cannot_instantiate_abstract_base() -> None:
     with raises(TypeError):
-        Scalarizer()  # type: ignore[abstract]
+        Scalarizer()
 
 
 class _Identity(Scalarizer):
