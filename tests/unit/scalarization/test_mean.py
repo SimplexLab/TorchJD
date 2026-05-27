@@ -10,7 +10,7 @@ from ._asserts import (
     assert_permutation_invariant,
     assert_returns_scalar,
 )
-from ._inputs import all_inputs, typical_inputs
+from ._inputs import all_inputs, non_scalar_inputs
 
 
 def test_value() -> None:
@@ -23,12 +23,12 @@ def test_expected_structure(losses: Tensor) -> None:
     assert_returns_scalar(Mean(), losses)
 
 
-@mark.parametrize("losses", typical_inputs)
+@mark.parametrize("losses", non_scalar_inputs)
 def test_grad_flow(losses: Tensor) -> None:
     assert_grad_flow(Mean(), losses)
 
 
-@mark.parametrize("losses", typical_inputs)
+@mark.parametrize("losses", non_scalar_inputs)
 def test_permutation_invariant(losses: Tensor) -> None:
     assert_permutation_invariant(Mean(), losses)
 
