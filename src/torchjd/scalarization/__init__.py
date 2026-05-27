@@ -14,7 +14,8 @@ losses into a single scalar loss.
 >>>
 >>> scalarizer = Mean()
 >>> losses = tensor([1.0, 2.0, 3.0])
->>> scalarizer(losses)
+>>> loss = scalarizer(losses)
+>>> loss
 tensor(2.)
 """
 

@@ -55,4 +55,9 @@ def test_shape_check(
 def test_representations() -> None:
     s = Constant(weights=torch.tensor([1.0, 2.0], device="cpu"))
     assert repr(s) == "Constant(weights=tensor([1., 2.]))"
-    assert str(s) == "Constant"
+    assert str(s) == "Constant([1., 2.])"
+
+
+def test_str_with_non_vector_weights() -> None:
+    assert str(Constant(weights=ones_((3, 4)))) == "Constant(weights of shape (3, 4))"
+    assert str(Constant(weights=ones_(()))) == "Constant(weights of shape ())"

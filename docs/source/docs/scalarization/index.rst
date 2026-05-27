@@ -15,7 +15,7 @@ Abstract base class
     :hidden:
     :maxdepth: 1
 
-    mean.rst
-    sum.rst
     constant.rst
+    mean.rst
     random.rst
+    sum.rst

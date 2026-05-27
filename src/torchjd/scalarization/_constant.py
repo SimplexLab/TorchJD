@@ -1,5 +1,7 @@
 from torch import Tensor
 
+from torchjd._vector_str import pref_vector_to_str_suffix
+
 from ._scalarizer_base import Scalarizer
 
 
@@ -26,3 +28,8 @@ class Constant(Scalarizer):
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(weights={repr(self.weights)})"
+
+    def __str__(self) -> str:
+        if self.weights.ndim == 1:
+            return f"{self.__class__.__name__}{pref_vector_to_str_suffix(self.weights)}"
+        return f"{self.__class__.__name__}(weights of shape {tuple(self.weights.shape)})"
