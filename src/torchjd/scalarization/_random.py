@@ -1,6 +1,6 @@
 import torch
 from torch import Tensor
-from torch.nn import functional as F
+from torch.nn.functional import softmax
 
 from ._scalarizer_base import Scalarizer
 
