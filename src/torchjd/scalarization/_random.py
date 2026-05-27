@@ -15,5 +15,5 @@ class Random(Scalarizer):
 
     def forward(self, losses: Tensor, /) -> Tensor:
         flat = torch.randn(losses.numel(), device=losses.device, dtype=losses.dtype)
-        weights = F.softmax(flat, dim=-1).reshape(losses.shape)
+        weights = softmax(flat, dim=-1).reshape(losses.shape)
         return (weights * losses).sum()
