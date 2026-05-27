@@ -13,6 +13,7 @@
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/SimplexLab/TorchJD/main.svg)](https://results.pre-commit.ci/latest/github/SimplexLab/TorchJD/main)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/torchjd)](https://pypi.org/project/torchjd/)
 [![Static Badge](https://img.shields.io/badge/Discord%20-%20community%20-%20%235865F2?logo=discord&logoColor=%23FFFFFF&label=Discord)](https://discord.gg/76KkRnb3nk)
+[![Static Badge](https://img.shields.io/badge/PyTorch-%3E%3D2.3-blue?logo=pytorch&logoColor=white)](https://pytorch.org/)
 
 TorchJD is a library extending autograd to enable
 [Jacobian descent](https://arxiv.org/pdf/2406.16232) with PyTorch. It can be used to train neural
