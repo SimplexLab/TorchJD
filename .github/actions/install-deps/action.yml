@@ -12,6 +12,10 @@ inputs:
     description: 'Dependency groups to install (space-separated, e.g., "test doc")'
     required: false
     default: ''
+  resolution:
+    description: 'Resolution strategy (e.g., "lowest-direct"). Use "none" for the default strategy.'
+    required: false
+    default: 'none'
 
 runs:
   using: composite
@@ -20,7 +24,7 @@ runs:
       shell: bash
       run: uv venv
 
-    - name: Install dependencies (options=[${{ inputs.options }}], groups=[${{ inputs.groups }}])
+    - name: Install dependencies (options=[${{ inputs.options }}], groups=[${{ inputs.groups }}], resolution=[${{ inputs.resolution }}])
       shell: bash
       run: |
         # Map "none" to the empty string
@@ -41,6 +45,12 @@ runs:
         for group in ${{ inputs.groups }}; do
           cmd="$cmd --group $group"
         done
+
+        # Add resolution strategy
+        resolution_input="${{ inputs.resolution }}"
+        if [ "$resolution_input" != "none" ] && [ -n "$resolution_input" ]; then
+          cmd="$cmd --resolution $resolution_input"
+        fi
 
         # Print and execute the command
         echo $cmd
