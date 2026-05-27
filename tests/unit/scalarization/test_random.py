@@ -32,7 +32,7 @@ def test_deterministic_under_seed() -> None:
 
 def test_weights_sum_to_one() -> None:
     # If all losses equal 1, then sum(weights * losses) == 1 when weights sum to 1.
-    losses = ones_((5,)) * 3.0
+    losses = ones_((5,))
     torch.testing.assert_close(Random()(losses), tensor_(1.0))
 
 
