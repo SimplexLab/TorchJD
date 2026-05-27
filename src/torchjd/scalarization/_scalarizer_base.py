@@ -20,7 +20,7 @@ class Scalarizer(nn.Module, ABC):
         """
         Computes the scalar loss from the input tensor of losses and applies all registered hooks.
 
-        param losses: The tensor of losses to scalarize. May be of any shape.
+        :param losses: The tensor of losses to scalarize. May be of any shape.
         """
         return super().__call__(losses)
 
