@@ -21,7 +21,8 @@ WORKDIR /tmp/torchjd-install
 
 COPY pyproject.toml README.md ./
 RUN mkdir -p src/torchjd && touch src/torchjd/__init__.py
-RUN uv venv /opt/venv \
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv venv /opt/venv \
     && uv pip install --python-version=3.14 -e '.[full]' --group check --group doc --group test --group plot
 
 COPY src/ src/

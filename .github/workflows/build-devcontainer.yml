@@ -28,11 +28,10 @@ jobs:
         run: |
           repo_lower=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')
           echo "name=ghcr.io/$repo_lower/devcontainer:latest" >> $GITHUB_OUTPUT
+          echo "repo_lower=$repo_lower" >> $GITHUB_OUTPUT
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "cache-from=" >> $GITHUB_OUTPUT
             echo "cache-to=" >> $GITHUB_OUTPUT
           else
-            echo "cache-from=type=registry,ref=ghcr.io/$repo_lower/devcontainer:cache" >> $GITHUB_OUTPUT
             echo "cache-to=type=registry,ref=ghcr.io/$repo_lower/devcontainer:cache,mode=max" >> $GITHUB_OUTPUT
           fi
 
@@ -54,5 +53,7 @@ jobs:
           file: .devcontainer/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.image.outputs.name }}
-          cache-from: ${{ steps.image.outputs.cache-from }}
+          cache-from: |
+            type=registry,ref=ghcr.io/${{ steps.image.outputs.repo_lower }}/devcontainer:cache
+            type=registry,ref=ghcr.io/${{ steps.image.outputs.repo_lower }}/devcontainer:latest
           cache-to: ${{ steps.image.outputs.cache-to }}
