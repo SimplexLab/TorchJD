@@ -67,85 +67,53 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  build-devcontainer:
-    name: Build devcontainer image
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-    outputs:
-      image: ${{ steps.image.outputs.name }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Compute image path
-        id: image
-        run: |
-          repo_lower=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')
-          echo "name=ghcr.io/$repo_lower/devcontainer:${{ github.sha }}" >> $GITHUB_OUTPUT
-          echo "cache-ref=ghcr.io/$repo_lower/devcontainer:cache" >> $GITHUB_OUTPUT
-
-      - name: Build and push devcontainer image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: .devcontainer/Dockerfile
-          push: true
-          tags: ${{ steps.image.outputs.name }}
-          cache-from: |
-            type=registry,ref=${{ steps.image.outputs.cache-ref }}
-            type=registry,ref=ghcr.io/${{ github.repository_owner }}/devcontainer:latest
-          cache-to: type=registry,ref=${{ steps.image.outputs.cache-ref }},mode=max
-
   build-doc:
     name: Build and test documentation
-    needs: build-devcontainer
     runs-on: ubuntu-latest
-    container:
-      image: ${{ needs.build-devcontainer.outputs.image }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Sync project installation
-        run: uv pip install --python /opt/venv/bin/python -e '.[full]' --group doc
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: '3.14'
+
+      - uses: ./.github/actions/install-deps
+        with:
+          options: full
+          groups: doc
 
       - name: Build Documentation
         working-directory: docs
-        run: make dirhtml
+        run: uv run make dirhtml
 
       - name: Test Documentation
         working-directory: docs
-        run: make doctest
+        run: uv run make doctest
 
   code-quality:
     name: Code quality (ty and pre-commit hooks)
-    needs: build-devcontainer
     runs-on: ubuntu-latest
-    container:
-      image: ${{ needs.build-devcontainer.outputs.image }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Sync project installation
-        run: uv pip install --python /opt/venv/bin/python -e '.[full]' --group check --group test --group plot
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: '3.14'
+
+      - uses: ./.github/actions/install-deps
+        with:
+          options: full
+          groups: check test plot
 
       - name: Configure git safe directory
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Run pre-commit hooks
-        run: pre-commit run --all-files
+        run: uv run pre-commit run --all-files
 
       - name: Run ty
-        run: ty check --output-format=github
+        run: uv run ty check --output-format=github
