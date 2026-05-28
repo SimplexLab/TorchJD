@@ -23,12 +23,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Compute image path
+      - name: Compute image path and cache settings
         id: image
         run: |
           repo_lower=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')
           echo "name=ghcr.io/$repo_lower/devcontainer:latest" >> $GITHUB_OUTPUT
-          echo "cache-ref=ghcr.io/$repo_lower/devcontainer:cache" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "cache-from=" >> $GITHUB_OUTPUT
+            echo "cache-to=" >> $GITHUB_OUTPUT
+          else
+            echo "cache-from=type=registry,ref=ghcr.io/$repo_lower/devcontainer:cache" >> $GITHUB_OUTPUT
+            echo "cache-to=type=registry,ref=ghcr.io/$repo_lower/devcontainer:cache,mode=max" >> $GITHUB_OUTPUT
+          fi
 
       - name: Log in to GitHub Container Registry
         if: github.event_name != 'pull_request'
@@ -38,6 +44,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build and push devcontainer image
         uses: docker/build-push-action@v6
         with:
@@ -45,5 +54,5 @@ jobs:
           file: .devcontainer/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.image.outputs.name }}
-          cache-from: type=registry,ref=${{ steps.image.outputs.cache-ref }}
-          cache-to: type=registry,ref=${{ steps.image.outputs.cache-ref }},mode=max
+          cache-from: ${{ steps.image.outputs.cache-from }}
+          cache-to: ${{ steps.image.outputs.cache-to }}
