@@ -7,15 +7,15 @@ from utils.tensors import ones_, tensor_
 from torchjd.scalarization import Random
 
 from ._asserts import assert_grad_flow, assert_returns_scalar
-from ._inputs import non_scalar_inputs
+from ._inputs import all_inputs
 
 
-@mark.parametrize("losses", non_scalar_inputs)
+@mark.parametrize("losses", all_inputs)
 def test_expected_structure(losses: Tensor) -> None:
     assert_returns_scalar(Random(), losses)
 
 
-@mark.parametrize("losses", non_scalar_inputs)
+@mark.parametrize("losses", all_inputs)
 def test_grad_flow(losses: Tensor) -> None:
     assert_grad_flow(Random(), losses)
 
