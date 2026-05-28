@@ -139,6 +139,9 @@ jobs:
       - name: Sync project installation
         run: uv pip install --python /opt/venv/bin/python -e '.[full]' --group check --group test --group plot
 
+      - name: Configure git safe directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Run pre-commit hooks
         run: pre-commit run --all-files
 
