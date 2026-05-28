@@ -92,8 +92,8 @@ jobs:
         id: image
         run: |
           repo_lower=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')
-          image="ghcr.io/$repo_lower/devcontainer:${{ github.sha }}"
-          echo "name=$image" >> $GITHUB_OUTPUT
+          echo "name=ghcr.io/$repo_lower/devcontainer:${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "cache-ref=ghcr.io/$repo_lower/devcontainer:cache" >> $GITHUB_OUTPUT
 
       - name: Build and push devcontainer image
         uses: docker/build-push-action@v6
@@ -102,8 +102,8 @@ jobs:
           file: .devcontainer/Dockerfile
           push: true
           tags: ${{ steps.image.outputs.name }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=${{ steps.image.outputs.cache-ref }}
+          cache-to: type=registry,ref=${{ steps.image.outputs.cache-ref }},mode=max
 
   build-doc:
     name: Build and test documentation

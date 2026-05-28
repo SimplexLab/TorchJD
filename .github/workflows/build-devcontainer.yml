@@ -28,6 +28,7 @@ jobs:
         run: |
           repo_lower=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')
           echo "name=ghcr.io/$repo_lower/devcontainer:latest" >> $GITHUB_OUTPUT
+          echo "cache-ref=ghcr.io/$repo_lower/devcontainer:cache" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -47,5 +48,5 @@ jobs:
           file: .devcontainer/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.image.outputs.name }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=${{ steps.image.outputs.cache-ref }}
+          cache-to: type=registry,ref=${{ steps.image.outputs.cache-ref }},mode=max
