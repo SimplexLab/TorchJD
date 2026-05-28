@@ -69,6 +69,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+    outputs:
+      image: ${{ steps.image.outputs.name }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -83,13 +85,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Compute image path
+        id: image
+        run: |
+          repo_lower=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')
+          image="ghcr.io/$repo_lower/devcontainer:${{ github.sha }}"
+          echo "name=$image" >> $GITHUB_OUTPUT
+
       - name: Build and push devcontainer image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: .devcontainer/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository }}/devcontainer:${{ github.sha }}
+          tags: ${{ steps.image.outputs.name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -98,7 +107,7 @@ jobs:
     needs: build-devcontainer
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/${{ github.repository }}/devcontainer:${{ github.sha }}
+      image: ${{ needs.build-devcontainer.outputs.image }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -119,7 +128,7 @@ jobs:
     needs: build-devcontainer
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/${{ github.repository }}/devcontainer:${{ github.sha }}
+      image: ${{ needs.build-devcontainer.outputs.image }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
