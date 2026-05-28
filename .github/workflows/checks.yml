@@ -39,7 +39,7 @@ jobs:
           # Lower-bounds of all dependencies and Python version.
           - python-version: '3.10.0'
             extra_groups: 'lower_bounds'
-          # Upper-bounds: torch nightly build.
+          # Latest: torch nightly build.
           - torch_channel: 'nightly'
 
     steps:
