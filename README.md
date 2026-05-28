@@ -10,7 +10,6 @@
 [![Static Badge](https://img.shields.io/badge/%F0%9F%92%AC_ChatBot-chat.torchjd.org-blue?logo=%F0%9F%92%AC)](https://chat.torchjd.org)
 [![Tests](https://github.com/SimplexLab/TorchJD/actions/workflows/checks.yml/badge.svg)](https://github.com/SimplexLab/TorchJD/actions/workflows/checks.yml)
 [![codecov](https://codecov.io/gh/SimplexLab/TorchJD/graph/badge.svg?token=8AUCZE76QH)](https://codecov.io/gh/SimplexLab/TorchJD)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/SimplexLab/TorchJD/main.svg)](https://results.pre-commit.ci/latest/github/SimplexLab/TorchJD/main)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/torchjd)](https://pypi.org/project/torchjd/)
 [![Static Badge](https://img.shields.io/badge/PyTorch-%3E%3D2.3-blue?logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![Static Badge](https://img.shields.io/badge/Discord%20-%20community%20-%20%235865F2?logo=discord&logoColor=%23FFFFFF&label=Discord)](https://discord.gg/76KkRnb3nk)
@@ -215,58 +214,7 @@ losses with Jacobian descent using [UPGrad](https://torchjd.org/stable/docs/aggr
 ```
 
 You can even go one step further by considering the multiple tasks and each element of the batch
-independently. We call that Instance-Wise Multitask Learning (IWMTL).
-
-```python
-import torch
-from torch.nn import Linear, MSELoss, ReLU, Sequential
-from torch.optim import SGD
-
-from torchjd.aggregation import Flattening, UPGradWeighting
-from torchjd.autogram import Engine
-
-shared_module = Sequential(Linear(10, 5), ReLU(), Linear(5, 3), ReLU())
-task1_module = Linear(3, 1)
-task2_module = Linear(3, 1)
-params = [
-    *shared_module.parameters(),
-    *task1_module.parameters(),
-    *task2_module.parameters(),
-]
-
-optimizer = SGD(params, lr=0.1)
-mse = MSELoss(reduction="none")
-weighting = Flattening(UPGradWeighting())
-engine = Engine(shared_module, batch_dim=0)
-
-inputs = torch.randn(8, 16, 10)  # 8 batches of 16 random input vectors of length 10
-task1_targets = torch.randn(8, 16)  # 8 batches of 16 targets for the first task
-task2_targets = torch.randn(8, 16)  # 8 batches of 16 targets for the second task
-
-for input, target1, target2 in zip(inputs, task1_targets, task2_targets):
-    features = shared_module(input)  # shape: [16, 3]
-    out1 = task1_module(features).squeeze(1)  # shape: [16]
-    out2 = task2_module(features).squeeze(1)  # shape: [16]
-
-    # Compute the matrix of losses: one loss per element of the batch and per task
-    losses = torch.stack([mse(out1, target1), mse(out2, target2)], dim=1)  # shape: [16, 2]
-
-    # Compute the gramian (inner products between pairs of gradients of the losses)
-    gramian = engine.compute_gramian(losses)  # shape: [16, 2, 2, 16]
-
-    # Obtain the weights that lead to no conflict between reweighted gradients
-    weights = weighting(gramian)  # shape: [16, 2]
-
-    # Do the standard backward pass, but weighted using the obtained weights
-    losses.backward(weights)
-    optimizer.step()
-    optimizer.zero_grad()
-```
-
-> [!NOTE]
-> Here, because the losses are a matrix instead of a simple vector, we compute a *generalized
-> Gramian* and we extract weights from it using a
-> [GeneralizedWeighting](https://torchjd.org/stable/docs/aggregation/#torchjd.aggregation.GeneralizedWeighting).
+independently (Instance-Wise Multitask Learning). See [this example](https://torchjd.org/stable/examples/iwmtl/) for more details.
 
 More usage examples can be found [here](https://torchjd.org/stable/examples/).
 
@@ -283,6 +231,7 @@ TorchJD provides many existing aggregators from the literature, listed in the fo
 | [Constant](https://torchjd.org/stable/docs/aggregation/constant#torchjd.aggregation.Constant)              | [ConstantWeighting](https://torchjd.org/stable/docs/aggregation/constant#torchjd.aggregation.ConstantWeighting)        | -                                                                                                                                                                    |
 | -                                                                                                           | [CRMOGMWeighting](https://torchjd.org/stable/docs/aggregation/cr_mogm/#torchjd.aggregation.CRMOGMWeighting)           | [On the Convergence of Stochastic Multi-Objective Gradient Manipulation and Beyond](https://proceedings.neurips.cc/paper_files/paper/2022/file/f91bd64a3620aad8e70a27ad9cb3ca57-Paper-Conference.pdf) |
 | [DualProj](https://torchjd.org/stable/docs/aggregation/dualproj#torchjd.aggregation.DualProj)              | [DualProjWeighting](https://torchjd.org/stable/docs/aggregation/dualproj#torchjd.aggregation.DualProjWeighting)        | [Gradient Episodic Memory for Continual Learning](https://arxiv.org/pdf/1706.08840)                                                                                  |
+| [FairGrad](https://torchjd.org/stable/docs/aggregation/fairgrad#torchjd.aggregation.FairGrad)              | [FairGradWeighting](https://torchjd.org/stable/docs/aggregation/fairgrad#torchjd.aggregation.FairGradWeighting)        | [Fair Resource Allocation in Multi-Task Learning](https://arxiv.org/pdf/2402.15638)                                                                                  |
 | [GradDrop](https://torchjd.org/stable/docs/aggregation/graddrop#torchjd.aggregation.GradDrop)              | -                                                                                                                      | [Just Pick a Sign: Optimizing Deep Multitask Models with Gradient Sign Dropout](https://arxiv.org/pdf/2010.06808)                                                    |
 | [GradVac](https://torchjd.org/stable/docs/aggregation/gradvac#torchjd.aggregation.GradVac)              | [GradVacWeighting](https://torchjd.org/stable/docs/aggregation/gradvac#torchjd.aggregation.GradVacWeighting)                                                                                                                      | [Gradient Vaccine: Investigating and Improving Multi-task Optimization in Massively Multilingual Models](https://arxiv.org/pdf/2010.05874)                                                    |
 | [IMTLG](https://torchjd.org/stable/docs/aggregation/imtl_g#torchjd.aggregation.IMTLG)                      | [IMTLGWeighting](https://torchjd.org/stable/docs/aggregation/imtl_g#torchjd.aggregation.IMTLGWeighting)                | [Towards Impartial Multi-task Learning](https://discovery.ucl.ac.uk/id/eprint/10120667/)                                                                             |
@@ -306,6 +255,10 @@ include clear instructions on how to migrate.
 
 ## Contribution
 Please read the [Contribution page](CONTRIBUTING.md).
+
+Thanks to our amazing contributors for making this project possible:
+
+<a href="https://github.com/SimplexLab/TorchJD/graphs/contributors"><img src="https://stg.contrib.rocks/image?repo=SimplexLab/TorchJD&max=240&columns=18" /></a>
 
 ## Citation
 If you use TorchJD for your research, please cite:
