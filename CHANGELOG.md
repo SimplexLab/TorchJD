@@ -8,6 +8,8 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-05-28
+
 ### Added
 
 - Added a new `torchjd.scalarization` package providing the abstract `Scalarizer` base class and
