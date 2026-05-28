@@ -9,3 +9,11 @@ def vector_to_str(vector: Tensor) -> str:
 
     weights_str = ", ".join([f"{value:.2f}".rstrip("0") for value in vector])
     return weights_str
+
+
+def pref_vector_to_str_suffix(pref_vector: Tensor | None) -> str:
+    """Returns a suffix string containing the representation of the optional preference vector."""
+
+    if pref_vector is None:
+        return ""
+    return f"([{vector_to_str(pref_vector)}])"

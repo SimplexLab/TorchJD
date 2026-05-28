@@ -1,7 +1,8 @@
 from torch import Tensor
 
+from torchjd._vector_str import vector_to_str
+
 from ._aggregator_bases import WeightedAggregator
-from ._utils.str import vector_to_str
 from ._weighting_bases import _MatrixWeighting
 
 

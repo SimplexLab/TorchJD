@@ -4,8 +4,6 @@ from torchjd.aggregation._constant import ConstantWeighting
 from torchjd.aggregation._weighting_bases import Weighting
 from torchjd.linalg import Matrix
 
-from .str import vector_to_str
-
 
 def pref_vector_to_weighting(
     pref_vector: Tensor | None,
@@ -24,11 +22,3 @@ def pref_vector_to_weighting(
             f"{pref_vector.ndim}`.",
         )
     return ConstantWeighting(pref_vector)
-
-
-def pref_vector_to_str_suffix(pref_vector: Tensor | None) -> str:
-    """Returns a suffix string containing the representation of the optional preference vector."""
-
-    if pref_vector is None:
-        return ""
-    return f"([{vector_to_str(pref_vector)}])"

@@ -1,12 +1,13 @@
 from torch import Tensor
 
 from torchjd._linalg import DualConeProjector, projector_or_default
+from torchjd._vector_str import pref_vector_to_str_suffix
 from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
 from ._mean import MeanWeighting
 from ._mixins import _NonDifferentiable
-from ._utils.pref_vector import pref_vector_to_str_suffix, pref_vector_to_weighting
+from ._utils.pref_vector import pref_vector_to_weighting
 from ._weighting_bases import _GramianWeighting
 
 

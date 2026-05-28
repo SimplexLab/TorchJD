@@ -5,12 +5,13 @@
 import torch
 from torch import Tensor
 
+from torchjd._vector_str import pref_vector_to_str_suffix
 from torchjd.linalg import Matrix
 
 from ._aggregator_bases import Aggregator
 from ._mixins import _NonDifferentiable
 from ._sum import SumWeighting
-from ._utils.pref_vector import pref_vector_to_str_suffix, pref_vector_to_weighting
+from ._utils.pref_vector import pref_vector_to_weighting
 
 
 # Non-differentiable: the pseudoinverse and the normalization are not differentiable in this context.
