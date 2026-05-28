@@ -17,7 +17,7 @@ jobs:
   tests:
     # Default config: py3.14, ubuntu-latest, float32, full options.
     # The idea is to make each of those params vary one by one, to limit the number of tests to run.
-    name: Tests (py${{ matrix.python-version || '3.14' }}, ${{ matrix.os || 'ubuntu-latest' }}, ${{ matrix.dtype || 'float32' }}, ${{ matrix.options || 'full' }}${{ matrix.extra_groups && format(', {0}', matrix.extra_groups) || '' }})
+    name: Tests (py${{ matrix.python-version || '3.14' }}, ${{ matrix.os || 'ubuntu-latest' }}, ${{ matrix.dtype || 'float32' }}, ${{ matrix.options || 'full' }}${{ matrix.extra_groups && format(', {0}', matrix.extra_groups) || '' }}${{ matrix.torch_channel == 'nightly' && ', torch-nightly' || '' }})
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
@@ -39,6 +39,8 @@ jobs:
           # Lower-bounds of all dependencies and Python version.
           - python-version: '3.10.0'
             extra_groups: 'lower_bounds'
+          # Latest: torch nightly build.
+          - torch_channel: 'nightly'
 
     steps:
       - name: Checkout repository
@@ -53,6 +55,7 @@ jobs:
         with:
           options: ${{ matrix.options || 'full' }}
           groups: test ${{ matrix.extra_groups }}
+          torch_channel: ${{ matrix.torch_channel || 'stable' }}
 
       - name: Run unit tests
         run: uv run pytest -W error tests/unit --cov=src --cov-report=xml

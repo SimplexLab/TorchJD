@@ -12,6 +12,10 @@ inputs:
     description: 'Dependency groups to install (space-separated, e.g., "test doc")'
     required: false
     default: ''
+  torch_channel:
+    description: 'PyTorch channel to use. Use "nightly" to upgrade torch and torchvision to the latest nightly build.'
+    required: false
+    default: 'stable'
 
 runs:
   using: composite
@@ -45,3 +49,10 @@ runs:
         # Print and execute the command
         echo $cmd
         eval $cmd
+
+    - name: Upgrade to torch nightly
+      if: ${{ inputs.torch_channel == 'nightly' }}
+      shell: bash
+      run: |
+        uv pip install --pre --upgrade torch torchvision --index-url https://download.pytorch.org/whl/nightly/cpu
+        uv run python -c "import torch, torchvision; print('torch:', torch.__version__, '| torchvision:', torchvision.__version__)"
