@@ -1,0 +1,26 @@
+{
+  "name": "TorchJD",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "astral-sh.ruff",
+        "astral-sh.ty"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/opt/venv/bin/python",
+        "python.languageServer": "None",
+        "[python]": {
+          "editor.defaultFormatter": "astral-sh.ruff"
+        },
+        "ruff.importStrategy": "fromEnvironment",
+        "ty.importStrategy": "fromEnvironment"
+      }
+    }
+  },
+  "postCreateCommand": "uv pip install -e '.[full]' --group check --group doc --group test --group plot && uv run pre-commit install"
+}

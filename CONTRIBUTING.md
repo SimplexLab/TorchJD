@@ -19,63 +19,72 @@ with the affected code.
 
 ## Installation
 
-To work with TorchJD, we suggest you to use [uv](https://docs.astral.sh/uv/). While this is not
-mandatory, we only provide installation steps with this tool. You can install it by following their
-[installation documentation](https://docs.astral.sh/uv/getting-started/installation/). We also
-suggest to use VSCode with the `Python`, `ty` and `ruff` extensions (without `Pylance`).
+TorchJD provides a **[devcontainer](https://containers.dev/)** configuration that gives you a
+ready-to-use development environment with all dependencies pre-installed. This is the recommended way
+to set up your environment.
 
-1) Pre-requisites: Use `uv` to install a Python version compatible with TorchJD and to pin it to the
-  `TorchJD` folder. From the root of the `TorchJD` repo, run:
+### Using the devcontainer
+
+1. Install [Docker](https://docs.docker.com/get-docker/) and
+   [VS Code](https://code.visualstudio.com/) with the
+   [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers).
+2. Clone the repository and open it in VS Code:
    ```bash
-   uv python install 3.14.0
-   uv python pin 3.14.0
+   git clone https://github.com/SimplexLab/TorchJD.git
+   code TorchJD
    ```
+3. When prompted, click **"Reopen in Container"** (or press `Ctrl+Shift+P` and run
+   *"Dev Containers: Reopen in Container"*). The container will build on first launch and install all
+   dependencies automatically.
 
-2) Create a virtual environment and install the project in it. From the root of `TorchJD`, run:
-   ```bash
-   uv venv
-   CC=gcc uv pip install --python-version=3.14 -e '.[full]' --group check --group doc --group test --group plot
-   ```
-   If you want to install PyTorch with a different CUDA version (this could be required depending on
-   your GPU), you'll need to specify an extra index. For instance, for CUDA 12.6, run:
-      ```bash
-   uv venv
-   CC=gcc uv pip install --python-version=3.14 -e '.[full]' --group check --group doc --group test --group plot --index-strategy unsafe-best-match --extra-index-url https://download.pytorch.org/whl/cu126
-   ```
+Alternatively, you can use **[GitHub Codespaces](https://github.com/features/codespaces)** directly
+from the repository page — no local setup required.
 
-3) Set environment variables:
+The devcontainer includes:
+- Python 3.14 with all TorchJD dependencies (including optional ones)
+- All development tools: `uv`, `ruff`, `ty`, `pre-commit`, `pytest`
+- Pre-configured VS Code extensions and settings
+- `PYTHONPATH` set up for the `tests/` folder
 
-   We need to use `UV_NO_SYNC=1` to prevent `uv` from syncing all the time. This is because by
-   default, it tries to resolve libraries compatible with the whole range of Python versions
-   supported by TorchJD, but in reality, we just need an installation compatible with the currently
-   used Python version. That's also why we specify `--python-version=3.14` when running
-   `uv pip install`. To follow that recommendation, add the following line to your `.bashrc`:
-   ```bash
-   export UV_NO_SYNC=1
-   ```
-   and start a new terminal. The alternative is to use the `--no-sync` flag whenever you run a pip
-   command that would normally sync (like `uv run`).
+### GPU support
 
-   Lastly, to run some scripts from the `tests` folder, you'll have to add the `TorchJD/tests`
-   folder to your `PYTHONPATH`. For that, you should add the following line to your `.bashrc`:
-   ```bash
-   export PYTHONPATH="$PYTHONPATH:<path_to_TorchJD>/tests"
-   ```
-   where `<path_to_TorchJD>` is the absolute path to your `TorchJD` repo.
+If you have an NVIDIA GPU and want to run tests on CUDA, add the following to
+`.devcontainer/devcontainer.json` inside the top-level object:
+```json
+"runArgs": ["--gpus", "all"]
+```
 
-4) Install pre-commit:
-   ```bash
-   uv run pre-commit install
-   ```
+### CUDA-specific PyTorch installation
 
-> [!TIP]
-> If you're running into issues when `uv` tries to compile `ecos`, make sure that `gcc` is
-> installed. Alternatively, you can try to install `clang` or try to use some older Python version
-> (3.12) for which `ecos` has provided compiled packages (the list is accessible
-> [here](https://pypi.org/project/ecos/#files)).
+By default, the devcontainer installs the CPU-only version of PyTorch. If you need a CUDA version,
+run the following inside the container:
+```bash
+uv pip install --python-version=3.14 -e '.[full]' --group check --group doc --group test --group plot --index-strategy unsafe-best-match --extra-index-url https://download.pytorch.org/whl/cu126
+```
+(replace `cu126` with your CUDA version).
 
-> [!TIP]
-> The Python version that you should specify in your IDE is `<path-to-TorchJD>/.venv/bin/python`.
+### Adding LaTeX (for trajectory plotting)
+
+The trajectory plotting scripts require LaTeX. Install it inside the container with:
+```bash
+sudo apt-get update && sudo apt-get install -y texlive-latex-extra texlive-fonts-recommended dvipng cm-super
+```
+
+### Manual setup (without devcontainer)
+
+If you prefer a local setup, you'll need:
+- [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- Python 3.14 (install via `uv python install 3.14.0`)
+- `gcc` (for compiling `ecos`)
+
+Then, from the repo root:
+```bash
+uv venv
+CC=gcc uv pip install --python-version=3.14 -e '.[full]' --group check --group doc --group test --group plot
+export UV_NO_SYNC=1
+export PYTHONPATH="$PYTHONPATH:$PWD/tests"
+uv run pre-commit install
+```
 
 > [!TIP]
 > In the following commands, you can get rid of the `uv run` prefix if you activate the `venv`
@@ -85,13 +94,12 @@ suggest to use VSCode with the `Python`, `ty` and `ruff` extensions (without `Py
 
 ### Clean reinstallation
 
-If you want to update all dependencies or just reinstall from scratch, run the following command
-from the root of `TorchJD`:
+If you want to update all dependencies or just reinstall from scratch, run the following inside the
+container:
 ```bash
-rm -rf .venv
-rm -f uv.lock
-uv venv
-CC=gcc uv pip install --python-version=3.14 -e '.[full]' --group check --group doc --group test --group plot
+rm -rf /opt/venv
+uv venv /opt/venv
+uv pip install --python-version=3.14 -e '.[full]' --group check --group doc --group test --group plot
 uv run pre-commit install
 ```
 

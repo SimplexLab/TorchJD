@@ -64,21 +64,44 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  build-doc:
-    name: Build and test documentation
+  build-devcontainer:
+    name: Build devcontainer image
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v7
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          python-version: '3.14'
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: ./.github/actions/install-deps
+      - name: Build and push devcontainer image
+        uses: docker/build-push-action@v6
         with:
-          groups: doc
+          context: .
+          file: .devcontainer/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository }}/devcontainer:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-doc:
+    name: Build and test documentation
+    needs: build-devcontainer
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}/devcontainer:${{ github.sha }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Sync project installation
+        run: uv pip install -e '.[full]' --group doc
 
       - name: Build Documentation
         working-directory: docs
@@ -90,19 +113,16 @@ jobs:
 
   code-quality:
     name: Code quality (ty and pre-commit hooks)
+    needs: build-devcontainer
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}/devcontainer:${{ github.sha }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          python-version: '3.14'
-
-      - uses: ./.github/actions/install-deps
-        with:
-          groups: check test plot
+      - name: Sync project installation
+        run: uv pip install -e '.[full]' --group check --group test --group plot
 
       - name: Run pre-commit hooks
         run: uv run pre-commit run --all-files
