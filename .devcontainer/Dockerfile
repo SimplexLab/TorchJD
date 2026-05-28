@@ -11,6 +11,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 ENV UV_NO_SYNC=1
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv
 ENV CC=gcc
 ENV PYTHONPATH=/workspaces/TorchJD/tests
 ENV VIRTUAL_ENV=/opt/venv

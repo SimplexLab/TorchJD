@@ -113,15 +113,15 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Sync project installation
-        run: uv pip install -e '.[full]' --group doc
+        run: uv pip install --python /opt/venv/bin/python -e '.[full]' --group doc
 
       - name: Build Documentation
         working-directory: docs
-        run: uv run make dirhtml
+        run: make dirhtml
 
       - name: Test Documentation
         working-directory: docs
-        run: uv run make doctest
+        run: make doctest
 
   code-quality:
     name: Code quality (ty and pre-commit hooks)
@@ -134,10 +134,10 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Sync project installation
-        run: uv pip install -e '.[full]' --group check --group test --group plot
+        run: uv pip install --python /opt/venv/bin/python -e '.[full]' --group check --group test --group plot
 
       - name: Run pre-commit hooks
-        run: uv run pre-commit run --all-files
+        run: pre-commit run --all-files
 
       - name: Run ty
-        run: uv run ty check --output-format=github
+        run: ty check --output-format=github
