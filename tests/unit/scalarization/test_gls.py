@@ -35,6 +35,11 @@ def test_permutation_invariant(losses: Tensor) -> None:
     assert_permutation_invariant(GLS(), losses)
 
 
+def test_propagates_nan_on_invalid_input() -> None:
+    # GLS is undefined for non-positive values; nan must propagate (no silent clamp).
+    assert GLS()(tensor_([1.0, -1.0])).isnan()
+
+
 def test_representations() -> None:
     s = GLS()
     assert repr(s) == "GLS()"
