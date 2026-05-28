@@ -17,12 +17,13 @@ ENV PYTHONPATH=/workspaces/TorchJD/tests
 ENV VIRTUAL_ENV=/opt/venv
 ENV PATH=/opt/venv/bin:$PATH
 
-COPY pyproject.toml /tmp/torchjd-install/pyproject.toml
-COPY README.md /tmp/torchjd-install/README.md
-COPY src/ /tmp/torchjd-install/src/
-
 WORKDIR /tmp/torchjd-install
+
+COPY pyproject.toml README.md ./
+RUN mkdir -p src/torchjd && touch src/torchjd/__init__.py
 RUN uv venv /opt/venv \
     && uv pip install --python-version=3.14 -e '.[full]' --group check --group doc --group test --group plot
+
+COPY src/ src/
 
 WORKDIR /workspaces/TorchJD
