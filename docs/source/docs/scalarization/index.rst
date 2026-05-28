@@ -1,0 +1,21 @@
+scalarization
+=============
+
+.. automodule:: torchjd.scalarization
+   :no-members:
+
+Abstract base class
+-------------------
+
+.. autoclass:: torchjd.scalarization.Scalarizer
+    :members: __call__
+
+
+.. toctree::
+    :hidden:
+    :maxdepth: 1
+
+    constant.rst
+    mean.rst
+    random.rst
+    sum.rst

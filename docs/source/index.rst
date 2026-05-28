@@ -31,6 +31,10 @@ Jacobian descent is the aggregator, which maps the Jacobian to an optimization s
 :doc:`Aggregation <docs/aggregation/index>`, we provide an overview of the various aggregators
 available in TorchJD, and their corresponding weightings.
 
+For comparison against simple baselines, the :doc:`Scalarization <docs/scalarization/index>`
+package provides scalarizers that combine a tensor of losses into a single scalar loss, allowing
+standard gradient descent to be used.
+
 A straightforward application of Jacobian descent is multi-task learning, in which the vector of
 per-task losses has to be minimized. To start using TorchJD for multi-task learning, follow our
 :doc:`MTL example <examples/mtl>`.
@@ -70,4 +74,5 @@ TorchJD is open-source, under MIT License. The source code is available on
     docs/autogram/index.rst
     docs/autojac/index.rst
     docs/aggregation/index.rst
+    docs/scalarization/index.rst
     docs/linalg/index.rst

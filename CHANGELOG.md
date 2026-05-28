@@ -10,6 +10,10 @@ changelog does not include internal changes that do not affect the user.
 
 ### Added
 
+- Added a new `torchjd.scalarization` package providing the abstract `Scalarizer` base class and
+  the concrete implementations `Constant`, `Mean`, `Random`, and `Sum`. These baselines simply
+  combine losses into a scalar that can be optimized with a standard backward pass, making them
+  useful for comparison with JD-based methods.
 - Added `FairGrad` and `FairGradWeighting` from [Fair Resource Allocation in Multi-Task
   Learning](https://arxiv.org/pdf/2402.15638).
 
