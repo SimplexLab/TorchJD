@@ -41,6 +41,7 @@ Abstract base classes
     krum.rst
     mean.rst
     mgda.rst
+    modo.rst
     nash_mtl.rst
     pcgrad.rst
     random.rst

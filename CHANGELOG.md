@@ -8,6 +8,12 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Added
+
+- Added `MoDoWeighting` from [Three-Way Trade-Off in Multi-Objective Learning: Optimization,Generalization and Conflict-Avoidance](https://www.jmlr.org/papers/volume25/23-1287/23-1287.pdf) (JMLR 2024). It is a stateful `Weighting` that maintains task weights across calls via a
+  softmax-projected gradient step on the Gramian, intended to be composed with `autogram.Engine`
+  in a two-batch training loop.
+
 ## [0.12.0] - 2026-05-28
 
 ### Added
