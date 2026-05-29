@@ -10,6 +10,9 @@ changelog does not include internal changes that do not affect the user.
 
 ### Added
 
+- Added `STCH` from [Smooth Tchebycheff Scalarization for Multi-Objective
+  Optimization](https://openreview.net/pdf?id=m4dO5L6eCp), a `Scalarizer` that combines the input
+  tensor of values into a smooth approximation of their (weighted, shifted) maximum.
 - Added `GeometricMean` (also known as GLS) studied in [MultiNet++: Multi-Stream Feature
   Aggregation and Geometric Loss Strategy for Multi-Task
   Learning](https://openaccess.thecvf.com/content_CVPRW_2019/papers/WAD/Chennupati_MultiNet_Multi-Stream_Feature_Aggregation_and_Geometric_Loss_Strategy_for_Multi-Task_CVPRW_2019_paper.pdf),
