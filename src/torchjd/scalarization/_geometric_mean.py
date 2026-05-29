@@ -15,9 +15,9 @@ class GeometricMean(Scalarizer):
     """
 
     def forward(self, values: Tensor, /) -> Tensor:
-        if (values < 1e-12).any():
+        if (values < 0.0).any():
             raise ValueError(
-                "GeometricMean is only defined for strictly positive values. Found a value "
-                "below 1e-12 in the input."
+                "GeometricMean is only defined for strictly positive values."
+                "Found a negative value in the input."
             )
         return torch.exp(torch.log(values).mean())
