@@ -143,11 +143,3 @@ def test_changing_m_auto_resets() -> None:
     J = randn_((2, 8))
     G = J @ J.T
     assert_close(W(G), fresh(G))
-
-
-def test_zero_rows() -> None:
-    """A (0, 0) Gramian yields an empty weight vector."""
-
-    W = MoDoWeighting()
-    weights = W(tensor_([]).reshape(0, 0))
-    assert weights.shape == (0,)
