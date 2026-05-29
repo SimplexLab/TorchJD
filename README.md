@@ -10,7 +10,6 @@
 [![Static Badge](https://img.shields.io/badge/%F0%9F%92%AC_ChatBot-chat.torchjd.org-blue?logo=%F0%9F%92%AC)](https://chat.torchjd.org)
 [![Tests](https://github.com/SimplexLab/TorchJD/actions/workflows/checks.yml/badge.svg)](https://github.com/SimplexLab/TorchJD/actions/workflows/checks.yml)
 [![codecov](https://codecov.io/gh/SimplexLab/TorchJD/graph/badge.svg?token=8AUCZE76QH)](https://codecov.io/gh/SimplexLab/TorchJD)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/SimplexLab/TorchJD/main.svg)](https://results.pre-commit.ci/latest/github/SimplexLab/TorchJD/main)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/torchjd)](https://pypi.org/project/torchjd/)
 [![Static Badge](https://img.shields.io/badge/PyTorch-%3E%3D2.3-blue?logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![Static Badge](https://img.shields.io/badge/Discord%20-%20community%20-%20%235865F2?logo=discord&logoColor=%23FFFFFF&label=Discord)](https://discord.gg/76KkRnb3nk)
@@ -256,6 +255,10 @@ include clear instructions on how to migrate.
 
 ## Contribution
 Please read the [Contribution page](CONTRIBUTING.md).
+
+Thanks to our amazing contributors for making this project possible:
+
+<a href="https://github.com/SimplexLab/TorchJD/graphs/contributors"><img src="https://stg.contrib.rocks/image?repo=SimplexLab/TorchJD&max=240&columns=18" /></a>
 
 ## Citation
 If you use TorchJD for your research, please cite:
