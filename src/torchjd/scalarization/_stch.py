@@ -8,15 +8,23 @@ class STCH(Scalarizer):
     """
     :class:`~torchjd.scalarization.Scalarizer` that combines the input tensor of values using smooth
     Tchebycheff scalarization, as defined in `Smooth Tchebycheff Scalarization for Multi-Objective
-    Optimization <https://openreview.net/pdf?id=m4dO5L6eCp>`_. It returns
-    :math:`\\mu \\log \\sum_{i=1}^m \\exp\\left(\\frac{\\lambda_i (f_i - z_i^*)}{\\mu}\\right)`, a
-    smooth approximation of the (non-differentiable) weighted maximum
-    :math:`\\max_i \\lambda_i (f_i - z_i^*)` that becomes tighter as ``mu`` decreases. Following the
-    paper's notation, :math:`f_i` is the :math:`i`-th input value (the
-    :math:`i`-th objective), :math:`m` is the number of objectives (the number of elements of the
-    input), :math:`\\lambda_i` is its preference weight (the ``weights`` parameter), :math:`z_i^*` is
-    the :math:`i`-th component of the ideal point (the ``reference`` parameter), and :math:`\\mu` is
-    the smoothing parameter (the ``mu`` parameter).
+    Optimization <https://openreview.net/pdf?id=m4dO5L6eCp>`_.
+
+    It returns
+
+    .. math::
+        \\mu \\log \\sum_{i=1}^m \\exp\\left(\\frac{\\lambda_i (f_i - z_i^*)}{\\mu}\\right),
+
+    a smooth approximation of the (non-differentiable) weighted maximum
+    :math:`\\max_i \\lambda_i (f_i - z_i^*)` that becomes tighter as ``mu`` decreases.
+
+    Following the paper's notation:
+
+    - :math:`f_i` is the :math:`i`-th input value (the :math:`i`-th objective),
+    - :math:`m` is the number of objectives (the number of elements of the input),
+    - :math:`\\lambda_i` is its preference weight (the ``weights`` parameter),
+    - :math:`z_i^*` is the :math:`i`-th component of the ideal point (the ``reference`` parameter),
+    - :math:`\\mu` is the smoothing parameter (the ``mu`` parameter).
 
     :param mu: The smoothing parameter :math:`\\mu`. Must be strictly positive. Smaller values make
         the scalarization closer to the maximum. The paper evaluates :math:`\\mu \\in \\{0.01, 0.1,
