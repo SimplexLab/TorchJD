@@ -5,7 +5,7 @@ from ._scalarizer_base import Scalarizer
 
 
 class STCH(Scalarizer):
-    """
+    r"""
     :class:`~torchjd.scalarization.Scalarizer` that combines the input tensor of values using smooth
     Tchebycheff scalarization, as defined in `Smooth Tchebycheff Scalarization for Multi-Objective
     Optimization <https://openreview.net/pdf?id=m4dO5L6eCp>`_.
@@ -13,24 +13,24 @@ class STCH(Scalarizer):
     It returns
 
     .. math::
-        \\mu \\log \\sum_{i=1}^m \\exp\\left(\\frac{\\lambda_i (f_i - z_i^*)}{\\mu}\\right),
+        \mu \log \sum_{i=1}^m \exp\left(\frac{\lambda_i (f_i - z_i^*)}{\mu}\right),
 
     a smooth approximation of the (non-differentiable) weighted maximum
-    :math:`\\max_i \\lambda_i (f_i - z_i^*)` that becomes tighter as ``mu`` decreases.
+    :math:`\max_i \lambda_i (f_i - z_i^*)` that becomes tighter as ``mu`` decreases.
 
     Following the paper's notation:
 
     - :math:`f_i` is the :math:`i`-th input value (the :math:`i`-th objective),
     - :math:`m` is the number of objectives (the number of elements of the input),
-    - :math:`\\lambda_i` is its preference weight (the ``weights`` parameter),
+    - :math:`\lambda_i` is its preference weight (the ``weights`` parameter),
     - :math:`z_i^*` is the :math:`i`-th component of the ideal point (the ``reference`` parameter),
-    - :math:`\\mu` is the smoothing parameter (the ``mu`` parameter).
+    - :math:`\mu` is the smoothing parameter (the ``mu`` parameter).
 
-    :param mu: The smoothing parameter :math:`\\mu`. Must be strictly positive. Smaller values make
-        the scalarization closer to the maximum. The paper evaluates :math:`\\mu \\in \\{0.01, 0.1,
-        0.5, 1\\}` and reports that a small :math:`\\mu` works reasonably well, while no single value
+    :param mu: The smoothing parameter :math:`\mu`. Must be strictly positive. Smaller values make
+        the scalarization closer to the maximum. The paper evaluates :math:`\mu \in \{0.01, 0.1,
+        0.5, 1\}` and reports that a small :math:`\mu` works reasonably well, while no single value
         is best across all problems.
-    :param weights: The preference vector :math:`\\lambda` applied to the values (in the paper, on
+    :param weights: The preference vector :math:`\lambda` applied to the values (in the paper, on
         the probability simplex). If ``None``, a uniform preference summing to one is used. If
         provided, it must have the same shape as the values passed at call time.
     :param reference: The ideal point :math:`z^*` subtracted from the values. If ``None``, no shift
