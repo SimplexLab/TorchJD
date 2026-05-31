@@ -6,51 +6,29 @@ import torch
 from torch import Tensor
 
 from torchjd.aggregation._mixins import Stateful, _NonDifferentiable
-from torchjd.linalg import PSDMatrix
+from torchjd.linalg import Matrix
 
-from ._weighting_bases import _GramianWeighting
+from ._weighting_bases import _MatrixWeighting
 
 
-class MoDoWeighting(_GramianWeighting, Stateful, _NonDifferentiable):
+class MoDoWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
     r"""
     :class:`~torchjd.aggregation._mixins.Stateful`
-    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`] from `Three-Way
+    :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`] from `Three-Way
     Trade-Off in Multi-Objective Learning: Optimization, Generalization and Conflict-Avoidance
-    <https://www.jmlr.org/papers/volume25/23-1287/23-1287.pdf>`_ (JMLR 2024), commonly referred
-    to as MoDo (Multi-Objective gradient with Double sampling).
-
-    Given a Gramian :math:`G`, the weights :math:`\lambda` are updated at each call by a
-    softmax-projected gradient step:
-
-    .. math::
-
-        \lambda_{t+1} = \operatorname{softmax}\!\bigl(
-            \lambda_t - \gamma \cdot (G \lambda_t + \rho \lambda_t)
-        \bigr)
-
-    The paper specifies hard simplex projection :math:`\Pi_\Delta`; we follow the `official
-    LibMTL implementation <https://github.com/median-research-group/LibMTL>`_ and use
-    :func:`torch.softmax` as the projection step.
-
-    The state :math:`\lambda_{t-1}` is initialised lazily to the uniform vector
-    :math:`[1/m, \ldots, 1/m]` on the first forward call once :math:`m` is known, and is reset
-    automatically when :math:`m`, ``dtype`` or ``device`` of the input Gramian changes. Use
-    :meth:`reset` to manually restart from uniform weights.
+    <https://www.jmlr.org/papers/volume25/23-1287/23-1287.pdf>`_ (JMLR 2024).
 
     .. warning::
-        MoDo's convergence guarantees rely on **double sampling**: the Gramian passed to this
-        weighting must come from a mini-batch that is independent of the one used for the
-        subsequent parameter update. The Gramian can be computed efficiently from a batch of
-        losses using the :class:`~torchjd.autogram.Engine`. See the usage example below.
+        The input matrix must be :math:`G = J_1 J_2^\top`, computed from two **independent**
+        mini-batches via :func:`torchjd.autojac.jac`. Using a single-batch Gramian
+        (:math:`J_1 J_1^\top`) breaks the convergence guarantee. See the usage examples below.
 
     :param gamma: Learning rate of the task-weight update. Must be positive.
     :param rho: Non-negative :math:`\ell_2` regularisation coefficient.
 
-    .. admonition:: Example
+    .. admonition:: Example (two batches per step)
 
-        Train a model using MoDo with two independent mini-batches per step. The first batch
-        drives the :math:`\lambda` update via the Gramian; the second batch drives the parameter
-        update via the usual backward pass.
+        The following example reproduces basic MoDo using two independent mini-batches per step.
 
         .. code-block:: python
 
@@ -59,27 +37,73 @@ class MoDoWeighting(_GramianWeighting, Stateful, _NonDifferentiable):
             from torch.optim import SGD
 
             from torchjd.aggregation import MoDoWeighting
-            from torchjd.autogram import Engine
+            from torchjd.autojac import jac
 
             model = Sequential(Linear(5, 4), ReLU(), Linear(4, 1))
             optimizer = SGD(model.parameters())
             criterion = MSELoss(reduction="none")
             weighting = MoDoWeighting(gamma=0.1, rho=0.0)
-            engine = Engine(model, batch_dim=0)
+            params = list(model.parameters())
 
-            # loader_1 and loader_2 must yield independent draws from the same distribution.
+            # loader_1 and loader_2 must yield independent draws of the same size.
             for batch_1, batch_2 in zip(loader_1, loader_2):
                 input_1, target_1 = batch_1
                 input_2, target_2 = batch_2
 
-                # Step 1: Gramian from batch 1 drives the lambda update.
                 losses_1 = criterion(model(input_1).squeeze(dim=1), target_1)
-                gramian = engine.compute_gramian(losses_1)
-                weights = weighting(gramian)
+                jacs_1 = jac(losses_1, params)
+                J_1 = torch.cat([j.flatten(1) for j in jacs_1], dim=1)
 
-                # Step 2: backward on batch 2 with those weights drives the parameter update.
+                # retain_graph=True keeps the graph for the backward step below.
                 losses_2 = criterion(model(input_2).squeeze(dim=1), target_2)
+                jacs_2 = jac(losses_2, params, retain_graph=True)
+                J_2 = torch.cat([j.flatten(1) for j in jacs_2], dim=1)
+
+                G = J_1 @ J_2.T
+                weights = weighting(G)
+
                 losses_2.backward(weights)
+                optimizer.step()
+                optimizer.zero_grad()
+
+    .. admonition:: Example (three batches per step)
+
+        The following example reproduces basic MoDo using three independent mini-batches per step,
+        keeping the :math:`\lambda` update and the parameter update on separate draws.
+
+        .. code-block:: python
+
+            import torch
+            from torch.nn import Linear, MSELoss, ReLU, Sequential
+            from torch.optim import SGD
+
+            from torchjd.aggregation import MoDoWeighting
+            from torchjd.autojac import jac
+
+            model = Sequential(Linear(5, 4), ReLU(), Linear(4, 1))
+            optimizer = SGD(model.parameters())
+            criterion = MSELoss(reduction="none")
+            weighting = MoDoWeighting(gamma=0.1, rho=0.0)
+            params = list(model.parameters())
+
+            for batch_1, batch_2, batch_3 in zip(loader_1, loader_2, loader_3):
+                input_1, target_1 = batch_1
+                input_2, target_2 = batch_2
+                input_3, target_3 = batch_3
+
+                losses_1 = criterion(model(input_1).squeeze(dim=1), target_1)
+                jacs_1 = jac(losses_1, params)
+                J_1 = torch.cat([j.flatten(1) for j in jacs_1], dim=1)
+
+                losses_2 = criterion(model(input_2).squeeze(dim=1), target_2)
+                jacs_2 = jac(losses_2, params)
+                J_2 = torch.cat([j.flatten(1) for j in jacs_2], dim=1)
+
+                G = J_1 @ J_2.T
+                weights = weighting(G)
+
+                losses_3 = criterion(model(input_3).squeeze(dim=1), target_3)
+                losses_3.backward(weights)
                 optimizer.step()
                 optimizer.zero_grad()
     """
@@ -117,21 +141,21 @@ class MoDoWeighting(_GramianWeighting, Stateful, _NonDifferentiable):
         self._lambda = None
         self._state_key = None
 
-    def forward(self, gramian: PSDMatrix, /) -> Tensor:
-        self._ensure_state(gramian)
+    def forward(self, matrix: Matrix, /) -> Tensor:
+        self._ensure_state(matrix)
         lambd = cast(Tensor, self._lambda)
 
-        grad = gramian @ lambd + self._rho * lambd
+        grad = matrix @ lambd + self._rho * lambd
         lambd = torch.softmax(lambd - self._gamma * grad, dim=-1)
 
         self._lambda = lambd
         return lambd
 
-    def _ensure_state(self, gramian: PSDMatrix) -> None:
-        key = (gramian.shape[0], gramian.dtype, gramian.device)
+    def _ensure_state(self, matrix: Matrix) -> None:
+        key = (matrix.shape[0], matrix.dtype, matrix.device)
         if self._state_key == key and self._lambda is not None:
             return
-        self._lambda = gramian.new_full((gramian.shape[0],), 1.0 / gramian.shape[0])
+        self._lambda = matrix.new_full((matrix.shape[0],), 1.0 / matrix.shape[0])
         self._state_key = key
 
     def __repr__(self) -> str:

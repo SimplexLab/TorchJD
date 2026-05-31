@@ -1,30 +1,14 @@
 import torch
-from pytest import mark, raises
-from torch import Tensor
+from pytest import raises
 from torch.testing import assert_close
 from utils.tensors import randn_, tensor_
 
-from torchjd.aggregation._aggregator_bases import GramianWeightedAggregator
 from torchjd.aggregation._modo import MoDoWeighting
-
-from ._asserts import assert_expected_structure
-from ._inputs import scaled_matrices, typical_matrices
-
-gramian_pairs = [
-    (GramianWeightedAggregator(MoDoWeighting()), m) for m in typical_matrices + scaled_matrices
-]
 
 
 def test_representations() -> None:
     W = MoDoWeighting(gamma=0.1, rho=0.05)
     assert repr(W) == "MoDoWeighting(gamma=0.1, rho=0.05)"
-
-
-@mark.parametrize(["aggregator", "matrix"], gramian_pairs)
-def test_expected_structure_gramian_weighting(
-    aggregator: GramianWeightedAggregator, matrix: Tensor
-) -> None:
-    assert_expected_structure(aggregator, matrix)
 
 
 def test_reset_restores_first_step_behavior() -> None:
@@ -143,3 +127,33 @@ def test_changing_m_auto_resets() -> None:
     J = randn_((2, 8))
     G = J @ J.T
     assert_close(W(G), fresh(G))
+
+
+def test_non_differentiable() -> None:
+    """The _NonDifferentiable mixin must prevent autograd graph construction."""
+
+    G = randn_((3, 8)) @ randn_((3, 8)).T
+    G.requires_grad_(True)
+    W = MoDoWeighting()
+    weights = W(G)
+    assert not weights.requires_grad
+
+
+def test_non_symmetric_input() -> None:
+    """MoDoWeighting must accept and correctly process a non-symmetric cross-batch matrix."""
+
+    gamma = 0.1
+    rho = 0.05
+    J1 = randn_((3, 8))
+    J2 = randn_((3, 8))
+    G = J1 @ J2.T  # not symmetric, not PSD in general
+    m = J1.shape[0]
+
+    W = MoDoWeighting(gamma=gamma, rho=rho)
+    lambda_0 = tensor_([1.0 / m] * m)
+    grad = G @ lambda_0 + rho * lambda_0
+    expected = torch.softmax(lambda_0 - gamma * grad, dim=-1)
+
+    assert_close(W(G), expected)
+    assert W(G).shape == (m,)
+    assert (W(G) >= 0).all()
