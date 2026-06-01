@@ -11,8 +11,8 @@ from ._scalarizer_base import Scalarizer
 class UW(Scalarizer, Stateful):
     r"""
     :class:`~torchjd.scalarization.Scalarizer` that combines the input tensor of values using
-    learned per-task uncertainties, as proposed in `Multi-Task Learning Using Uncertainty to Weigh
-    Losses for Scene Geometry and Semantics
+    learned per-task uncertainties. ``UW`` is short for Uncertainty Weighting, the method proposed
+    in `Multi-Task Learning Using Uncertainty to Weigh Losses for Scene Geometry and Semantics
     <https://openaccess.thecvf.com/content_cvpr_2018/papers/Kendall_Multi-Task_Learning_Using_CVPR_2018_paper.pdf>`_.
 
     Each value :math:`L_i` is assigned a learnable log-variance :math:`s_i`, and the values are
