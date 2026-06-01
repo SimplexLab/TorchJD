@@ -13,7 +13,7 @@ _T = TypeVar("_T", contravariant=True, bound=Tensor)
 
 class CRMOGMWeighting(Weighting[_T], Stateful):
     r"""
-    :class:`~torchjd.aggregation.Stateful`
+    :class:`~torchjd._mixins.Stateful`
     :class:`~torchjd.aggregation._weighting_bases.Weighting` that wraps another
     :class:`~torchjd.aggregation._weighting_bases.Weighting` and stabilises the weights it
     produces with an exponential moving average (EMA) across calls. This is the weight-smoothing
@@ -61,7 +61,7 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
 
     This weighting is stateful: it keeps :math:`\lambda_{k-1}` across calls. Use :meth:`reset`
     to restart the smoothing from the initial state. Note that calling :meth:`reset` will also
-    reset the wrapped weighting if it is :class:`~torchjd.aggregation.Stateful`.
+    reset the wrapped weighting if it is :class:`~torchjd._mixins.Stateful`.
 
     :param weighting: The wrapped weighting whose output is smoothed.
     :param alpha: EMA coefficient on the previous weights. ``alpha=0`` disables smoothing
@@ -120,7 +120,7 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
     def reset(self) -> None:
         r"""
         Clears the EMA state so the next forward restarts from the initial state. Also resets the
-        wrapped weighting if it is :class:`~torchjd.aggregation.Stateful`.
+        wrapped weighting if it is :class:`~torchjd._mixins.Stateful`.
         """
 
         if isinstance(self.weighting, Stateful):

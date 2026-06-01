@@ -35,6 +35,24 @@ class UW(Scalarizer, Stateful):
     :param shape: The shape of the values to scalarize, used to create one log-variance per value.
         An ``int`` ``n`` is interpreted as the shape ``(n,)``.
 
+    The following example shows how to co-train a model together with the per-task log-variances, by
+    passing both sets of parameters to the optimizer.
+
+        >>> import torch
+        >>> from torch.nn import Linear
+        >>>
+        >>> from torchjd.scalarization import UW
+        >>>
+        >>> model = Linear(3, 2)
+        >>> scalarizer = UW(2)
+        >>> optimizer = torch.optim.SGD([*model.parameters(), *scalarizer.parameters()], lr=0.1)
+        >>>
+        >>> features = torch.randn(8, 3)
+        >>> losses = model(features).pow(2).mean(dim=0)  # One loss per output dimension.
+        >>> loss = scalarizer(losses)
+        >>> loss.backward()
+        >>> optimizer.step()
+
     .. note::
         The log-variances are initialized to ``0`` (i.e. :math:`\sigma_i^2 = 1`), which gives
         uniform weights at the start of training. The paper reports that the result is robust to
@@ -44,8 +62,7 @@ class UW(Scalarizer, Stateful):
 
     def __init__(self, shape: int | Sequence[int]) -> None:
         super().__init__()
-        normalized_shape = (shape,) if isinstance(shape, int) else tuple(shape)
-        self.log_var = nn.Parameter(torch.zeros(normalized_shape))
+        self.log_var = nn.Parameter(torch.zeros(shape))
 
     def forward(self, values: Tensor, /) -> Tensor:
         if values.shape != self.log_var.shape:

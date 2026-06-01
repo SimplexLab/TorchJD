@@ -56,7 +56,7 @@ def test_reset_restores_first_step_behavior() -> None:
 def test_reset_propagates_to_stateful_weighting() -> None:
     """
     Verify that ``reset()`` calls the wrapped weighting's ``reset()`` when it is
-    :class:`~torchjd.aggregation.Stateful`. Checks that ``GradVacWeighting``'s internal
+    :class:`~torchjd._mixins.Stateful`. Checks that ``GradVacWeighting``'s internal
     state is cleared after ``reset()``.
     """
 

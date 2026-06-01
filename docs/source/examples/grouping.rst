@@ -19,7 +19,7 @@ the parameters:
 
 In TorchJD, grouping is achieved by calling :func:`~torchjd.autojac.jac_to_grad` once per group
 after :func:`~torchjd.autojac.backward` or :func:`~torchjd.autojac.mtl_backward`, with a dedicated
-aggregator instance per group. For :class:`~torchjd.aggregation.Stateful` aggregators, each instance
+aggregator instance per group. For :class:`~torchjd._mixins.Stateful` aggregators, each instance
 should independently maintain its own state (e.g. the EMA :math:`\hat{\phi}` state in
 :class:`~torchjd.aggregation.GradVac`, matching the per-block targets from the original paper).
 
