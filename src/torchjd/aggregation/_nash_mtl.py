@@ -8,8 +8,8 @@ import contextlib
 import torch
 from torch import Tensor
 
-from torchjd._mixins import _WithOptionalDeps
-from torchjd.aggregation._mixins import Stateful, _NonDifferentiable
+from torchjd._mixins import Stateful, _WithOptionalDeps
+from torchjd.aggregation._mixins import _NonDifferentiable
 
 from ._aggregator_bases import WeightedAggregator
 from ._weighting_bases import _MatrixWeighting
@@ -25,7 +25,7 @@ class _NashMTLWeighting(_WithOptionalDeps, _MatrixWeighting, Stateful, _NonDiffe
     _REQUIRED_DEPS = ["numpy", "cvxpy", "ecos"]
     _INSTALL_HINT = 'Install them with: pip install "torchjd[nash_mtl]"'
     """
-    :class:`~torchjd.aggregation._mixins.Stateful`
+    :class:`~torchjd.aggregation.Stateful`
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`] that
     extracts weights using the step decision of Algorithm 1 of `Multi-Task Learning as a Bargaining
     Game <https://arxiv.org/pdf/2202.01017.pdf>`_.
@@ -206,7 +206,7 @@ class _NashMTLWeighting(_WithOptionalDeps, _MatrixWeighting, Stateful, _NonDiffe
 
 class NashMTL(WeightedAggregator, Stateful, _NonDifferentiable):
     """
-    :class:`~torchjd.aggregation._mixins.Stateful`
+    :class:`~torchjd.aggregation.Stateful`
     :class:`~torchjd.aggregation.WeightedAggregator` as proposed in Algorithm 1 of
     `Multi-Task Learning as a Bargaining Game <https://arxiv.org/pdf/2202.01017.pdf>`_.
 

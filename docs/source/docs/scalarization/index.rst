@@ -20,3 +20,4 @@ Abstract base class
     mean.rst
     random.rst
     sum.rst
+    uw.rst

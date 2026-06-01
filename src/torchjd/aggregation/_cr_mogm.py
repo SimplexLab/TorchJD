@@ -4,7 +4,7 @@ from typing import TypeVar
 
 from torch import Tensor
 
-from torchjd.aggregation._mixins import Stateful
+from torchjd._mixins import Stateful
 
 from ._weighting_bases import Weighting
 
@@ -13,7 +13,7 @@ _T = TypeVar("_T", contravariant=True, bound=Tensor)
 
 class CRMOGMWeighting(Weighting[_T], Stateful):
     r"""
-    :class:`~torchjd.aggregation._mixins.Stateful`
+    :class:`~torchjd.aggregation.Stateful`
     :class:`~torchjd.aggregation._weighting_bases.Weighting` that wraps another
     :class:`~torchjd.aggregation._weighting_bases.Weighting` and stabilises the weights it
     produces with an exponential moving average (EMA) across calls. This is the weight-smoothing
@@ -120,7 +120,7 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
     def reset(self) -> None:
         r"""
         Clears the EMA state so the next forward restarts from the initial state. Also resets the
-        wrapped weighting if it is :class:`~torchjd.aggregation._mixins.Stateful`.
+        wrapped weighting if it is :class:`~torchjd.aggregation.Stateful`.
         """
 
         if isinstance(self.weighting, Stateful):

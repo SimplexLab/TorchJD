@@ -10,6 +10,10 @@ changelog does not include internal changes that do not affect the user.
 
 ### Added
 
+- Added `UW` from [Multi-Task Learning Using Uncertainty to Weigh Losses for Scene Geometry and
+  Semantics](https://arxiv.org/pdf/1705.07115), a `Scalarizer` that combines the values using
+  learned per-task uncertainties. It is the first stateful, trainable scalarizer: its
+  log-variances are an `nn.Parameter` that must be passed to the optimizer.
 - Added `GeometricMean` (also known as GLS) studied in [MultiNet++: Multi-Stream Feature
   Aggregation and Geometric Loss Strategy for Multi-Task
   Learning](https://openaccess.thecvf.com/content_CVPRW_2019/papers/WAD/Chennupati_MultiNet_Multi-Stream_Feature_Aggregation_and_Geometric_Loss_Strategy_for_Multi-Task_CVPRW_2019_paper.pdf),

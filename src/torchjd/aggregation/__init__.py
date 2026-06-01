@@ -38,6 +38,8 @@ tensor([0.2929, 1.9004, 1.9004])
 tensor([1.1109, 0.7894])
 """
 
+from torchjd._mixins import Stateful
+
 from ._aggregator_bases import Aggregator, GramianWeightedAggregator, WeightedAggregator
 from ._aligned_mtl import AlignedMTL, AlignedMTLWeighting
 from ._cagrad import CAGrad, CAGradWeighting
@@ -52,7 +54,6 @@ from ._imtl_g import IMTLG, IMTLGWeighting
 from ._krum import Krum, KrumWeighting
 from ._mean import Mean, MeanWeighting
 from ._mgda import MGDA, MGDAWeighting
-from ._mixins import Stateful
 from ._nash_mtl import NashMTL
 from ._pcgrad import PCGrad, PCGradWeighting
 from ._random import Random, RandomWeighting
