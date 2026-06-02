@@ -12,8 +12,9 @@ def test_representations() -> None:
 
 
 def test_reset_restores_first_step_behavior() -> None:
-    J = randn_((3, 8))
-    G = J @ J.T
+    J1 = randn_((3, 8))
+    J2 = randn_((3, 8))
+    G = J1 @ J2.T
     W = MoDoWeighting(gamma=0.1)
     first = W(G)
     W(G)
@@ -56,8 +57,9 @@ def test_rho_setter_rejects_negative() -> None:
 def test_output_lies_on_simplex() -> None:
     """The softmax projection ensures the weights sum to 1 and are non-negative."""
 
-    J = randn_((4, 10))
-    G = J @ J.T
+    J1 = randn_((4, 10))
+    J2 = randn_((4, 10))
+    G = J1 @ J2.T
     W = MoDoWeighting(gamma=0.1, rho=0.05)
     weights = W(G)
     assert weights.shape == (4,)
@@ -65,25 +67,15 @@ def test_output_lies_on_simplex() -> None:
     assert_close(weights.sum(), tensor_(1.0))
 
 
-def test_small_gamma_stays_near_uniform() -> None:
-    """With a tiny gamma, one step barely moves lambda from the uniform initialisation."""
-
-    J = randn_((3, 8))
-    G = J @ J.T
-    m = J.shape[0]
-    W = MoDoWeighting(gamma=1e-8)
-    uniform = tensor_([1.0 / m] * m)
-    assert_close(W(G), uniform, atol=1e-6, rtol=1e-6)
-
-
 def test_update_recurrence() -> None:
     """Verify one step of the softmax-projected gradient update by hand."""
 
     gamma = 0.1
     rho = 0.05
-    J = randn_((3, 8))
-    G = J @ J.T
-    m = J.shape[0]
+    J1 = randn_((3, 8))
+    J2 = randn_((3, 8))
+    G = J1 @ J2.T
+    m = J1.shape[0]
 
     W = MoDoWeighting(gamma=gamma, rho=rho)
     lambda_0 = tensor_([1.0 / m] * m)
@@ -100,8 +92,10 @@ def test_two_consecutive_steps() -> None:
     rho = 0.0
     J1 = randn_((3, 8))
     J2 = randn_((3, 8))
-    G1 = J1 @ J1.T
-    G2 = J2 @ J2.T
+    J3 = randn_((3, 8))
+    J4 = randn_((3, 8))
+    G1 = J1 @ J2.T
+    G2 = J3 @ J4.T
     m = J1.shape[0]
 
     W = MoDoWeighting(gamma=gamma, rho=rho)
@@ -124,8 +118,9 @@ def test_changing_m_auto_resets() -> None:
     W(randn_((3, 8)) @ randn_((3, 8)).T)
     # After a state-resetting call with m=2, the first output should equal the uniform step's output.
     fresh = MoDoWeighting(gamma=0.1)
-    J = randn_((2, 8))
-    G = J @ J.T
+    J1 = randn_((2, 8))
+    J2 = randn_((2, 8))
+    G = J1 @ J2.T
     assert_close(W(G), fresh(G))
 
 

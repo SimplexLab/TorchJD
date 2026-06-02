@@ -29,8 +29,10 @@ class MoDoWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
     .. admonition:: Example (two batches per step)
 
         The following example reproduces basic MoDo using two independent mini-batches per step.
+        This matches MoDo as described in the paper, and the behavior of the official
+        implementation when ``three_grads`` is ``False``.
 
-        .. code-block:: python
+        .. testcode::
 
             import torch
             from torch.nn import Linear, MSELoss, ReLU, Sequential
@@ -39,22 +41,26 @@ class MoDoWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
             from torchjd.aggregation import MoDoWeighting
             from torchjd.autojac import jac
 
+            # Generate data (8 batches of 16 examples of dim 5) for the sake of the example.
+            inputs = torch.randn(8, 16, 5)
+            targets = torch.randn(8, 16)
+
             model = Sequential(Linear(5, 4), ReLU(), Linear(4, 1))
             optimizer = SGD(model.parameters())
             criterion = MSELoss(reduction="none")
             weighting = MoDoWeighting(gamma=0.1, rho=0.0)
             params = list(model.parameters())
 
-            # loader_1 and loader_2 must yield independent draws of the same size.
-            for batch_1, batch_2 in zip(loader_1, loader_2):
-                input_1, target_1 = batch_1
-                input_2, target_2 = batch_2
+            # Consume two consecutive (independent) batches per step.
+            for i in range(len(inputs) // 2):
+                input_1, input_2 = inputs[2 * i], inputs[2 * i + 1]
+                target_1, target_2 = targets[2 * i], targets[2 * i + 1]
 
+                # retain_graph=True so both graphs survive for the backward step below.
                 losses_1 = criterion(model(input_1).squeeze(dim=1), target_1)
-                jacs_1 = jac(losses_1, params)
+                jacs_1 = jac(losses_1, params, retain_graph=True)
                 J_1 = torch.cat([j.flatten(1) for j in jacs_1], dim=1)
 
-                # retain_graph=True keeps the graph for the backward step below.
                 losses_2 = criterion(model(input_2).squeeze(dim=1), target_2)
                 jacs_2 = jac(losses_2, params, retain_graph=True)
                 J_2 = torch.cat([j.flatten(1) for j in jacs_2], dim=1)
@@ -62,16 +68,19 @@ class MoDoWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
                 G = J_1 @ J_2.T
                 weights = weighting(G)
 
-                losses_2.backward(weights)
+                # Equation 2.9b: the parameter update uses the mean of both batches' losses.
+                losses = (losses_1 + losses_2) / 2.0
+                losses.backward(weights)
                 optimizer.step()
                 optimizer.zero_grad()
 
     .. admonition:: Example (three batches per step)
 
         The following example reproduces basic MoDo using three independent mini-batches per step,
-        keeping the :math:`\lambda` update and the parameter update on separate draws.
+        keeping the :math:`\lambda` update and the parameter update on separate draws. This matches
+        the behavior of LibMTL and of the official implementation when ``three_grads`` is ``True``.
 
-        .. code-block:: python
+        .. testcode::
 
             import torch
             from torch.nn import Linear, MSELoss, ReLU, Sequential
@@ -80,16 +89,20 @@ class MoDoWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
             from torchjd.aggregation import MoDoWeighting
             from torchjd.autojac import jac
 
+            # Generate data (9 batches of 16 examples of dim 5) for the sake of the example.
+            inputs = torch.randn(9, 16, 5)
+            targets = torch.randn(9, 16)
+
             model = Sequential(Linear(5, 4), ReLU(), Linear(4, 1))
             optimizer = SGD(model.parameters())
             criterion = MSELoss(reduction="none")
             weighting = MoDoWeighting(gamma=0.1, rho=0.0)
             params = list(model.parameters())
 
-            for batch_1, batch_2, batch_3 in zip(loader_1, loader_2, loader_3):
-                input_1, target_1 = batch_1
-                input_2, target_2 = batch_2
-                input_3, target_3 = batch_3
+            # Consume three consecutive (independent) batches per step.
+            for i in range(len(inputs) // 3):
+                input_1, input_2, input_3 = inputs[3 * i], inputs[3 * i + 1], inputs[3 * i + 2]
+                target_1, target_2, target_3 = targets[3 * i], targets[3 * i + 1], targets[3 * i + 2]
 
                 losses_1 = criterion(model(input_1).squeeze(dim=1), target_1)
                 jacs_1 = jac(losses_1, params)
@@ -108,7 +121,7 @@ class MoDoWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
                 optimizer.zero_grad()
     """
 
-    def __init__(self, gamma: float = 0.1, rho: float = 0.0) -> None:
+    def __init__(self, gamma: float = 0.1, rho: float = 0.1) -> None:
         super().__init__()
         self.gamma = gamma
         self.rho = rho
