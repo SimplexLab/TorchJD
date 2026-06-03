@@ -53,6 +53,7 @@ from ._krum import Krum, KrumWeighting
 from ._mean import Mean, MeanWeighting
 from ._mgda import MGDA, MGDAWeighting
 from ._mixins import Stateful
+from ._modo import MoDoWeighting
 from ._nash_mtl import NashMTL
 from ._pcgrad import PCGrad, PCGradWeighting
 from ._random import Random, RandomWeighting
@@ -87,6 +88,7 @@ __all__ = [
     "MeanWeighting",
     "MGDA",
     "MGDAWeighting",
+    "MoDoWeighting",
     "NashMTL",
     "PCGrad",
     "PCGradWeighting",
