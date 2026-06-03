@@ -1,9 +1,27 @@
 import torch
 from pytest import raises
+from torch import Tensor
 from torch.testing import assert_close
 from utils.tensors import randn_, tensor_
 
 from torchjd.aggregation._modo import MoDoWeighting
+
+
+def _project_to_simplex(y: Tensor) -> Tensor:
+    """Reference Euclidean projection onto the probability simplex, used to derive expected
+    values independently of the implementation."""
+
+    m = len(y)
+    sorted_y = torch.sort(y, descending=True)[0]
+    tmpsum = y.new_zeros(())
+    tmax_f = (torch.sum(y) - 1.0) / m
+    for i in range(m - 1):
+        tmpsum = tmpsum + sorted_y[i]
+        tmax = (tmpsum - 1.0) / (i + 1.0)
+        if tmax > sorted_y[i + 1]:
+            tmax_f = tmax
+            break
+    return torch.max(y - tmax_f, y.new_zeros(m))
 
 
 def test_representations() -> None:
@@ -80,7 +98,7 @@ def test_update_recurrence() -> None:
     W = MoDoWeighting(gamma=gamma, rho=rho)
     lambda_0 = tensor_([1.0 / m] * m)
     grad = G @ lambda_0 + rho * lambda_0
-    expected = torch.softmax(lambda_0 - gamma * grad, dim=-1)
+    expected = _project_to_simplex(lambda_0 - gamma * grad)
 
     assert_close(W(G), expected)
 
@@ -102,10 +120,10 @@ def test_two_consecutive_steps() -> None:
 
     lambda_0 = tensor_([1.0 / m] * m)
     grad_1 = G1 @ lambda_0 + rho * lambda_0
-    lambda_1 = torch.softmax(lambda_0 - gamma * grad_1, dim=-1)
+    lambda_1 = _project_to_simplex(lambda_0 - gamma * grad_1)
 
     grad_2 = G2 @ lambda_1 + rho * lambda_1
-    lambda_2 = torch.softmax(lambda_1 - gamma * grad_2, dim=-1)
+    lambda_2 = _project_to_simplex(lambda_1 - gamma * grad_2)
 
     assert_close(W(G1), lambda_1)
     assert_close(W(G2), lambda_2)
@@ -147,8 +165,23 @@ def test_non_symmetric_input() -> None:
     W = MoDoWeighting(gamma=gamma, rho=rho)
     lambda_0 = tensor_([1.0 / m] * m)
     grad = G @ lambda_0 + rho * lambda_0
-    expected = torch.softmax(lambda_0 - gamma * grad, dim=-1)
+    expected = _project_to_simplex(lambda_0 - gamma * grad)
 
     assert_close(W(G), expected)
     assert W(G).shape == (m,)
     assert (W(G) >= 0).all()
+
+
+def test_projection2simplex_known_values() -> None:
+    """The simplex projection matches hand-computed Euclidean projections."""
+
+    # Already-positive input: the deficit (1 - sum) is spread equally, no clamping.
+    assert_close(
+        MoDoWeighting._projection2simplex(tensor_([0.5, 0.1, 0.1])),
+        tensor_([0.6, 0.2, 0.2]),
+    )
+    # Input with a negative entry: it gets clamped to zero.
+    assert_close(
+        MoDoWeighting._projection2simplex(tensor_([1.0, 0.0, -0.5])),
+        tensor_([1.0, 0.0, 0.0]),
+    )

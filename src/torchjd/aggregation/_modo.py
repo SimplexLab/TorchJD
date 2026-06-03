@@ -1,3 +1,5 @@
+# Partly adapted from https://github.com/heshandevaka/Trade-Off-MOL — MIT License, Copyright (c) 2023 Heshan Fernando.
+# See NOTICES for the full license text.
 from __future__ import annotations
 
 from typing import cast
@@ -25,6 +27,10 @@ class MoDoWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
 
     :param gamma: Learning rate of the task-weight update. Must be positive.
     :param rho: Non-negative :math:`\ell_2` regularisation coefficient.
+
+    .. note::
+        The Euclidean projection onto the simplex used in the :math:`\lambda` update is adapted from
+        the `official implementation <https://github.com/heshandevaka/Trade-Off-MOL/blob/main/LibMTL/LibMTL/weighting/MoDo.py>`_.
 
     .. admonition:: Example (two batches per step)
 
@@ -159,10 +165,26 @@ class MoDoWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
         lambd = cast(Tensor, self._lambda)
 
         grad = matrix @ lambd + self._rho * lambd
-        lambd = torch.softmax(lambd - self._gamma * grad, dim=-1)
+        lambd = self._projection2simplex(lambd - self._gamma * grad)
 
         self._lambda = lambd
         return lambd
+
+    @staticmethod
+    def _projection2simplex(y: Tensor) -> Tensor:
+        """Euclidean projection of ``y`` onto the probability simplex."""
+
+        m = len(y)
+        sorted_y = torch.sort(y, descending=True)[0]
+        tmpsum = y.new_zeros(())
+        tmax_f = (torch.sum(y) - 1.0) / m
+        for i in range(m - 1):
+            tmpsum = tmpsum + sorted_y[i]
+            tmax = (tmpsum - 1.0) / (i + 1.0)
+            if tmax > sorted_y[i + 1]:
+                tmax_f = tmax
+                break
+        return torch.max(y - tmax_f, y.new_zeros(m))
 
     def _ensure_state(self, matrix: Matrix) -> None:
         key = (matrix.shape[0], matrix.dtype, matrix.device)
