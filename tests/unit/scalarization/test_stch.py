@@ -49,6 +49,15 @@ def test_permutation_invariant(losses: Tensor) -> None:
     assert_permutation_invariant(STCH(mu=1.0), losses)
 
 
+def test_does_not_overflow_for_large_values_and_small_mu() -> None:
+    # `weights * values / mu` would overflow to inf before logsumexp can stabilize it. The
+    # value-preserving centering keeps the result finite and equal to the dominant (max) term.
+    values = tensor_([1e30, 2e30, 3e30])
+    out = STCH(mu=1e-10)(values)
+    assert out.isfinite()
+    torch.testing.assert_close(out, tensor_(1e30))  # 3e30 weighted by the uniform 1/3.
+
+
 @mark.parametrize("mu", [0.0, -1.0])
 def test_raises_on_non_positive_mu(mu: float) -> None:
     with raises(ValueError):

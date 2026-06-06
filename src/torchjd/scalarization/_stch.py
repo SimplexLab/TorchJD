@@ -71,8 +71,15 @@ class STCH(Scalarizer):
             weights = self.weights
 
         shifted = values if self.reference is None else values - self.reference
-        exponents = weights * shifted / self.mu
-        return self.mu * torch.logsumexp(exponents.flatten(), dim=-1)
+
+        # Center the weighted values before dividing by mu (Appendix B.1 of the paper). This keeps
+        # the largest exponent at 0 so the `/ mu` step never overflows for large values and small
+        # mu. Adding `max_y` back makes it value-preserving: the result and its gradient are
+        # mathematically identical to `mu * logsumexp(weights * shifted / mu)`.
+        y = weights * shifted
+        max_y = y.max()
+        exponents = (y - max_y) / self.mu
+        return self.mu * torch.logsumexp(exponents.flatten(), dim=-1) + max_y
 
     def __repr__(self) -> str:
         return (
