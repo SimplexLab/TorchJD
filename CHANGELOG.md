@@ -16,6 +16,9 @@ changelog does not include internal changes that do not affect the user.
   a `Scalarizer` that combines the values using learned per-task uncertainties. It is the first
   stateful, trainable scalarizer: its log-variances are an `nn.Parameter` that must be passed to
   the optimizer.
+- Added `STCH` from [Smooth Tchebycheff Scalarization for Multi-Objective
+  Optimization](https://openreview.net/pdf?id=m4dO5L6eCp), a `Scalarizer` that combines the input
+  tensor of values into a smooth approximation of their (weighted, shifted) maximum.
 - Added `MoDoWeighting` from [Three-Way Trade-Off in Multi-Objective Learning: Optimization, Generalization and Conflict-Avoidance](https://www.jmlr.org/papers/volume25/23-1287/23-1287.pdf) (JMLR 2024). It is a stateful `Weighting` that maintains task weights across calls via a simplex-projected gradient step on a cross-batch matrix `G = J_1 @ J_2.T`, computed from two independent mini-batches using `autojac.jac`.
 - Added `GeometricMean` (also known as GLS) studied in [MultiNet++: Multi-Stream Feature
   Aggregation and Geometric Loss Strategy for Multi-Task
