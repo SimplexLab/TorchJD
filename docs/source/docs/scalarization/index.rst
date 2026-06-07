@@ -19,4 +19,5 @@ Abstract base class
     geometric_mean.rst
     mean.rst
     random.rst
+    stch.rst
     sum.rst
