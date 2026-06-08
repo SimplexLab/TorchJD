@@ -3,8 +3,6 @@ from typing import Any
 import torch
 from torch import nn
 
-from torchjd._mixins import Stateful as Stateful
-
 
 class _NonDifferentiable(nn.Module):
     """

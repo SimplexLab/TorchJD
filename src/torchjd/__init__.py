@@ -1,12 +1,15 @@
 from collections.abc import Callable
 from warnings import warn as _warn
 
+from ._mixins import Stateful
 from .autojac import backward as _backward, mtl_backward as _mtl_backward
 
 _deprecated_items: dict[str, tuple[str, Callable]] = {
     "backward": ("autojac", _backward),
     "mtl_backward": ("autojac", _mtl_backward),
 }
+
+__all__ = ["Stateful"]
 
 
 def __getattr__(name: str) -> Callable:

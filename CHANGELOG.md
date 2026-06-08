@@ -25,6 +25,12 @@ changelog does not include internal changes that do not affect the user.
   Learning](https://openaccess.thecvf.com/content_CVPRW_2019/papers/WAD/Chennupati_MultiNet_Multi-Stream_Feature_Aggregation_and_Geometric_Loss_Strategy_for_Multi-Task_CVPRW_2019_paper.pdf),
   a `Scalarizer` that returns the geometric mean of the input tensor of values.
 
+### Changed
+
+- **BREAKING**: Moved the `Stateful` mixin from `torchjd.aggregation` to the top-level `torchjd`
+  namespace, so it can be shared between the aggregation and scalarization packages. Import it as
+  `torchjd.Stateful` instead of `torchjd.aggregation.Stateful`.
+
 ## [0.12.0] - 2026-05-28
 
 ### Added

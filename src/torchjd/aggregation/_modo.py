@@ -7,7 +7,8 @@ from typing import cast
 import torch
 from torch import Tensor
 
-from torchjd.aggregation._mixins import Stateful, _NonDifferentiable
+from torchjd._mixins import Stateful
+from torchjd.aggregation._mixins import _NonDifferentiable
 from torchjd.linalg import Matrix
 
 from ._weighting_bases import _MatrixWeighting
@@ -15,7 +16,7 @@ from ._weighting_bases import _MatrixWeighting
 
 class MoDoWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
     r"""
-    :class:`~torchjd.aggregation.Stateful`
+    :class:`~torchjd.Stateful`
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`] from `Three-Way
     Trade-Off in Multi-Objective Learning: Optimization, Generalization and Conflict-Avoidance
     <https://www.jmlr.org/papers/volume25/23-1287/23-1287.pdf>`_ (JMLR 2024).

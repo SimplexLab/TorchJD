@@ -19,8 +19,6 @@ losses into a single scalar loss.
 tensor(2.)
 """
 
-from torchjd._mixins import Stateful
-
 from ._constant import Constant
 from ._geometric_mean import GeometricMean
 from ._mean import Mean
@@ -37,7 +35,6 @@ __all__ = [
     "Random",
     "Scalarizer",
     "STCH",
-    "Stateful",
     "Sum",
     "UW",
 ]

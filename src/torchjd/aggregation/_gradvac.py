@@ -5,7 +5,8 @@ from typing import cast
 import torch
 from torch import Tensor
 
-from torchjd.aggregation._mixins import Stateful, _NonDifferentiable
+from torchjd._mixins import Stateful
+from torchjd.aggregation._mixins import _NonDifferentiable
 from torchjd.linalg import PSDMatrix
 
 from ._aggregator_bases import GramianWeightedAggregator
@@ -15,7 +16,7 @@ from ._weighting_bases import _GramianWeighting
 # Non-differentiable: weights are modified in-place during the gradient correction loop.
 class GradVacWeighting(_GramianWeighting, Stateful, _NonDifferentiable):
     r"""
-    :class:`~torchjd.aggregation.Stateful`
+    :class:`~torchjd.Stateful`
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
     giving the weights of :class:`~torchjd.aggregation.GradVac`.
 
@@ -130,7 +131,7 @@ class GradVacWeighting(_GramianWeighting, Stateful, _NonDifferentiable):
 
 class GradVac(GramianWeightedAggregator, Stateful, _NonDifferentiable):
     r"""
-    :class:`~torchjd.aggregation.Stateful`
+    :class:`~torchjd.Stateful`
     :class:`~torchjd.aggregation.GramianWeightedAggregator` implementing the aggregation step of
     Gradient Vaccine (GradVac) from `Gradient Vaccine: Investigating and Improving Multi-task
     Optimization in Massively Multilingual Models (ICLR 2021 Spotlight)

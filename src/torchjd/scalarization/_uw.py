@@ -10,7 +10,7 @@ from ._scalarizer_base import Scalarizer
 
 class UW(Scalarizer, Stateful):
     r"""
-    :class:`~torchjd.scalarization.Stateful`
+    :class:`~torchjd.Stateful`
     :class:`~torchjd.scalarization.Scalarizer` that combines the input tensor of values using
     learned per-task uncertainties. ``UW`` is short for Uncertainty Weighting, the method proposed
     in `Multi-Task Learning Using Uncertainty to Weigh Losses for Scene Geometry and Semantics
