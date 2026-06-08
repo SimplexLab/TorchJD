@@ -26,5 +26,15 @@ from ._random import Random
 from ._scalarizer_base import Scalarizer
 from ._stch import STCH
 from ._sum import Sum
+from ._uw import UW
 
-__all__ = ["Constant", "GeometricMean", "Mean", "Random", "Scalarizer", "STCH", "Sum"]
+__all__ = [
+    "Constant",
+    "GeometricMean",
+    "Mean",
+    "Random",
+    "Scalarizer",
+    "STCH",
+    "Sum",
+    "UW",
+]

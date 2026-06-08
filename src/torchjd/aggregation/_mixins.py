@@ -1,16 +1,7 @@
-from abc import ABC, abstractmethod
 from typing import Any
 
 import torch
 from torch import nn
-
-
-class Stateful(ABC):
-    """Mixin adding a reset method."""
-
-    @abstractmethod
-    def reset(self) -> None:
-        """Resets the internal state."""
 
 
 class _NonDifferentiable(nn.Module):
