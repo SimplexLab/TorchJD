@@ -54,5 +54,5 @@ runs:
       if: ${{ inputs.torch_channel == 'nightly' }}
       shell: bash
       run: |
-        uv pip install --pre --upgrade torch torchvision --index-url https://download.pytorch.org/whl/nightly/cpu
+        uv pip install --pre torch torchvision -P torch -P torchvision --extra-index-url https://download.pytorch.org/whl/nightly/cpu
         uv run python -c "import torch, torchvision; print('torch:', torch.__version__, '| torchvision:', torchvision.__version__)"
