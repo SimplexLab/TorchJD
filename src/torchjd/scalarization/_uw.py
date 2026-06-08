@@ -44,7 +44,7 @@ class UW(Scalarizer, Stateful):
         >>> from torchjd.scalarization import UW
         >>>
         >>> model = Linear(3, 2)
-        >>> scalarizer = UW(2)
+        >>> scalarizer = UW(2)  # Move to the right device with e.g. UW(2).to(device="cuda")
         >>> optimizer = torch.optim.SGD([*model.parameters(), *scalarizer.parameters()], lr=0.1)
         >>>
         >>> features = torch.randn(8, 3)
