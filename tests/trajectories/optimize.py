@@ -19,7 +19,7 @@ import numpy as np
 import torch
 
 from tests.paths import TRAJECTORIES_RESULTS_DIR
-from torchjd import Stateful
+from torchjd.aggregation import Stateful
 from trajectories._constants import (
     AGGREGATORS,
     BASE_LEARNING_RATES,

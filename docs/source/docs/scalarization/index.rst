@@ -4,11 +4,19 @@ scalarization
 .. automodule:: torchjd.scalarization
    :no-members:
 
-Abstract base class
--------------------
+Abstract base classes
+---------------------
 
 .. autoclass:: torchjd.scalarization.Scalarizer
     :members: __call__
+
+.. py:class:: torchjd.scalarization.Stateful
+
+    Mixin adding a reset method.
+
+    .. py:method:: reset()
+
+        Resets the internal state.
 
 
 .. toctree::

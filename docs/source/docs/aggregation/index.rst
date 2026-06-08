@@ -19,7 +19,7 @@ Abstract base classes
 .. autoclass:: torchjd.aggregation.Weighting
     :members: __call__
 
-.. autoclass:: torchjd.Stateful
+.. autoclass:: torchjd.aggregation.Stateful
     :members: reset
 
 

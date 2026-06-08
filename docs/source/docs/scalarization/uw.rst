@@ -4,4 +4,4 @@ UW
 ==
 
 .. autoclass:: torchjd.scalarization.UW
-    :members: __call__, __reset__
+    :members: __call__, reset
