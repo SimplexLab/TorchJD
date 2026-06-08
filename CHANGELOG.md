@@ -10,6 +10,12 @@ changelog does not include internal changes that do not affect the user.
 
 ### Added
 
+- Added `UW` (Uncertainty Weighting) from [Multi-Task Learning Using Uncertainty to Weigh Losses
+  for Scene Geometry and
+  Semantics](https://openaccess.thecvf.com/content_cvpr_2018/papers/Kendall_Multi-Task_Learning_Using_CVPR_2018_paper.pdf),
+  a `Scalarizer` that combines the values using learned per-task uncertainties. It is the first
+  stateful, trainable scalarizer: its log-variances are an `nn.Parameter` that must be passed to
+  the optimizer.
 - Added `STCH` from [Smooth Tchebycheff Scalarization for Multi-Objective
   Optimization](https://openreview.net/pdf?id=m4dO5L6eCp), a `Scalarizer` that combines the input
   tensor of values into a smooth approximation of their (weighted, shifted) maximum.
@@ -18,6 +24,12 @@ changelog does not include internal changes that do not affect the user.
   Aggregation and Geometric Loss Strategy for Multi-Task
   Learning](https://openaccess.thecvf.com/content_CVPRW_2019/papers/WAD/Chennupati_MultiNet_Multi-Stream_Feature_Aggregation_and_Geometric_Loss_Strategy_for_Multi-Task_CVPRW_2019_paper.pdf),
   a `Scalarizer` that returns the geometric mean of the input tensor of values.
+
+### Changed
+
+- **BREAKING**: Moved the `Stateful` mixin from `torchjd.aggregation` to the top-level `torchjd`
+  namespace, so it can be shared between the aggregation and scalarization packages. Import it as
+  `torchjd.Stateful` instead of `torchjd.aggregation.Stateful`.
 
 ## [0.12.0] - 2026-05-28
 

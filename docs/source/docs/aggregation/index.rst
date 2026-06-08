@@ -19,10 +19,6 @@ Abstract base classes
 .. autoclass:: torchjd.aggregation.Weighting
     :members: __call__
 
-.. autoclass:: torchjd.aggregation.Stateful
-    :members: reset
-
-
 .. toctree::
     :hidden:
     :maxdepth: 1
