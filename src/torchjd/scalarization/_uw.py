@@ -48,6 +48,7 @@ class UW(Scalarizer, Stateful):
         >>> optimizer = torch.optim.SGD([*model.parameters(), *scalarizer.parameters()], lr=0.1)
         >>>
         >>> features = torch.randn(8, 3)
+        >>> # Compute some dummy losses just for the sake of the example
         >>> losses = model(features).pow(2).mean(dim=0)  # One loss per output dimension.
         >>> loss = scalarizer(losses)
         >>> loss.backward()
