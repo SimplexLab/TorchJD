@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). This
 changelog does not include internal changes that do not affect the user.
 
+## [Unreleased]
+
+### Added
+
+- Added `IMTL` (the loss-balancing variant, IMTL-L, of Impartial Multi-Task Learning) from [Towards
+  Impartial Multi-Task Learning](https://openreview.net/pdf?id=IMPnRXEWpvr) (ICLR 2021), a stateful
+  `Scalarizer` that learns a per-task scale `s_i` and combines the values as
+  `Σ (exp(s_i) · L_i − s_i)`.
+
 ## [0.13.0] - 2026-06-07
 
 ### Added
