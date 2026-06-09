@@ -14,17 +14,17 @@ changelog does not include internal changes that do not affect the user.
   Impartial Multi-Task Learning](https://openreview.net/pdf?id=IMPnRXEWpvr) (ICLR 2021), a stateful
   `Scalarizer` that learns a per-task scale `s_i` and combines the values as
   `Σ (exp(s_i) · L_i − s_i)`.
-
-## [0.13.0] - 2026-06-07
-
-### Added
-
 - Added `UW` (Uncertainty Weighting) from [Multi-Task Learning Using Uncertainty to Weigh Losses
   for Scene Geometry and
   Semantics](https://openaccess.thecvf.com/content_cvpr_2018/papers/Kendall_Multi-Task_Learning_Using_CVPR_2018_paper.pdf),
   a `Scalarizer` that combines the values using learned per-task uncertainties. It is the first
   stateful, trainable scalarizer: its log-variances are an `nn.Parameter` that must be passed to
   the optimizer.
+
+## [0.13.0] - 2026-06-07
+
+### Added
+
 - Added `STCH` from [Smooth Tchebycheff Scalarization for Multi-Objective
   Optimization](https://openreview.net/pdf?id=m4dO5L6eCp), a `Scalarizer` that combines the input
   tensor of values into a smooth approximation of their (weighted, shifted) maximum.
