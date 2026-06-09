@@ -8,7 +8,7 @@ from torchjd._mixins import Stateful
 from ._scalarizer_base import Scalarizer
 
 
-class IMTL(Scalarizer, Stateful):
+class IMTLL(Scalarizer, Stateful):
     r"""
     :class:`~torchjd.Stateful`
     :class:`~torchjd.scalarization.Scalarizer` that combines the input tensor of values using learned
@@ -52,10 +52,10 @@ class IMTL(Scalarizer, Stateful):
         >>> import torch
         >>> from torch.nn import Linear
         >>>
-        >>> from torchjd.scalarization import IMTL
+        >>> from torchjd.scalarization import IMTLL
         >>>
         >>> model = Linear(3, 2)
-        >>> scalarizer = IMTL(2)  # Move to the right device with e.g. IMTL(2).to(device="cuda")
+        >>> scalarizer = IMTLL(2)  # Move to the right device with e.g. IMTLL(2).to(device="cuda")
         >>> optimizer = torch.optim.SGD([*model.parameters(), *scalarizer.parameters()], lr=0.1)
         >>>
         >>> features = torch.randn(8, 3)

@@ -21,7 +21,7 @@ tensor(2.)
 
 from ._constant import Constant
 from ._geometric_mean import GeometricMean
-from ._imtl import IMTL
+from ._imtl_l import IMTLL
 from ._mean import Mean
 from ._random import Random
 from ._scalarizer_base import Scalarizer
@@ -32,7 +32,7 @@ from ._uw import UW
 __all__ = [
     "Constant",
     "GeometricMean",
-    "IMTL",
+    "IMTLL",
     "Mean",
     "Random",
     "Scalarizer",

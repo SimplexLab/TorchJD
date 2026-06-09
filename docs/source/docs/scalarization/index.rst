@@ -16,7 +16,7 @@ Abstract base class
 
     constant.rst
     geometric_mean.rst
-    imtl.rst
+    imtl_l.rst
     mean.rst
     random.rst
     stch.rst
