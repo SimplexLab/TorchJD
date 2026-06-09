@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). This
 changelog does not include internal changes that do not affect the user.
 
-## [0.13.0] - 2026-06-07
+## [Unreleased]
 
 ### Added
 
@@ -16,6 +16,11 @@ changelog does not include internal changes that do not affect the user.
   a `Scalarizer` that combines the values using learned per-task uncertainties. It is the first
   stateful, trainable scalarizer: its log-variances are an `nn.Parameter` that must be passed to
   the optimizer.
+
+## [0.13.0] - 2026-06-07
+
+### Added
+
 - Added `STCH` from [Smooth Tchebycheff Scalarization for Multi-Objective
   Optimization](https://openreview.net/pdf?id=m4dO5L6eCp), a `Scalarizer` that combines the input
   tensor of values into a smooth approximation of their (weighted, shifted) maximum.
