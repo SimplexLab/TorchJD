@@ -10,7 +10,7 @@ changelog does not include internal changes that do not affect the user.
 
 ### Added
 
-- Added `IMTL` (the loss-balancing variant, IMTL-L, of Impartial Multi-Task Learning) from [Towards
+- Added `IMTL-L` (the loss-balancing variant of Impartial Multi-Task Learning) from [Towards
   Impartial Multi-Task Learning](https://openreview.net/pdf?id=IMPnRXEWpvr) (ICLR 2021), a stateful
   `Scalarizer` that learns a per-task scale `s_i` and combines the values as
   `Σ (exp(s_i) · L_i − s_i)`.
