@@ -7,7 +7,7 @@ from torch import Tensor
 from utils.contexts import ExceptionContext
 from utils.tensors import ones_, tensor_, zeros_
 
-from torchjd.scalarization import IMTL
+from torchjd.scalarization import IMTL, UW
 
 from ._asserts import assert_grad_flow, assert_returns_scalar
 from ._inputs import all_inputs
@@ -92,6 +92,19 @@ def test_is_trainable() -> None:
     scalarizer(values).backward()
     optimizer.step()
     assert not torch.equal(scalarizer.log_scale.detach(), zeros_((2,)))
+
+
+def test_equivalent_to_uw_up_to_factor_and_sign() -> None:
+    # Locks the documented relationship: IMTL(s) == 2 * UW(-s), i.e. the two scalarizations are
+    # equal up to a constant factor of 2 and the sign of the learned parameter.
+    values = tensor_([0.5, 2.0, 4.0])
+    imtl = _imtl((3,))
+    uw = UW((3,)).to(device=DEVICE, dtype=DTYPE)
+    with torch.no_grad():
+        s = tensor_([0.3, -0.7, 1.2])
+        imtl.log_scale.copy_(s)
+        uw.log_var.copy_(-s)
+    torch.testing.assert_close(imtl(values), 2.0 * uw(values))
 
 
 def test_representations() -> None:

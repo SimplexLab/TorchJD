@@ -31,9 +31,17 @@ class IMTL(Scalarizer, Stateful):
     magnitude across tasks, while the :math:`- s_i` term is a regularizer that prevents the trivial
     solution :math:`s_i \to -\infty`. The :math:`s_i` are stored as an ``nn.Parameter``, so the
     parameters of this scalarizer must be passed to the optimizer to be learned jointly with the
-    model. Unlike :class:`~torchjd.scalarization.UW`, IMTL-L makes no distribution assumption and
-    applies to any kind of loss. The complementary gradient-balancing variant (IMTL-G) is provided
-    as the :class:`~torchjd.aggregation.IMTLG` aggregator.
+    model.
+
+    Although it is derived without any distribution assumption (unlike
+    :class:`~torchjd.scalarization.UW`, which is derived from Gaussian/Laplace likelihoods), IMTL-L
+    is in fact almost equivalent to :class:`~torchjd.scalarization.UW`: this scalarization equals
+    :math:`2\,\mathrm{UW}` evaluated at the negated parameter, so the two differ only by a constant
+    factor of two and the sign convention of the learned parameter, and share the same per-task
+    weighting and the same optima.
+
+    The complementary gradient-balancing variant (IMTL-G) is provided as the
+    :class:`~torchjd.aggregation.IMTLG` aggregator.
 
     :param shape: The shape of the values to scalarize, used to create one scale per value. An
         ``int`` ``n`` is interpreted as the shape ``(n,)``.
