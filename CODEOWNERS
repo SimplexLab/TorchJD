@@ -19,6 +19,7 @@
 
 # Python packages in src/torchjd
 /src/torchjd/_linalg/    @PierreQuinton @ValerianRey
-/src/torchjd/aggregation/    @PierreQuinton @ValerianRey
+/src/torchjd/aggregation/    @PierreQuinton @ValerianRey @KhusPatel4450
 /src/torchjd/autogram/    @PierreQuinton @ValerianRey
 /src/torchjd/autojac/    @PierreQuinton @ValerianRey
+/src/torchjd/scalarization/    @PierreQuinton @ValerianRey @ppraneth
