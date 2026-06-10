@@ -1,7 +1,7 @@
 import torch
 from pytest import raises
 from torch.testing import assert_close
-from utils.tensors import randn_, tensor_
+from utils.tensors import eye_, randn_, tensor_
 
 from torchjd.aggregation._sdmgrad import SDMGradWeighting
 
@@ -116,7 +116,7 @@ def test_two_consecutive_steps() -> None:
       return ([0.5,0.5,0] + 0.3*[1/3,...]) / 1.3 = [6/13, 6/13, 1/13]
     """
     A1 = torch.diag(tensor_([2.0, 1.0, 0.0]))
-    A2 = torch.eye(3)
+    A2 = eye_(3)
     W = SDMGradWeighting(lr=10.0, momentum=0.5, n_iter=1, lambda_=0.3)
     assert_close(W(A1), tensor_([1 / 13, 1 / 13, 11 / 13]))
     assert_close(W(A2), tensor_([6 / 13, 6 / 13, 1 / 13]))
