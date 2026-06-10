@@ -97,12 +97,13 @@ def test_output_lies_on_simplex() -> None:
 def test_update_recurrence() -> None:
     """One inner-solve step matches the manually-computed expected output.
 
-    With A = diag(2, 1, 0), n_iter=1, lr=10, lambda_=0.3, starting from uniform w=[1/3,1/3,1/3]:
-      grad = A @ 1.3*[1/3,1/3,1/3] = [13/15, 13/30, 0]
-      w - lr*grad = [-25/3, -4, 1/3]  ->  projected to [0, 0, 1]
+    With A = diag(1, 0.25, 0), n_iter=1, lr=10, lambda_=0.3, starting from uniform w=[1/3,1/3,1/3]:
+      scale = mean([1, 0.5, 0]) = 0.5  =>  A_norm = diag(4, 1, 0)
+      grad = A_norm @ 1.3*[1/3,1/3,1/3] = [52/30, 13/30, 0]
+      w - lr*grad = [-17, -4, 1/3]  ->  projected to [0, 0, 1]
       return ([0,0,1] + 0.3*[1/3,...]) / 1.3 = [1/13, 1/13, 11/13]
     """
-    A = torch.diag(tensor_([2.0, 1.0, 0.0]))
+    A = torch.diag(tensor_([1.0, 0.25, 0.0]))
     W = SDMGradWeighting(lr=10.0, momentum=0.5, n_iter=1, lambda_=0.3)
     assert_close(W(A), tensor_([1 / 13, 1 / 13, 11 / 13]))
 
@@ -110,12 +111,12 @@ def test_update_recurrence() -> None:
 def test_two_consecutive_steps() -> None:
     """Warm-started carry-over across two consecutive calls matches manually-computed values.
 
-    Step 1: A1=diag(2,1,0) -> state w=[0,0,1], return [1/13, 1/13, 11/13]  (see test_update_recurrence)
-    Step 2: A2=eye(3), warm start w=[0,0,1]:
+    Step 1: A1=diag(1,0.25,0) -> A_norm=diag(4,1,0), state w=[0,0,1], return [1/13,1/13,11/13]
+    Step 2: A2=eye(3), scale=1 so A_norm=eye(3), warm start w=[0,0,1]:
       grad = [0.1, 0.1, 1.1]; w - lr*grad = [-1,-1,-10] -> projected to [0.5, 0.5, 0]
       return ([0.5,0.5,0] + 0.3*[1/3,...]) / 1.3 = [6/13, 6/13, 1/13]
     """
-    A1 = torch.diag(tensor_([2.0, 1.0, 0.0]))
+    A1 = torch.diag(tensor_([1.0, 0.25, 0.0]))
     A2 = eye_(3)
     W = SDMGradWeighting(lr=10.0, momentum=0.5, n_iter=1, lambda_=0.3)
     assert_close(W(A1), tensor_([1 / 13, 1 / 13, 11 / 13]))
@@ -125,13 +126,13 @@ def test_two_consecutive_steps() -> None:
 def test_custom_pref_vector() -> None:
     """A custom preference vector changes the output relative to the uniform default.
 
-    With A=diag(2,1,0), pref=[0,0,1], n_iter=1, lr=10, lambda_=0.3:
-      grad = A @ ([1/3,1/3,1/3] + 0.3*[0,0,1]) = [2/3, 1/3, 0]
-      w - lr*grad = [-19/3, -3, 1/3] -> projected to [0, 0, 1]
+    With A=diag(1,0.25,0), A_norm=diag(4,1,0), pref=[0,0,1], n_iter=1, lr=10, lambda_=0.3:
+      grad = A_norm @ ([1/3,1/3,1/3] + 0.3*[0,0,1]) = [4/3, 1/3, 0]
+      w - lr*grad = [-13, -3, 1/3] -> projected to [0, 0, 1]
       return ([0,0,1] + 0.3*[0,0,1]) / 1.3 = [0, 0, 1]
     This differs from the uniform-pref result [1/13, 1/13, 11/13].
     """
-    A = torch.diag(tensor_([2.0, 1.0, 0.0]))
+    A = torch.diag(tensor_([1.0, 0.25, 0.0]))
     pref = tensor_([0.0, 0.0, 1.0])
     W_pref = SDMGradWeighting(lr=10.0, momentum=0.5, n_iter=1, lambda_=0.3, pref_vector=pref)
     assert_close(W_pref(A), tensor_([0.0, 0.0, 1.0]))

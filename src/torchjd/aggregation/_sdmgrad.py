@@ -42,6 +42,11 @@ class SDMGradWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
         experiments, which is the value used here (and in `LibMTL
         <https://github.com/median-research-group/LibMTL/blob/main/LibMTL/weighting/SDMGrad.py>`_).
 
+        Before the inner solve, the input matrix is scale-normalized by the mean of the square
+        roots of its non-negative diagonal entries (following both the official implementation and
+        LibMTL). This makes the inner SGD learning rate scale-invariant with respect to gradient
+        magnitude. The normalization is briefly described in section 6.1 of the paper.
+
     .. admonition:: Example (three batches per step)
 
         The following example shows how to train with the SDMGrad algorithm.
@@ -171,9 +176,13 @@ class SDMGradWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
         w = cast(Tensor, self._w)
         w_tilde = self._resolve_w_tilde(matrix)
 
+        diag = torch.diag(matrix).clamp(min=0.0)
+        scale = diag.sqrt().mean()
+        a = matrix / (scale.pow(2) + 1e-8)
+
         velocity: Tensor | None = None
         for _ in range(self._n_iter):
-            grad = matrix @ (w + self._lambda * w_tilde)
+            grad = a @ (w + self._lambda * w_tilde)
             velocity = grad if velocity is None else self._momentum * velocity + grad
             w = _projection2simplex(w - self._lr * velocity)
 
