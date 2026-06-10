@@ -8,6 +8,8 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-06-10
+
 ### Added
 
 - Added `IMTL-L` (the loss-balancing variant of Impartial Multi-Task Learning) from [Towards
