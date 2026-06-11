@@ -11,18 +11,18 @@ class GradNormScalarizer(Scalarizer):
         self.register_buffer("initial_losses", None)
 
     def forward(self, values: Tensor, model: nn.Module = None) -> Tensor:
-        # 1. Initialize losses if this is the first step
+        
         if self.initial_losses is None:
             self.initial_losses = values.detach().clone()
         
-        # 2. IF model is provided, calculate the GradNorm balancing
+        
         if model is not None:
             # We move your logic inside here so it actually runs
             norms = self._compute_gradient_norms(values, model)
             # ... (add your GradNorm balancing calculation here) ...
             # You would update self.weights based on the norms
         
-        # 3. Always return the weighted sum
+        
         return (values * self.weights).sum()
     
     def _compute_gradient_norms(self, values: Tensor, model: nn.Module) -> Tensor:
