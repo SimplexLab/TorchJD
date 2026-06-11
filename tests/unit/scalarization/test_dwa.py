@@ -120,9 +120,18 @@ def test_has_no_learnable_parameters() -> None:
     assert list(DWA().parameters()) == []
 
 
-def test_does_not_raise_on_negative_input() -> None:
-    # DWA is designed for positive losses but does not enforce a positivity precondition.
-    assert_returns_scalar(DWA(), tensor_([-1.0, -2.0, 3.0]))
+def test_supports_consistently_negative_losses() -> None:
+    # DWA works on negative losses too, as long as each value keeps a consistent sign: the ratio of
+    # same-sign losses is positive, so the weights match those of the equivalent positive case.
+    dwa = DWA(temperature=2.0)
+    dwa(tensor_([-2.0, -2.0]))
+    dwa.step()  # Epoch 1 average = [-2, -2].
+    dwa(tensor_([-2.0, -8.0]))
+    dwa.step()  # Epoch 2 average = [-2, -8]; rates = [-2, -8] / [-2, -2] = [1, 4].
+    losses = tensor_([3.0, 5.0])
+    result = dwa(losses)
+    expected_weights = 2.0 * torch.softmax(tensor_([1.0, 4.0]) / 2.0, dim=0)
+    torch.testing.assert_close(result, (expected_weights * losses).sum())
 
 
 def test_raises_on_shape_change_within_epoch() -> None:

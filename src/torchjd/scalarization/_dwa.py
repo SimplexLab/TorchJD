@@ -66,7 +66,9 @@ class DWA(Scalarizer, Stateful):
         ...     scalarizer.step()  # Roll the epoch history once, at the end of the epoch.
 
     .. note::
-        DWA is designed to balance positive losses (it divides the losses of consecutive epochs).
+        DWA weights each value by the ratio of its losses over consecutive epochs, which the paper
+        defines as a descending rate in the range :math:`(0, +\infty)`. The losses are therefore
+        expected to keep a consistent, nonzero sign across epochs (they need not be positive).
     """
 
     def __init__(self, temperature: float = 2.0) -> None:
