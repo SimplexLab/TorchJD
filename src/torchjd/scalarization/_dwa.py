@@ -24,13 +24,15 @@ class DWA(Scalarizer, Stateful):
 
     where:
 
-    - :math:`\ell_k` is the :math:`k`-th value being scalarized (typically the current batch's loss);
+    - :math:`\ell_k` is the :math:`k`-th value being scalarized (typically the current batch's loss
+      for task k);
     - :math:`L_k(t)` is the :math:`k`-th value averaged over epoch :math:`t` (used only for the
       weights);
     - :math:`w_k(t-1)` is the relative descending rate: the ratio of average losses over the two
       previous epochs;
     - :math:`T` is the temperature; a larger :math:`T` makes the weights more uniform;
-    - :math:`K` is the number of values; the factor :math:`K` keeps :math:`\sum_k \lambda_k = K`.
+    - :math:`K` is the number of values (e.g. the number of tasks); the factor :math:`K` keeps
+      :math:`\sum_k \lambda_k = K`.
 
     The weights use only the two previous epochs' average losses, so they need no gradient. At each
     call, the scalarization is returned and the current batch's losses are summed to the current
