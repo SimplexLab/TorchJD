@@ -20,6 +20,7 @@ tensor(2.)
 """
 
 from ._constant import Constant
+from ._dwa import DWA
 from ._geometric_mean import GeometricMean
 from ._imtl_l import IMTLL
 from ._mean import Mean
@@ -31,6 +32,7 @@ from ._uw import UW
 
 __all__ = [
     "Constant",
+    "DWA",
     "GeometricMean",
     "IMTLL",
     "Mean",

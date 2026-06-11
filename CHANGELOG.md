@@ -10,6 +10,11 @@ changelog does not include internal changes that do not affect the user.
 
 ### Added
 
+- Added `DWA` (Dynamic Weight Average) from [End-to-End Multi-Task Learning with
+  Attention](https://openaccess.thecvf.com/content_CVPR_2019/papers/Liu_End-To-End_Multi-Task_Learning_With_Attention_CVPR_2019_paper.pdf)
+  (CVPR 2019), a stateful `Scalarizer` that weights each value by the relative rate at which its
+  loss decreased over the two previous epochs. It has no learnable parameters; call its `step()`
+  method once per epoch to roll the loss history.
 - Added `IMTL-L` (the loss-balancing variant of Impartial Multi-Task Learning) from [Towards
   Impartial Multi-Task Learning](https://openreview.net/pdf?id=IMPnRXEWpvr) (ICLR 2021), a stateful
   `Scalarizer` that learns a per-task scale `s_i` and combines the values as
