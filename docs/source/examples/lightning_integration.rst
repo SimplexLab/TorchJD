@@ -4,11 +4,11 @@ PyTorch Lightning Integration
 To use Jacobian descent with TorchJD in a :class:`~lightning.pytorch.core.LightningModule`, you need
 to turn off automatic optimization by setting ``automatic_optimization`` to ``False`` and to
 customize the ``training_step`` method to make it call the appropriate TorchJD method
-(:doc:`backward <../docs/autojac/backward>` or :doc:`mtl_backward <../docs/autojac/mtl_backward>`).
+(:doc:`backward <../reference/autojac/backward>` or :doc:`mtl_backward <../reference/autojac/mtl_backward>`).
 
 The following code example demonstrates a basic multi-task learning setup using a
 :class:`~lightning.pytorch.core.LightningModule` that will call :doc:`mtl_backward
-<../docs/autojac/mtl_backward>` at each training iteration.
+<../reference/autojac/mtl_backward>` at each training iteration.
 
 .. testsetup::
 

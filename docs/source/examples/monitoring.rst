@@ -1,17 +1,17 @@
 Monitoring aggregations
 =======================
 
-The :doc:`Aggregator <../docs/aggregation/index>` class is a subclass of :class:`torch.nn.Module`.
+The :doc:`Aggregator <../reference/aggregation/index>` class is a subclass of :class:`torch.nn.Module`.
 This allows registering hooks, which can be used to monitor some information about aggregations.
 The following code example demonstrates registering a hook to compute and print the cosine
-similarity between the aggregation performed by :doc:`UPGrad <../docs/aggregation/upgrad>` and the
+similarity between the aggregation performed by :doc:`UPGrad <../reference/aggregation/upgrad>` and the
 average of the gradients, and another hook to compute and print the weights of the weighting of
-:doc:`UPGrad <../docs/aggregation/upgrad>`.
+:doc:`UPGrad <../reference/aggregation/upgrad>`.
 
 Updating the parameters of the model with the average gradient is equivalent to using gradient
 descent on the average of the losses. Observing a cosine similarity smaller than 1 means that
 Jacobian descent is doing something different than gradient descent. With
-:doc:`UPGrad <../docs/aggregation/upgrad>`, this happens when the original gradients conflict (i.e.
+:doc:`UPGrad <../reference/aggregation/upgrad>`, this happens when the original gradients conflict (i.e.
 they have a negative inner product).
 
 .. testsetup::

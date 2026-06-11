@@ -28,10 +28,10 @@ optimization. To get started, check out our :doc:`basic usage example
 Gradient descent relies on gradients to optimize a single objective. Jacobian descent takes this
 idea a step further, using the Jacobian to optimize multiple objectives. An important component of
 Jacobian descent is the aggregator, which maps the Jacobian to an optimization step. In the page
-:doc:`Aggregation <docs/aggregation/index>`, we provide an overview of the various aggregators
+:doc:`Aggregation <reference/aggregation/index>`, we provide an overview of the various aggregators
 available in TorchJD, and their corresponding weightings.
 
-For comparison against simple baselines, the :doc:`Scalarization <docs/scalarization/index>`
+For comparison against simple baselines, the :doc:`Scalarization <reference/scalarization/index>`
 package provides scalarizers that combine a tensor of losses into a single scalar loss, allowing
 standard gradient descent to be used.
 
@@ -50,7 +50,7 @@ the gradient of the obtained weighted loss. The iterative computation of the Gra
 Algorithm 3 of
 `Jacobian Descent For Multi-Objective Optimization <https://arxiv.org/pdf/2406.16232>`_. The
 documentation and usage example of this algorithm is provided in
-:doc:`autogram.Engine <docs/autogram/engine>`.
+:doc:`autogram.Engine <reference/autogram/engine>`.
 
 The original usage of the autogram engine is to compute the Gramian of the Jacobian very efficiently
 for :doc:`IWRM <examples/iwrm>`. Another direct application is when considering one loss per element
@@ -71,8 +71,8 @@ TorchJD is open-source, under MIT License. The source code is available on
     :caption: API Reference
     :hidden:
 
-    docs/autogram/index.rst
-    docs/autojac/index.rst
-    docs/aggregation/index.rst
-    docs/scalarization/index.rst
-    docs/linalg/index.rst
+    reference/autogram/index.rst
+    reference/autojac/index.rst
+    reference/aggregation/index.rst
+    reference/scalarization/index.rst
+    reference/linalg/index.rst

@@ -87,6 +87,10 @@ jobs:
         working-directory: docs
         run: uv run make dirhtml
 
+      - name: Verify Redirects
+        working-directory: docs
+        run: uv run make redirects-check
+
       - name: Test Documentation
         working-directory: docs
         run: uv run make doctest
