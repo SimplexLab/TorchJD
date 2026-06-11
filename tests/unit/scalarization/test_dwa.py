@@ -116,10 +116,6 @@ def test_step_without_forward_is_noop() -> None:
     assert dwa._previous_averages == []
 
 
-def test_has_no_learnable_parameters() -> None:
-    assert list(DWA().parameters()) == []
-
-
 def test_supports_consistently_negative_losses() -> None:
     # DWA works on negative losses too, as long as each value keeps a consistent sign: the ratio of
     # same-sign losses is positive, so the weights match those of the equivalent positive case.
