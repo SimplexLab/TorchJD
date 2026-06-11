@@ -1,5 +1,5 @@
-from torch import Tensor, nn
 import torch
+from torch import Tensor, nn
 from torchjd.src.torchjd.scalarization._scalarizer_base import Scalarizer
 
 class GradNormScalarizer(Scalarizer):
@@ -11,22 +11,18 @@ class GradNormScalarizer(Scalarizer):
         self.register_buffer("initial_losses", None)
 
     def forward(self, values: Tensor, model: nn.Module = None) -> Tensor:
-        
         if self.initial_losses is None:
             self.initial_losses = values.detach().clone()
         
-        
         if model is not None:
-            # We move your logic inside here so it actually runs
             norms = self._compute_gradient_norms(values, model)
-            # ... (add your GradNorm balancing calculation here) ...
-            # You would update self.weights based on the norms
-        
-        
+            loss_ratios = values / self.initial_losses
+            target_norm = torch.mean(norms) * (loss_ratios ** self.alpha)
+            self.weights.data = target_norm / norms
+            
         return (values * self.weights).sum()
     
     def _compute_gradient_norms(self, values: Tensor, model: nn.Module) -> Tensor:
-        # This helper remains, but is now called by forward()
         norms = []
         for loss in values:
             grads = torch.autograd.grad(loss, model.parameters(), retain_graph=True)
