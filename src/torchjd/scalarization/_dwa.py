@@ -37,9 +37,6 @@ class DWA(Scalarizer, Stateful):
     epoch's average loss and roll the history forward. During the first two epochs (before two
     averages are available) the weights are uniform.
 
-    Unlike :class:`~torchjd.scalarization.UW` and :class:`~torchjd.scalarization.IMTLL`, DWA has no
-    learnable parameters; its state is a non-trainable buffer cleared by :meth:`reset`.
-
     :param temperature: The temperature :math:`T`. Must be strictly positive. Larger values make the
         weights more uniform. The paper uses ``2.0``.
 
