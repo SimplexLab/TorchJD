@@ -56,6 +56,7 @@ from ._modo import MoDoWeighting
 from ._nash_mtl import NashMTL
 from ._pcgrad import PCGrad, PCGradWeighting
 from ._random import Random, RandomWeighting
+from ._sdmgrad import SDMGradWeighting
 from ._sum import Sum, SumWeighting
 from ._trimmed_mean import TrimmedMean
 from ._upgrad import UPGrad, UPGradWeighting
@@ -93,6 +94,7 @@ __all__ = [
     "PCGradWeighting",
     "Random",
     "RandomWeighting",
+    "SDMGradWeighting",
     "Sum",
     "SumWeighting",
     "TrimmedMean",

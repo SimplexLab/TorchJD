@@ -17,6 +17,7 @@ changelog does not include internal changes that do not affect the user.
   (CVPR 2019), a stateful `Scalarizer` that weights each value by the relative rate at which its
   loss decreased over the two previous epochs. It has no learnable parameters; call its `step()`
   method once per epoch to roll the loss history.
+- Added `SDMGradWeighting` from [Direction-oriented Multi-objective Learning: Simple and Provable Stochastic Algorithms](https://arxiv.org/pdf/2305.18409) (NeurIPS 2023). It is a stateful `Weighting` that solves for task weights via a simplex-projected inner loop on a cross-batch matrix `A = J_1 @ J_2.T` (computed from two independent mini-batches using `autojac.jac`), with a direction-oriented regularizer pulling the descent direction toward a preference direction.
 - Added `IMTL-L` (the loss-balancing variant of Impartial Multi-Task Learning) from [Towards
   Impartial Multi-Task Learning](https://openreview.net/pdf?id=IMPnRXEWpvr) (ICLR 2021), a stateful
   `Scalarizer` that learns a per-task scale `s_i` and combines the values as
