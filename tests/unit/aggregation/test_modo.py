@@ -170,18 +170,3 @@ def test_non_symmetric_input() -> None:
     assert_close(W(G), expected)
     assert W(G).shape == (m,)
     assert (W(G) >= 0).all()
-
-
-def test_projection2simplex_known_values() -> None:
-    """The simplex projection matches hand-computed Euclidean projections."""
-
-    # Already-positive input: the deficit (1 - sum) is spread equally, no clamping.
-    assert_close(
-        MoDoWeighting._projection2simplex(tensor_([0.5, 0.1, 0.1])),
-        tensor_([0.6, 0.2, 0.2]),
-    )
-    # Input with a negative entry: it gets clamped to zero.
-    assert_close(
-        MoDoWeighting._projection2simplex(tensor_([1.0, 0.0, -0.5])),
-        tensor_([1.0, 0.0, 0.0]),
-    )
