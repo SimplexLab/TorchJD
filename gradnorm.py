@@ -3,7 +3,7 @@ from torch import Tensor, nn
 from ._scalarizer_base import Scalarizer
 
 class GradNormScalarizer(Scalarizer):
-    def __init__(self, num_tasks: int, alpha: float = 1.5):
+    def __init__(self, num_tasks: int, alpha: float = 1.5) -> None:
         super().__init__()
         self.num_tasks = num_tasks
         self.weights = nn.Parameter(torch.ones(num_tasks))
