@@ -2,6 +2,7 @@ import torch
 from torch import Tensor, nn
 from ._scalarizer_base import Scalarizer
 
+
 class GradNormScalarizer(Scalarizer):
     def __init__(self, num_tasks: int, alpha: float = 1.5) -> None:
         super().__init__()
@@ -13,15 +14,16 @@ class GradNormScalarizer(Scalarizer):
     def forward(self, values: Tensor, model: nn.Module = None) -> Tensor:
         if self.initial_losses is None:
             self.initial_losses = values.detach().clone()
-        
+
         if model is not None:
             norms = self._compute_gradient_norms(values, model)
             loss_ratios = values / self.initial_losses
-            target_norm = torch.mean(norms) * (loss_ratios ** self.alpha)
-            self.weights.data = target_norm / norms
-            
+            target_norm = torch.mean(norms) * (loss_ratios**self.alpha)
+            # Added 1e-8 epsilon for numerical stability
+            self.weights.data = target_norm / (norms + 1e-8)
+
         return (values * self.weights).sum()
-    
+
     def _compute_gradient_norms(self, values: Tensor, model: nn.Module) -> Tensor:
         norms = []
         for loss in values:
