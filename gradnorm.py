@@ -1,6 +1,6 @@
 import torch
 from torch import Tensor, nn
-from torchjd.src.torchjd.scalarization._scalarizer_base import Scalarizer
+from ._scalarizer_base import Scalarizer
 
 class GradNormScalarizer(Scalarizer):
     def __init__(self, num_tasks: int, alpha: float = 1.5):
