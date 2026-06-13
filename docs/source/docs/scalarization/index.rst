@@ -16,6 +16,7 @@ Abstract base class
 
     constant.rst
     dwa.rst
+    famo.rst
     geometric_mean.rst
     imtl_l.rst
     mean.rst
