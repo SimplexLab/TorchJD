@@ -22,8 +22,8 @@ objectives. It is based on the theory from `Jacobian Descent For Multi-Objective
 
 The main purpose is to jointly optimize multiple objectives without combining them into a single
 scalar loss. When the objectives are conflicting, this can be the key to a successful and stable
-optimization. To get started, check out our :doc:`basic usage example
-<examples/basic_usage>`.
+optimization. To get started, check out our :doc:`basic usage guide
+<how_to/basic_usage>`.
 
 Gradient descent relies on gradients to optimize a single objective. Jacobian descent takes this
 idea a step further, using the Jacobian to optimize multiple objectives. An important component of
@@ -37,10 +37,10 @@ standard gradient descent to be used.
 
 A straightforward application of Jacobian descent is multi-task learning, in which the vector of
 per-task losses has to be minimized. To start using TorchJD for multi-task learning, follow our
-:doc:`MTL example <examples/mtl>`.
+:doc:`MTL tutorial <tutorials/mtl>`.
 
 Another more interesting application is to consider separately the loss of each element in the
-batch. This is what we define as :doc:`Instance-Wise Risk Minimization <examples/iwrm>` (IWRM).
+batch. This is what we define as :doc:`Instance-Wise Risk Minimization <tutorials/iwrm>` (IWRM).
 
 The Gramian-based Jacobian descent algorithm provides a very efficient alternative way of
 performing Jacobian descent. It consists in computing
@@ -53,9 +53,9 @@ documentation and usage example of this algorithm is provided in
 :doc:`autogram.Engine <reference/autogram/engine>`.
 
 The original usage of the autogram engine is to compute the Gramian of the Jacobian very efficiently
-for :doc:`IWRM <examples/iwrm>`. Another direct application is when considering one loss per element
+for :doc:`IWRM <tutorials/iwrm>`. Another direct application is when considering one loss per element
 of the batch and per task, in the context of multi-task learning. We call this
-:doc:`Instance-Wise Risk Multi-Task Learning <examples/iwmtl>` (IWMTL).
+:doc:`Instance-Wise Risk Multi-Task Learning <tutorials/iwmtl>` (IWMTL).
 
 TorchJD is open-source, under MIT License. The source code is available on
 `GitHub <https://github.com/SimplexLab/TorchJD>`_.
@@ -65,7 +65,8 @@ TorchJD is open-source, under MIT License. The source code is available on
     :hidden:
 
     installation.md
-    examples/index.rst
+    how_to/index.rst
+    tutorials/index.rst
 
 .. toctree::
     :caption: API Reference

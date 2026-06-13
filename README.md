@@ -83,7 +83,7 @@ store it in the `.jac` fields of the model parameters. You then have to call
 this Jacobian using the specified
 [`Aggregator`](https://torchjd.org/stable/reference/aggregation#torchjd.aggregation.Aggregator), and to
 store the result into the `.grad` fields of the model parameters. See this
-[usage example](https://torchjd.org/stable/examples/basic_usage/) for more details.
+[usage example](https://torchjd.org/stable/how_to/basic_usage/) for more details.
 
 #### 2. `mtl_backward` + `jac_to_grad`
 In the case of multi-task learning, an alternative to
@@ -214,9 +214,9 @@ losses with Jacobian descent using [UPGrad](https://torchjd.org/stable/reference
 ```
 
 You can even go one step further by considering the multiple tasks and each element of the batch
-independently (Instance-Wise Multitask Learning). See [this example](https://torchjd.org/stable/examples/iwmtl/) for more details.
+independently (Instance-Wise Multitask Learning). See [this example](https://torchjd.org/stable/tutorials/iwmtl/) for more details.
 
-More usage examples can be found [here](https://torchjd.org/stable/examples/).
+More usage examples can be found [here](https://torchjd.org/stable/tutorials/).
 
 ## Supported Aggregators and Weightings
 TorchJD provides many existing aggregators from the literature, listed in the following table.

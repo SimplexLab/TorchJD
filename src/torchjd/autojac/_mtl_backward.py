@@ -74,7 +74,7 @@ def mtl_backward(
         Example
 
         A usage example of ``mtl_backward`` is provided in
-        :doc:`Multi-Task Learning (MTL) <../../examples/mtl>`.
+        :doc:`Multi-Task Learning (MTL) <../../tutorials/mtl>`.
 
     .. note::
         ``shared_params`` should contain no parameter in common with ``tasks_params``. The different
