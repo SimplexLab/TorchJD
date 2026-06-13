@@ -11,6 +11,7 @@ from torchjd._mixins import Stateful
 from torchjd.aggregation._mixins import _NonDifferentiable
 from torchjd.linalg import Matrix
 
+from ._utils.simplex import _projection2simplex
 from ._weighting_bases import _MatrixWeighting
 
 
@@ -166,26 +167,10 @@ class MoDoWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
         lambd = cast(Tensor, self._lambda)
 
         grad = matrix @ lambd + self._rho * lambd
-        lambd = self._projection2simplex(lambd - self._gamma * grad)
+        lambd = _projection2simplex(lambd - self._gamma * grad)
 
         self._lambda = lambd
         return lambd
-
-    @staticmethod
-    def _projection2simplex(y: Tensor) -> Tensor:
-        """Euclidean projection of ``y`` onto the probability simplex."""
-
-        m = len(y)
-        sorted_y = torch.sort(y, descending=True)[0]
-        tmpsum = y.new_zeros(())
-        tmax_f = (torch.sum(y) - 1.0) / m
-        for i in range(m - 1):
-            tmpsum = tmpsum + sorted_y[i]
-            tmax = (tmpsum - 1.0) / (i + 1.0)
-            if tmax > sorted_y[i + 1]:
-                tmax_f = tmax
-                break
-        return torch.max(y - tmax_f, y.new_zeros(m))
 
     def _ensure_state(self, matrix: Matrix) -> None:
         key = (matrix.shape[0], matrix.dtype, matrix.device)
