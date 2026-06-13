@@ -4,7 +4,7 @@ Instance-Wise Risk Minimization (IWRM)
 This example shows how to use TorchJD to minimize the vector of per-instance losses. This learning
 paradigm, called IWRM, is multi-objective, as opposed to the usual empirical risk minimization
 (ERM), which seeks to minimize the average loss. While a step of ERM may increase the loss of some
-samples of the batch, a step of IWRM using :doc:`UPGrad <../docs/aggregation/upgrad>` guarantees
+samples of the batch, a step of IWRM using :doc:`UPGrad <../reference/aggregation/upgrad>` guarantees
 that no loss from the batch is increased (given a sufficiently small learning rate).
 
 .. hint::
@@ -12,31 +12,31 @@ that no loss from the batch is increased (given a sufficiently small learning ra
     available in `Jacobian Descent For Multi-Objective Optimization
     <https://arxiv.org/pdf/2406.16232>`_.
 
-TorchJD offers two methods to perform IWRM. The :doc:`autojac <../docs/autojac/index>` engine
+TorchJD offers two methods to perform IWRM. The :doc:`autojac <../reference/autojac/index>` engine
 backpropagates the Jacobian of each sample's loss. It uses an
-:doc:`Aggregator <../docs/aggregation/index>` to combine the rows of this Jacobian to fill the
+:doc:`Aggregator <../reference/aggregation/index>` to combine the rows of this Jacobian to fill the
 ``.grad`` fields of the model's parameters. Because it has to store the full Jacobian, this approach
 uses a lot of memory.
 
-The recommended approach, called the :doc:`autogram engine <../docs/autogram/engine>`, works by
+The recommended approach, called the :doc:`autogram engine <../reference/autogram/engine>`, works by
 backpropagating the Gramian of the Jacobian of each sample's loss with respect to the model's
 parameters. This method is more memory-efficient and generally much faster because it avoids
 storing the full Jacobians. A vector of weights is then computed by applying a
-:doc:`Weighting <../docs/aggregation/index>` to the obtained Gramian, and a normal step of gradient
+:doc:`Weighting <../reference/aggregation/index>` to the obtained Gramian, and a normal step of gradient
 descent is then done on the weighted sum of the losses.
 
 Both approaches (autojac and autogram) are mathematically equivalent, and should thus give the same
 results up to small numerical differences. Even though the autogram engine is generally much faster
 than the autojac engine, there are some layers that are incompatible with it. These limitations are
-documented :doc:`here <../docs/autogram/engine>`.
+documented :doc:`here <../reference/autogram/engine>`.
 
 For the sake of the example, we generate a fake dataset consisting of 8 batches of 16 random input
 vectors of dimension 10, and their corresponding scalar labels. We train a very simple regression
 model to retrieve the label from the corresponding input. To minimize the average loss (ERM), we use
 stochastic gradient descent (SGD), where each gradient is computed from the average loss over a
 batch of data. When minimizing per-instance losses (IWRM), we use either autojac, with
-:doc:`UPGrad <../docs/aggregation/upgrad>` to aggregate the Jacobian, or autogram, with
-:doc:`UPGradWeighting <../docs/aggregation/upgrad>` to extract weights from the Gramian.
+:doc:`UPGrad <../reference/aggregation/upgrad>` to aggregate the Jacobian, or autogram, with
+:doc:`UPGradWeighting <../reference/aggregation/upgrad>` to extract weights from the Gramian.
 
 .. tab-set::
     .. tab-item:: autograd (baseline)

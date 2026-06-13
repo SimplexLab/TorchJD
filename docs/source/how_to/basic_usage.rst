@@ -5,7 +5,7 @@ This example shows how to use TorchJD to perform an iteration of Jacobian descen
 model with two objectives. In this example, a batch of inputs is forwarded through the model and two
 corresponding batches of labels are used to compute two losses. These losses are then backwarded
 through the model. The obtained Jacobian matrix, consisting of the gradients of the two losses with
-respect to the parameters, is then aggregated using :doc:`UPGrad <../docs/aggregation/upgrad>`, and
+respect to the parameters, is then aggregated using :doc:`UPGrad <../reference/aggregation/upgrad>`, and
 the parameters are updated using the resulting aggregation.
 
 
@@ -35,7 +35,7 @@ Define the aggregator that will be used to combine the Jacobian matrix:
 
     aggregator = UPGrad()
 
-In essence, :doc:`UPGrad <../docs/aggregation/upgrad>` projects each gradient onto the dual cone of
+In essence, :doc:`UPGrad <../reference/aggregation/upgrad>` projects each gradient onto the dual cone of
 the rows of the Jacobian and averages the results. This ensures that locally, no loss will be
 negatively affected by the update.
 

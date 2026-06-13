@@ -49,7 +49,7 @@ Gradients $\mathcal A_{\text{UPGrad}}$: it
 projects each gradient onto the dual cone, and averages the projections. This ensures that the
 update will always be beneficial to each individual objective (given a sufficiently small step
 size). In addition to $\mathcal A_{\text{UPGrad}}$, TorchJD supports
-[more than 10 aggregators from the literature](https://torchjd.org/stable/docs/aggregation).
+[more than 10 aggregators from the literature](https://torchjd.org/stable/reference/aggregation).
 
 ## Installation
 <!-- start installation -->
@@ -76,28 +76,28 @@ In standard `torch`, you generally combine your `losses` into a single scalar `l
 `loss.backward()` to compute the gradient of the loss with respect to each model parameter and to
 store it in the `.grad` fields of those parameters. The basic usage of `torchjd` is to replace this
 `loss.backward()` by a call to
-[`torchjd.autojac.backward(losses)`](https://torchjd.org/stable/docs/autojac/backward/). Instead of
+[`torchjd.autojac.backward(losses)`](https://torchjd.org/stable/reference/autojac/backward/). Instead of
 computing the gradient of a scalar loss, it will compute the Jacobian of a vector of losses, and
 store it in the `.jac` fields of the model parameters. You then have to call
-[`torchjd.autojac.jac_to_grad`](https://torchjd.org/stable/docs/autojac/jac_to_grad/) to aggregate
+[`torchjd.autojac.jac_to_grad`](https://torchjd.org/stable/reference/autojac/jac_to_grad/) to aggregate
 this Jacobian using the specified
-[`Aggregator`](https://torchjd.org/stable/docs/aggregation#torchjd.aggregation.Aggregator), and to
+[`Aggregator`](https://torchjd.org/stable/reference/aggregation#torchjd.aggregation.Aggregator), and to
 store the result into the `.grad` fields of the model parameters. See this
-[usage example](https://torchjd.org/stable/examples/basic_usage/) for more details.
+[usage example](https://torchjd.org/stable/how_to/basic_usage/) for more details.
 
 #### 2. `mtl_backward` + `jac_to_grad`
 In the case of multi-task learning, an alternative to
-[`torchjd.autojac.backward`](https://torchjd.org/stable/docs/autojac/backward/) is
-[`torchjd.autojac.mtl_backward`](https://torchjd.org/stable/docs/autojac/mtl_backward/). It computes
+[`torchjd.autojac.backward`](https://torchjd.org/stable/reference/autojac/backward/) is
+[`torchjd.autojac.mtl_backward`](https://torchjd.org/stable/reference/autojac/mtl_backward/). It computes
 the gradient of each task-specific loss with respect to the corresponding task's parameters, and
 stores it in their `.grad` fields. It also computes the Jacobian of the vector of losses with
 respect to the shared parameters and stores it in their `.jac` field. Then, the
-[`torchjd.autojac.jac_to_grad`](https://torchjd.org/stable/docs/autojac/jac_to_grad/) function can
+[`torchjd.autojac.jac_to_grad`](https://torchjd.org/stable/reference/autojac/jac_to_grad/) function can
 be called to aggregate this Jacobian and replace the `.jac` fields by `.grad` fields for the shared
 parameters.
 
 The following example shows how to use TorchJD to train a multi-task model with Jacobian descent,
-using [UPGrad](https://torchjd.org/stable/docs/aggregation/upgrad/).
+using [UPGrad](https://torchjd.org/stable/reference/aggregation/upgrad/).
 
 ```diff
   import torch
@@ -151,7 +151,7 @@ using [UPGrad](https://torchjd.org/stable/docs/aggregation/upgrad/).
 #### 3. `jac`
 
 If you're simply interested in computing Jacobians without storing them in the `.jac` fields, you
-can also use the [`torchjd.autojac.jac`](https://torchjd.org/stable/docs/autojac/jac/) function,
+can also use the [`torchjd.autojac.jac`](https://torchjd.org/stable/reference/autojac/jac/) function,
 that is analog to
 [`torch.autograd.grad`](https://docs.pytorch.org/docs/stable/generated/torch.autograd.grad.html),
 except that it computes the Jacobian of a vector of losses rather than the gradient of a scalar
@@ -162,23 +162,23 @@ loss.
 The Gramian of the Jacobian, defined as the Jacobian multiplied by its transpose, contains all the
 dot products between individual gradients. It thus contains all the information about conflict and
 gradient imbalance. It turns out that most aggregators from the literature
-(e.g. [UPGrad](https://torchjd.org/stable/docs/aggregation/upgrad/)) make a linear combination of
+(e.g. [UPGrad](https://torchjd.org/stable/reference/aggregation/upgrad/)) make a linear combination of
 the rows of the Jacobian, whose weights only depend on the Gramian of the Jacobian.
 
 An alternative implementation of Jacobian descent is thus to:
 - Compute this Gramian incrementally (layer by layer), without ever storing the full Jacobian in
   memory.
 - Extract the weights from it using a
-  [`Weighting`](https://torchjd.org/stable/docs/aggregation#torchjd.aggregation.Weighting).
+  [`Weighting`](https://torchjd.org/stable/reference/aggregation#torchjd.aggregation.Weighting).
 - Combine the losses using those weights and make a step of gradient descent on the combined loss.
 
 The main advantage of this approach is to save memory because the Jacobian (that is typically large)
 never has to be stored in memory. The
-[`torchjd.autogram.Engine`](https://torchjd.org/stable/docs/autogram/engine/) is precisely made to
+[`torchjd.autogram.Engine`](https://torchjd.org/stable/reference/autogram/engine/) is precisely made to
 compute the Gramian of the Jacobian efficiently.
 
 The following example shows how to use the `autogram` engine to minimize the vector of per-instance
-losses with Jacobian descent using [UPGrad](https://torchjd.org/stable/docs/aggregation/upgrad/).
+losses with Jacobian descent using [UPGrad](https://torchjd.org/stable/reference/aggregation/upgrad/).
 
 ```diff
   import torch
@@ -214,9 +214,9 @@ losses with Jacobian descent using [UPGrad](https://torchjd.org/stable/docs/aggr
 ```
 
 You can even go one step further by considering the multiple tasks and each element of the batch
-independently (Instance-Wise Multitask Learning). See [this example](https://torchjd.org/stable/examples/iwmtl/) for more details.
+independently (Instance-Wise Multitask Learning). See [this example](https://torchjd.org/stable/tutorials/iwmtl/) for more details.
 
-More usage examples can be found [here](https://torchjd.org/stable/examples/).
+More usage examples can be found [here](https://torchjd.org/stable/tutorials/).
 
 ## Supported Aggregators and Weightings
 TorchJD provides many existing aggregators from the literature, listed in the following table.
@@ -224,26 +224,26 @@ TorchJD provides many existing aggregators from the literature, listed in the fo
 <!-- recommended aggregators first, then alphabetical order -->
 | Aggregator                                                                                                 | Weighting                                                                                                              | Publication                                                                                                                                                          |
 |------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [UPGrad](https://torchjd.org/stable/docs/aggregation/upgrad/#torchjd.aggregation.UPGrad) (recommended) | [UPGradWeighting](https://torchjd.org/stable/docs/aggregation/upgrad/#torchjd.aggregation.UPGradWeighting)              | [Jacobian Descent For Multi-Objective Optimization](https://arxiv.org/pdf/2406.16232)                                                                                |
-| [AlignedMTL](https://torchjd.org/stable/docs/aggregation/aligned_mtl#torchjd.aggregation.AlignedMTL)       | [AlignedMTLWeighting](https://torchjd.org/stable/docs/aggregation/aligned_mtl#torchjd.aggregation.AlignedMTLWeighting) | [Independent Component Alignment for Multi-Task Learning](https://arxiv.org/pdf/2305.19000)                                                                          |
-| [CAGrad](https://torchjd.org/stable/docs/aggregation/cagrad#torchjd.aggregation.CAGrad)                    | [CAGradWeighting](https://torchjd.org/stable/docs/aggregation/cagrad#torchjd.aggregation.CAGradWeighting)              | [Conflict-Averse Gradient Descent for Multi-task Learning](https://arxiv.org/pdf/2110.14048)                                                                         |
-| [ConFIG](https://torchjd.org/stable/docs/aggregation/config#torchjd.aggregation.ConFIG)                    | -                                                                                                                      | [ConFIG: Towards Conflict-free Training of Physics Informed Neural Networks](https://arxiv.org/pdf/2408.11104)                                                       |
-| [Constant](https://torchjd.org/stable/docs/aggregation/constant#torchjd.aggregation.Constant)              | [ConstantWeighting](https://torchjd.org/stable/docs/aggregation/constant#torchjd.aggregation.ConstantWeighting)        | -                                                                                                                                                                    |
-| -                                                                                                           | [CRMOGMWeighting](https://torchjd.org/stable/docs/aggregation/cr_mogm/#torchjd.aggregation.CRMOGMWeighting)           | [On the Convergence of Stochastic Multi-Objective Gradient Manipulation and Beyond](https://proceedings.neurips.cc/paper_files/paper/2022/file/f91bd64a3620aad8e70a27ad9cb3ca57-Paper-Conference.pdf) |
-| [DualProj](https://torchjd.org/stable/docs/aggregation/dualproj#torchjd.aggregation.DualProj)              | [DualProjWeighting](https://torchjd.org/stable/docs/aggregation/dualproj#torchjd.aggregation.DualProjWeighting)        | [Gradient Episodic Memory for Continual Learning](https://arxiv.org/pdf/1706.08840)                                                                                  |
-| [FairGrad](https://torchjd.org/stable/docs/aggregation/fairgrad#torchjd.aggregation.FairGrad)              | [FairGradWeighting](https://torchjd.org/stable/docs/aggregation/fairgrad#torchjd.aggregation.FairGradWeighting)        | [Fair Resource Allocation in Multi-Task Learning](https://arxiv.org/pdf/2402.15638)                                                                                  |
-| [GradDrop](https://torchjd.org/stable/docs/aggregation/graddrop#torchjd.aggregation.GradDrop)              | -                                                                                                                      | [Just Pick a Sign: Optimizing Deep Multitask Models with Gradient Sign Dropout](https://arxiv.org/pdf/2010.06808)                                                    |
-| [GradVac](https://torchjd.org/stable/docs/aggregation/gradvac#torchjd.aggregation.GradVac)              | [GradVacWeighting](https://torchjd.org/stable/docs/aggregation/gradvac#torchjd.aggregation.GradVacWeighting)                                                                                                                      | [Gradient Vaccine: Investigating and Improving Multi-task Optimization in Massively Multilingual Models](https://arxiv.org/pdf/2010.05874)                                                    |
-| [IMTLG](https://torchjd.org/stable/docs/aggregation/imtl_g#torchjd.aggregation.IMTLG)                      | [IMTLGWeighting](https://torchjd.org/stable/docs/aggregation/imtl_g#torchjd.aggregation.IMTLGWeighting)                | [Towards Impartial Multi-task Learning](https://discovery.ucl.ac.uk/id/eprint/10120667/)                                                                             |
-| [Krum](https://torchjd.org/stable/docs/aggregation/krum#torchjd.aggregation.Krum)                          | [KrumWeighting](https://torchjd.org/stable/docs/aggregation/krum#torchjd.aggregation.KrumWeighting)                    | [Machine Learning with Adversaries: Byzantine Tolerant Gradient Descent](https://proceedings.neurips.cc/paper/2017/file/f4b9ec30ad9f68f89b29639786cb62ef-Paper.pdf)  |
-| [Mean](https://torchjd.org/stable/docs/aggregation/mean#torchjd.aggregation.Mean)                          | [MeanWeighting](https://torchjd.org/stable/docs/aggregation/mean#torchjd.aggregation.MeanWeighting)                    | -                                                                                                                                                                    |
-| [MGDA](https://torchjd.org/stable/docs/aggregation/mgda#torchjd.aggregation.MGDA)                          | [MGDAWeighting](https://torchjd.org/stable/docs/aggregation/mgda#torchjd.aggregation.MGDAWeighting)                    | [Multiple-gradient descent algorithm (MGDA) for multiobjective optimization](https://comptes-rendus.academie-sciences.fr/mathematique/articles/10.1016/j.crma.2012.03.014/)                    |
-| -                                                                                                           | [MoDoWeighting](https://torchjd.org/stable/docs/aggregation/modo/#torchjd.aggregation.MoDoWeighting)                  | [Three-Way Trade-Off in Multi-Objective Learning: Optimization, Generalization and Conflict-Avoidance](https://www.jmlr.org/papers/volume25/23-1287/23-1287.pdf)     |
-| [NashMTL](https://torchjd.org/stable/docs/aggregation/nash_mtl#torchjd.aggregation.NashMTL)                | -                                                                                                                      | [Multi-Task Learning as a Bargaining Game](https://arxiv.org/pdf/2202.01017)                                                                                         |
-| [PCGrad](https://torchjd.org/stable/docs/aggregation/pcgrad#torchjd.aggregation.PCGrad)                    | [PCGradWeighting](https://torchjd.org/stable/docs/aggregation/pcgrad#torchjd.aggregation.PCGradWeighting)              | [Gradient Surgery for Multi-Task Learning](https://arxiv.org/pdf/2001.06782)                                                                                         |
-| [Random](https://torchjd.org/stable/docs/aggregation/random#torchjd.aggregation.Random)                    | [RandomWeighting](https://torchjd.org/stable/docs/aggregation/random#torchjd.aggregation.RandomWeighting)              | [Reasonable Effectiveness of Random Weighting: A Litmus Test for Multi-Task Learning](https://arxiv.org/pdf/2111.10603)                                              |
-| [Sum](https://torchjd.org/stable/docs/aggregation/sum#torchjd.aggregation.Sum)                             | [SumWeighting](https://torchjd.org/stable/docs/aggregation/sum#torchjd.aggregation.SumWeighting)                       | -                                                                                                                                                                    |
-| [Trimmed Mean](https://torchjd.org/stable/docs/aggregation/trimmed_mean#torchjd.aggregation.TrimmedMean)   | -                                                                                                                      | [Byzantine-Robust Distributed Learning: Towards Optimal Statistical Rates](https://proceedings.mlr.press/v80/yin18a/yin18a.pdf)                                      |
+| [UPGrad](https://torchjd.org/stable/reference/aggregation/upgrad/#torchjd.aggregation.UPGrad) (recommended) | [UPGradWeighting](https://torchjd.org/stable/reference/aggregation/upgrad/#torchjd.aggregation.UPGradWeighting)              | [Jacobian Descent For Multi-Objective Optimization](https://arxiv.org/pdf/2406.16232)                                                                                |
+| [AlignedMTL](https://torchjd.org/stable/reference/aggregation/aligned_mtl#torchjd.aggregation.AlignedMTL)       | [AlignedMTLWeighting](https://torchjd.org/stable/reference/aggregation/aligned_mtl#torchjd.aggregation.AlignedMTLWeighting) | [Independent Component Alignment for Multi-Task Learning](https://arxiv.org/pdf/2305.19000)                                                                          |
+| [CAGrad](https://torchjd.org/stable/reference/aggregation/cagrad#torchjd.aggregation.CAGrad)                    | [CAGradWeighting](https://torchjd.org/stable/reference/aggregation/cagrad#torchjd.aggregation.CAGradWeighting)              | [Conflict-Averse Gradient Descent for Multi-task Learning](https://arxiv.org/pdf/2110.14048)                                                                         |
+| [ConFIG](https://torchjd.org/stable/reference/aggregation/config#torchjd.aggregation.ConFIG)                    | -                                                                                                                      | [ConFIG: Towards Conflict-free Training of Physics Informed Neural Networks](https://arxiv.org/pdf/2408.11104)                                                       |
+| [Constant](https://torchjd.org/stable/reference/aggregation/constant#torchjd.aggregation.Constant)              | [ConstantWeighting](https://torchjd.org/stable/reference/aggregation/constant#torchjd.aggregation.ConstantWeighting)        | -                                                                                                                                                                    |
+| -                                                                                                           | [CRMOGMWeighting](https://torchjd.org/stable/reference/aggregation/cr_mogm/#torchjd.aggregation.CRMOGMWeighting)           | [On the Convergence of Stochastic Multi-Objective Gradient Manipulation and Beyond](https://proceedings.neurips.cc/paper_files/paper/2022/file/f91bd64a3620aad8e70a27ad9cb3ca57-Paper-Conference.pdf) |
+| [DualProj](https://torchjd.org/stable/reference/aggregation/dualproj#torchjd.aggregation.DualProj)              | [DualProjWeighting](https://torchjd.org/stable/reference/aggregation/dualproj#torchjd.aggregation.DualProjWeighting)        | [Gradient Episodic Memory for Continual Learning](https://arxiv.org/pdf/1706.08840)                                                                                  |
+| [FairGrad](https://torchjd.org/stable/reference/aggregation/fairgrad#torchjd.aggregation.FairGrad)              | [FairGradWeighting](https://torchjd.org/stable/reference/aggregation/fairgrad#torchjd.aggregation.FairGradWeighting)        | [Fair Resource Allocation in Multi-Task Learning](https://arxiv.org/pdf/2402.15638)                                                                                  |
+| [GradDrop](https://torchjd.org/stable/reference/aggregation/graddrop#torchjd.aggregation.GradDrop)              | -                                                                                                                      | [Just Pick a Sign: Optimizing Deep Multitask Models with Gradient Sign Dropout](https://arxiv.org/pdf/2010.06808)                                                    |
+| [GradVac](https://torchjd.org/stable/reference/aggregation/gradvac#torchjd.aggregation.GradVac)              | [GradVacWeighting](https://torchjd.org/stable/reference/aggregation/gradvac#torchjd.aggregation.GradVacWeighting)                                                                                                                      | [Gradient Vaccine: Investigating and Improving Multi-task Optimization in Massively Multilingual Models](https://arxiv.org/pdf/2010.05874)                                                    |
+| [IMTLG](https://torchjd.org/stable/reference/aggregation/imtl_g#torchjd.aggregation.IMTLG)                      | [IMTLGWeighting](https://torchjd.org/stable/reference/aggregation/imtl_g#torchjd.aggregation.IMTLGWeighting)                | [Towards Impartial Multi-task Learning](https://discovery.ucl.ac.uk/id/eprint/10120667/)                                                                             |
+| [Krum](https://torchjd.org/stable/reference/aggregation/krum#torchjd.aggregation.Krum)                          | [KrumWeighting](https://torchjd.org/stable/reference/aggregation/krum#torchjd.aggregation.KrumWeighting)                    | [Machine Learning with Adversaries: Byzantine Tolerant Gradient Descent](https://proceedings.neurips.cc/paper/2017/file/f4b9ec30ad9f68f89b29639786cb62ef-Paper.pdf)  |
+| [Mean](https://torchjd.org/stable/reference/aggregation/mean#torchjd.aggregation.Mean)                          | [MeanWeighting](https://torchjd.org/stable/reference/aggregation/mean#torchjd.aggregation.MeanWeighting)                    | -                                                                                                                                                                    |
+| [MGDA](https://torchjd.org/stable/reference/aggregation/mgda#torchjd.aggregation.MGDA)                          | [MGDAWeighting](https://torchjd.org/stable/reference/aggregation/mgda#torchjd.aggregation.MGDAWeighting)                    | [Multiple-gradient descent algorithm (MGDA) for multiobjective optimization](https://comptes-rendus.academie-sciences.fr/mathematique/articles/10.1016/j.crma.2012.03.014/)                    |
+| -                                                                                                           | [MoDoWeighting](https://torchjd.org/stable/reference/aggregation/modo/#torchjd.aggregation.MoDoWeighting)                  | [Three-Way Trade-Off in Multi-Objective Learning: Optimization, Generalization and Conflict-Avoidance](https://www.jmlr.org/papers/volume25/23-1287/23-1287.pdf)     |
+| [NashMTL](https://torchjd.org/stable/reference/aggregation/nash_mtl#torchjd.aggregation.NashMTL)                | -                                                                                                                      | [Multi-Task Learning as a Bargaining Game](https://arxiv.org/pdf/2202.01017)                                                                                         |
+| [PCGrad](https://torchjd.org/stable/reference/aggregation/pcgrad#torchjd.aggregation.PCGrad)                    | [PCGradWeighting](https://torchjd.org/stable/reference/aggregation/pcgrad#torchjd.aggregation.PCGradWeighting)              | [Gradient Surgery for Multi-Task Learning](https://arxiv.org/pdf/2001.06782)                                                                                         |
+| [Random](https://torchjd.org/stable/reference/aggregation/random#torchjd.aggregation.Random)                    | [RandomWeighting](https://torchjd.org/stable/reference/aggregation/random#torchjd.aggregation.RandomWeighting)              | [Reasonable Effectiveness of Random Weighting: A Litmus Test for Multi-Task Learning](https://arxiv.org/pdf/2111.10603)                                              |
+| [Sum](https://torchjd.org/stable/reference/aggregation/sum#torchjd.aggregation.Sum)                             | [SumWeighting](https://torchjd.org/stable/reference/aggregation/sum#torchjd.aggregation.SumWeighting)                       | -                                                                                                                                                                    |
+| [Trimmed Mean](https://torchjd.org/stable/reference/aggregation/trimmed_mean#torchjd.aggregation.TrimmedMean)   | -                                                                                                                      | [Byzantine-Robust Distributed Learning: Towards Optimal Statistical Rates](https://proceedings.mlr.press/v80/yin18a/yin18a.pdf)                                      |
 
 ## Release Methodology
 

@@ -257,7 +257,7 @@ class Engine:
                   standard setting of Jacobian descent).
                 - Matrix ``output`` of dimension :math:`m_1\times m_2`: :math:`m_1 m_2 \times m_1 m_2`
                   Gramian (this can be used for :doc:`Instance-Wise Multi-Task Learning (IWMTL)
-                  <../../examples/iwmtl>`, as each sample in the batch has one loss per task).
+                  <../../tutorials/iwmtl>`, as each sample in the batch has one loss per task).
         """
 
         if self._batch_dim is not None:

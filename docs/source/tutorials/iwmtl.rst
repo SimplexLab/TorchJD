@@ -3,7 +3,7 @@ Instance-Wise Multi-Task Learning (IWMTL)
 
 When training a model with multiple tasks, the gradients of the individual tasks are likely to
 conflict. This is particularly true when looking at the individual (per-sample) gradients.
-The :doc:`autogram engine <../docs/autogram/engine>` can be used to efficiently compute the Gramian
+The :doc:`autogram engine <../reference/autogram/engine>` can be used to efficiently compute the Gramian
 of the Jacobian of the matrix of per-sample and per-task losses. Weights can then be extracted from
 this Gramian to reweight the gradients and resolve conflict entirely.
 

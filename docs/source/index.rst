@@ -22,25 +22,25 @@ objectives. It is based on the theory from `Jacobian Descent For Multi-Objective
 
 The main purpose is to jointly optimize multiple objectives without combining them into a single
 scalar loss. When the objectives are conflicting, this can be the key to a successful and stable
-optimization. To get started, check out our :doc:`basic usage example
-<examples/basic_usage>`.
+optimization. To get started, check out our :doc:`basic usage guide
+<how_to/basic_usage>`.
 
 Gradient descent relies on gradients to optimize a single objective. Jacobian descent takes this
 idea a step further, using the Jacobian to optimize multiple objectives. An important component of
 Jacobian descent is the aggregator, which maps the Jacobian to an optimization step. In the page
-:doc:`Aggregation <docs/aggregation/index>`, we provide an overview of the various aggregators
+:doc:`Aggregation <reference/aggregation/index>`, we provide an overview of the various aggregators
 available in TorchJD, and their corresponding weightings.
 
-For comparison against simple baselines, the :doc:`Scalarization <docs/scalarization/index>`
+For comparison against simple baselines, the :doc:`Scalarization <reference/scalarization/index>`
 package provides scalarizers that combine a tensor of losses into a single scalar loss, allowing
 standard gradient descent to be used.
 
 A straightforward application of Jacobian descent is multi-task learning, in which the vector of
 per-task losses has to be minimized. To start using TorchJD for multi-task learning, follow our
-:doc:`MTL example <examples/mtl>`.
+:doc:`MTL tutorial <tutorials/mtl>`.
 
 Another more interesting application is to consider separately the loss of each element in the
-batch. This is what we define as :doc:`Instance-Wise Risk Minimization <examples/iwrm>` (IWRM).
+batch. This is what we define as :doc:`Instance-Wise Risk Minimization <tutorials/iwrm>` (IWRM).
 
 The Gramian-based Jacobian descent algorithm provides a very efficient alternative way of
 performing Jacobian descent. It consists in computing
@@ -50,12 +50,12 @@ the gradient of the obtained weighted loss. The iterative computation of the Gra
 Algorithm 3 of
 `Jacobian Descent For Multi-Objective Optimization <https://arxiv.org/pdf/2406.16232>`_. The
 documentation and usage example of this algorithm is provided in
-:doc:`autogram.Engine <docs/autogram/engine>`.
+:doc:`autogram.Engine <reference/autogram/engine>`.
 
 The original usage of the autogram engine is to compute the Gramian of the Jacobian very efficiently
-for :doc:`IWRM <examples/iwrm>`. Another direct application is when considering one loss per element
+for :doc:`IWRM <tutorials/iwrm>`. Another direct application is when considering one loss per element
 of the batch and per task, in the context of multi-task learning. We call this
-:doc:`Instance-Wise Risk Multi-Task Learning <examples/iwmtl>` (IWMTL).
+:doc:`Instance-Wise Risk Multi-Task Learning <tutorials/iwmtl>` (IWMTL).
 
 TorchJD is open-source, under MIT License. The source code is available on
 `GitHub <https://github.com/SimplexLab/TorchJD>`_.
@@ -65,14 +65,15 @@ TorchJD is open-source, under MIT License. The source code is available on
     :hidden:
 
     installation.md
-    examples/index.rst
+    how_to/index.rst
+    tutorials/index.rst
 
 .. toctree::
     :caption: API Reference
     :hidden:
 
-    docs/autogram/index.rst
-    docs/autojac/index.rst
-    docs/aggregation/index.rst
-    docs/scalarization/index.rst
-    docs/linalg/index.rst
+    reference/autogram/index.rst
+    reference/autojac/index.rst
+    reference/aggregation/index.rst
+    reference/scalarization/index.rst
+    reference/linalg/index.rst

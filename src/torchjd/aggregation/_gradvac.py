@@ -159,7 +159,7 @@ class GradVac(GramianWeightedAggregator, Stateful, _NonDifferentiable):
 
     .. note::
         To apply GradVac with the `whole_model`, `enc_dec`, `all_layer` or `all_matrix` grouping
-        strategy, please refer to the :doc:`Grouping </examples/grouping>` examples.
+        strategy, please refer to the :doc:`Grouping </tutorials/grouping>` examples.
     """
 
     gramian_weighting: GradVacWeighting

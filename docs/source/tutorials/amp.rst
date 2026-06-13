@@ -62,4 +62,4 @@ following example shows the resulting code for a multi-task learning use-case.
     behavior of PyTorch, that would also compute all gradients in ``float32`` type.
 
 .. note::
-    :doc:`torchjd.backward <../docs/autojac/backward>` can be similarly combined with AMP.
+    :doc:`torchjd.backward <../reference/autojac/backward>` can be similarly combined with AMP.
