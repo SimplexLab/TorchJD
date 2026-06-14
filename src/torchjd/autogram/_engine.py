@@ -3,7 +3,6 @@ from typing import cast
 import torch
 from torch import Tensor, nn, vmap
 from torch.autograd.graph import get_gradient_edge
-
 from torchjd._linalg import flatten, movedim, reshape
 from torchjd.linalg import PSDMatrix
 

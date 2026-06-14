@@ -3,10 +3,10 @@ from typing import cast
 
 from torch import Tensor
 from torch.utils._pytree import PyTree
-
 from torchjd._linalg import compute_gramian
-from torchjd.autogram._jacobian_computer import JacobianComputer
 from torchjd.linalg import Matrix, PSDMatrix
+
+from torchjd.autogram._jacobian_computer import JacobianComputer
 
 
 class GramianComputer(ABC):
