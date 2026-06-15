@@ -126,7 +126,7 @@ class ContourCirclesPlotter(MultiPlotter):
 
     def __init__(self) -> None:
         radiuses = [1.0, 2.5, 4, 5.5, 7, 8.5]
-        colormap = cm.inferno_r  # ty:ignore[unresolved-attribute]
+        colormap = cm.inferno_r
         norm = mcolors.Normalize(vmin=-1, vmax=max(radiuses))
         plotters = tuple(CirclePlotter(radius, colormap(norm(radius))) for radius in radiuses)
         super().__init__(plotters)
