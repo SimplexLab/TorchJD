@@ -133,7 +133,7 @@ class MoDoWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
         super().__init__()
         self.gamma = gamma
         self.rho = rho
-        self._lambda: Tensor | None = None
+        self.register_buffer("_lambda", None)
         self._state_key: tuple[int, torch.dtype, torch.device] | None = None
 
     @property
