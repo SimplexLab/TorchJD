@@ -66,8 +66,9 @@ class FAMO(Scalarizer, Stateful):
         coefficient on the logits. Must be non-negative. Defaults to ``1e-3`` (as in the paper's
         Algorithm 2 and in LibMTL); the official implementation uses ``1e-5``.
 
-    The following example shows how to train a model with FAMO. The losses are recomputed on the
-    same batch after the model step so that :meth:`update` can adjust the weights.
+    The following example shows how to do one iteration of training of a model with FAMO. The losses
+    are recomputed on the same batch after the model step so that :meth:`update` can adjust the
+    weights.
 
         >>> import torch
         >>> from torch.nn import Linear
