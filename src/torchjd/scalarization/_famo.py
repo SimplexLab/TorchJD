@@ -50,7 +50,8 @@ class FAMO(Scalarizer, Stateful):
         \delta_i = \log(\ell_i^{\text{before}} - b_i + \epsilon)
         - \log(\ell_i^{\text{after}} - b_i + \epsilon),
 
-    and takes an ``Adam`` step on :math:`w` in that direction. FAMO owns this ``Adam`` internally
+    and takes an `Adam <https://docs.pytorch.org/docs/stable/generated/torch.optim.Adam.html>`_ step
+    on :math:`w` in that direction. FAMO owns this ``Adam`` internally
     (configured by ``lr`` and ``weight_decay``), so you only call the scalarizer and then
     :meth:`update`; there is no second optimizer to manage.
 
