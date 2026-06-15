@@ -8,6 +8,14 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Added
+
+- Added `FAMO` (Fast Adaptive Multitask Optimization) from [FAMO: Fast Adaptive Multitask
+  Optimization](https://proceedings.neurips.cc/paper_files/paper/2023/file/b2fe1ee8d936ac08dd26f2ff58986c8f-Paper-Conference.pdf)
+  (NeurIPS 2023), a stateful `Scalarizer` that decreases all task losses at an approximately equal
+  rate using only the loss values. It learns the task weights internally; after the model step,
+  call its `update()` method with the losses recomputed on the same batch to adjust them.
+
 ## [0.14.0] - 2026-06-10
 
 ### Added
