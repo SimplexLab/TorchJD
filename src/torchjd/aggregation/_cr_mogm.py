@@ -105,7 +105,7 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
         self.weighting = weighting
         self.alpha = alpha
         self._initial_weights = initial_weights
-        self._lambda: Tensor | None = None
+        self.register_buffer("_lambda", None)
 
     @property
     def alpha(self) -> float:

@@ -44,7 +44,7 @@ class GradVacWeighting(_GramianWeighting, Stateful, _NonDifferentiable):
         super().__init__()
         self.beta = beta
         self.eps = eps
-        self._phi_t: Tensor | None = None
+        self.register_buffer("_phi_t", None)
         self._state_key: tuple[int, torch.dtype] | None = None
 
     @property
