@@ -15,6 +15,7 @@ Abstract base class
     :maxdepth: 1
 
     constant.rst
+    cosmos.rst
     dwa.rst
     famo.rst
     geometric_mean.rst
