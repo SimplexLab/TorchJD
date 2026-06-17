@@ -1,5 +1,5 @@
-import torch
 from torch import Tensor
+from torch.nn.functional import cosine_similarity
 
 from ._scalarizer_base import Scalarizer
 
@@ -27,23 +27,21 @@ class COSMOS(Scalarizer):
     :param lambda_: The cosine-similarity penalty coefficient :math:`\lambda`. Must be non-negative.
         A value of ``0`` reduces COSMOS to a plain linear scalarization. The paper uses values
         ranging from ``0.01`` to ``8`` depending on the dataset, with no single best value.
-    :param weights: The preference vector :math:`r` applied to the values (in the paper, sampled on
-        the probability simplex). If ``None``, a uniform preference summing to one is used. If
-        provided, it must have the same shape as the values passed at call time.
-
-    .. note::
-        COSMOS divides by :math:`\lVert L \rVert`, so an all-zero vector of values produces ``nan``.
-        This is not enforced.
+    :param weights: The preference vector :math:`r` applied to the values. It must have the same
+        shape as the values passed at call time. To approximate the whole Pareto front rather than a
+        single trade-off, it should be re-sampled from a Dirichlet distribution and reassigned before
+        every call, as in the paper, e.g. for ``m`` objectives
+        ``cosmos.weights = torch.distributions.Dirichlet(torch.ones(m)).sample()`` (a uniform
+        distribution over the probability simplex; a concentration smaller than one spreads the
+        samples toward the corners of the simplex).
 
     .. note::
         The full COSMOS method also conditions the model on the preference vector by concatenating it
         to the input; that is a modeling choice left to the user. This scalarizer only implements the
-        objective. The `libmoon <https://github.com/xzhang2523/libmoon>`_ reference normalizes the
-        linear term by :math:`\lVert r \rVert`; here the linear term is the raw weighted sum, as in
-        the paper and the official implementation.
+        objective.
     """
 
-    def __init__(self, lambda_: float, weights: Tensor | None = None) -> None:
+    def __init__(self, lambda_: float, weights: Tensor) -> None:
         if lambda_ < 0.0:
             raise ValueError(
                 f"Parameter `lambda_` should be non-negative. Found `lambda_ = {lambda_}`."
@@ -54,21 +52,16 @@ class COSMOS(Scalarizer):
         self.weights = weights
 
     def forward(self, values: Tensor, /) -> Tensor:
-        if self.weights is not None and self.weights.shape != values.shape:
+        if self.weights.shape != values.shape:
             raise ValueError(
                 f"Parameter `weights` should have the same shape as `values`. Found "
                 f"`weights.shape = {tuple(self.weights.shape)}` and `values.shape = "
                 f"{tuple(values.shape)}`."
             )
 
-        if self.weights is None:
-            weights = torch.full_like(values, 1.0 / values.numel())
-        else:
-            weights = self.weights
-
-        weighted_sum = (weights * values).sum()
-        cosine_similarity = weighted_sum / (weights.norm() * values.norm())
-        return weighted_sum - self.lambda_ * cosine_similarity
+        weighted_sum = (self.weights * values).sum()
+        cosine = cosine_similarity(self.weights.flatten(), values.flatten(), dim=0)
+        return weighted_sum - self.lambda_ * cosine
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(lambda_={self.lambda_}, weights={self.weights!r})"
