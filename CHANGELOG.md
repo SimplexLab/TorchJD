@@ -8,6 +8,13 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Added
+
+- Added `COSMOS` from [Scalable Pareto Front Approximation for Deep Multi-Objective
+  Learning](https://arxiv.org/pdf/2103.13392) (ICDM 2021), a `Scalarizer` that combines a linear
+  scalarization with a cosine-similarity penalty pulling the vector of values toward a preference
+  direction.
+
 ## [0.15.0] - 2026-06-15
 
 ### Added

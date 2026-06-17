@@ -20,6 +20,7 @@ tensor(2.)
 """
 
 from ._constant import Constant
+from ._cosmos import COSMOS
 from ._dwa import DWA
 from ._famo import FAMO
 from ._geometric_mean import GeometricMean
@@ -33,6 +34,7 @@ from ._uw import UW
 
 __all__ = [
     "Constant",
+    "COSMOS",
     "DWA",
     "FAMO",
     "GeometricMean",
