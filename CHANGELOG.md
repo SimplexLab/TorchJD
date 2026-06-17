@@ -8,6 +8,13 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Added
+
+- Added `COSMOS` from [Scalable Pareto Front Approximation for Deep Multi-Objective
+  Learning](https://arxiv.org/pdf/2103.13392) (ICDM 2021), a `Scalarizer` that combines a linear
+  scalarization with a cosine-similarity penalty pulling the vector of values toward a preference
+  direction.
+
 ## [0.15.0] - 2026-06-15
 
 ### Added
@@ -19,10 +26,6 @@ changelog does not include internal changes that do not affect the user.
   inner loop on a cross-batch matrix `A = J_1 @ J_2.T` (computed from two independent mini-batches
   using `autojac.jac`), with a direction-oriented regularizer pulling the descent direction toward
   a preference direction.
-- Added `COSMOS` from [Scalable Pareto Front Approximation for Deep Multi-Objective
-  Learning](https://arxiv.org/pdf/2103.13392) (ICDM 2021), a `Scalarizer` that combines a linear
-  scalarization with a cosine-similarity penalty pulling the vector of values toward a preference
-  direction.
 - Added `DWA` (Dynamic Weight Average) from [End-to-End Multi-Task Learning with
   Attention](https://openaccess.thecvf.com/content_CVPR_2019/papers/Liu_End-To-End_Multi-Task_Learning_With_Attention_CVPR_2019_paper.pdf)
   (CVPR 2019), a stateful `Scalarizer` that weights each value by the relative rate at which its
