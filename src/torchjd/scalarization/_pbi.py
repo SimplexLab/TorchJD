@@ -35,10 +35,10 @@ class PBI(Scalarizer):
         direction. The paper uses ``5`` in its experiments; there is no single best value, and the
         paper notes that a too large or too small value worsens the result.
     :param weights: The preference vector :math:`r`, giving the direction along which the values are
-        decomposed. It must have the same shape as the values passed at call time. To approximate the
-        whole Pareto front rather than a single trade-off, it should be re-sampled from a Dirichlet
-        distribution and reassigned before every call, e.g. for ``m`` objectives
-        ``pbi.weights = torch.distributions.Dirichlet(torch.ones(m)).sample()``.
+        decomposed. Its values should be non-negative. It must have the same shape as the values
+        passed at call time. To approximate the whole Pareto front rather than a single trade-off, it
+        should be re-sampled from a Dirichlet distribution and reassigned before every call, e.g. for
+        ``m`` objectives ``pbi.weights = torch.distributions.Dirichlet(torch.ones(m)).sample()``.
     :param reference: The reference (ideal) point :math:`z^*` subtracted from the values. It should
         be a lower bound on the values. If ``None``, the origin is used, which assumes non-negative
         values. If provided, it must have the same shape as the values passed at call time.
@@ -78,9 +78,13 @@ class PBI(Scalarizer):
         direction = self.weights.flatten()
         direction = direction / direction.norm()
 
-        d1 = (f * direction).sum()
+        d1 = f @ direction
         perpendicular = f - d1 * direction
-        d2 = torch.sqrt((perpendicular * perpendicular).sum() + _EPSILON)
+        # `perpendicular` has a zero norm when the values lie exactly on the preference direction
+        # (always the case for a single-objective input, which has no perpendicular component). The
+        # norm's gradient is then undefined, so we add a small constant under the square root to keep
+        # it finite; this shifts the result by at most around 1e-6 there and is negligible elsewhere.
+        d2 = torch.sqrt(perpendicular @ perpendicular + _EPSILON)
         return d1 + self.theta * d2
 
     def __repr__(self) -> str:
