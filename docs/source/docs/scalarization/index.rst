@@ -21,6 +21,7 @@ Abstract base class
     geometric_mean.rst
     imtl_l.rst
     mean.rst
+    pbi.rst
     random.rst
     stch.rst
     sum.rst

@@ -26,6 +26,7 @@ from ._famo import FAMO
 from ._geometric_mean import GeometricMean
 from ._imtl_l import IMTLL
 from ._mean import Mean
+from ._pbi import PBI
 from ._random import Random
 from ._scalarizer_base import Scalarizer
 from ._stch import STCH
@@ -40,6 +41,7 @@ __all__ = [
     "GeometricMean",
     "IMTLL",
     "Mean",
+    "PBI",
     "Random",
     "Scalarizer",
     "STCH",

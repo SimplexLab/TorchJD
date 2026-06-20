@@ -14,6 +14,10 @@ changelog does not include internal changes that do not affect the user.
   Learning](https://arxiv.org/pdf/2103.13392) (ICDM 2021), a `Scalarizer` that combines a linear
   scalarization with a cosine-similarity penalty pulling the vector of values toward a preference
   direction.
+- Added `PBI` (Penalty-based Boundary Intersection) from [MOEA/D: A Multiobjective Evolutionary
+  Algorithm Based on Decomposition](https://ieeexplore.ieee.org/document/4358754) (IEEE TEVC 2007), a
+  `Scalarizer` that decomposes the values into a component along a preference direction and a
+  penalized perpendicular component.
 
 ## [0.15.0] - 2026-06-15
 
