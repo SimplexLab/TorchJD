@@ -282,4 +282,3 @@ The three plot scripts produce PDFs saved to `tests/trajectories/results/<object
 > [!NOTE]
 > The plot scripts require a LaTeX installation for rendering:
 > `sudo apt-get install texlive-latex-extra texlive-fonts-recommended dvipng cm-super`
-

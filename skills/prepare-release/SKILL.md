@@ -60,7 +60,7 @@ line that follows `## [Unreleased]`, before the existing subsections:
 
 ```diff
  ## [Unreleased]
- 
+
 +## [X.Y.Z] - yyyy-mm-dd
 +
  ### Added
@@ -95,4 +95,3 @@ gh release create vX.Y.Z --draft --title vX.Y.Z --notes "<insert notes here>"
 To write the actual release notes, look at what is done in recent releases and suggest the new notes. Make it short. Also, prompt the user for a good-looking emoji (propose a list) to use in the main section of the release notes.
 
 ---
-
