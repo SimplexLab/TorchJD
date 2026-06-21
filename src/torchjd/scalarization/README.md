@@ -21,18 +21,11 @@ def forward(self, values: Tensor, /) -> Tensor:
     ...
 ```
 
-- It reduces over *all* elements of `values`, of any shape, into a 0-dim scalar.
-- The result is a **differentiable** function of `values` and the configured parameters, so that
-  `scalarizer(values).backward()` produces the gradient.
-
-## What is not a scalarizer
-
-A scalarizer sees only the values. Its gradient-level counterpart lives in the
-[aggregation](../aggregation) package: an `Aggregator` (which, like a scalarizer, can be stateful)
-combines the per-objective *gradients* (the Jacobian or its Gramian) into a single gradient.
-
-So if your method needs the model, its parameters, or the per-objective gradients (gradient norms,
-for instance), it is an aggregator, not a scalarizer.
+- **Any shape in, scalar out:** it reduces over *all* dimensions of `values` (scalar, vector, matrix,
+  etc...) into a scalar.
+- **`values`, not `losses`:** a scalarizer is generic and not tied to losses.
+- **Pure and differentiable:** the output depends only on `values` and the configured parameters, so
+  that `scalarizer(values).backward()` produces the gradient.
 
 ## Adding one
 
