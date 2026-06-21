@@ -66,6 +66,7 @@ TorchJD is open-source, under MIT License. The source code is available on
 
     installation.md
     examples/index.rst
+    candidate_aggregators.md
 
 .. toctree::
     :caption: API Reference
