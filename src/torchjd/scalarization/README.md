@@ -8,10 +8,11 @@ full API, see [torchjd.org](https://torchjd.org/latest/docs/scalarization/).
 
 ## The abstraction
 
-A scalarizer captures a single decision: **how to collapse a vector of objective values into one
-scalar to minimize**, using only those values. It is the value-level counterpart of an aggregator,
-which makes the same kind of decision at the gradient level. Everything after it (backpropagation,
-the optimizer step) is standard PyTorch.
+A scalarizer captures a single decision: **how to collapse a vector of values into one scalar to
+minimize**. It operates purely on those values: it has no notion of the losses, tasks, or model they
+come from, which is why its input is named `values` and not `losses`. It is the value-level
+counterpart of an aggregator, which makes the same decision at the gradient level. Everything after
+it (backpropagation, the optimizer step) is standard PyTorch.
 
 Concretely, it subclasses `Scalarizer` (in [`_scalarizer_base.py`](_scalarizer_base.py)) and
 implements one method:
@@ -21,9 +22,8 @@ def forward(self, values: Tensor, /) -> Tensor:
     ...
 ```
 
-- **Any shape in, scalar out:** it reduces over *all* dimensions of `values` (scalar, vector, matrix,
-  etc...) into a scalar.
-- **`values`, not `losses`:** a scalarizer is generic and not tied to losses.
+- **Any shape in, scalar out:** it reduces over *all* elements of `values` (scalar, vector, matrix,
+  higher-dim) into a single scalar.
 - **Pure and differentiable:** the output depends only on `values` and the configured parameters, so
   that `scalarizer(values).backward()` produces the gradient.
 
