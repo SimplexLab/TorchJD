@@ -16,8 +16,8 @@ def forward(self, values: Tensor, /) -> Tensor:
     ...
 ```
 
-- **Any shape in, scalar out:** it reduces over *all* elements of `values` (0-dim, vector, matrix,
-  higher-dim) into a 0-dim scalar.
+- **Any shape in, scalar out:** it reduces over *all* dimensions of `values` (scalar, vector, matrix,
+  etc...) into a scalar.
 - **`values`, not `losses`:** a scalarizer is generic and not tied to losses.
 - **Pure and differentiable:** the output depends only on `values` and the configured parameters, so
   that `scalarizer(values).backward()` produces the gradient.
