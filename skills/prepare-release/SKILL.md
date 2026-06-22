@@ -80,7 +80,7 @@ In `pyproject.toml`, update the `version` field under `[project]`:
 
 ### Step 7: Open the release PR
 
-Stage changes, then open a pull request targeting `main`.
+Checkout a new branch release-vX.Y.Z, stage changes, commit, then open a pull request targeting `main`.
 Return the PR URL when done.
 
 ### Step 8: Create a draft release on GitHub

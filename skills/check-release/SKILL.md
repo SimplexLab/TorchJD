@@ -64,7 +64,7 @@ Verify the installed version matches X.Y.Z:
 cd /tmp/test_torchjd_install && uv pip show torchjd
 ```
 
-If the version is wrong, report it and stop.
+If the version is wrong, you may need to install with `--no-cache`.
 
 ### Step 7: Smoke-test the newly added classes
 
