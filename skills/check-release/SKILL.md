@@ -26,7 +26,7 @@ public classes, functions, or methods listed under `### Added`. You will use the
 
 ### Step 3: Check the docs site
 
-Fetch `https://torchjd.org` with the WebFetch tool.
+Fetch `https://torchjd.org`.
 
 - Verify that the versions dropdown (or switcher) includes `vX.Y.Z` as an entry.
 - Verify that the `stable` entry is present.
