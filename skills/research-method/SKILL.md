@@ -7,7 +7,7 @@ description: Researches about a new method (scalarizer or aggregator) from the s
 
 This skill researched about a new method by reading the paper and the existing implementations, proposing a plan for a TorchJD implementation.
 
-**For agents:** invoke as `/implement-method method-name (paper-name)` (e.g. `/implement-method upgradi (Jacobian Descent for Multi-objective Optimization)`).
+**For agents:** invoke as `/implement-method method-name (paper-name)` (e.g. `/implement-method upgrad (Jacobian Descent for Multi-objective Optimization)`).
 If no method name is provided, ask the user for the name of the method and the title of the paper.
 
 **For humans:** follow the numbered steps below to guide you in your development.
