@@ -20,7 +20,7 @@ If no method name is provided, ask the user for the name of the method and the t
 
 On GitHub, we have a tracking issue for scalarizers (https://github.com/SimplexLab/TorchJD/issues/667) and one for aggregators (https://github.com/SimplexLab/TorchJD/issues/665).
 The first goal is to generate a new row for the table in the appropriate tracking issue.
-You will also have to find the official implementation (if any), that could be linked in the paper, and the most known non-official implementations (search in particular in LibMTL, libmoon and pymoo, and search for more repos online). You will have to find the exact file(s) and lines in which the method is implemented.
+You will also have to find the official implementation (if any), that could be linked in the paper, and the most known non-official implementations (search in particular in LibMTL, libmoon and pymoo, and search for more repos online). You will have to find the exact files and lines in which the method is implemented.
 You can also write special remarks if anything deserves further attention / if you're not sure about something.
 Do not bother trying to find citation count or the exact venue in which the paper was published, unless you directly see this information from your initial search.
 
