@@ -5,7 +5,7 @@ description: Researches about a new method (scalarizer or aggregator) from the s
 
 # Research new method
 
-This skill researched about a new method by reading the paper and the existing implementations, proposing a plan for a TorchJD implementation.
+This skill researches about a new method by reading the paper and the existing implementations, proposing a plan for integrating an implmentation in TorchJD.
 
 **For agents:** invoke as `/implement-method method-name (paper-name)` (e.g. `/implement-method upgrad (Jacobian Descent for Multi-objective Optimization)`).
 If no method name is provided, ask the user for the name of the method and the title of the paper.
