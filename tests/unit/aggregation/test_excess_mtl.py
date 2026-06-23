@@ -88,23 +88,6 @@ def test_weights_change_after_warmup() -> None:
     assert weights[0] > weights[1]
 
 
-def test_update_recurrence() -> None:
-    """Verify the first weight update manually (n_warmup_steps=0, LibMTL behaviour).
-
-    With J = [[2., 0.], [1., 0.]] and robust_step_size=1.0:
-      grad_sum = [[4., 0.], [1., 0.]]
-      h ≈ [[2., sqrt(eps)], [1., sqrt(eps)]]  (eps = 1e-7, negligible in float32 for nonzero entries)
-      w = [4/2 + 0, 1/1 + 0] = [2, 1]
-      initial_w = [2, 1]   (first call: save raw excess as baseline)
-      weights = [exp(2), exp(1)] / (exp(2) + exp(1))
-    """
-    J = tensor_([[2.0, 0.0], [1.0, 0.0]])
-    W = ExcessMTLWeighting(robust_step_size=1.0)
-    e2 = torch.exp(tensor_(2.0))
-    e1 = torch.exp(tensor_(1.0))
-    assert_close(W(J), tensor_([e2 / (e2 + e1), e1 / (e2 + e1)]))
-
-
 def test_two_consecutive_steps() -> None:
     """Verify warm-started carry-over across two calls.
 
@@ -119,7 +102,7 @@ def test_two_consecutive_steps() -> None:
     """
     J1 = tensor_([[2.0, 0.0], [1.0, 0.0]])
     J2 = tensor_([[1.0, 0.0], [2.0, 0.0]])
-    W = ExcessMTLWeighting(robust_step_size=1.0)
+    W = ExcessMTLWeighting(robust_step_size=1.0, n_warmup_steps=0)
 
     e2 = torch.exp(tensor_(2.0))
     e1 = torch.exp(tensor_(1.0))
@@ -140,17 +123,17 @@ def test_warmup_baseline_is_average() -> None:
 
     With n_warmup_steps=2 and J1=[[2,0],[1,0]], J2=[[1,0],[2,0]]:
 
-    Warmup call 1 — grad_sum_1 = J1**2 = [[4,0],[1,0]]:
+    Warmup call 1 — sq_grad_sum_1 = J1**2 = [[4,0],[1,0]]:
       h_1 ≈ [[2, sqrt(eps)], [1, sqrt(eps)]]
       w_1 = [4/2, 1/1] = [2, 1]
 
-    Warmup call 2 — grad_sum_2 = J1**2 + J2**2 = [[5,0],[5,0]]:
+    Warmup call 2 — sq_grad_sum_2 = J1**2 + J2**2 = [[5,0],[5,0]]:
       h_2 ≈ [[sqrt(5), sqrt(eps)], [sqrt(5), sqrt(eps)]]
       w_2 = [1/sqrt(5), 4/sqrt(5)]
 
     initial_w = (w_1 + w_2) / 2  (Appendix C.1 average)
 
-    Post-warmup call 3 with J3 = J1 — grad_sum_3 = [[9,0],[6,0]]:
+    Post-warmup call 3 with J3 = J1 — sq_grad_sum_3 = [[9,0],[6,0]]:
       h_3 ≈ [[3, sqrt(eps)], [sqrt(6), sqrt(eps)]]
       w_3 = [4/3, 1/sqrt(6)]
       w_norm = w_3 / (initial_w + 1e-7)
@@ -162,21 +145,21 @@ def test_warmup_baseline_is_average() -> None:
     J3 = tensor_([[2.0, 0.0], [1.0, 0.0]])
     W = ExcessMTLWeighting(n_warmup_steps=2, robust_step_size=1.0)
 
-    W(J1)  # warmup step 1 — grad_sum becomes J1**2
-    W(J2)  # warmup step 2 — grad_sum becomes J1**2 + J2**2
+    W(J1)  # warmup step 1 — sq_grad_sum becomes J1**2
+    W(J2)  # warmup step 2 — sq_grad_sum becomes J1**2 + J2**2
 
-    grad_sum_1 = J1**2
-    h_1 = torch.sqrt(grad_sum_1 + 1e-7)
+    sq_grad_sum_1 = J1**2
+    h_1 = torch.sqrt(sq_grad_sum_1 + 1e-7)
     w_1 = (J1**2 / h_1).sum(dim=1)
 
-    grad_sum_2 = grad_sum_1 + J2**2
-    h_2 = torch.sqrt(grad_sum_2 + 1e-7)
+    sq_grad_sum_2 = sq_grad_sum_1 + J2**2
+    h_2 = torch.sqrt(sq_grad_sum_2 + 1e-7)
     w_2 = (J2**2 / h_2).sum(dim=1)
 
     initial_w = (w_1 + w_2) / 2  # Appendix C.1 baseline
 
-    grad_sum_3 = grad_sum_2 + J3**2
-    h_3 = torch.sqrt(grad_sum_3 + 1e-7)
+    sq_grad_sum_3 = sq_grad_sum_2 + J3**2
+    h_3 = torch.sqrt(sq_grad_sum_3 + 1e-7)
     w_3 = (J3**2 / h_3).sum(dim=1)
     w_norm = w_3 / (initial_w + 1e-7)
     pre_norm = tensor_([0.5, 0.5]) * torch.exp(w_norm)
