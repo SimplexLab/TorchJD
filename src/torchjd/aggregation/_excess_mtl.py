@@ -124,12 +124,12 @@ class ExcessMTLWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
             if self._n_warmup_steps > 0:
                 # Average excess risk observed during warmup (Appendix C.1)
                 self._initial_w = cast(Tensor, self._warmup_w_sum) / self._n_warmup_steps
-                w = w / (cast(Tensor, self._initial_w) + 1e-7)
+                w = w / (self._initial_w + 1e-7)
             else:
                 # Official impl behavior: first call's excess is the baseline; use w raw
                 self._initial_w = w
         else:
-            w = w / (cast(Tensor, self._initial_w) + 1e-7)
+            w = w / (self._initial_w + 1e-7)
 
         # Exponentiated gradient weight update (Equation 9)
         weights = cast(Tensor, self._weights)

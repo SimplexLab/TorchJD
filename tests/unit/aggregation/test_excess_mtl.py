@@ -3,7 +3,7 @@ from pytest import raises
 from torch.testing import assert_close
 from utils.tensors import randn_, tensor_
 
-from torchjd.aggregation._excess_mtl import ExcessMTLWeighting
+from torchjd.aggregation._excess_mtl import ExcessMTL, ExcessMTLWeighting
 
 
 def test_representations() -> None:
@@ -190,3 +190,34 @@ def test_non_differentiable() -> None:
     W = ExcessMTLWeighting()
     weights = W(J)
     assert not weights.requires_grad
+
+
+# ExcessMTL (aggregator wrapper) tests
+
+
+def test_excess_mtl_representations() -> None:
+    agg = ExcessMTL(robust_step_size=2.0, n_warmup_steps=3)
+    assert repr(agg) == "ExcessMTL(robust_step_size=2.0, n_warmup_steps=3)"
+
+
+def test_excess_mtl_properties_delegate() -> None:
+    agg = ExcessMTL(robust_step_size=1.0, n_warmup_steps=0)
+    assert agg.robust_step_size == 1.0
+    assert agg.n_warmup_steps == 0
+
+    agg.robust_step_size = 0.5
+    assert agg.robust_step_size == 0.5
+    assert agg.weighting.robust_step_size == 0.5
+
+    agg.n_warmup_steps = 5
+    assert agg.n_warmup_steps == 5
+    assert agg.weighting.n_warmup_steps == 5
+
+
+def test_excess_mtl_reset_delegates() -> None:
+    J = randn_((3, 8))
+    agg = ExcessMTL(n_warmup_steps=0)
+    first = agg(J)
+    agg(J)
+    agg.reset()
+    assert_close(first, agg(J))
