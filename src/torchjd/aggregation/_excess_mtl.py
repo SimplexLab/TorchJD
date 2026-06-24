@@ -24,16 +24,16 @@ class ExcessMTLWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
 
     At each call, task weights are updated via an exponentiated gradient step (Equation 9) driven
     by per-task excess risk estimates. The excess risk for task :math:`i` is approximated via a
-    second-order Taylor expansion (Equations 6-7):
+    second-order Taylor expansion (Equations 6-7).
 
     :param robust_step_size: Step size :math:`\eta_\alpha` for the exponentiated weight update.
         Must be positive.
     :param n_warmup_steps: Number of forward calls during which weights stay uniform
         (:math:`[1/m, \ldots, 1/m]`) and gradient statistics are collected. The baseline excess
-        risk is then set to the average excess risk observed during warmup. When ``0``, the first
-        call's excess risk is used immediately as the baseline. The default ``1`` matches the
-        behavior of the official implementation and LibMTL. The paper (Appendix C.1) recommends
-        collecting statistics for 3 full epochs, i.e. ``n_warmup_steps = 3 * len(dataloader)``.
+        risk is then set to the average excess risk observed during warmup. When ``0`` (default),
+        the first call's excess risk is used immediately as the baseline, matching the behavior of
+        the official implementation and LibMTL. The paper (Appendix C.1) recommends collecting
+        statistics for 3 full epochs, i.e. ``n_warmup_steps = 3 * len(dataloader)``.
 
     .. warning::
         The state tensor :math:`S \in \mathbb{R}^{m \times n}` accumulates squared gradients
@@ -51,7 +51,7 @@ class ExcessMTLWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
     def __init__(
         self,
         robust_step_size: float = 1.0,
-        n_warmup_steps: int = 1,
+        n_warmup_steps: int = 0,
     ) -> None:
         super().__init__()
         self.robust_step_size = robust_step_size
@@ -87,6 +87,46 @@ class ExcessMTLWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
             )
         self._n_warmup_steps = value
 
+    def forward(self, matrix: Matrix, /) -> Tensor:
+        self._ensure_state(matrix)
+
+        sq_matrix = matrix.detach() ** 2
+
+        # Accumulate squared gradients for AdaGrad-style diagonal Hessian (Equation 7)
+        sq_grad_sum = cast(Tensor, self._sq_grad_sum)
+        sq_grad_sum.add_(sq_matrix)
+
+        # Excess risk proxy: Ê_i ≈ g_i^T H_i^{-1} g_i (Equation 6)
+        h = torch.sqrt(sq_grad_sum + 1e-7)
+        w = (sq_matrix / h).sum(dim=1)  # shape [m]
+
+        # Warmup: collect excess risk stats but return uniform weights
+        if self._n_steps < self._n_warmup_steps:
+            cast(Tensor, self._warmup_w_sum).add_(w)
+            self._n_steps += 1
+            return cast(Tensor, self._weights)
+
+        self._n_steps += 1
+
+        # Set baseline on the first non-warmup call
+        if self._initial_w is None:
+            if self._n_warmup_steps > 0:
+                # Average excess risk observed during warmup (Appendix C.1)
+                self._initial_w = cast(Tensor, self._warmup_w_sum) / self._n_warmup_steps
+                w = w / (self._initial_w + 1e-7)  # Scale processing (Section 3.2)
+            else:
+                # Official impl behavior: first call's excess is the baseline; use w raw
+                self._initial_w = w
+        else:
+            w = w / (self._initial_w + 1e-7)  # Scale processing (Section 3.2)
+
+        # Exponentiated gradient weight update (Equation 9)
+        weights = cast(Tensor, self._weights)
+        weights = weights * torch.exp(w * self._robust_step_size)
+        weights = weights / weights.sum()
+        self._weights = weights
+        return weights
+
     def reset(self) -> None:
         """Clears all state so the next forward starts from uniform weights and re-enters
         warmup."""
@@ -97,46 +137,6 @@ class ExcessMTLWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
         self._warmup_w_sum = None
         self._n_steps = 0
         self._state_key = None
-
-    def forward(self, matrix: Matrix, /) -> Tensor:
-        self._ensure_state(matrix)
-
-        sq_matrix = matrix.detach() ** 2
-
-        # Accumulate squared gradients for AdaGrad-style diagonal Hessian (Equation 7)
-        sq_grad_sum = cast(Tensor, self._sq_grad_sum)
-        sq_grad_sum += sq_matrix
-
-        # Excess risk proxy: Ê_i ≈ g_i^T H_i^{-1} g_i (Equation 6)
-        h = torch.sqrt(sq_grad_sum + 1e-7)
-        w = (sq_matrix / h).sum(dim=1)  # shape [m]
-
-        n_steps = self._n_steps
-        self._n_steps += 1
-
-        # Warmup: collect excess risk stats but return uniform weights
-        if n_steps < self._n_warmup_steps:
-            cast(Tensor, self._warmup_w_sum).add_(w)
-            return cast(Tensor, self._weights)
-
-        # Set baseline on the first non-warmup call
-        if self._initial_w is None:
-            if self._n_warmup_steps > 0:
-                # Average excess risk observed during warmup (Appendix C.1)
-                self._initial_w = cast(Tensor, self._warmup_w_sum) / self._n_warmup_steps
-                w = w / (self._initial_w + 1e-7)
-            else:
-                # Official impl behavior: first call's excess is the baseline; use w raw
-                self._initial_w = w
-        else:
-            w = w / (self._initial_w + 1e-7)
-
-        # Exponentiated gradient weight update (Equation 9)
-        weights = cast(Tensor, self._weights)
-        weights = weights * torch.exp(w * self._robust_step_size)
-        weights = weights / weights.sum()
-        self._weights = weights
-        return weights
 
     def _ensure_state(self, matrix: Matrix) -> None:
         key = (matrix.shape[0], matrix.shape[1], matrix.dtype, matrix.device)
@@ -160,6 +160,7 @@ class ExcessMTLWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
 
 class ExcessMTL(WeightedAggregator, Stateful, _NonDifferentiable):
     r"""
+    :class:`~torchjd.Stateful`
     :class:`~torchjd.aggregation.WeightedAggregator` from `Robust Multi-Task Learning with Excess
     Risks <https://proceedings.mlr.press/v235/he24n.html>`_ (ICML 2024).
 
@@ -170,8 +171,11 @@ class ExcessMTL(WeightedAggregator, Stateful, _NonDifferentiable):
     :param robust_step_size: Step size :math:`\eta_\alpha` for the exponentiated weight update.
         Must be positive.
     :param n_warmup_steps: Number of forward calls during which weights stay uniform
-        (:math:`[1/m, \ldots, 1/m]`) and gradient statistics are collected. When ``0``, the first
-        call's excess risk is used as the baseline immediately. Defaults to ``1``.
+        (:math:`[1/m, \ldots, 1/m]`) and gradient statistics are collected. The baseline excess
+        risk is then set to the average excess risk observed during warmup. When ``0`` (default),
+        the first call's excess risk is used immediately as the baseline, matching the behavior of
+        the official implementation and LibMTL. The paper (Appendix C.1) recommends collecting
+        statistics for 3 full epochs, i.e. ``n_warmup_steps = 3 * len(dataloader)``.
     """
 
     weighting: ExcessMTLWeighting
@@ -179,7 +183,7 @@ class ExcessMTL(WeightedAggregator, Stateful, _NonDifferentiable):
     def __init__(
         self,
         robust_step_size: float = 1.0,
-        n_warmup_steps: int = 1,
+        n_warmup_steps: int = 0,
     ) -> None:
         super().__init__(ExcessMTLWeighting(robust_step_size, n_warmup_steps))
 
