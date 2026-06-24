@@ -103,6 +103,6 @@ PYTEST_TORCH_DEVICE=cuda:0 uv run pytest tests/unit -W error # GPU (needs CUDA)
 
 - If `uv run` re-syncs unexpectedly, prefix with `UV_NO_SYNC=1`. Docs build is strict (`-W -n`), so
   an `.rst` title underline must match its title length.
-- `test_dualproj.py::test_permutation_invariant` and `test_upgrad.py::test_permutation_invariant`
-  are known flaky off-Linux (~1 float32 ULP, quadprog), pre-existing and unrelated. CI (Linux) is
-  the source of truth.
+- Treat CI as the source of truth. A pre-existing test unrelated to your change can fail by
+  a tiny float tolerance on other platforms; confirm your new tests pass and that nothing you
+  touched regressed, rather than chasing it.

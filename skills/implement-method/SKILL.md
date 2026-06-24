@@ -60,24 +60,29 @@ Always do this — it is the step we invariably end up needing. Read the relevan
 algorithm box in the paper, then read the official and best-known third-party implementations at the
 exact files/lines from the tracking row.
 
-Reconcile any discrepancies between them (a different normalization, an extra factor, an
-initialization value, a stabilization trick, a sign convention). Decide which version to follow,
-note **why**, and surface the disagreement to the user. The implementation should be faithful to a
-clearly-stated source, not an unexplained blend.
+Reconcile any discrepancies between them. The ones that most often bite:
+
+- **Minimization vs maximization.** TorchJD minimizes losses; much MOO/evolutionary work is written
+  for maximization, with the minimization form buried in a footnote. Find it, and check the sign of
+  every reference / ideal-point subtraction.
+- **Normalization.** A direction or weight vector may be normalized (`w / ‖w‖`) in the code but not
+  the paper, or vice versa.
+- **Dead arguments.** An impl may accept a parameter (e.g. a reference point) yet silently ignore it.
+- **Droppable terms.** An `abs` / `clamp` / `max(0, ·)` in the paper may be unnecessary under the
+  method's preconditions (e.g. non-negative weights); drop it only with a justification.
+- **Other:** an extra factor, an init value, a stabilization / epsilon trick.
+
+Decide which to follow, note **why**, and surface the disagreement to the user — the implementation
+should be faithful to a clearly-stated source, not an unexplained blend.
 
 ### Step 4: Settle the interface and design decisions
 
-Using the research findings (Step 1) and the comparison (Step 3), decide how each non-standard
-aspect maps onto TorchJD, reusing the closest existing pattern:
+Using the research findings (Step 1) and the comparison (Step 3), map each non-standard aspect onto
+the closest existing pattern from the reference loaded in Step 2 (statefulness, trainable parameters,
+an internal optimizer, a preference/reference vector, ...). Then settle, for any method type:
 
-- **Stateful, trainable** parameter(s) → `nn.Parameter` + the `Stateful` mixin's `reset()` (mirror
-  `UW` / `IMTL-L`).
-- **Stateful, non-trainable** history/buffer → a registered buffer + an explicit update method (e.g.
-  `step()`), with no `nn.Parameter` (mirror `DWA`).
-- **Internal optimizer / multi-call update protocol** (mirror `FAMO`).
-- **Preference / reference vector** argument (mirror `STCH` / `COSMOS` / `PBI`).
-- **Preconditions** (e.g. positivity): decide whether to enforce them (raise `ValueError`) or only
-  document them, and how `nan`/`inf` should propagate.
+- **Preconditions** (e.g. positivity): enforce them (raise `ValueError`) or only document them, and
+  how `nan`/`inf` should propagate.
 - Which constructor arguments are **required vs optional**, and their **defaults**.
 
 List the non-standard parts and your proposed handling, and **confirm the design with the user
@@ -91,15 +96,34 @@ license header to the source file and an entry to `NOTICES` (see the reference).
 
 ### Step 6: Verify
 
-Run the checks listed in the reference (unit tests with `-W error`, lint, type-check, and the docs
+Run the checks listed in the reference (unit tests with `-W error`, lint, and the docs
 build/doctest). GPU tests require a CUDA device; if you cannot run them, provide the exact commands
 for the user to run on their GPU and report back the results.
 
-### Step 7: Open the PR
+### Step 7: Self-review the code you produced
 
-Create a new branch, commit, and open a pull request targeting `main`, following the repository's
-PR conventions (a `CHANGELOG.md` entry under `[Unreleased] > ### Added`; when asked for a PR
-description, output raw GitHub-flavored markdown in a fenced code block, with GitHub math syntax
-`$...$` / `$$...$$` and no em dashes). Return the PR URL when done.
+Before opening anything, re-read your own diff against the requirements and improve what can be
+improved. Check that:
+
+- The class follows the closest existing method's conventions (the reference's checklist): correct
+  base class(es), `forward(self, values, /)` returning a 0-dim scalar, shape validation, `reset()`
+  for stateful methods, a correct `__repr__`, and the docstring conventions (`r"""` only with LaTeX,
+  `:class:` cross-ref, `.. math::` + bullet list, a usage doctest, `:param:` for each argument).
+- The design decisions settled in Step 4 are actually reflected in the code, and any discrepancy
+  between the paper and the existing implementations (Step 3) is resolved deliberately, with a
+  comment or docstring note where it is non-obvious.
+- The tests cover the documented edge cases and contracts, not just the happy path.
+- All six files are present and consistent (class, `__init__.py`, `.rst`, toctree, test,
+  `CHANGELOG.md`), plus `NOTICES` + a license header if you adapted code.
+
+Apply the fixes you find, then re-run the relevant checks from Step 6.
+
+### Step 8: Open a draft PR
+
+Create a new branch, commit, and open a **draft** pull request targeting `main`, following the
+repository's PR conventions (a `CHANGELOG.md` entry under `[Unreleased] > ### Added`; when asked for
+a PR description, output raw GitHub-flavored markdown in a fenced code block, with GitHub math syntax
+`$...$` / `$$...$$` and no em dashes). Keep it a draft so the contributor can read the code
+themselves before requesting maintainer review. Return the PR URL when done.
 
 ---
