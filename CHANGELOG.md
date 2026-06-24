@@ -8,6 +8,8 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-06-22
+
 ### Added
 
 - Added `COSMOS` from [Scalable Pareto Front Approximation for Deep Multi-Objective

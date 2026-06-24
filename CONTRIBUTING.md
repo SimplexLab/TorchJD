@@ -95,6 +95,13 @@ CC=gcc uv pip install --python-version=3.14 -e '.[full]' --group check --group d
 uv run pre-commit install
 ```
 
+## Working with agents
+
+We encourage contributors to use AI agents when contributing to TorchJD, but there are a few rules:
+- The initiative should come from a human. We do not want PRs from fully automated bots.
+- The changes should be reviewed by a human before a non-draft PR is open.
+- To avoid vendor lock-in, we do not provide any file that is specific to an agent vendor. To use a specific agent that does not follow open file naming conventions, you have to adapt a few things yourself (e.g. symlink files). For example, to work with claude, you have to symlink `CLAUDE.md` to `AGENTS.md`, and `.claude/skill/` to `skills/`.
+
 ## Checks
 
 ### Running tests
@@ -275,26 +282,3 @@ The three plot scripts produce PDFs saved to `tests/trajectories/results/<object
 > [!NOTE]
 > The plot scripts require a LaTeX installation for rendering:
 > `sudo apt-get install texlive-latex-extra texlive-fonts-recommended dvipng cm-super`
-
-
-## Release
-
-*This section is addressed to maintainers.*
-
-To release a new `torchjd` version, you have to:
-- If the release introduces changes to the interface, make sure that `README.md` reflects those
-  changes.
-- Make sure that all tests, including those on cuda, pass (for this, you need access to a machine
-  that has a cuda-enabled GPU).
-- Make sure that all important changes since the last release have been reported in the
-  `[Unreleased]` section at the top of the changelog.
-- Add a `[X.Y.Z] - yyyy-mm-dd` header in the changelog just below the `[Unreleased]` header.
-- Change the version in `pyproject.toml`.
-- Make a pull request with those changes and merge it.
-- Make a draft of the release on GitHub (click on `Releases`, then `Draft a new release`, then fill
-  the details).
-- Publish the release (click on  `Publish release`). This should trigger the deployment of the new
-  version on PyPI and the building and deployment of the documentation on github-pages.
-- Check that the new version is correctly deployed to PyPI, that it is installable and that it
-  works.
-- Check that the documentation has been correctly deployed.
