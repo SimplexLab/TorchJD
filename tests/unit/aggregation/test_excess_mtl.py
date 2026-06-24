@@ -1,9 +1,20 @@
 import torch
-from pytest import raises
+from pytest import mark, raises
+from torch import Tensor
 from torch.testing import assert_close
 from utils.tensors import randn_, tensor_
 
 from torchjd.aggregation._excess_mtl import ExcessMTL, ExcessMTLWeighting
+
+from ._asserts import assert_expected_structure
+from ._inputs import typical_matrices
+
+typical_pairs = [(ExcessMTL(), m) for m in typical_matrices]
+
+
+@mark.parametrize(["aggregator", "matrix"], typical_pairs)
+def test_expected_structure(aggregator: ExcessMTL, matrix: Tensor) -> None:
+    assert_expected_structure(aggregator, matrix)
 
 
 def test_representations() -> None:
@@ -198,6 +209,7 @@ def test_non_differentiable() -> None:
 def test_excess_mtl_representations() -> None:
     agg = ExcessMTL(robust_step_size=2.0, n_warmup_steps=3)
     assert repr(agg) == "ExcessMTL(robust_step_size=2.0, n_warmup_steps=3)"
+    assert str(agg) == "ExcessMTL"
 
 
 def test_excess_mtl_properties_delegate() -> None:
