@@ -8,6 +8,15 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Added
+
+- Added `ExcessMTL` and `ExcessMTLWeighting` from [Robust Multi-Task Learning with Excess
+  Risks](https://proceedings.mlr.press/v235/he24n.html) (ICML 2024). `ExcessMTLWeighting` is a
+  stateful `Weighting` that maintains task weights across calls via an exponentiated gradient update
+  driven by per-task excess risk estimates. The excess risk is approximated using an AdaGrad-style
+  diagonal Hessian. An optional `n_warmup_steps` parameter controls how many forward calls collect
+  gradient statistics before weight updates begin.
+
 ## [0.16.0] - 2026-06-22
 
 ### Added
