@@ -8,6 +8,8 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-06-24
+
 ### Added
 
 - Added `ExcessMTL` and `ExcessMTLWeighting` from [Robust Multi-Task Learning with Excess
