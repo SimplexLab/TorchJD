@@ -30,6 +30,7 @@ Abstract base classes
     constant.rst
     cr_mogm.rst
     dualproj.rst
+    excess_mtl.rst
     fairgrad.rst
     graddrop.rst
     gradvac.rst
