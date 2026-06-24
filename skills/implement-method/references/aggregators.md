@@ -43,8 +43,8 @@ use `_GramianWeighting`.
 
 Almost every algorithm ships as **two classes**:
 
-1. `_FooWeighting(_MatrixWeighting or _GramianWeighting, ...)` — the core computation.
-   Prefixed with `_` to signal it is private. Takes either `Matrix` or `PSDMatrix` as input.
+1. `FooWeighting(_MatrixWeighting or _GramianWeighting, ...)` — the core computation.
+   Prefixed with `_` to signal if it is private. Takes either `Matrix` or `PSDMatrix` as input.
 2. `Foo(WeightedAggregator or GramianWeightedAggregator, ...)` — the public-facing aggregator
    wrapping the weighting.
 
@@ -105,8 +105,7 @@ from torchjd.aggregation._mixins import _NonDifferentiable
 ```
 
 This is the case for most stateful aggregators (GradVac, NashMTL, CR-MOGM, MoDo, SDMGrad,
-ExcessMTL). The `_NonDifferentiable` mixin registers a backward hook on the Aggregator that
-raises a clear error if a user accidentally tries to backprop through the weighting.
+ExcessMTL). The `_NonDifferentiable` wraps the `__call__` in a `torch.no_grad` context, so it's useless to detach the input matrix in such a method.
 
 ---
 
@@ -138,10 +137,12 @@ Common constraints:
 
 ---
 
-## `set_losses` Setter
+## Extra Inputs via Setters
 
-If the method needs raw loss values (not just the Jacobian), expose them via a setter
-rather than passing them to `forward`. CONTRIBUTING.md explicitly anticipates this pattern.
+If the method needs information beyond the Jacobian matrix (e.g. raw loss values, auxiliary
+statistics), expose it via a setter rather than adding arguments to `forward`. This keeps the
+`forward` signature uniform across all weightings. CONTRIBUTING.md explicitly anticipates this
+pattern.
 
 ```python
 def set_losses(self, losses: Tensor) -> None:
@@ -149,8 +150,9 @@ def set_losses(self, losses: Tensor) -> None:
     self._losses = losses.detach()
 ```
 
-Document clearly in the docstring that users must call `set_losses` before each training
-step.
+The same principle applies to any other extra input (e.g. task-specific learning rates,
+reference gradients). Document clearly in the docstring that the setter must be called before
+each training step.
 
 ---
 
@@ -168,6 +170,22 @@ def __repr__(self) -> str:
         f"rho={self.rho!r})"
     )
 ```
+
+---
+
+## Docstring Usage Examples
+
+If the method has **non-standard usage** (e.g. requires double-sampling, a `set_losses` call
+before each forward, or manual state management), add a `.. testcode::` example in the
+docstring showing a realistic training step. Methods with standard usage (construct, call with
+a Jacobian matrix, done) should **not** add an example — the class hierarchy and parameter
+descriptions are sufficient.
+
+Non-standard examples include:
+- Cross-batch `A = J_1 @ J_2.T` input (MoDo, SDMGrad) — show both `autojac.jac` calls and
+  how to pass `A`.
+- `set_losses` requirement (e.g. GradNorm) — show the `weighting.set_losses(losses)` call
+  immediately before the aggregation step.
 
 ---
 
