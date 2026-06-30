@@ -20,10 +20,11 @@ TorchJD is a PyTorch library for training neural networks with **multiple losses
 two complementary approaches:
 
 - **Scalarization**: combine losses into a single scalar before backprop, using methods from the
-  literature (geometric mean, softmax weighting, etc.). This is often a good baseline.
+  literature (geometric mean, softmax weighting, [etc.](#supported-scalarizers)). This is often a good baseline.
 - **[Jacobian descent](https://arxiv.org/pdf/2406.16232)**: compute the Jacobian matrix of losses
   with respect to parameters and aggregate it into an update direction using state-of-the-art
-  aggregators (UPGrad, MGDA, CAGrad, and many more). This in particular allows taking conflict-free
+  aggregators (UPGrad, MGDA, CAGrad, [and many more]()#supported-aggregators-and-weightings). 
+  This in particular allows taking conflict-free
   optimization directions, which can resolve problems that may be impossible to solve with standard
   scalarizers.
 
