@@ -185,7 +185,7 @@ include clear instructions on how to migrate.
 ## Contribution
 
 Please read the [Contribution page](CONTRIBUTING.md) and join our
-[![Discord](https://img.shields.io/badge/Discord-%235865F2?logo=discord&logoColor=white)](https://discord.gg/76KkRnb3nk)
+[Discord](https://discord.gg/76KkRnb3nk)
 to get involved!
 
 Thanks to our amazing contributors for making this project possible:
