@@ -23,7 +23,7 @@ two complementary approaches:
   literature (geometric mean, softmax weighting, [etc.](#supported-scalarizers)). This is often a good baseline.
 - **[Jacobian descent](https://arxiv.org/pdf/2406.16232)**: compute the Jacobian matrix of losses
   with respect to parameters and aggregate it into an update direction using state-of-the-art
-  aggregators (UPGrad, MGDA, CAGrad, [and many more]()#supported-aggregators-and-weightings). 
+  aggregators (UPGrad, MGDA, CAGrad, [and many more](#supported-aggregators-and-weightings)). 
   This in particular allows taking conflict-free
   optimization directions, which can resolve problems that may be impossible to solve with standard
   scalarizers.
