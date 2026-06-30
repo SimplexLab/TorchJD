@@ -193,7 +193,7 @@ Thanks to our amazing contributors for making this project possible:
 <a href="https://github.com/SimplexLab/TorchJD/graphs/contributors"><img src="https://stg.contrib.rocks/image?repo=SimplexLab/TorchJD&max=240&columns=18" /></a>
 
 ## Citation
-
+If you use TorchJD for your research, please cite:
 ```
 @article{jacobian_descent,
   title={Jacobian Descent For Multi-Objective Optimization},
