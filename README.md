@@ -99,9 +99,9 @@ Here is how to change a standard multi-task training loop to use Jacobian descen
   optimizer = SGD(params, lr=0.1)
 + aggregator = UPGrad()
 
-  inputs = torch.randn(8, 16, 10)
-  task1_targets = torch.randn(8, 16, 1)
-  task2_targets = torch.randn(8, 16, 1)
+  inputs = torch.randn(8, 16, 10)  # 8 batches of 16 random input vectors of length 10
+  task1_targets = torch.randn(8, 16, 1)  # 8 batches of 16 targets for the first task
+  task2_targets = torch.randn(8, 16, 1)  # 8 batches of 16 targets for the second task
 
   for input, target1, target2 in zip(inputs, task1_targets, task2_targets):
       features = shared_module(input)
