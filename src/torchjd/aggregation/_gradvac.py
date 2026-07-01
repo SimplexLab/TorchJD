@@ -135,7 +135,7 @@ class GradVac(GramianWeightedAggregator, Stateful, _NonDifferentiable):
     :class:`~torchjd.aggregation.GramianWeightedAggregator` implementing the aggregation step of
     Gradient Vaccine (GradVac) from `Gradient Vaccine: Investigating and Improving Multi-task
     Optimization in Massively Multilingual Models (ICLR 2021 Spotlight)
-    <https://openreview.net/forum?id=F1vEjWK-lH_>`_.
+    <https://arxiv.org/abs/2010.05874>`_.
 
     For each task :math:`i`, the order in which other tasks :math:`j` are visited is drawn at
     random. For each pair :math:`(i, j)`, the cosine similarity :math:`\phi_{ij}` between the

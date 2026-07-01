@@ -59,7 +59,7 @@ changelog does not include internal changes that do not affect the user.
 ### Added
 
 - Added `IMTL-L` (the loss-balancing variant of Impartial Multi-Task Learning) from [Towards
-  Impartial Multi-Task Learning](https://openreview.net/pdf?id=IMPnRXEWpvr) (ICLR 2021), a stateful
+  Impartial Multi-Task Learning](https://www.semanticscholar.org/paper/Towards-Impartial-Multi-task-Learning-Liu-Li/45c0828baec1dd53b81f1b2635788fdf27d0792d) (ICLR 2021), a stateful
   `Scalarizer` that learns a per-task scale `s_i` and combines the values as
   `Σ (exp(s_i) · L_i − s_i)`.
 - Added `UW` (Uncertainty Weighting) from [Multi-Task Learning Using Uncertainty to Weigh Losses
@@ -74,7 +74,7 @@ changelog does not include internal changes that do not affect the user.
 ### Added
 
 - Added `STCH` from [Smooth Tchebycheff Scalarization for Multi-Objective
-  Optimization](https://openreview.net/pdf?id=m4dO5L6eCp), a `Scalarizer` that combines the input
+  Optimization](https://arxiv.org/abs/2402.19078), a `Scalarizer` that combines the input
   tensor of values into a smooth approximation of their (weighted, shifted) maximum.
 - Added `MoDoWeighting` from [Three-Way Trade-Off in Multi-Objective Learning: Optimization, Generalization and Conflict-Avoidance](https://www.jmlr.org/papers/volume25/23-1287/23-1287.pdf) (JMLR 2024). It is a stateful `Weighting` that maintains task weights across calls via a simplex-projected gradient step on a cross-batch matrix `G = J_1 @ J_2.T`, computed from two independent mini-batches using `autojac.jac`.
 - Added `GeometricMean` (also known as GLS) studied in [MultiNet++: Multi-Stream Feature

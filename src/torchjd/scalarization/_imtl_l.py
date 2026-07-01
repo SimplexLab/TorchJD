@@ -14,7 +14,7 @@ class IMTLL(Scalarizer, Stateful):
     :class:`~torchjd.scalarization.Scalarizer` that combines the input tensor of values using learned
     per-task scales. ``IMTL-L`` is the loss-balancing variant of Impartial
     Multi-Task Learning, proposed in `Towards Impartial Multi-Task Learning
-    <https://openreview.net/pdf?id=IMPnRXEWpvr>`_.
+    <https://www.semanticscholar.org/paper/Towards-Impartial-Multi-task-Learning-Liu-Li/45c0828baec1dd53b81f1b2635788fdf27d0792d>`_.
 
     Each value :math:`L_i` is assigned a learnable scale parameter :math:`s_i`, and the values are
     combined as

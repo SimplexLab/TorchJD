@@ -8,7 +8,7 @@ class STCH(Scalarizer):
     r"""
     :class:`~torchjd.scalarization.Scalarizer` that combines the input tensor of values using smooth
     Tchebycheff scalarization, as defined in `Smooth Tchebycheff Scalarization for Multi-Objective
-    Optimization <https://openreview.net/pdf?id=m4dO5L6eCp>`_.
+    Optimization <https://arxiv.org/abs/2402.19078>`_.
 
     It returns
 
