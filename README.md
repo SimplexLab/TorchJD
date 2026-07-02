@@ -23,7 +23,7 @@ two complementary approaches:
   literature (geometric mean, softmax weighting, [etc.](#supported-scalarizers)). This is often a good baseline.
 - **[Jacobian descent](https://arxiv.org/pdf/2406.16232)**: compute the Jacobian matrix of losses
   with respect to parameters and aggregate it into an update direction using state-of-the-art
-  aggregators (UPGrad, MGDA, CAGrad, [and many more](#supported-aggregators-and-weightings)). 
+  aggregators (UPGrad, MGDA, CAGrad, [and many more](#supported-aggregators-and-weightings)).
   This in particular allows taking conflict-free
   optimization directions, which can resolve problems that may be impossible to solve with standard
   scalarizers.
@@ -57,22 +57,30 @@ a standard training loop to use scalarization:
 
 + from torchjd.scalarization import GeometricMean
 
-  model = Sequential(Linear(10, 5), ReLU(), Linear(5, 1))
-  optimizer = SGD(model.parameters(), lr=0.1)
-  criterion = MSELoss()
+  shared_module = Sequential(Linear(10, 5), ReLU(), Linear(5, 3), ReLU())
+  task1_module = Linear(3, 1)
+  task2_module = Linear(3, 1)
+  params = [*shared_module.parameters(), *task1_module.parameters(), *task2_module.parameters()]
+
+  loss_fn = MSELoss()
+  optimizer = SGD(params, lr=0.1)
 + scalarizer = GeometricMean()
 
-  inputs = torch.randn(16, 10)
-  task1_targets, task2_targets = torch.randn(16, 1), torch.randn(16, 1)
+  inputs = torch.randn(8, 16, 10)  # 8 batches of 16 random input vectors of length 10
+  task1_targets = torch.randn(8, 16, 1)  # 8 batches of 16 targets for the first task
+  task2_targets = torch.randn(8, 16, 1)  # 8 batches of 16 targets for the second task
 
-  output = model(inputs)
-- loss = criterion(output, task1_targets) + criterion(output, task2_targets)
-- loss.backward()
-+ losses = torch.stack([criterion(output, task1_targets), criterion(output, task2_targets)])
-+ loss = scalarizer(losses)
-+ loss.backward()
-  optimizer.step()
-  optimizer.zero_grad()
+  for input, target1, target2 in zip(inputs, task1_targets, task2_targets):
+      features = shared_module(input)
+      loss1 = loss_fn(task1_module(features), target1)
+      loss2 = loss_fn(task2_module(features), target2)
+
+-     loss = loss1 + loss2
+-     loss.backward()
++     loss = scalarizer(torch.stack([loss1, loss2]))
++     loss.backward()
+      optimizer.step()
+      optimizer.zero_grad()
 ```
 
 ### Jacobian descent
@@ -115,6 +123,14 @@ Here is how to change a standard multi-task training loop to use Jacobian descen
       optimizer.step()
       optimizer.zero_grad()
 ```
+
+### The `autojac` engine
+
+The [`autojac` engine](https://torchjd.org/stable/docs/autojac/) provides fine-grained control
+over Jacobian computation and aggregation. It lets you compute Jacobians with respect to specific
+layers or activations (partial Jacobian descent), store them in `.jac` fields for inspection, and
+apply any aggregator independently. See the [autojac examples](https://torchjd.org/stable/examples/)
+for more details.
 
 ### The `autogram` engine
 
