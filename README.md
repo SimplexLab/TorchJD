@@ -136,7 +136,7 @@ returns Jacobians insteads of gradients, and
 [`autograd.backward`](https://docs.pytorch.org/docs/stable/generated/torch.autograd.backward)
 but accumulates Jacobians in the `.jac` fields of parameters instead of gradients in the `.grad`
 fields (these Jacobians can then be aggregated into gradients and moved to the `.grad` fields by
-calling [`autojac.jac_to_grad`](https://torchjd.org/stable/docs/autojac/jac_to_grad). Lastly, the
+calling [`autojac.jac_to_grad`](https://torchjd.org/stable/docs/autojac/jac_to_grad)). Lastly, the
 [`mtl_backward`](https://torchjd.org/stable/docs/autojac/mtl_backward) function can be used for
 multi-task learning to compute and accumulate gradients with respect to task-specific parameters
 and Jacobians with respect to shared parameters.
