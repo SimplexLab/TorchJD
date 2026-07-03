@@ -126,11 +126,20 @@ Here is how to change a standard multi-task training loop to use Jacobian descen
 
 ### The `autojac` engine
 
-The [`autojac` engine](https://torchjd.org/stable/docs/autojac/) provides fine-grained control
-over Jacobian computation and aggregation. It lets you compute Jacobians with respect to specific
-layers or activations (partial Jacobian descent), store them in `.jac` fields for inspection, and
-apply any aggregator independently. See the [autojac examples](https://torchjd.org/stable/examples/)
-for more details.
+The [`torchjd.autojac` engine](https://torchjd.org/stable/docs/autojac/) provides a way to compute
+Jacobians (generally of the losses with respect to the parameters). Its interface is very similar
+to that of [`torch.autograd`](https://docs.pytorch.org/docs/stable/autograd):
+[`autojac.jac`](https://torchjd.org/stable/docs/autojac/jac) is analog to
+[`autograd.grad`](https://docs.pytorch.org/docs/stable/generated/torch.autograd.grad) but
+returns Jacobians insteads of gradients, and
+[`autojac.backward`](https://torchjd.org/stable/docs/autojac/backward) is analog to
+[`autograd.backward`](https://docs.pytorch.org/docs/stable/generated/torch.autograd.backward)
+but accumulates Jacobians in the `.jac` fields of parameters instead of gradients in the `.grad`
+fields (these Jacobians can then be aggregated into gradients and moved to the `.grad` fields by
+calling [`autojac.jac_to_grad`](https://torchjd.org/stable/docs/autojac/jac_to_grad). Lastly, the
+[`mtl_backward`](https://torchjd.org/stable/docs/autojac/mtl_backward) function can be used for
+multi-task learning to compute and accumulate gradients with respect to task-specific parameters
+and Jacobians with respect to shared parameters.
 
 ### The `autogram` engine
 
