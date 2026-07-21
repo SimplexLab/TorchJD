@@ -1,4 +1,5 @@
 import math
+import warnings
 from collections.abc import Callable, Sequence
 from functools import partial
 
@@ -77,18 +78,18 @@ class Jac(Differentiate):
         jacs_chunks: list[tuple[Tensor, ...]] = []
 
         # First differentiations: always retain graph
-        get_vjp_retain = partial(self._get_vjp, retain_graph=True)
         for i in range(n_chunks - 1):
             start = i * max_chunk_size
             end = (i + 1) * max_chunk_size
             jac_outputs_chunk = [jac_output[start:end] for jac_output in jac_outputs]
-            jacs_chunks.append(_get_jacs_chunk(jac_outputs_chunk, get_vjp_retain))
+            jacs_chunks.append(_get_jacs_chunk(jac_outputs_chunk, self._get_vjp, retain_graph=True))
 
         # Last differentiation: retain the graph only if self.retain_graph==True
-        get_vjp_last = partial(self._get_vjp, retain_graph=self.retain_graph)
         start = (n_chunks - 1) * max_chunk_size
         jac_outputs_chunk = [jac_output[start:] for jac_output in jac_outputs]
-        jacs_chunks.append(_get_jacs_chunk(jac_outputs_chunk, get_vjp_last))
+        jacs_chunks.append(
+            _get_jacs_chunk(jac_outputs_chunk, self._get_vjp, retain_graph=self.retain_graph)
+        )
 
         n_inputs = len(self.inputs)
         if len(jacs_chunks) == 1:
@@ -102,7 +103,8 @@ class Jac(Differentiate):
 
 def _get_jacs_chunk(
     jac_outputs_chunk: list[Tensor],
-    get_vjp: Callable[[Sequence[Tensor]], tuple[Tensor, ...]],
+    get_vjp: Callable,
+    retain_graph: bool,
 ) -> tuple[Tensor, ...]:
     """
     Computes the jacobian matrix chunk corresponding to the provided get_vjp function, either by
@@ -112,8 +114,28 @@ def _get_jacs_chunk(
     """
 
     chunk_size = jac_outputs_chunk[0].shape[0]
+    
+    def _vmap_target(grad_outputs: Sequence[Tensor]) -> tuple[Tensor, ...]:
+        return get_vjp(grad_outputs, retain_graph=retain_graph)
+
     if chunk_size == 1:
         grad_outputs = [tensor.squeeze(0) for tensor in jac_outputs_chunk]
-        gradients = get_vjp(grad_outputs)
+        gradients = _vmap_target(grad_outputs)
         return tuple(gradient.unsqueeze(0) for gradient in gradients)
-    return torch.vmap(get_vjp, chunk_size=chunk_size)(jac_outputs_chunk)
+
+    try:
+        return torch.vmap(_vmap_target, chunk_size=chunk_size)(jac_outputs_chunk)
+    except RuntimeError as e:
+        warnings.warn(
+            f"torch.vmap failed with RuntimeError: {e}. "
+            "Falling back to sequential differentiation. To suppress this warning, "
+            "explicitly provide `chunk_size=1` or `parallel_chunk_size=1`."
+        )
+        # Fallback to sequential execution if vmap fails (e.g., due to AMP mixed precision issues)
+        jacs = []
+        for i in range(chunk_size):
+            grad_outputs = [tensor[i] for tensor in jac_outputs_chunk]
+            # Retain graph for all elements except the last one (if retain_graph is False)
+            should_retain = retain_graph or (i < chunk_size - 1)
+            jacs.append(get_vjp(grad_outputs, retain_graph=should_retain))
+        return tuple(torch.stack(grads) for grads in zip(*jacs, strict=True))
