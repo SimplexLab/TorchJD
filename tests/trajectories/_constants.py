@@ -55,7 +55,10 @@ LR_MULTIPLIER_OVERRIDES = {
         "imtl_g": 2.0,
     },
     "CQF": {"nashmtl": 0.5},
-    "PNF": {"nashmtl": 8.0},
+    "PNF": {
+        "nashmtl": 8.0,
+        "aligned_mtl": 8.0,
+    },
 }
 AGGREGATOR_ORDER = {
     "upgrad": 9,
@@ -104,8 +107,8 @@ OBJECTIVES = {
         us=[torch.tensor([1.0, 0.0]), torch.tensor([-10.0, 0.0])],
     ),
     "PNF": PowerNormFunction(
-        powers=torch.tensor([6.0, 6.0]),
-        scales=torch.tensor([1.0, 3.0]),
+        powers=torch.tensor([4.0, 4.0]),
+        scales=torch.tensor([1.0, 10.0]),
         us=[torch.tensor([1.0, 0.0]), torch.tensor([-1.0, 0.0])],
     ),
 }
@@ -135,16 +138,16 @@ INITIAL_POINTS = {
         [2.5, 5.5],
     ],
     "PNF": [
-        [0.6, 0.45],
-        [-0.6, 0.3],
-        [0.3, -0.3],
-        [-0.6, -0.45],
-        [0.6, -0.6],
+        [0.4, 0.7],
+        [0.1, 0.5],
+        [-0.15, 0.5],
+        [0.2, -0.55],
+        [0.55, -0.75],
     ],
 }
 N_ITERS = {
     "EWQ": 50,
     "CQF": 200,
     "HQF": 100,
-    "PNF": 200,
+    "PNF": 250,
 }
