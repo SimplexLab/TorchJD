@@ -241,7 +241,7 @@ The `tests/trajectories/` directory contains scripts to generate and visualize o
 trajectories using various aggregators on simple multi-objective problems. They require the `plot`
 dependency group.
 
-Available objective keys: `EWQ`, `CQF`, `HQF`.
+Available objective keys: `EWQ`, `CQF`, `HQF`, `PNF`.
 
 Available aggregator keys: `upgrad`, `mgda`, `cagrad`, `nashmtl`, `graddrop`,
 `imtl_g`, `aligned_mtl`, `dualproj`, `pcgrad`, `random`, `mean`.
@@ -275,6 +275,10 @@ uv run python tests/trajectories/optimize.py HQF upgrad mean mgda cagrad dualpro
 uv run python tests/trajectories/plot_params.py HQF
 uv run python tests/trajectories/plot_values.py HQF
 uv run python tests/trajectories/plot_distance_to_pf.py HQF
+uv run python tests/trajectories/optimize.py PNF upgrad mean mgda cagrad dualproj graddrop imtl_g aligned_mtl nashmtl random
+uv run python tests/trajectories/plot_params.py PNF
+uv run python tests/trajectories/plot_values.py PNF
+uv run python tests/trajectories/plot_distance_to_pf.py PNF
 ```
 
 The three plot scripts produce PDFs saved to `tests/trajectories/results/<objective>/`.

@@ -101,6 +101,88 @@ class HomogenousQuadraticFunction(QuadraticFunction):
         return f"{self.__class__.__name__}(A={self.A}, scales={self.scales}, us={self.us})"
 
 
+class PowerNormFunction(Objective, WithSPSMappingMixin):
+    """
+    Objective whose values are powers of distances to fixed points:
+    f_i(x) = scales_i * ||x - us_i||^powers_i.
+
+    Each f_i is convex, and non-quadratic whenever powers_i != 2.
+
+    :param powers: The exponents. Must all be >= 2 for the objective to be smooth.
+    :param scales: The positive factors multiplying each powered distance.
+    :param us: The points from which the distances are computed.
+    """
+
+    def __init__(self, powers: Tensor, scales: Tensor, us: list[Tensor]) -> None:
+        if not (len(powers) == len(scales) == len(us)):
+            raise ValueError("powers, scales and us must have the same length.")
+
+        if bool((powers < 2.0).any()):
+            raise ValueError("powers must all be >= 2 for the objective to be smooth.")
+
+        super().__init__(n_params=len(us[0]), n_values=len(us))
+        self.powers = powers
+        self.scales = scales
+        self.us = us
+
+    def __call__(self, x: Tensor) -> Tensor:
+        objective_values = [
+            s * (x - u).dot(x - u) ** (p / 2)
+            for p, s, u in zip(self.powers, self.scales, self.us, strict=False)
+        ]
+        return torch.stack(objective_values)
+
+    def jacobian(self, x: Tensor) -> Tensor:
+        return torch.vstack(
+            [
+                s * p * (x - u).dot(x - u) ** ((p - 2) / 2) * (x - u)
+                for p, s, u in zip(self.powers, self.scales, self.us, strict=False)
+            ]
+        )
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(powers={self.powers}, scales={self.scales}, us={self.us})"
+        )
+
+    class SPSMapping(WithSPSMappingMixin.SPSMapping):
+        """
+        SPS mapping for a pair of powered distance functions. The Pareto set is the segment between
+        the two points, so the weighted gradient balance equation is solved by bisection along it.
+        """
+
+        def __init__(self, powers: Tensor, scales: Tensor, us: list[Tensor]) -> None:
+            if len(us) != 2:
+                raise ValueError("SPSMapping is only defined for objectives with 2 values.")
+            self.powers = powers.to(dtype=torch.float64)
+            self.scales = scales.to(dtype=torch.float64)
+            self.us = [u.to(dtype=torch.float64) for u in us]
+
+        def __call__(self, w: Tensor) -> Tensor:
+            distance = (self.us[1] - self.us[0]).norm()
+
+            def gradient_norm_imbalance(t: Tensor) -> Tensor:
+                norms = []
+                for i, d in enumerate([t * distance, (1 - t) * distance]):
+                    norms.append(w[i] * self.scales[i] * self.powers[i] * d ** (self.powers[i] - 1))
+                return norms[0] - norms[1]
+
+            low = torch.tensor(0.0, dtype=torch.float64)
+            high = torch.tensor(1.0, dtype=torch.float64)
+            for _ in range(100):
+                mid = (low + high) / 2
+                if gradient_norm_imbalance(mid) < 0.0:
+                    low = mid
+                else:
+                    high = mid
+            t = (low + high) / 2
+            return self.us[0] + t * (self.us[1] - self.us[0])
+
+    @property
+    def sps_mapping(self) -> "PowerNormFunction.SPSMapping":
+        return self.SPSMapping(self.powers, self.scales, self.us)
+
+
 class ElementWiseQuadratic(Objective, WithSPSMappingMixin):
     def __init__(self, n_dim: int) -> None:
         super().__init__(n_params=n_dim, n_values=n_dim)

@@ -17,6 +17,7 @@ from torchjd.aggregation import (
 from trajectories._objectives import (
     ElementWiseQuadratic,
     HomogenousQuadraticFunction,
+    PowerNormFunction,
     QuadraticFunction,
 )
 
@@ -54,6 +55,7 @@ LR_MULTIPLIER_OVERRIDES = {
         "imtl_g": 2.0,
     },
     "CQF": {"nashmtl": 0.5},
+    "PNF": {"nashmtl": 8.0},
 }
 AGGREGATOR_ORDER = {
     "upgrad": 9,
@@ -101,11 +103,17 @@ OBJECTIVES = {
         scales=torch.tensor([1.0, 10.0]),
         us=[torch.tensor([1.0, 0.0]), torch.tensor([-10.0, 0.0])],
     ),
+    "PNF": PowerNormFunction(
+        powers=torch.tensor([6.0, 6.0]),
+        scales=torch.tensor([1.0, 3.0]),
+        us=[torch.tensor([1.0, 0.0]), torch.tensor([-1.0, 0.0])],
+    ),
 }
 BASE_LEARNING_RATES = {
     "EWQ": 0.075,
     "CQF": 0.125,
     "HQF": 0.005,
+    "PNF": 0.002,
 }
 INITIAL_POINTS = {
     "EWQ": [
@@ -126,9 +134,17 @@ INITIAL_POINTS = {
         [1.5, 2.0],
         [2.5, 5.5],
     ],
+    "PNF": [
+        [0.6, 0.45],
+        [-0.6, 0.3],
+        [0.3, -0.3],
+        [-0.6, -0.45],
+        [0.6, -0.6],
+    ],
 }
 N_ITERS = {
     "EWQ": 50,
     "CQF": 200,
     "HQF": 100,
+    "PNF": 200,
 }
