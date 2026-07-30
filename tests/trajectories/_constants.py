@@ -107,7 +107,7 @@ OBJECTIVES = {
         us=[torch.tensor([1.0, 0.0]), torch.tensor([-10.0, 0.0])],
     ),
     "PNF": PowerNormFunction(
-        powers=torch.tensor([4.0, 4.0]),
+        powers=torch.tensor([3.0, 3.0]),
         scales=torch.tensor([1.0, 10.0]),
         us=[torch.tensor([1.0, 0.0]), torch.tensor([-1.0, 0.0])],
     ),
@@ -140,8 +140,8 @@ INITIAL_POINTS = {
     "PNF": [
         [0.4, 0.7],
         [0.1, 0.5],
-        [-0.55, 0.45],
-        [-0.5, -0.45],
+        [-0.65, 0.45],
+        [-0.6, -0.45],
         [0.7, -0.55],
     ],
 }
