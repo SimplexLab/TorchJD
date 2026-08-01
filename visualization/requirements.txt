@@ -1,0 +1,4 @@
+torchjd[full]>=0.16.0
+dash>=2.16.0
+plotly>=5.19.0
+numpy>=1.21.2

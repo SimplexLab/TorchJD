@@ -1,0 +1,36 @@
+name: Deploy Visualization to Hugging Face Spaces
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - visualization/**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy to Hugging Face Spaces
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Deploy visualization folder to HF Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          pip install --quiet huggingface-hub
+          python -c "
+          import os
+          from huggingface_hub import HfApi
+          api = HfApi(token=os.environ['HF_TOKEN'])
+          api.upload_folder(
+              folder_path='visualization',
+              repo_id='torchjd/interactive-plotter',
+              repo_type='space',
+          )
+          print('Deployed successfully.')
+          "
