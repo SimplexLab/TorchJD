@@ -3,8 +3,9 @@ title: TorchJD Interactive Plotter
 emoji: 📊
 colorFrom: blue
 colorTo: green
-sdk: docker
-app_port: 7860
+sdk: gradio
+sdk_version: 4.0.0
+app_file: app.py
 pinned: false
 license: mit
 ---
@@ -26,9 +27,3 @@ documentation with an aggregator pre-selected:
 | `agg` | Comma-separated aggregator names | `?agg=Mean,MGDA` |
 | `g1`, `g2`, `g3` | `angle_radians,length` | `?g1=1.5708,2.0` |
 | `seed` | Integer | `?seed=42` |
-
-Example — open with MGDA pre-selected:
-
-```
-https://torchjd-interactive-plotter.hf.space/?agg=MGDA
-```
