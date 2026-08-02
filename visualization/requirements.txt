@@ -1,4 +1,5 @@
 torchjd[full]>=0.16.0
-gradio>=4.0
+gradio>=6.0
+audioop-lts; python_version >= "3.13"
 plotly>=5.19.0
 numpy>=1.21.2
