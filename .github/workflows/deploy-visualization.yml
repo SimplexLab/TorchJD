@@ -1,14 +1,9 @@
 name: Deploy Visualization to Hugging Face Spaces
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - tests/plots/**
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  release:
+    types: [published]
+  workflow_dispatch:
 
 jobs:
   deploy:
