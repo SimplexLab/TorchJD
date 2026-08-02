@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - visualization/**
+      - tests/plots/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -28,7 +28,7 @@ jobs:
           from huggingface_hub import HfApi
           api = HfApi(token=os.environ['HF_TOKEN'])
           api.upload_folder(
-              folder_path='visualization',
+              folder_path='tests/plots',
               repo_id='torchjd/interactive-plotter',
               repo_type='space',
           )

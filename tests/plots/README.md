@@ -15,7 +15,7 @@ license: mit
 Interactive visualization of gradient aggregation methods from [TorchJD](https://torchjd.org).
 
 Adjust the angle and length of each gradient vector and select aggregators to see how they combine
-the gradients. The green region shows the dual cone — any descent direction must lie inside it.
+the gradients. The green region shows the dual cone: the set of vectors with a non-negative inner product with each gradient.
 
 ## URL parameters
 
