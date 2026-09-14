@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Callable, Generic, TypeVar
 
 from torch import Tensor, nn
 
@@ -86,3 +87,32 @@ class GramianWeightedAggregator(WeightedAggregator):
     def __init__(self, gramian_weighting: Weighting[PSDMatrix]) -> None:
         super().__init__(gramian_weighting << compute_gramian)
         self.gramian_weighting = gramian_weighting
+
+
+A = TypeVar("A", bound=nn.Module)
+F = TypeVar("F", bound=Callable)
+
+
+class Composition(nn.Module, Generic[A, F]):
+    """
+    Wraps an aggregator and a function into a composite nn.Module.
+    """
+
+    def __init__(self, outer: A, inner: F) -> None:
+        super().__init__()
+        self.outer = outer
+        self.inner = inner
+
+    def forward(self, *args, **kwargs):
+        return self.outer(self.inner(*args, **kwargs))
+
+    def __str__(self) -> str:
+        return str(self.outer) + " << " + str(self.inner)
+
+
+def compose(self: A, inner: F) -> Composition[A, F]:
+    return Composition(self, inner)
+
+
+# Bind the << operator to nn.Module
+nn.Module.__lshift__ = compose
