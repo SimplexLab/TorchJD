@@ -44,6 +44,15 @@ class Aggregator(nn.Module, ABC):
     def __str__(self) -> str:
         return f"{self.__class__.__name__}"
 
+    def __lshift__(self, other: "Aggregator") -> "Composition":
+        from torchjd.aggregation.composition import Composition
+        
+        if isinstance(other, Composition):
+            return Composition([*other.aggregators, self])
+        elif isinstance(self, Composition):
+            return Composition([*self.aggregators, other])
+        return Composition([other, self])
+
 
 class WeightedAggregator(Aggregator):
     """
