@@ -142,7 +142,7 @@ def main(
         result = results[name]
         aggregation_scatter = make_vector_scatter(
             result,
-            color="rgb(142, 20, 242)",
+            color="rgb(242, 0, 108)",
             label="",  # Label will be added as text element at the end
             textposition="top center",
             showlegend=False,
@@ -164,7 +164,7 @@ def main(
         result = results[name]
         aggregation_scatter = make_vector_scatter(
             result,
-            color="rgb(142, 20, 242)",
+            color="rgb(242, 0, 108)",
             label="",  # Label will be added as text element at the end
             textposition="top center",
             showlegend=False,
@@ -196,7 +196,7 @@ def main(
         result = results[name]
         aggregation_scatter = make_vector_scatter(
             result,
-            color="rgb(142, 20, 242)",
+            color="rgb(242, 0, 108)",
             label="",  # Label will be added as text element at the end
             textposition="top center",
             showlegend=False,
@@ -228,7 +228,7 @@ def main(
         result = results[name]
         aggregation_scatter = make_vector_scatter(
             result,
-            color="rgb(142, 20, 242)",
+            color="rgb(242, 0, 108)",
             label="",  # Label will be added as text element at the end
             textposition="top center",
             showlegend=False,
@@ -248,7 +248,7 @@ def main(
             y=result[1].item() + 0.05,
             text=label,
             showarrow=False,
-            font={"size": 32, "color": "rgb(142, 20, 242)"},
+            font={"size": 32, "color": "rgb(242, 0, 108)"},
             yanchor="bottom",
             xanchor="center",
         )
