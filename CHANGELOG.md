@@ -8,6 +8,8 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+## [0.17.1] - 2026-09-23
+
 ### Fixed
 
 - Fixed a bug with type annotations making it impossible to use TorchJD without any optional
