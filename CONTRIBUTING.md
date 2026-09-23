@@ -100,7 +100,7 @@ uv run pre-commit install
 We encourage contributors to use AI agents when contributing to TorchJD, but there are a few rules:
 - The initiative should come from a human. We do not want PRs from fully automated bots.
 - The changes should be reviewed by a human before a non-draft PR is open.
-- To avoid vendor lock-in, we do not provide any file that is specific to an agent vendor. To use a specific agent that does not follow open file naming conventions, you have to adapt a few things yourself (e.g. symlink files). For example, to work with claude, you have to symlink `CLAUDE.md` to `AGENTS.md`, and `.claude/skill/` to `skills/`.
+- To avoid vendor lock-in, we do not provide any file that is specific to an agent vendor. To use a specific agent that does not follow open file naming conventions, you have to adapt a few things yourself (e.g. symlink files). For example, to work with claude, you have to symlink `CLAUDE.md` to `AGENTS.md`, and `.claude/skills/` to `skills/`.
 
 ## Checks
 
