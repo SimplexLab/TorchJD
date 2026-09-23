@@ -8,6 +8,11 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed a bug with type annotations making it impossible to use TorchJD without any optional
+  dependencies on Python versions older than 3.14.
+
 ## [0.17.0] - 2026-06-24
 
 ### Added
