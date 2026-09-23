@@ -4,8 +4,12 @@ This document explains how to contribute to TorchJD.
 
 ## Getting Started
 
-- **Minor changes** (bug fixes, documentation, small improvements): Open a pull request directly following the guidelines in this document.
-- **Significant or major changes** (new features, API changes, architectural decisions): Join the [SimplexLab Discord server](https://discord.gg/76KkRnb3nk), introduce yourself and your idea, and discuss it with the community to determine if and how it fits within the project's goals before implementing.
+- **Minor changes** (bug fixes, documentation, small improvements): Open a pull request directly
+  following the guidelines in this document.
+- **Significant or major changes** (new features, API changes, architectural decisions): Join the
+  [SimplexLab Discord server](https://discord.gg/76KkRnb3nk), introduce yourself and your idea, and
+  discuss it with the community to determine if and how it fits within the project's goals before
+  implementing.
 
 ## Code Ownership
 
@@ -13,9 +17,9 @@ This project uses a [CODEOWNERS](CODEOWNERS) file to automatically assign review
 based on which files are changed. The code owners are the people or groups who created or maintain
 specific parts of the codebase.
 
-When you open a pull request, GitHub will automatically request reviews from the relevant code owners
-for the files you've modified. This ensures that changes are reviewed by the people most familiar
-with the affected code.
+When you open a pull request, GitHub will automatically request reviews from the relevant code
+owners for the files you've modified. This ensures that changes are reviewed by the people most
+familiar with the affected code.
 
 ## Installation
 
@@ -100,7 +104,10 @@ uv run pre-commit install
 We encourage contributors to use AI agents when contributing to TorchJD, but there are a few rules:
 - The initiative should come from a human. We do not want PRs from fully automated bots.
 - The changes should be reviewed by a human before a non-draft PR is open.
-- To avoid vendor lock-in, we do not provide any file that is specific to an agent vendor. To use a specific agent that does not follow open file naming conventions, you have to adapt a few things yourself (e.g. symlink files). For example, to work with claude, you have to symlink `CLAUDE.md` to `AGENTS.md`, and `.claude/skills/` to `skills/`.
+- To avoid vendor lock-in, we do not provide any file that is specific to an agent vendor. To use a
+  specific agent that does not follow open file naming conventions, you have to adapt a few things
+  yourself (e.g. symlink files). For example, to work with claude, you have to symlink `CLAUDE.md`
+  to `AGENTS.md`, and `.claude/skills/` to `skills/`.
 
 ## Checks
 
