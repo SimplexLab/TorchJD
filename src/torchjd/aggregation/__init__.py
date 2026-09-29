@@ -48,6 +48,7 @@ from ._dualproj import DualProj, DualProjWeighting
 from ._excess_mtl import ExcessMTL, ExcessMTLWeighting
 from ._fairgrad import FairGrad, FairGradWeighting
 from ._graddrop import GradDrop
+from ._gradnorm import GradNorm, GradNormWeighting
 from ._gradvac import GradVac, GradVacWeighting
 from ._imtl_g import IMTLG, IMTLGWeighting
 from ._krum import Krum, KrumWeighting
@@ -80,6 +81,8 @@ __all__ = [
     "FairGrad",
     "FairGradWeighting",
     "GradDrop",
+    "GradNorm",
+    "GradNormWeighting",
     "GradVac",
     "GradVacWeighting",
     "GramianWeightedAggregator",
