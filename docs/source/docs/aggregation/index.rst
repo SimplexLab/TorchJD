@@ -33,6 +33,7 @@ Abstract base classes
     excess_mtl.rst
     fairgrad.rst
     graddrop.rst
+    gradnorm.rst
     gradvac.rst
     imtl_g.rst
     krum.rst

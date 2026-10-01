@@ -18,6 +18,8 @@ This section contains some usage examples for TorchJD.
 - :doc:`Multi-Task Learning (MTL) <mtl>` provides an example of multi-task learning where Jacobian
   descent is used to optimize the vector of per-task losses of a multi-task model, using the
   dedicated backpropagation function :doc:`mtl_backward <../docs/autojac/mtl_backward>`.
+- :doc:`GradNorm <gradnorm>` learns task weights from the gradient norms of the last shared layer
+  and applies them to the whole model.
 - :doc:`Instance-Wise Multi-Task Learning (IWMTL) <iwmtl>` shows how to combine multi-task learning
   with instance-wise risk minimization: one loss per task and per element of the batch, using the
   :doc:`autogram.Engine <../docs/autogram/engine>`.
@@ -40,6 +42,7 @@ This section contains some usage examples for TorchJD.
     iwrm.rst
     partial_jd.rst
     mtl.rst
+    gradnorm.rst
     iwmtl.rst
     rnn.rst
     monitoring.rst

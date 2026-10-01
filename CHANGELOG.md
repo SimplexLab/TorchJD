@@ -8,6 +8,12 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Added
+
+- Added `GradNorm` and `GradNormWeighting` for adaptive task-loss balancing, with an
+  external optimizer for the task weights and an example using the last shared layer's
+  gradient norms.
+
 ## [0.17.1] - 2026-09-23
 
 ### Fixed
