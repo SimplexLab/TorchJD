@@ -15,6 +15,7 @@ from torchjd._linalg import QuadprogProjector
 from torchjd.aggregation import (
     IMTLG,
     MGDA,
+    PCD,
     Aggregator,
     AlignedMTL,
     CAGrad,
@@ -71,6 +72,7 @@ def main() -> None:
         str(Mean()): lambda: Mean(),
         str(MGDA()): lambda: MGDA(),
         str(NashMTL(n_tasks=n_tasks)): lambda: NashMTL(n_tasks=n_tasks),
+        str(PCD()): lambda: PCD(),
         str(PCGrad()): lambda: PCGrad(),
         str(Random()): lambda: Random(),
         str(Sum()): lambda: Sum(),

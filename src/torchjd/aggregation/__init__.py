@@ -55,6 +55,7 @@ from ._mean import Mean, MeanWeighting
 from ._mgda import MGDA, MGDAWeighting
 from ._modo import MoDoWeighting
 from ._nash_mtl import NashMTL
+from ._pcd import PCD, PCDWeighting
 from ._pcgrad import PCGrad, PCGradWeighting
 from ._random import Random, RandomWeighting
 from ._sdmgrad import SDMGradWeighting
@@ -93,6 +94,8 @@ __all__ = [
     "MGDAWeighting",
     "MoDoWeighting",
     "NashMTL",
+    "PCD",
+    "PCDWeighting",
     "PCGrad",
     "PCGradWeighting",
     "Random",

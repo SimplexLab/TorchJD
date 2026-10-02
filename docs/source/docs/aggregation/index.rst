@@ -40,6 +40,7 @@ Abstract base classes
     mgda.rst
     modo.rst
     nash_mtl.rst
+    pcd.rst
     pcgrad.rst
     random.rst
     sdmgrad.rst

@@ -8,6 +8,15 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Added
+
+- Added `PCD` and `PCDWeighting` from [Not All Objectives Are Born Equal: Priority-Constrained
+  Descent for Hierarchical Multi-Objective Optimization](https://openreview.net/forum?id=HT01yGHLEt)
+  (TMLR 2026). The first row of the Jacobian is treated as the primary objective: `PCD` follows its
+  gradient as closely as possible, subject to each other objective receiving at least a fraction
+  `tau` of normalized first-order progress. `PCD` and `PCDWeighting` are stateful: they normalize
+  the gradients by a bias-corrected moving average of their squared norms.
+
 ## [0.17.1] - 2026-09-23
 
 ### Fixed
