@@ -193,4 +193,4 @@ quote-style = "double"
 
 [tool.ty.src]
 include = ["src", "tests"]
-exclude = ["src/torchjd/aggregation/_nash_mtl.py"]
+exclude = ["src/torchjd/aggregation/_nash_mtl.py", "tests/plots/app.py"]
