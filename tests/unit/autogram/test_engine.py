@@ -570,3 +570,22 @@ def test_batched_non_batched_equivalence_2(factory: ModuleFactory, batch_size: i
     gramian_none = engine_none.compute_gramian(losses_none)
 
     assert_close(gramian_0, gramian_none, rtol=1e-4, atol=1e-5)
+
+
+@mark.parametrize("batch_dim", [0, None])
+def test_forward_pass_not_used_in_output_raises(batch_dim: int | None) -> None:
+    """
+    Tests that compute_gramian raises an error when a module was called in a forward pass that is
+    not used to compute the output, instead of silently ignoring the contribution of this module.
+    """
+
+    encoder = ModuleFactory(Linear, 3, 3)()
+    head = ModuleFactory(Linear, 3, 1)()
+    engine = Engine(encoder, head, batch_dim=batch_dim)
+    input = randn_((4, 3))
+
+    target = encoder(input + 0.1).detach()  # Forward pass of encoder not used to compute losses
+    losses = (head(encoder(input)) - target.sum(dim=1, keepdim=True)).squeeze(dim=1) ** 2
+
+    with pytest.raises(ValueError):
+        engine.compute_gramian(losses)
