@@ -328,7 +328,8 @@ class Engine:
 
         if any(computer.has_pending_jacobian() for computer in self._gramian_computers.values()):
             raise ValueError(
-                "Some modules were called in forward passes that were not used to compute `output`. "
+                "Some modules had a forward pass without an associated backward pass (e.g. because "
+                "its output was detached)."
             )
 
         # If the gramian were None, then leaf_targets would be empty, so autograd.grad would

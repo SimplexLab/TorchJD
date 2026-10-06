@@ -18,9 +18,9 @@ changelog does not include internal changes that do not affect the user.
   matrix are almost equal. Rounding errors could make the squared distance between such rows
   slightly negative, giving a `nan` distance that was then ignored when computing the scores.
   Squared distances are now clamped to be non-negative before taking the square root.
-- Fixed `Engine.compute_gramian` silently ignoring the contribution of a module when this module
-  was also called in a forward pass that was not used to compute the output (e.g. a forward pass
-  whose output is detached). It now raises a `ValueError` instead.
+- Fixed `Engine.compute_gramian` silently ignoring the contribution of a module when one of its
+  forward passes had no associated backward pass (e.g. because its output was detached). It now
+  raises a `ValueError` instead.
 
 ## [0.17.1] - 2026-09-23
 
