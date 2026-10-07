@@ -111,9 +111,10 @@ class Engine:
                 optimizer.step()
                 optimizer.zero_grad()
 
-        This is equivalent to just calling ``torchjd.autojac.backward(losses, UPGrad())``. However,
-        since the Jacobian never has to be entirely in memory, it is often much more
-        memory-efficient, and thus typically faster, to use the Gramian-based approach.
+        This is equivalent to calling ``torchjd.autojac.backward(losses)`` followed by
+        ``torchjd.autojac.jac_to_grad(model.parameters(), UPGrad())``. However, since the Jacobian
+        never has to be entirely in memory, it is often much more memory-efficient, and thus
+        typically faster, to use the Gramian-based approach.
 
     .. warning::
         When providing a non-None ``batch_dim``, all provided modules must respect a few conditions:
