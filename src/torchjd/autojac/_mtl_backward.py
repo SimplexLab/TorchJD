@@ -87,8 +87,8 @@ def mtl_backward(
         <https://github.com/pytorch/pytorch/issues/138422>`_, `when some tensors have
         <https://github.com/SimplexLab/TorchJD/issues/184>`_ ``retains_grad=True`` or `when using an
         RNN on CUDA <https://github.com/SimplexLab/TorchJD/issues/220>`_, for instance. If you
-        experience issues with ``backward`` try to use ``parallel_chunk_size=1`` to avoid relying on
-        ``torch.vmap``.
+        experience issues with ``mtl_backward`` try to use ``parallel_chunk_size=1`` to avoid
+        relying on ``torch.vmap``.
     """
 
     check_optional_positive_chunk_size(parallel_chunk_size)

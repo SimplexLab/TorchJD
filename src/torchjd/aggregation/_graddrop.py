@@ -3,6 +3,7 @@ from collections.abc import Callable
 import torch
 from torch import Tensor
 
+from torchjd._vector_str import vector_to_str
 from torchjd.linalg import Matrix
 
 from ._aggregator_bases import Aggregator
@@ -76,8 +77,5 @@ class GradDrop(Aggregator, _NonDifferentiable):
         return f"{self.__class__.__name__}(f={repr(self.f)}, leak={repr(self.leak)})"
 
     def __str__(self) -> str:
-        if self.leak is None:
-            leak_str = ""
-        else:
-            leak_str = f"([{', '.join([f'{l_:.2f}'.rstrip('0') for l_ in self.leak])}])"
+        leak_str = "" if self.leak is None else f"([{vector_to_str(self.leak)}])"
         return f"GradDrop{leak_str}"
