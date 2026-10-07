@@ -21,7 +21,7 @@ def is_tensor_with_jac(t: Tensor) -> TypeGuard[TensorWithJac]:
 def accumulate_jacs(params: Iterable[Tensor], jacobians: Iterable[Tensor]) -> None:
     for param, jac in zip(params, jacobians, strict=True):
         _check_expects_grad(param, field_name=".jac")
-        # We that the shape is correct to be consistent with torch, that checks that the grad
+        # We check that the shape is correct to be consistent with torch, that checks that the grad
         # shape is correct before assigning it.
         if jac.shape[1:] != param.shape:
             raise RuntimeError(

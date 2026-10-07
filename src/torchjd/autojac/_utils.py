@@ -6,7 +6,7 @@ from torch import Tensor
 from torch.autograd.graph import Node
 from torch.overrides import is_tensor_like
 
-from ._transform import OrderedSet
+from ._transform import Diagonalize, Init, OrderedSet
 
 
 def check_optional_positive_chunk_size(parallel_chunk_size: int | None) -> None:
@@ -30,7 +30,7 @@ def as_checked_ordered_set(
     if len(output) != original_length:
         raise ValueError(f"`{variable_name}` should contain unique elements.")
 
-    return OrderedSet(tensors)
+    return output
 
 
 def check_matching_length(
@@ -121,9 +121,6 @@ def create_jac_dict(
     :param tensor_param_name: The name of the tensor parameter for error messages.
     :param jacobian_param_name: The name of the jacobian parameter for error messages.
     """
-    from torchjd.autojac._transform._diagonalize import Diagonalize
-    from torchjd.autojac._transform._init import Init
-
     if opt_jacobians is None:
         init = Init(tensors)
         diag = Diagonalize(tensors)
