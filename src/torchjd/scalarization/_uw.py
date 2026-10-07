@@ -36,7 +36,8 @@ class UW(Scalarizer, Stateful):
     :param shape: The shape of the values to scalarize, used to create one log-variance per value.
         An ``int`` ``n`` is interpreted as the shape ``(n,)``.
 
-    The following example shows train a model with Uncertainty Weighting, as described in the paper.
+    The following example shows how to train a model with Uncertainty Weighting, as described in
+    the paper.
 
         >>> import torch
         >>> from torch.nn import Linear

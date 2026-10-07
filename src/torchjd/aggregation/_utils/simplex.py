@@ -2,7 +2,7 @@ import torch
 from torch import Tensor
 
 
-def _projection2simplex(y: Tensor) -> Tensor:
+def project_onto_simplex(y: Tensor) -> Tensor:
     """Euclidean projection of ``y`` onto the probability simplex."""
 
     m = len(y)

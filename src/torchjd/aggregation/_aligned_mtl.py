@@ -61,7 +61,7 @@ class AlignedMTLWeighting(_GramianWeighting):
         scale_mode: SUPPORTED_SCALE_MODE = "min",
     ) -> Tensor:
         lambda_, V = torch.linalg.eigh(M, UPLO="U")  # More modern equivalent to torch.symeig
-        tol = torch.max(lambda_) * len(M) * torch.finfo().eps
+        tol = torch.max(lambda_) * len(M) * torch.finfo(M.dtype).eps
         rank = sum(lambda_ > tol)
 
         if rank == 0:
@@ -94,7 +94,7 @@ class AlignedMTL(GramianWeightedAggregator):
     `Independent Component Alignment for Multi-Task Learning
     <https://openaccess.thecvf.com/content/CVPR2023/papers/Senushkin_Independent_Component_Alignment_for_Multi-Task_Learning_CVPR_2023_paper.pdf>`_.
 
-    :param pref_vector: The preference vector to use.  If not provided, defaults to
+    :param pref_vector: The preference vector to use. If not provided, defaults to
         :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in \mathbb{R}^m`.
     :param scale_mode: The scaling mode used to build the balance transformation. ``"min"`` uses
         the smallest eigenvalue (default), ``"median"`` uses the median eigenvalue, and ``"rmse"``

@@ -1,7 +1,8 @@
 import torch
 from pytest import mark, raises
 from torch import Tensor
-from utils.tensors import ones_
+from torch.testing import assert_close
+from utils.tensors import ones_, tensor_
 
 from torchjd.aggregation import AlignedMTL, ConstantWeighting
 
@@ -59,3 +60,9 @@ def test_scale_mode_setter_updates_value() -> None:
     A.scale_mode = "rmse"
     assert A.scale_mode == "rmse"
     assert A.gramian_weighting.scale_mode == "rmse"
+
+
+def test_float64_small_eigenvalue_is_kept() -> None:
+    J = tensor_([[1.0, 0.0], [0.0, 1e-4]], dtype=torch.float64)
+    result = AlignedMTL()(J)
+    assert_close(result, tensor_([5e-5, 5e-5], dtype=torch.float64))

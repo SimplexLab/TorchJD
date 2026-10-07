@@ -93,7 +93,7 @@ def jac_to_grad(
     .. admonition::
         Example
 
-        This example shows how to use ``jac_to_grad`` after a call to ``backward``
+        This example shows how to use ``jac_to_grad`` after a call to ``backward``.
 
             >>> import torch
             >>>

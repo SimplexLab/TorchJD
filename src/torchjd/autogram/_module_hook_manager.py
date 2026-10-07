@@ -54,7 +54,7 @@ class ModuleHookManager:
         """
         Add a module hook used to insert Jacobian accumulation nodes into the backward graph.
 
-        The hook injects a AutogramNode function into the computation graph after the module,
+        The hook injects an AutogramNode function into the computation graph after the module,
         enabling Gramian computation.
         """
 

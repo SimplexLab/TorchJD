@@ -130,7 +130,7 @@ Jacobians (generally of the losses with respect to the parameters). Its interfac
 to that of [`torch.autograd`](https://docs.pytorch.org/docs/stable/autograd):
 [`autojac.jac`](https://torchjd.org/stable/docs/autojac/jac) is analog to
 [`autograd.grad`](https://docs.pytorch.org/docs/stable/generated/torch.autograd.grad) but
-returns Jacobians insteads of gradients, and
+returns Jacobians instead of gradients, and
 [`autojac.backward`](https://torchjd.org/stable/docs/autojac/backward) is analog to
 [`autograd.backward`](https://docs.pytorch.org/docs/stable/generated/torch.autograd.backward)
 but accumulates Jacobians in the `.jac` fields of parameters instead of gradients in the `.grad`

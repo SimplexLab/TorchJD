@@ -60,6 +60,22 @@ def test_representations() -> None:
     assert str(A) == "CAGrad0.5"
 
 
+@mark.parametrize(
+    ["c", "expected"],
+    [
+        (0, "CAGrad0"),
+        (0.0, "CAGrad0"),
+        (0.5, "CAGrad0.5"),
+        (1, "CAGrad1"),
+        (1.0, "CAGrad1"),
+        (10, "CAGrad10"),
+        (100.0, "CAGrad100"),
+    ],
+)
+def test_str_keeps_significant_zeros(c: float, expected: str) -> None:
+    assert str(CAGrad(c=c)) == expected
+
+
 def test_c_setter_updates_value() -> None:
     A = CAGrad(c=0.5)
     A.c = 1.25
