@@ -35,7 +35,7 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
     Creating the corresponding :class:`~torchjd.aggregation.Aggregator` from a wrapped weighting can
     be done by composing it with the appropriate aggregator subclass
     (:class:`~torchjd.aggregation.WeightedAggregator` or
-    :class:`~torchjd.aggregation.GramianWeightedAggregator`)
+    :class:`~torchjd.aggregation.GramianWeightedAggregator`).
 
     The following example shows how to instantiate a Gramian-based weighted aggregator whose
     Gramian weighting is wrapped by CR-MOGM.
