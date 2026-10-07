@@ -15,4 +15,4 @@ def _projection2simplex(y: Tensor) -> Tensor:
         if tmax > sorted_y[i + 1]:
             tmax_f = tmax
             break
-    return torch.max(y - tmax_f, y.new_zeros(m))
+    return (y - tmax_f).clamp(min=0.0)
