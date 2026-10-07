@@ -11,7 +11,7 @@ from torchjd._mixins import Stateful
 from torchjd.aggregation._mixins import _NonDifferentiable
 from torchjd.linalg import Matrix
 
-from ._utils.simplex import _projection2simplex
+from ._utils.simplex import project_onto_simplex
 from ._weighting_bases import _MatrixWeighting
 
 
@@ -185,7 +185,7 @@ class SDMGradWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
         for _ in range(self._n_iter):
             grad = a @ (w + self._lambda * w_tilde)
             velocity = grad if velocity is None else self._momentum * velocity + grad
-            w = _projection2simplex(w - self._lr * velocity)
+            w = project_onto_simplex(w - self._lr * velocity)
 
         self._w = w
         return (w + self._lambda * w_tilde) / (1.0 + self._lambda)

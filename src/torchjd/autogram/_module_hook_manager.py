@@ -1,5 +1,5 @@
 import weakref
-from typing import Any, cast
+from typing import Any
 
 import torch
 from torch import Tensor, nn
@@ -129,9 +129,8 @@ class Hook:
         # We only care about running the AutogramNode, so we need one of its child
         # edges (the edges of the original outputs of the model) as target. For memory
         # efficiency, we select the smallest one (that requires grad).
-        preference = torch.tensor([t.numel() for t in rg_outputs])
-        index = cast(int, preference.argmin().item())
-        self.target_edges.register(get_gradient_edge(rg_outputs[index]))
+        smallest_rg_output = min(rg_outputs, key=lambda t: t.numel())
+        self.target_edges.register(get_gradient_edge(smallest_rg_output))
 
         autograd_fn_rg_outputs = AutogramNode.apply(
             self.gramian_accumulation_phase,

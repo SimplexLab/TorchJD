@@ -102,7 +102,7 @@ class QuadprogProjector(_WithOptionalDeps, DualConeProjector):
         self._reg_eps = value
 
     def __repr__(self) -> str:
-        return f"QuadprogProjector(norm_eps={self._norm_eps}, reg_eps={self._reg_eps})"
+        return f"{self.__class__.__name__}(norm_eps={self._norm_eps}, reg_eps={self._reg_eps})"
 
     def __call__(self, U: Tensor, G: PSDMatrix) -> Tensor:
 

@@ -11,7 +11,7 @@ from torchjd._mixins import Stateful
 from torchjd.aggregation._mixins import _NonDifferentiable
 from torchjd.linalg import Matrix
 
-from ._utils.simplex import _projection2simplex
+from ._utils.simplex import project_onto_simplex
 from ._weighting_bases import _MatrixWeighting
 
 
@@ -167,7 +167,7 @@ class MoDoWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
         lambd = cast(Tensor, self._lambda)
 
         grad = matrix @ lambd + self._rho * lambd
-        lambd = _projection2simplex(lambd - self._gamma * grad)
+        lambd = project_onto_simplex(lambd - self._gamma * grad)
 
         self._lambda = lambd
         return lambd

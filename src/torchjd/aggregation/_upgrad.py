@@ -30,7 +30,7 @@ class UPGradWeighting(_GramianWeighting, _NonDifferentiable):
     ) -> None:
         super().__init__()
         self.pref_vector = pref_vector
-        self.projector = projector_or_default(projector)
+        self.projector = projector
 
     def forward(self, gramian: PSDMatrix, /) -> Tensor:
         U = torch.diag(self.weighting(gramian))
