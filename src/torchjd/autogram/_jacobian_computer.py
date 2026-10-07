@@ -21,9 +21,9 @@ from torchjd.linalg import Matrix
 
 class JacobianComputer(ABC):
     """
-    Abstract class to computes Jacobians for a module's forward pass with respect to its parameters.
+    Abstract class to compute Jacobians for a module's forward pass with respect to its parameters.
 
-    :params module: The module to differentiate.
+    :param module: The module to differentiate.
     """
 
     def __init__(self, module: nn.Module) -> None:

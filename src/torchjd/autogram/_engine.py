@@ -111,9 +111,10 @@ class Engine:
                 optimizer.step()
                 optimizer.zero_grad()
 
-        This is equivalent to just calling ``torchjd.autojac.backward(losses, UPGrad())``. However,
-        since the Jacobian never has to be entirely in memory, it is often much more
-        memory-efficient, and thus typically faster, to use the Gramian-based approach.
+        This is equivalent to calling ``torchjd.autojac.backward(losses)`` followed by
+        ``torchjd.autojac.jac_to_grad(model.parameters(), UPGrad())``. However, since the Jacobian
+        never has to be entirely in memory, it is often much more memory-efficient, and thus
+        typically faster, to use the Gramian-based approach.
 
     .. warning::
         When providing a non-None ``batch_dim``, all provided modules must respect a few conditions:
@@ -140,8 +141,8 @@ class Engine:
           <https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html>`_, which use a
           dropout function (rather than a `Dropout
           <https://docs.pytorch.org/docs/stable/generated/torch.nn.Dropout.html>`_ layer) in a
-          module with some trainable parameters, has to be used with
-          ``dropout=0.0``. Note that a `Dropout
+          module with some trainable parameters, have to be used with
+          ``dropout=0.0``. Note that `Dropout
           <https://docs.pytorch.org/docs/stable/generated/torch.nn.Dropout.html>`_ layers are
           entirely supported and should be preferred. It is also perfectly fine for random modules
           to have child modules that have trainable parameters, so if you have a random module with
@@ -325,6 +326,12 @@ class Engine:
         else:
             grad_output = torch.ones_like(output)
             _ = differentiation(grad_output)
+
+        if any(computer.has_pending_jacobian() for computer in self._gramian_computers.values()):
+            raise ValueError(
+                "Some modules had a forward pass without an associated backward pass (e.g. because "
+                "its output was detached)."
+            )
 
         # If the gramian were None, then leaf_targets would be empty, so autograd.grad would
         # have failed. So gramian is necessarily a valid Tensor here.

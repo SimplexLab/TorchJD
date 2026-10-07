@@ -6,8 +6,8 @@ worktrees/
 CLAUDE.md
 .claude/
 
-# Profiling results
-tests/profiling/results/
+# Profiler results
+tests/profiler/results/
 
 # Trajectories results
 tests/trajectories/results/

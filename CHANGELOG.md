@@ -17,6 +17,24 @@ changelog does not include internal changes that do not affect the user.
   `tau` of normalized first-order progress. `PCD` and `PCDWeighting` are stateful: they normalize
   the gradients by a bias-corrected moving average of their squared norms.
 
+### Fixed
+
+- Fixed `ExcessMTL` and `ExcessMTLWeighting` producing `nan` weights for the rest of the run when a
+  task had a zero gradient at the call that sets its baseline excess risk. The exponentiated
+  gradient update is now computed in log space, so a very large excess risk saturates the weights
+  instead of overflowing.
+- Fixed `Krum` and `KrumWeighting` sometimes selecting the wrong rows when two rows of the input
+  matrix are almost equal. Rounding errors could make the squared distance between such rows
+  slightly negative, giving a `nan` distance that was then ignored when computing the scores.
+  Squared distances are now clamped to be non-negative before taking the square root.
+- Fixed `AlignedMTL` and `AlignedMTLWeighting` ignoring tasks with a much smaller gradient than
+  the others when the input is in `float64`. The tolerance used to find the rank of the Gramian was
+  always based on the machine epsilon of the default dtype (usually `float32`) instead of the dtype
+  of the Gramian, so valid small eigenvalues were discarded.
+- Fixed `Engine.compute_gramian` silently ignoring the contribution of a module when one of its
+  forward passes had no associated backward pass (e.g. because its output was detached). It now
+  raises a `ValueError` instead.
+
 ## [0.17.1] - 2026-09-23
 
 ### Fixed

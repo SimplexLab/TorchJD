@@ -3,7 +3,7 @@ from contextlib import nullcontext as does_not_raise
 from pytest import mark, raises
 from torch import Tensor
 from utils.contexts import ExceptionContext
-from utils.tensors import ones_
+from utils.tensors import ones_, tensor_
 
 from torchjd.aggregation import Krum
 from torchjd.aggregation._krum import KrumWeighting
@@ -119,3 +119,15 @@ def test_weighting_n_selected_setter_rejects_non_positive() -> None:
     W = KrumWeighting(n_byzantine=1)
     with raises(ValueError, match="n_selected"):
         W.n_selected = 0
+
+
+def test_negative_squared_distances_are_clamped() -> None:
+    x = tensor_([1.0, 1.0, 2.0, 2.1, 11.0])
+    gramian = x.unsqueeze(1) * x.unsqueeze(0)
+    gramian[0, 1] = gramian[0, 1] + 1e-6
+    gramian[1, 0] = gramian[1, 0] + 1e-6
+
+    weights = KrumWeighting(n_byzantine=1)(gramian)
+
+    assert weights[:2].sum().item() == 1.0
+    assert weights[2:].abs().sum().item() == 0.0

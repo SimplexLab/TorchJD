@@ -29,7 +29,7 @@ class KrumWeighting(_GramianWeighting):
         distances_squared = (
             gradient_norms_squared.unsqueeze(0) + gradient_norms_squared.unsqueeze(1) - 2 * gramian
         )
-        distances = torch.sqrt(distances_squared)
+        distances = torch.sqrt(distances_squared.clamp(min=0.0))
 
         n_closest = gramian.shape[0] - self.n_byzantine - 2
         smallest_distances, _ = torch.topk(distances, k=n_closest + 1, largest=False)

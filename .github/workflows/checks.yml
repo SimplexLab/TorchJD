@@ -45,6 +45,11 @@ jobs:
             extra_groups: 'lower_bounds'
           # Latest: torch nightly build.
           - torch_channel: 'nightly'
+          # Upcoming Python version, not yet supported by stable torch. cvxpy is excluded because one
+          # of its dependencies (sparsediffpy) has no wheel yet and can't be built without BLAS.
+          - python-version: '3.15'
+            torch_channel: 'nightly'
+            options: 'quadprog_projector fairgrad'
 
     steps:
       - name: Checkout repository

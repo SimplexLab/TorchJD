@@ -2,6 +2,7 @@ import torch
 from torch import Tensor
 
 from ._scalarizer_base import Scalarizer
+from ._utils import check_same_shape_as_values
 
 
 class STCH(Scalarizer):
@@ -52,18 +53,8 @@ class STCH(Scalarizer):
         self.reference = reference
 
     def forward(self, values: Tensor, /) -> Tensor:
-        if self.weights is not None and self.weights.shape != values.shape:
-            raise ValueError(
-                f"Parameter `weights` should have the same shape as `values`. Found "
-                f"`weights.shape = {tuple(self.weights.shape)}` and `values.shape = "
-                f"{tuple(values.shape)}`."
-            )
-        if self.reference is not None and self.reference.shape != values.shape:
-            raise ValueError(
-                f"Parameter `reference` should have the same shape as `values`. Found "
-                f"`reference.shape = {tuple(self.reference.shape)}` and `values.shape = "
-                f"{tuple(values.shape)}`."
-            )
+        check_same_shape_as_values(self.weights, values, "weights")
+        check_same_shape_as_values(self.reference, values, "reference")
 
         if self.weights is None:
             weights = torch.full_like(values, 1.0 / values.numel())

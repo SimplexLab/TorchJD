@@ -120,10 +120,11 @@ class ExcessMTLWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
         else:
             w = w / (self._initial_w + 1e-7)  # Scale processing (Section 3.2)
 
-        # Exponentiated gradient weight update (Equation 9)
+        # Exponentiated gradient weight update (Equation 9), done in log space so that a very
+        # large excess risk (e.g. a task whose baseline excess risk was zero) saturates the
+        # weights instead of overflowing to inf and turning them into nan for good.
         weights = cast(Tensor, self._weights)
-        weights = weights * torch.exp(w * self._robust_step_size)
-        weights = weights / weights.sum()
+        weights = torch.softmax(torch.log(weights) + w * self._robust_step_size, dim=0)
         self._weights = weights
         return weights
 

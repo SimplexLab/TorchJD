@@ -28,6 +28,12 @@ class GramianComputer(ABC):
     def reset(self) -> None:
         """Reset state if any. Necessary in some implementations."""
 
+    @abstractmethod
+    def has_pending_jacobian(self) -> bool:
+        """
+        Whether some Jacobian was computed but its Gramian was never returned. Necessary in some implementations.
+        """
+
 
 class JacobianBasedGramianComputer(GramianComputer, ABC):
     def __init__(self, jacobian_computer: JacobianComputer) -> None:
@@ -52,6 +58,9 @@ class JacobianBasedGramianComputerWithCrossTerms(JacobianBasedGramianComputer):
     def track_forward_call(self) -> None:
         self.remaining_counter += 1
 
+    def has_pending_jacobian(self) -> bool:
+        return self.summed_jacobian is not None
+
     def __call__(
         self,
         rg_outputs: tuple[Tensor, ...],
@@ -72,6 +81,6 @@ class JacobianBasedGramianComputerWithCrossTerms(JacobianBasedGramianComputer):
 
         if self.remaining_counter == 0:
             gramian = compute_gramian(self.summed_jacobian)
-            del self.summed_jacobian
+            self.summed_jacobian = None
             return gramian
         return None
