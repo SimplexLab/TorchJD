@@ -31,7 +31,7 @@ def reshape(gramian: PSDTensor, half_shape: list[int]) -> PSDTensor:
 
     :param gramian: Gramian to reshape. Can be a generalized Gramian.
     :param half_shape: First half of the target shape, the shape of the output is therefore
-        `shape + shape[::-1]`.
+        `half_shape + half_shape[::-1]`.
     """
 
     # Example 1: `gramian` of shape [4, 3, 2, 2, 3, 4] and `half_shape` of [8, 3]:
@@ -59,7 +59,7 @@ def movedim(gramian: PSDTensor, half_source: list[int], half_destination: list[i
     must be done simultaneously on the first half of the dimensions and on the second half of the
     dimensions reversed.
 
-    :param gramian: Gramian to reshape. Can be a generalized Gramian.
+    :param gramian: Gramian whose dimensions should be moved. Can be a generalized Gramian.
     :param half_source: Source dimensions, that should be in the range [-gramian.ndim//2,
         gramian.ndim//2[. Its elements should be unique.
     :param half_destination: Destination dimensions, that should be in the range

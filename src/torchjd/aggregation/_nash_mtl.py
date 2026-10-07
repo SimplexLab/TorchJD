@@ -22,8 +22,6 @@ with contextlib.suppress(ImportError):
 
 # Non-differentiable: the cvxpy solver operates on numpy arrays, breaking the autograd graph.
 class _NashMTLWeighting(_WithOptionalDeps, _MatrixWeighting, Stateful, _NonDifferentiable):
-    _REQUIRED_DEPS = ["numpy", "cvxpy", "ecos"]
-    _INSTALL_HINT = 'Install them with: pip install "torchjd[nash_mtl]"'
     """
     :class:`~torchjd.Stateful`
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.Matrix`] that
@@ -44,6 +42,9 @@ class _NashMTLWeighting(_WithOptionalDeps, _MatrixWeighting, Stateful, _NonDiffe
         internal state. Call :meth:`reset` if needed (especially after changing ``n_tasks``, which
         affects the shape of the cached state).
     """
+
+    _REQUIRED_DEPS = ["numpy", "cvxpy", "ecos"]
+    _INSTALL_HINT = 'Install them with: pip install "torchjd[nash_mtl]"'
 
     def __init__(
         self,

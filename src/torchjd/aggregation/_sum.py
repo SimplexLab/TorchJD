@@ -20,7 +20,7 @@ class SumWeighting(_MatrixWeighting):
 
 class Sum(WeightedAggregator):
     """
-    :class:`~torchjd.aggregation.WeightedAggregator` that sums of the rows of the input
+    :class:`~torchjd.aggregation.WeightedAggregator` that sums the rows of the input
     matrices.
     """
 

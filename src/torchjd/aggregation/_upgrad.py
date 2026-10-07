@@ -61,7 +61,7 @@ class UPGrad(GramianWeightedAggregator, _NonDifferentiable):
     matrix onto the dual cone of all rows of this matrix, and that combines the result, as proposed
     in `Jacobian Descent For Multi-Objective Optimization <https://arxiv.org/pdf/2406.16232>`_.
 
-    :param pref_vector: The preference vector used to combine the projected rows.  If not provided,
+    :param pref_vector: The preference vector used to combine the projected rows. If not provided,
         defaults to :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in
         \mathbb{R}^m`.
     :param projector: The :class:`~torchjd.linalg.DualConeProjector` used to compute the projection.

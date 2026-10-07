@@ -3,6 +3,7 @@ from collections.abc import Callable
 import torch
 from torch import Tensor
 
+from torchjd._vector_str import vector_to_str
 from torchjd.linalg import Matrix
 
 from ._aggregator_bases import Aggregator
@@ -33,7 +34,7 @@ class GradDrop(Aggregator, _NonDifferentiable):
         self.leak = leak
 
     def forward(self, matrix: Matrix, /) -> Tensor:
-        self._check_matrix_has_enough_rows(matrix)
+        self._check_matrix_shape(matrix)
 
         if matrix.shape[0] == 0 or matrix.shape[1] == 0:
             return torch.zeros(matrix.shape[1], dtype=matrix.dtype, device=matrix.device)
@@ -64,7 +65,7 @@ class GradDrop(Aggregator, _NonDifferentiable):
 
         self._leak = value
 
-    def _check_matrix_has_enough_rows(self, matrix: Tensor) -> None:
+    def _check_matrix_shape(self, matrix: Tensor) -> None:
         n_rows = matrix.shape[0]
         if self.leak is not None and n_rows != len(self.leak):
             raise ValueError(
@@ -76,8 +77,5 @@ class GradDrop(Aggregator, _NonDifferentiable):
         return f"{self.__class__.__name__}(f={repr(self.f)}, leak={repr(self.leak)})"
 
     def __str__(self) -> str:
-        if self.leak is None:
-            leak_str = ""
-        else:
-            leak_str = f"([{', '.join([f'{l_:.2f}'.rstrip('0') for l_ in self.leak])}])"
+        leak_str = "" if self.leak is None else f"([{vector_to_str(self.leak)}])"
         return f"GradDrop{leak_str}"

@@ -78,8 +78,8 @@ class QuadprogProjector(_WithOptionalDeps, DualConeProjector):
         reg_eps: float = 0.0001,
     ) -> None:
         super().__init__()
-        self._norm_eps = norm_eps
-        self._reg_eps = reg_eps
+        self.norm_eps = norm_eps
+        self.reg_eps = reg_eps
 
     @property
     def norm_eps(self) -> float:
