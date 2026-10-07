@@ -33,7 +33,8 @@ class SDMGradWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
     :param lambda_: Non-negative coefficient controlling how strongly the descent direction is pulled
         toward the preference direction. Must be non-negative.
     :param pref_vector: The preference vector :math:`\tilde w` defining the target direction. If not
-        provided, defaults to the uniform vector :math:`[1/m, \ldots, 1/m]` (i.e. the target diection is the average gradient).
+        provided, defaults to the uniform vector :math:`[1/m, \ldots, 1/m]` (i.e. the target
+        direction is the average gradient).
 
     .. note::
         The inner simplex-projected solver is adapted from the `official implementation

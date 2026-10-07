@@ -34,7 +34,7 @@ class GradDrop(Aggregator, _NonDifferentiable):
         self.leak = leak
 
     def forward(self, matrix: Matrix, /) -> Tensor:
-        self._check_matrix_has_enough_rows(matrix)
+        self._check_matrix_shape(matrix)
 
         if matrix.shape[0] == 0 or matrix.shape[1] == 0:
             return torch.zeros(matrix.shape[1], dtype=matrix.dtype, device=matrix.device)
@@ -65,7 +65,7 @@ class GradDrop(Aggregator, _NonDifferentiable):
 
         self._leak = value
 
-    def _check_matrix_has_enough_rows(self, matrix: Tensor) -> None:
+    def _check_matrix_shape(self, matrix: Tensor) -> None:
         n_rows = matrix.shape[0]
         if self.leak is not None and n_rows != len(self.leak):
             raise ValueError(

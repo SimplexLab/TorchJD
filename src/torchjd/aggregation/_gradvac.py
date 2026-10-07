@@ -165,30 +165,28 @@ class GradVac(GramianWeightedAggregator, Stateful, _NonDifferentiable):
     gramian_weighting: GradVacWeighting
 
     def __init__(self, beta: float = 0.5, eps: float = 1e-8) -> None:
-        weighting = GradVacWeighting(beta=beta, eps=eps)
-        super().__init__(weighting)
-        self._gradvac_weighting = weighting
+        super().__init__(GradVacWeighting(beta=beta, eps=eps))
 
     @property
     def beta(self) -> float:
-        return self._gradvac_weighting.beta
+        return self.gramian_weighting.beta
 
     @beta.setter
     def beta(self, value: float) -> None:
-        self._gradvac_weighting.beta = value
+        self.gramian_weighting.beta = value
 
     @property
     def eps(self) -> float:
-        return self._gradvac_weighting.eps
+        return self.gramian_weighting.eps
 
     @eps.setter
     def eps(self, value: float) -> None:
-        self._gradvac_weighting.eps = value
+        self.gramian_weighting.eps = value
 
     def reset(self) -> None:
         """Clears EMA state so the next forward starts from zero targets."""
 
-        self._gradvac_weighting.reset()
+        self.gramian_weighting.reset()
 
     def __repr__(self) -> str:
-        return f"GradVac(beta={self.beta!r}, eps={self.eps!r})"
+        return f"{self.__class__.__name__}(beta={self.beta!r}, eps={self.eps!r})"

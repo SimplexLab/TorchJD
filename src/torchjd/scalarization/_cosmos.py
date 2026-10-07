@@ -2,6 +2,7 @@ from torch import Tensor
 from torch.nn.functional import cosine_similarity
 
 from ._scalarizer_base import Scalarizer
+from ._utils import check_same_shape_as_values
 
 
 class COSMOS(Scalarizer):
@@ -52,12 +53,7 @@ class COSMOS(Scalarizer):
         self.weights = weights
 
     def forward(self, values: Tensor, /) -> Tensor:
-        if self.weights.shape != values.shape:
-            raise ValueError(
-                f"Parameter `weights` should have the same shape as `values`. Found "
-                f"`weights.shape = {tuple(self.weights.shape)}` and `values.shape = "
-                f"{tuple(values.shape)}`."
-            )
+        check_same_shape_as_values(self.weights, values, "weights")
 
         weighted_sum = (self.weights * values).sum()
         cosine = cosine_similarity(self.weights.flatten(), values.flatten(), dim=0)
