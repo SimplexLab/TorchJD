@@ -156,13 +156,13 @@ found [in the docs](https://torchjd.org/stable/examples/).
 | Scalarizer | Publication |
 |---|---|
 | [Constant](https://torchjd.org/stable/docs/scalarization/constant/) | - |
-| [COSMOS](https://torchjd.org/stable/docs/scalarization/cosmos/) | [COSMOS: Enhancing Multi-Objective Optimization with Scalarization](https://arxiv.org/pdf/2303.04536) |
+| [COSMOS](https://torchjd.org/stable/docs/scalarization/cosmos/) | [Scalable Pareto Front Approximation for Deep Multi-Objective Learning](https://arxiv.org/pdf/2103.13392) |
 | [DWA](https://torchjd.org/stable/docs/scalarization/dwa/) | [End-to-End Multi-Task Learning with Attention](https://arxiv.org/pdf/1803.10704) |
 | [FAMO](https://torchjd.org/stable/docs/scalarization/famo/) | [FAMO: Fast Adaptive Multitask Optimization](https://arxiv.org/pdf/2306.03792) |
-| [GeometricMean](https://torchjd.org/stable/docs/scalarization/geometric_mean/) | [MultiNet++: Multi-Stream Feature Aggregation and Geometric Loss Strategy for Multi-Task Learning](https://arxiv.org/pdf/1902.08325) |
+| [GeometricMean](https://torchjd.org/stable/docs/scalarization/geometric_mean/) | [MultiNet++: Multi-Stream Feature Aggregation and Geometric Loss Strategy for Multi-Task Learning](https://arxiv.org/pdf/1904.08492) |
 | [IMTL-L](https://torchjd.org/stable/docs/scalarization/imtl_l/) | [Towards Impartial Multi-task Learning](https://discovery.ucl.ac.uk/id/eprint/10120667/) |
 | [Mean](https://torchjd.org/stable/docs/scalarization/mean/) | - |
-| [PBI](https://torchjd.org/stable/docs/scalarization/pbi/) | [A Decomposition-Based Evolutionary Algorithm for Many Objective Optimization](https://ieeexplore.ieee.org/document/7445185) |
+| [PBI](https://torchjd.org/stable/docs/scalarization/pbi/) | [MOEA/D: A Multiobjective Evolutionary Algorithm Based on Decomposition](https://ieeexplore.ieee.org/document/4358754) |
 | [Random](https://torchjd.org/stable/docs/scalarization/random/) | [Reasonable Effectiveness of Random Weighting: A Litmus Test for Multi-Task Learning](https://arxiv.org/pdf/2111.10603) |
 | [STCH](https://torchjd.org/stable/docs/scalarization/stch/) | [Smooth Tchebycheff Scalarization for Multi-Objective Optimization](https://arxiv.org/pdf/2402.19078) |
 | [Sum](https://torchjd.org/stable/docs/scalarization/sum/) | - |
