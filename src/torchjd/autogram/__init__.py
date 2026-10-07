@@ -17,7 +17,10 @@ The list of Weightings compatible with ``autogram`` is:
 * :class:`~torchjd.aggregation.AlignedMTLWeighting`
 * :class:`~torchjd.aggregation.CAGradWeighting`
 * :class:`~torchjd.aggregation.ConstantWeighting`
+* :class:`~torchjd.aggregation.CRMOGMWeighting` (when wrapping another weighting from this list)
 * :class:`~torchjd.aggregation.DualProjWeighting`
+* :class:`~torchjd.aggregation.FairGradWeighting`
+* :class:`~torchjd.aggregation.GradVacWeighting`
 * :class:`~torchjd.aggregation.IMTLGWeighting`
 * :class:`~torchjd.aggregation.KrumWeighting`
 * :class:`~torchjd.aggregation.MeanWeighting`
