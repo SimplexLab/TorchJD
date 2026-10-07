@@ -30,7 +30,7 @@ class UPGradWeighting(_GramianWeighting, _NonDifferentiable):
     ) -> None:
         super().__init__()
         self.pref_vector = pref_vector
-        self.projector = projector_or_default(projector)
+        self.projector = projector
 
     def forward(self, gramian: PSDMatrix, /) -> Tensor:
         U = torch.diag(self.weighting(gramian))
@@ -61,7 +61,7 @@ class UPGrad(GramianWeightedAggregator, _NonDifferentiable):
     matrix onto the dual cone of all rows of this matrix, and that combines the result, as proposed
     in `Jacobian Descent For Multi-Objective Optimization <https://arxiv.org/pdf/2406.16232>`_.
 
-    :param pref_vector: The preference vector used to combine the projected rows.  If not provided,
+    :param pref_vector: The preference vector used to combine the projected rows. If not provided,
         defaults to :math:`\begin{bmatrix} \frac{1}{m} & \dots & \frac{1}{m} \end{bmatrix}^T \in
         \mathbb{R}^m`.
     :param projector: The :class:`~torchjd.linalg.DualConeProjector` used to compute the projection.

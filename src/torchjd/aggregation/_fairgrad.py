@@ -43,7 +43,7 @@ class FairGradWeighting(_WithOptionalDeps, _GramianWeighting, _NonDifferentiable
     """
 
     _REQUIRED_DEPS = ["numpy", "scipy"]
-    _INSTALL_HINT = 'Install it with: pip install "torchjd[fairgrad]"'
+    _INSTALL_HINT = 'Install them with: pip install "torchjd[fairgrad]"'
 
     def __init__(self, alpha: float, max_iters: int | None = None) -> None:
         super().__init__()

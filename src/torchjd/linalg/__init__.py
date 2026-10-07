@@ -1,5 +1,5 @@
 """
-This module provides utilitary linear algebra methods as well as types to represent specific
+This module provides utility linear algebra methods as well as types to represent specific
 structural properties.
 """
 
