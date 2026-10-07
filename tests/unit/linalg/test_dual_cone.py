@@ -136,6 +136,16 @@ def test_reg_eps_setter_rejects_negative() -> None:
         projector.reg_eps = -1e-9
 
 
+def test_init_rejects_negative_norm_eps() -> None:
+    with raises(ValueError, match="norm_eps"):
+        QuadprogProjector(norm_eps=-1e-9)
+
+
+def test_init_rejects_negative_reg_eps() -> None:
+    with raises(ValueError, match="reg_eps"):
+        QuadprogProjector(reg_eps=-1e-9)
+
+
 def test_qp_solver_based_failure() -> None:
     """
     Tests that `QPSolverBased._project_weight_vector` raises an error when the input G has too large

@@ -141,8 +141,8 @@ class Engine:
           <https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html>`_, which use a
           dropout function (rather than a `Dropout
           <https://docs.pytorch.org/docs/stable/generated/torch.nn.Dropout.html>`_ layer) in a
-          module with some trainable parameters, has to be used with
-          ``dropout=0.0``. Note that a `Dropout
+          module with some trainable parameters, have to be used with
+          ``dropout=0.0``. Note that `Dropout
           <https://docs.pytorch.org/docs/stable/generated/torch.nn.Dropout.html>`_ layers are
           entirely supported and should be preferred. It is also perfectly fine for random modules
           to have child modules that have trainable parameters, so if you have a random module with
