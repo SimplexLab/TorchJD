@@ -40,10 +40,6 @@ changelog does not include internal changes that do not affect the user.
   (e.g. a model with some parameters in `float32` and others in `float64`). The aggregated gradient
   was computed in the promoted dtype and could not be assigned to the `.grad` field of the tensors
   of lower precision. Each tensor now gets a `.grad` of its own dtype, like with `torch.autograd`.
-- Fixed `QuadprogProjector` accepting negative values of `norm_eps` and `reg_eps` in its
-  constructor. It now raises a `ValueError`, like when setting these attributes after construction.
-- Fixed the string representation of `CAGrad` dropping significant trailing zeros of `c` (e.g.
-  `str(CAGrad(c=10))` was `"CAGrad1"` instead of `"CAGrad10"`).
 
 ## [0.17.1] - 2026-09-23
 
