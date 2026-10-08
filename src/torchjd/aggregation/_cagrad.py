@@ -19,6 +19,9 @@ with contextlib.suppress(ImportError):
 
 # Non-differentiable: the cvxpy solver operates on numpy arrays, breaking the autograd graph.
 class CAGradWeighting(_WithOptionalDeps, _GramianWeighting, _NonDifferentiable):
+    _REQUIRED_DEPS = ["numpy", "cvxpy", "clarabel"]
+    _INSTALL_HINT = 'Install them with: pip install "torchjd[cagrad]"'
+
     """
     :class:`~torchjd.aggregation.Weighting` [:class:`~torchjd.linalg.PSDMatrix`]
     giving the weights of :class:`~torchjd.aggregation.CAGrad`.
@@ -34,9 +37,6 @@ class CAGradWeighting(_WithOptionalDeps, _GramianWeighting, _NonDifferentiable):
         <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html>`_
         function.
     """
-
-    _REQUIRED_DEPS = ["numpy", "cvxpy", "clarabel"]
-    _INSTALL_HINT = 'Install them with: pip install "torchjd[cagrad]"'
 
     def __init__(self, c: float, norm_eps: float = 0.0001) -> None:
         super().__init__()
@@ -80,7 +80,6 @@ class CAGradWeighting(_WithOptionalDeps, _GramianWeighting, _NonDifferentiable):
     def c(self, value: float) -> None:
         if value < 0:
             raise ValueError(f"c must be non-negative, but got {value}.")
-
         self._c = value
 
     @property
@@ -89,51 +88,6 @@ class CAGradWeighting(_WithOptionalDeps, _GramianWeighting, _NonDifferentiable):
 
     @norm_eps.setter
     def norm_eps(self, value: float) -> None:
-        if value < 0:
-            raise ValueError(f"norm_eps must be non-negative, but got {value}.")
-
+        if value <= 0:
+            raise ValueError(f"norm_eps must be positive, but got {value}.")
         self._norm_eps = value
-
-
-class CAGrad(GramianWeightedAggregator, _NonDifferentiable):
-    """
-    :class:`~torchjd.aggregation.GramianWeightedAggregator` as defined in Algorithm 1 of
-    `Conflict-Averse Gradient Descent for Multi-task Learning
-    <https://arxiv.org/pdf/2110.14048.pdf>`_.
-
-    :param c: The scale of the radius of the ball constraint.
-    :param norm_eps: A small value to avoid division by zero when normalizing.
-
-    .. note::
-        This aggregator requires optional dependencies. When they are not installed, instantiating
-        it raises an :class:`ImportError` with installation instructions.
-        To install them, use ``pip install "torchjd[cagrad]"``.
-    """
-
-    gramian_weighting: CAGradWeighting
-
-    def __init__(self, c: float, norm_eps: float = 0.0001) -> None:
-        super().__init__(CAGradWeighting(c=c, norm_eps=norm_eps))
-
-    @property
-    def c(self) -> float:
-        return self.gramian_weighting.c
-
-    @c.setter
-    def c(self, value: float) -> None:
-        self.gramian_weighting.c = value
-
-    @property
-    def norm_eps(self) -> float:
-        return self.gramian_weighting.norm_eps
-
-    @norm_eps.setter
-    def norm_eps(self, value: float) -> None:
-        self.gramian_weighting.norm_eps = value
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(c={self.c}, norm_eps={self.norm_eps})"
-
-    def __str__(self) -> str:
-        c_str = str(self.c).removesuffix(".0")
-        return f"CAGrad{c_str}"
