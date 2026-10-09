@@ -8,6 +8,14 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed `ConstantWeighting` returning its weights as-is, regardless of the dtype and device of the
+  input matrix. `Constant`, as well as `AlignedMTL` and `ConFIG` with a `pref_vector`, failed when
+  the weights were not of the same dtype or device as the Jacobian, e.g. with a `float32`
+  `pref_vector` and a `float64` Jacobian. The weights are now cast to the dtype and device of the
+  input matrix.
+
 ## [0.18.0] - 2026-10-08
 
 ### Added
