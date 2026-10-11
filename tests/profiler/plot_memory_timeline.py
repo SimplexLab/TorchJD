@@ -3,6 +3,8 @@ Script to plot memory timeline evolution from profiling traces.
 Reads memory traces from json files and plots them on a single graph.
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 from dataclasses import dataclass
@@ -24,7 +26,7 @@ class MemoryFrame:
     device_id: int  # -1 for CPU, 0+ for CUDA devices
 
     @staticmethod
-    def from_event(event: dict) -> "MemoryFrame":
+    def from_event(event: dict) -> MemoryFrame:
         args = event["args"]
         return MemoryFrame(
             timestamp=event["ts"],

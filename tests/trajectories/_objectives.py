@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 
 import torch
@@ -77,7 +79,7 @@ class QuadraticFunction(Objective, WithSPSMappingMixin):
         return x_minus_u @ A @ x_minus_u
 
     @property
-    def sps_mapping(self) -> "QuadraticSPSMapping":
+    def sps_mapping(self) -> QuadraticSPSMapping:
         return QuadraticSPSMapping(self.As, self.us)
 
 
@@ -118,7 +120,7 @@ class ElementWiseQuadratic(Objective, WithSPSMappingMixin):
         return torch.diag(torch.stack([2 * x[0], 2 * x[1]]))
 
     @property
-    def sps_mapping(self) -> "ElementWiseQuadraticSPSMapping":
+    def sps_mapping(self) -> ElementWiseQuadraticSPSMapping:
         return ElementWiseQuadraticSPSMapping(self.n_values)
 
 
