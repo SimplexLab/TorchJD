@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import TypeAlias
 
@@ -16,7 +18,7 @@ class Plotter(ABC):
     def __call__(self, ax: plt.Axes) -> None:
         pass
 
-    def __add__(self, other: "Plotter") -> "Plotter":
+    def __add__(self, other: Plotter) -> Plotter:
         return MultiPlotter((self, other))
 
 
@@ -30,7 +32,7 @@ class EmptyPlotter(Plotter):
 class MultiPlotter(Plotter):
     """Plotter applying several plotters."""
 
-    def __init__(self, plotters: tuple["Plotter", ...]) -> None:
+    def __init__(self, plotters: tuple[Plotter, ...]) -> None:
         self.plotters = plotters
 
     def __call__(self, ax: plt.Axes) -> None:
