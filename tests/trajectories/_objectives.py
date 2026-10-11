@@ -28,20 +28,23 @@ class Objective(ABC):
         return f"{self.__class__.__name__}({self.n_values})"
 
 
+class SPSMapping(ABC):
+    """Strong Pareto stationary mapping of an objective."""
+
+    @abstractmethod
+    def __call__(self, w: Tensor) -> Tensor:
+        """
+        Map a vector with (strictly) positive coordinates to the corresponding strongly pareto
+        stationary point.
+        """
+
+
 class WithSPSMappingMixin(ABC):
     """Mixin adding the possibility to get the Strong Pareto stationary mapping."""
 
-    class SPSMapping(ABC):
-        @abstractmethod
-        def __call__(self, w: Tensor) -> Tensor:
-            """
-            Map a vector with (strictly) positive coordinates to the corresponding strongly pareto
-            stationary point.
-            """
-
     @property
     @abstractmethod
-    def sps_mapping(self) -> "WithSPSMappingMixin.SPSMapping":
+    def sps_mapping(self) -> SPSMapping:
         pass
 
 
@@ -73,21 +76,22 @@ class QuadraticFunction(Objective, WithSPSMappingMixin):
         x_minus_u = x - u
         return x_minus_u @ A @ x_minus_u
 
-    class SPSMapping(WithSPSMappingMixin.SPSMapping):
-        def __init__(self, As: list[Tensor], us: list[Tensor]) -> None:
-            self.As = As
-            self.us = us
-
-        def __call__(self, w: Tensor) -> Tensor:
-            G = torch.stack([weight * A for weight, A in zip(w, self.As, strict=False)]).sum(dim=0)
-            b = torch.stack(
-                [weight * A @ u for weight, A, u in zip(w, self.As, self.us, strict=False)]
-            ).sum(dim=0)
-            return torch.linalg.lstsq(G, b, driver="gelsd").solution
-
     @property
-    def sps_mapping(self) -> "QuadraticFunction.SPSMapping":
-        return self.SPSMapping(self.As, self.us)
+    def sps_mapping(self) -> "QuadraticSPSMapping":
+        return QuadraticSPSMapping(self.As, self.us)
+
+
+class QuadraticSPSMapping(SPSMapping):
+    def __init__(self, As: list[Tensor], us: list[Tensor]) -> None:
+        self.As = As
+        self.us = us
+
+    def __call__(self, w: Tensor) -> Tensor:
+        G = torch.stack([weight * A for weight, A in zip(w, self.As, strict=False)]).sum(dim=0)
+        b = torch.stack(
+            [weight * A @ u for weight, A, u in zip(w, self.As, self.us, strict=False)]
+        ).sum(dim=0)
+        return torch.linalg.lstsq(G, b, driver="gelsd").solution
 
 
 class HomogenousQuadraticFunction(QuadraticFunction):
@@ -113,13 +117,14 @@ class ElementWiseQuadratic(Objective, WithSPSMappingMixin):
     def jacobian(self, x: Tensor) -> Tensor:
         return torch.diag(torch.stack([2 * x[0], 2 * x[1]]))
 
-    class SPSMapping(WithSPSMappingMixin.SPSMapping):
-        def __init__(self, n_values: int) -> None:
-            self.n_values = n_values
-
-        def __call__(self, w: Tensor) -> Tensor:  # noqa: ARG002
-            return torch.zeros(self.n_values)
-
     @property
-    def sps_mapping(self) -> "ElementWiseQuadratic.SPSMapping":
-        return self.SPSMapping(self.n_values)
+    def sps_mapping(self) -> "ElementWiseQuadraticSPSMapping":
+        return ElementWiseQuadraticSPSMapping(self.n_values)
+
+
+class ElementWiseQuadraticSPSMapping(SPSMapping):
+    def __init__(self, n_values: int) -> None:
+        self.n_values = n_values
+
+    def __call__(self, w: Tensor) -> Tensor:  # noqa: ARG002
+        return torch.zeros(self.n_values)
