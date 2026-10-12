@@ -3,6 +3,7 @@ from contextlib import nullcontext as does_not_raise
 import torch
 from pytest import mark, raises
 from torch import Tensor
+from torch.testing import assert_close
 from utils.contexts import ExceptionContext
 from utils.tensors import ones_, tensor_
 
@@ -84,6 +85,20 @@ def test_matrix_shape_check(
 
     with expectation:
         _ = aggregator(matrix)
+
+
+@mark.parametrize(
+    ["weights_dtype", "matrix_dtype"],
+    [(torch.float32, torch.float64), (torch.float64, torch.float32)],
+)
+def test_weights_dtype_differs_from_matrix_dtype(
+    weights_dtype: torch.dtype, matrix_dtype: torch.dtype
+) -> None:
+    weights = torch.tensor([1.0, 2.0], device="cpu", dtype=weights_dtype)
+    matrix = tensor_([[-4.0, 1.0, 1.0], [6.0, 1.0, 1.0]], dtype=matrix_dtype)
+    expected = tensor_([8.0, 3.0, 3.0], dtype=matrix_dtype)
+
+    assert_close(Constant(weights)(matrix), expected)
 
 
 def test_representations() -> None:
