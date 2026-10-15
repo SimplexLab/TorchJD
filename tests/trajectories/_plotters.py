@@ -5,7 +5,7 @@ from typing import TypeAlias
 
 import matplotlib.patheffects as pe
 import numpy as np
-from matplotlib import cm as cm, colors as mcolors, pyplot as plt
+from matplotlib import colormaps, colors as mcolors, pyplot as plt
 from numpy.lib.stride_tricks import sliding_window_view
 
 Color: TypeAlias = str | tuple[float, float, float] | tuple[float, float, float, float]
@@ -128,7 +128,7 @@ class ContourCirclesPlotter(MultiPlotter):
 
     def __init__(self) -> None:
         radiuses = [1.0, 2.5, 4, 5.5, 7, 8.5]
-        colormap = cm.inferno_r
+        colormap = colormaps["inferno_r"]
         norm = mcolors.Normalize(vmin=-1, vmax=max(radiuses))
         plotters = tuple(CirclePlotter(radius, colormap(norm(radius))) for radius in radiuses)
         super().__init__(plotters)
