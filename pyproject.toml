@@ -194,3 +194,8 @@ quote-style = "double"
 [tool.ty.src]
 include = ["src", "tests"]
 exclude = ["src/torchjd/aggregation/_nash_mtl.py"]
+
+[tool.ty.rules]
+# nn.Module declares `forward` as a mutable `Callable[..., Any]` attribute, so every
+# `forward` override would be flagged.
+invalid-mutable-override = "ignore"
