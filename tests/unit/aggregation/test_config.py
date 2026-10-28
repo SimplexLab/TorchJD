@@ -1,7 +1,8 @@
 import torch
 from pytest import mark
 from torch import Tensor
-from utils.tensors import ones_
+from torch.testing import assert_close
+from utils.tensors import ones_, tensor_
 
 from torchjd.aggregation import ConFIG, ConstantWeighting
 
@@ -47,6 +48,20 @@ def test_representations() -> None:
     A = ConFIG(pref_vector=torch.tensor([1.0, 2.0, 3.0], device="cpu"))
     assert repr(A) == "ConFIG(pref_vector=tensor([1., 2., 3.]))"
     assert str(A) == "ConFIG([1., 2., 3.])"
+
+
+@mark.parametrize(
+    ["pref_vector_dtype", "matrix_dtype"],
+    [(torch.float32, torch.float64), (torch.float64, torch.float32)],
+)
+def test_pref_vector_dtype_differs_from_matrix_dtype(
+    pref_vector_dtype: torch.dtype, matrix_dtype: torch.dtype
+) -> None:
+    pref_vector = torch.tensor([1.0, 2.0], device="cpu", dtype=pref_vector_dtype)
+    matrix = tensor_([[-4.0, 1.0, 1.0], [6.0, 1.0, 1.0]], dtype=matrix_dtype)
+    expected = ConFIG(pref_vector=pref_vector.to(matrix))(matrix)
+
+    assert_close(ConFIG(pref_vector=pref_vector)(matrix), expected)
 
 
 def test_pref_vector_setter_updates_value() -> None:

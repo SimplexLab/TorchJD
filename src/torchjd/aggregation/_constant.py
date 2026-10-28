@@ -26,7 +26,7 @@ class ConstantWeighting(_MatrixWeighting):
 
     def forward(self, matrix: Tensor, /) -> Tensor:
         self._check_matrix_shape(matrix)
-        return self.weights
+        return self.weights.to(dtype=matrix.dtype, device=matrix.device)
 
     def _check_matrix_shape(self, matrix: Tensor) -> None:
         if matrix.shape[0] != len(self.weights):
