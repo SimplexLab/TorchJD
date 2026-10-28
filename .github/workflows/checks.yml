@@ -40,8 +40,9 @@ jobs:
           # annotations referencing optional dependencies.
           - python-version: '3.10'
             options: 'none'
-          # Lower-bounds of all dependencies and Python version.
-          - python-version: '3.10.0'
+          # Lower-bounds of all dependencies and Python version. Not 3.10.0 because of a dataclass
+          # bug (bpo-44649) breaking pytest>=9.2.0, nor 3.10.1 because uv doesn't provide it.
+          - python-version: '3.10.2'
             extra_groups: 'lower_bounds'
           # Latest: torch nightly build.
           - torch_channel: 'nightly'

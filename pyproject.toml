@@ -134,6 +134,7 @@ full = [
 
 [tool.pytest.ini_options]
 xfail_strict = true
+addopts = "-p no:dash"  # dash's pytest plugin uses deprecated hook marks, failing with -W error
 
 [tool.coverage.report]
 exclude_lines = [
