@@ -8,6 +8,12 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed `Krum` and `KrumWeighting` ranking rows by sums of Euclidean distances instead of
+  squared Euclidean distances, as required by Krum and Multi-Krum. This could select a different
+  gradient or a different set of gradients to average.
+
 ## [0.18.0] - 2026-10-08
 
 ### Added

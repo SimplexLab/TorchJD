@@ -2,11 +2,14 @@ from contextlib import nullcontext as does_not_raise
 
 from pytest import mark, raises
 from torch import Tensor
+from torch.optim import SGD
+from torch.testing import assert_close
 from utils.contexts import ExceptionContext
-from utils.tensors import ones_, tensor_
+from utils.tensors import ones_, tensor_, zeros_
 
 from torchjd.aggregation import Krum
 from torchjd.aggregation._krum import KrumWeighting
+from torchjd.autojac import backward, jac_to_grad
 
 from ._asserts import assert_expected_structure
 from ._inputs import scaled_matrices_2_plus_rows, typical_matrices_2_plus_rows
@@ -131,3 +134,53 @@ def test_negative_squared_distances_are_clamped() -> None:
 
     assert weights[:2].sum().item() == 1.0
     assert weights[2:].abs().sum().item() == 0.0
+
+
+def test_squared_distance_scores_select_correct_row() -> None:
+    # Summing the two nearest squared distances gives scores [30, 44, 28, 38, 56].
+    # Summing their square roots instead incorrectly selects row 0.
+    matrix = tensor_([[3, 0], [0, 7], [2, 5], [5, 0], [6, 7]])
+    weights = KrumWeighting(n_byzantine=1)(matrix @ matrix.T)
+
+    assert_close(weights, tensor_([0, 0, 1, 0, 0]))
+    assert_close(Krum(n_byzantine=1)(matrix), tensor_([2, 5]))
+
+
+@mark.parametrize(
+    ["n_selected", "expected_weights"],
+    [
+        (1, [1, 0, 0, 0, 0]),
+        (2, [0.5, 0.5, 0, 0, 0]),
+        (5, [0.2, 0.2, 0.2, 0.2, 0.2]),
+    ],
+)
+def test_multikrum_squared_distance_scores(n_selected: int, expected_weights: list[float]) -> None:
+    # Scores [21, 22, 26, 33, 43] rank rows 0 and 1 first. Unsquared distances
+    # rank rows 0 and 2 first, changing the Multi-Krum average.
+    matrix = tensor_([[3, 0], [3, 7], [2, 0], [5, 4], [0, 7]])
+    weights = KrumWeighting(n_byzantine=1, n_selected=n_selected)(matrix @ matrix.T)
+
+    assert_close(weights, tensor_(expected_weights))
+    assert_close(
+        Krum(n_byzantine=1, n_selected=n_selected)(matrix),
+        tensor_(expected_weights) @ matrix,
+    )
+
+
+@mark.parametrize("optimize_gramian_computation", [False, True])
+def test_squared_distance_scores_in_optimizer_step(optimize_gramian_computation: bool) -> None:
+    param = zeros_(2, requires_grad=True)
+    optimizer = SGD([param], lr=0.1)
+    targets = -tensor_([[3, 0], [0, 7], [2, 5], [5, 0], [6, 7]])
+    losses = 0.5 * (param - targets).square().sum(dim=1)
+
+    backward(losses, inputs=[param])
+    weights = jac_to_grad(
+        [param],
+        Krum(n_byzantine=1),
+        optimize_gramian_computation=optimize_gramian_computation,
+    )
+    assert_close(weights, tensor_([0, 0, 1, 0, 0]))
+    assert_close(param.grad, tensor_([2, 5]))
+    optimizer.step()
+    assert_close(param, tensor_([-0.2, -0.5]))
