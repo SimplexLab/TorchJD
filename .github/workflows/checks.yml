@@ -67,8 +67,13 @@ jobs:
           groups: test ${{ matrix.extra_groups }}
           torch_channel: ${{ matrix.torch_channel || 'stable' }}
 
+      # Since torch 2.15, the GPU of the macOS runners is rejected by torch, which warns about it
+      # during the first backward pass. Remove the filter once
+      # https://github.com/pytorch/pytorch/issues/202529 is fixed.
       - name: Run unit tests
-        run: uv run pytest -W error tests/unit --cov=src --cov-report=xml
+        run: >-
+          uv run pytest -W error -W "ignore:Skipping device:UserWarning" tests/unit --cov=src
+          --cov-report=xml
         env:
           PYTEST_TORCH_DTYPE: ${{ matrix.dtype || 'float32' }}
 
