@@ -8,6 +8,8 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+## [0.18.1] - 2026-10-31
+
 ### Fixed
 
 - Fixed `Krum` and `KrumWeighting` ranking rows by sums of Euclidean distances instead of
