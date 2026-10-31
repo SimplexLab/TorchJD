@@ -8,6 +8,10 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Added
+
+- Added Python 3.15 classifier in pyproject.toml (we now also run tests on Python 3.15 in the CI).
+
 ### Fixed
 
 - Fixed `Krum` and `KrumWeighting` ranking rows by sums of Euclidean distances instead of
