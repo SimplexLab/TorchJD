@@ -28,13 +28,14 @@ class KrumWeighting(_GramianWeighting):
         gradient_norms_squared = torch.diagonal(gramian)
         distances_squared = (
             gradient_norms_squared.unsqueeze(0) + gradient_norms_squared.unsqueeze(1) - 2 * gramian
-        )
-        distances = torch.sqrt(distances_squared.clamp(min=0.0))
+        ).clamp(min=0.0)
 
         n_closest = gramian.shape[0] - self.n_byzantine - 2
-        smallest_distances, _ = torch.topk(distances, k=n_closest + 1, largest=False)
-        smallest_distances_excluding_self = smallest_distances[:, 1:]
-        scores = smallest_distances_excluding_self.sum(dim=1)
+        smallest_distances_squared, _ = torch.topk(
+            distances_squared, k=n_closest + 1, largest=False
+        )
+        smallest_distances_squared_excluding_self = smallest_distances_squared[:, 1:]
+        scores = smallest_distances_squared_excluding_self.sum(dim=1)
 
         _, selected_indices = torch.topk(scores, k=self.n_selected, largest=False)
         one_hot_selected_indices = F.one_hot(selected_indices, num_classes=gramian.shape[0])
