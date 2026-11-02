@@ -8,6 +8,8 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+## [0.18.1] - 2026-11-02
+
 ### Added
 
 - Added Python 3.15 classifier in pyproject.toml (we now also run tests on Python 3.15 in the CI).
