@@ -20,7 +20,3 @@ To install `torchjd` with all of its optional dependencies, you can also use:
 ```
 pip install "torchjd[full]"
 ```
-
-Note that on Python 3.15, [cvxpy](https://github.com/cvxpy/cvxpy/) doesn't provide wheels yet, so
-installing `cagrad`, `nash_mtl` or `full` requires building some of its dependencies from source
-(which needs a BLAS library).
