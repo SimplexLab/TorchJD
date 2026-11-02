@@ -1,7 +1,7 @@
 import torch
 from pytest import mark
 from torch import Tensor
-from utils.tensors import ones_
+from utils.tensors import ones_, tensor_
 
 from torchjd.aggregation import ConFIG, ConstantWeighting
 
@@ -56,3 +56,17 @@ def test_pref_vector_setter_updates_value() -> None:
     assert A.pref_vector is new_pref
     assert isinstance(A.weighting, ConstantWeighting)
     assert A.weighting.weights is new_pref
+
+
+def test_to_moves_pref_vector() -> None:
+    A = ConFIG(pref_vector=tensor_([1.0, 2.0], dtype=torch.float32)).to(torch.float64)
+    weighting = A.weighting
+    assert isinstance(weighting, ConstantWeighting)
+
+    assert A.pref_vector is not None
+    assert A.pref_vector.dtype == torch.float64
+    assert weighting.weights.dtype == torch.float64
+    buffers = list(A.buffers())
+    assert any(buffer is A.pref_vector for buffer in buffers)
+    assert any(buffer is weighting.weights for buffer in buffers)
+    assert len(A.state_dict()) == 0

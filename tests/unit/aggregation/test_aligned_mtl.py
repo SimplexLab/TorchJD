@@ -66,3 +66,17 @@ def test_float64_small_eigenvalue_is_kept() -> None:
     J = tensor_([[1.0, 0.0], [0.0, 1e-4]], dtype=torch.float64)
     result = AlignedMTL()(J)
     assert_close(result, tensor_([5e-5, 5e-5], dtype=torch.float64))
+
+
+def test_to_moves_pref_vector() -> None:
+    A = AlignedMTL(pref_vector=tensor_([1.0, 2.0], dtype=torch.float32)).to(torch.float64)
+    weighting = A.gramian_weighting.weighting
+    assert isinstance(weighting, ConstantWeighting)
+
+    assert A.pref_vector is not None
+    assert A.pref_vector.dtype == torch.float64
+    assert weighting.weights.dtype == torch.float64
+    buffers = list(A.buffers())
+    assert any(buffer is A.pref_vector for buffer in buffers)
+    assert any(buffer is weighting.weights for buffer in buffers)
+    assert len(A.state_dict()) == 0

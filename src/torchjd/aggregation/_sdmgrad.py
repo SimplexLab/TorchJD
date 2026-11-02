@@ -107,6 +107,7 @@ class SDMGradWeighting(_MatrixWeighting, Stateful, _NonDifferentiable):
         self.momentum = momentum
         self.n_iter = n_iter
         self.lambda_ = lambda_
+        self.register_buffer("_pref_vector", None, persistent=False)
         self.pref_vector = pref_vector
         self.register_buffer("_w", None)
         self._state_key: tuple[int, torch.dtype, torch.device] | None = None

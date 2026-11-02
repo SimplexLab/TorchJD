@@ -13,6 +13,11 @@ changelog does not include internal changes that do not affect the user.
 - Fixed `Krum` and `KrumWeighting` ranking rows by sums of Euclidean distances instead of
   squared Euclidean distances, as required by Krum and Multi-Krum. This could select a different
   gradient or a different set of gradients to average.
+- Fixed `.to()` not moving the tensors given to `Constant`, `ConstantWeighting`, `UPGrad`,
+  `UPGradWeighting`, `DualProj`, `DualProjWeighting`, `AlignedMTL`, `AlignedMTLWeighting`, `ConFIG`,
+  `SDMGradWeighting` and `CRMOGMWeighting` (`weights`, `pref_vector` and `initial_weights`). These
+  tensors are now registered as non-persistent buffers, so they follow the dtype and device of the
+  aggregator or weighting without being added to its `state_dict`.
 
 ## [0.18.0] - 2026-10-08
 

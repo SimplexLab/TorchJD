@@ -36,6 +36,7 @@ class AlignedMTLWeighting(_GramianWeighting):
         scale_mode: SUPPORTED_SCALE_MODE = "min",
     ) -> None:
         super().__init__()
+        self.register_buffer("_pref_vector", None, persistent=False)
         self.pref_vector = pref_vector
         self.scale_mode: SUPPORTED_SCALE_MODE = scale_mode
 

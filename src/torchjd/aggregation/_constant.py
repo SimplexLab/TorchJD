@@ -14,6 +14,8 @@ class ConstantWeighting(_MatrixWeighting):
     :param weights: The weights to return at each call.
     """
 
+    weights: Tensor
+
     def __init__(self, weights: Tensor) -> None:
         if weights.dim() != 1:
             raise ValueError(
@@ -22,7 +24,7 @@ class ConstantWeighting(_MatrixWeighting):
             )
 
         super().__init__()
-        self.weights = weights
+        self.register_buffer("weights", weights, persistent=False)
 
     def forward(self, matrix: Tensor, /) -> Tensor:
         self._check_matrix_shape(matrix)
@@ -48,11 +50,10 @@ class Constant(WeightedAggregator):
 
     def __init__(self, weights: Tensor) -> None:
         super().__init__(weighting=ConstantWeighting(weights=weights))
-        self._weights = weights
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(weights={repr(self._weights)})"
+        return f"{self.__class__.__name__}(weights={repr(self.weighting.weights)})"
 
     def __str__(self) -> str:
-        weights_str = vector_to_str(self._weights)
+        weights_str = vector_to_str(self.weighting.weights)
         return f"{self.__class__.__name__}([{weights_str}])"

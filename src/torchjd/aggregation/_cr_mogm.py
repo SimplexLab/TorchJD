@@ -98,13 +98,15 @@ class CRMOGMWeighting(Weighting[_T], Stateful):
             cr_mogm.alpha = 1 - current_lr / initial_lr
     """
 
+    _initial_weights: Tensor | None
+
     def __init__(
         self, weighting: Weighting[_T], alpha: float = 0.9, initial_weights: Tensor | None = None
     ) -> None:
         super().__init__()
         self.weighting = weighting
         self.alpha = alpha
-        self._initial_weights = initial_weights
+        self.register_buffer("_initial_weights", initial_weights, persistent=False)
         self.register_buffer("_lambda", None)
 
     @property
