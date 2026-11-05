@@ -8,6 +8,17 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed `.to()` not moving the tensors given to `Constant`, `ConstantWeighting`, `UPGrad`,
+  `UPGradWeighting`, `DualProj`, `DualProjWeighting`, `AlignedMTL`, `AlignedMTLWeighting`, `ConFIG`,
+  `SDMGradWeighting`, `CRMOGMWeighting` and `GradDrop` (`weights`, `pref_vector`,
+  `initial_weights` and `leak`). These tensors are now registered as non-persistent buffers, so
+  they follow the dtype and device of the aggregator or weighting without being added to its
+  `state_dict`.
+
+## [0.18.1] - 2026-11-02
+
 ### Added
 
 - Added Python 3.15 classifier in pyproject.toml (we now also run tests on Python 3.15 in the CI).
@@ -17,12 +28,6 @@ changelog does not include internal changes that do not affect the user.
 - Fixed `Krum` and `KrumWeighting` ranking rows by sums of Euclidean distances instead of
   squared Euclidean distances, as required by Krum and Multi-Krum. This could select a different
   gradient or a different set of gradients to average.
-- Fixed `.to()` not moving the tensors given to `Constant`, `ConstantWeighting`, `UPGrad`,
-  `UPGradWeighting`, `DualProj`, `DualProjWeighting`, `AlignedMTL`, `AlignedMTLWeighting`, `ConFIG`,
-  `SDMGradWeighting`, `CRMOGMWeighting` and `GradDrop` (`weights`, `pref_vector`,
-  `initial_weights` and `leak`). These tensors are now registered as non-persistent buffers, so
-  they follow the dtype and device of the aggregator or weighting without being added to its
-  `state_dict`.
 
 ## [0.18.0] - 2026-10-08
 
