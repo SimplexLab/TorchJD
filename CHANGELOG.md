@@ -13,7 +13,7 @@ changelog does not include internal changes that do not affect the user.
 - Fixed `.to()` not moving the tensors given to the `Constant`, `STCH`, `PBI` and `COSMOS`
   scalarizers (`weights` and `reference`). These tensors are now registered as non-persistent
   buffers, so they follow the dtype and device of the scalarizer without being added to its
-  `state_dict`.
+  `state_dict`. `FAMO`'s `min_losses` buffer is also no longer in its `state_dict`.
 - Fixed `.to()` not moving the tensors given to `Constant`, `ConstantWeighting`, `UPGrad`,
   `UPGradWeighting`, `DualProj`, `DualProjWeighting`, `AlignedMTL`, `AlignedMTLWeighting`, `ConFIG`,
   `SDMGradWeighting`, `CRMOGMWeighting` and `GradDrop` (`weights`, `pref_vector`,

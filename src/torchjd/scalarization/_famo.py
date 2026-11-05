@@ -128,7 +128,7 @@ class FAMO(Scalarizer, Stateful):
                 f"Parameter `min_losses` should have shape {tuple(self._w.shape)} (matching the "
                 f"shape of the logits). Found `min_losses.shape = {tuple(min_losses.shape)}`."
             )
-        self.register_buffer("min_losses", min_losses)
+        self.register_buffer("min_losses", min_losses, persistent=False)
 
         self.lr = lr
         self.weight_decay = weight_decay
