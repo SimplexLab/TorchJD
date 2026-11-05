@@ -80,3 +80,20 @@ def test_representations() -> None:
     s = STCH(mu=0.5)
     assert repr(s) == "STCH(mu=0.5, weights=None, reference=None)"
     assert str(s) == "STCH"
+
+
+def test_to_moves_weights_and_reference() -> None:
+    s = STCH(
+        mu=1.0,
+        weights=tensor_([0.5, 0.5], dtype=torch.float32),
+        reference=tensor_([0.0, 1.0], dtype=torch.float32),
+    ).to(torch.float64)
+
+    assert s.weights is not None
+    assert s.reference is not None
+    assert s.weights.dtype == torch.float64
+    assert s.reference.dtype == torch.float64
+    buffers = list(s.buffers())
+    assert any(buffer is s.weights for buffer in buffers)
+    assert any(buffer is s.reference for buffer in buffers)
+    assert len(s.state_dict()) == 0

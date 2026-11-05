@@ -61,3 +61,11 @@ def test_representations() -> None:
 def test_str_with_non_vector_weights() -> None:
     assert str(Constant(weights=ones_((3, 4)))) == "Constant(weights of shape (3, 4))"
     assert str(Constant(weights=ones_(()))) == "Constant(weights of shape ())"
+
+
+def test_to_moves_weights() -> None:
+    s = Constant(weights=tensor_([1.0, 2.0], dtype=torch.float32)).to(torch.float64)
+
+    assert s.weights.dtype == torch.float64
+    assert any(buffer is s.weights for buffer in s.buffers())
+    assert len(s.state_dict()) == 0

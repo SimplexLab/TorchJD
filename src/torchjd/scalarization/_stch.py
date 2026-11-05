@@ -38,6 +38,9 @@ class STCH(Scalarizer):
         is applied. If provided, it must have the same shape as the values passed at call time.
     """
 
+    weights: Tensor | None
+    reference: Tensor | None
+
     def __init__(
         self,
         mu: float,
@@ -49,8 +52,8 @@ class STCH(Scalarizer):
 
         super().__init__()
         self.mu = mu
-        self.weights = weights
-        self.reference = reference
+        self.register_buffer("weights", weights, persistent=False)
+        self.register_buffer("reference", reference, persistent=False)
 
     def forward(self, values: Tensor, /) -> Tensor:
         check_same_shape_as_values(self.weights, values, "weights")

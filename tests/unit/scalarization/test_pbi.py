@@ -103,3 +103,19 @@ def test_representations() -> None:
     s = PBI(theta=5.0, weights=torch.tensor([0.5, 0.5]))
     assert repr(s) == "PBI(theta=5.0, weights=tensor([0.5000, 0.5000]), reference=None)"
     assert str(s) == "PBI"
+
+
+def test_to_moves_weights_and_reference() -> None:
+    s = PBI(
+        theta=5.0,
+        weights=tensor_([0.5, 0.5], dtype=torch.float32),
+        reference=tensor_([0.0, 1.0], dtype=torch.float32),
+    ).to(torch.float64)
+
+    assert s.reference is not None
+    assert s.weights.dtype == torch.float64
+    assert s.reference.dtype == torch.float64
+    buffers = list(s.buffers())
+    assert any(buffer is s.weights for buffer in buffers)
+    assert any(buffer is s.reference for buffer in buffers)
+    assert len(s.state_dict()) == 0

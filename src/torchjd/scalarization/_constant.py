@@ -14,9 +14,11 @@ class Constant(Scalarizer):
         passed at call time.
     """
 
+    weights: Tensor
+
     def __init__(self, weights: Tensor) -> None:
         super().__init__()
-        self.weights = weights
+        self.register_buffer("weights", weights, persistent=False)
 
     def forward(self, values: Tensor, /) -> Tensor:
         if values.shape != self.weights.shape:

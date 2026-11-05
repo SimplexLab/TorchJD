@@ -51,14 +51,17 @@ class PBI(Scalarizer):
         :math:`10^{-6}` at that point and is negligible elsewhere.
     """
 
+    weights: Tensor
+    reference: Tensor | None
+
     def __init__(self, theta: float, weights: Tensor, reference: Tensor | None = None) -> None:
         if theta < 0.0:
             raise ValueError(f"Parameter `theta` should be non-negative. Found `theta = {theta}`.")
 
         super().__init__()
         self.theta = theta
-        self.weights = weights
-        self.reference = reference
+        self.register_buffer("weights", weights, persistent=False)
+        self.register_buffer("reference", reference, persistent=False)
 
     def forward(self, values: Tensor, /) -> Tensor:
         check_same_shape_as_values(self.weights, values, "weights")
