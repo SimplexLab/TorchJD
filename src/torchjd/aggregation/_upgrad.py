@@ -29,6 +29,7 @@ class UPGradWeighting(_GramianWeighting, _NonDifferentiable):
         projector: DualConeProjector | None = None,
     ) -> None:
         super().__init__()
+        self.register_buffer("_pref_vector", None, persistent=False)
         self.pref_vector = pref_vector
         self.projector = projector
 

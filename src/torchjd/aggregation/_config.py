@@ -31,6 +31,7 @@ class ConFIG(Aggregator, _NonDifferentiable):
 
     def __init__(self, pref_vector: Tensor | None = None) -> None:
         super().__init__()
+        self.register_buffer("_pref_vector", None, persistent=False)
         self.pref_vector = pref_vector
 
     def forward(self, matrix: Matrix, /) -> Tensor:

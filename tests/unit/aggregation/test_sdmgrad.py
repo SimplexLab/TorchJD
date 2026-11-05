@@ -170,3 +170,12 @@ def test_non_differentiable() -> None:
     W = SDMGradWeighting()
     weights = W(A)
     assert not weights.requires_grad
+
+
+def test_to_moves_pref_vector() -> None:
+    W = SDMGradWeighting(pref_vector=tensor_([0.5, 0.5], dtype=torch.float32)).to(torch.float64)
+
+    assert W.pref_vector is not None
+    assert W.pref_vector.dtype == torch.float64
+    assert "_pref_vector" in dict(W.named_buffers())
+    assert "_pref_vector" not in W.state_dict()

@@ -90,3 +90,11 @@ def test_representations() -> None:
     A = Constant(weights=torch.tensor([1.0, 2.0], device="cpu"))
     assert repr(A) == "Constant(weights=tensor([1., 2.]))"
     assert str(A) == "Constant([1., 2.])"
+
+
+def test_to_moves_weights() -> None:
+    A = Constant(tensor_([1.0, 2.0], dtype=torch.float32)).to(torch.float64)
+
+    assert A.weighting.weights.dtype == torch.float64
+    assert any(buffer is A.weighting.weights for buffer in A.buffers())
+    assert len(A.state_dict()) == 0
