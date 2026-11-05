@@ -31,6 +31,7 @@ class GradDrop(Aggregator, _NonDifferentiable):
     def __init__(self, f: Callable = _identity, leak: Tensor | None = None) -> None:
         super().__init__()
         self.f = f
+        self.register_buffer("_leak", None, persistent=False)
         self.leak = leak
 
     def forward(self, matrix: Matrix, /) -> Tensor:

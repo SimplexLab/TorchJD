@@ -5,7 +5,7 @@ import torch
 from pytest import mark, raises
 from torch import Tensor
 from utils.contexts import ExceptionContext
-from utils.tensors import ones_
+from utils.tensors import ones_, tensor_
 
 from torchjd.aggregation import GradDrop
 
@@ -102,3 +102,12 @@ def test_leak_setter_rejects_non_1d() -> None:
     A = GradDrop()
     with raises(ValueError, match="leak"):
         A.leak = torch.tensor([[0.0, 1.0], [1.0, 0.0]])
+
+
+def test_to_moves_leak() -> None:
+    A = GradDrop(leak=tensor_([0.0, 1.0], dtype=torch.float32)).to(torch.float64)
+
+    assert A.leak is not None
+    assert A.leak.dtype == torch.float64
+    assert any(buffer is A.leak for buffer in A.buffers())
+    assert len(A.state_dict()) == 0

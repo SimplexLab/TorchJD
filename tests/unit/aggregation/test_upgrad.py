@@ -8,7 +8,7 @@ skip_if_deps_not_installed(QuadprogProjector)
 import torch
 from pytest import mark
 from torch import Tensor
-from utils.tensors import ones_
+from utils.tensors import ones_, tensor_
 
 from ._asserts import (
     assert_expected_structure,
@@ -95,3 +95,17 @@ def test_projector_setter_updates_value() -> None:
     A.projector = new_projector
     assert A.projector is new_projector
     assert A.gramian_weighting.projector is new_projector
+
+
+def test_to_moves_pref_vector() -> None:
+    A = UPGrad(pref_vector=tensor_([1.0, 2.0], dtype=torch.float32)).to(torch.float64)
+    weighting = A.gramian_weighting.weighting
+    assert isinstance(weighting, ConstantWeighting)
+
+    assert A.pref_vector is not None
+    assert A.pref_vector.dtype == torch.float64
+    assert weighting.weights.dtype == torch.float64
+    buffers = list(A.buffers())
+    assert any(buffer is A.pref_vector for buffer in buffers)
+    assert any(buffer is weighting.weights for buffer in buffers)
+    assert len(A.state_dict()) == 0

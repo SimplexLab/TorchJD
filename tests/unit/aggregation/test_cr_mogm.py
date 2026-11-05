@@ -1,3 +1,4 @@
+import torch
 from pytest import mark, raises
 from torch import Tensor
 from torch.testing import assert_close
@@ -201,3 +202,12 @@ def test_zero_columns() -> None:
     aggregator = WeightedAggregator(CRMOGMWeighting(MeanWeighting()))
     out = aggregator(tensor_([]).reshape(2, 0))
     assert out.shape == (0,)
+
+
+def test_to_moves_initial_weights() -> None:
+    W = CRMOGMWeighting(MeanWeighting(), initial_weights=tensor_([0.5, 0.5], dtype=torch.float32))
+    W = W.to(torch.float64)
+
+    buffers = dict(W.named_buffers())
+    assert buffers["_initial_weights"].dtype == torch.float64
+    assert "_initial_weights" not in W.state_dict()
