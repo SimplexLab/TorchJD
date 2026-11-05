@@ -8,6 +8,13 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed `.to()` not moving the tensors given to the `Constant`, `STCH`, `PBI` and `COSMOS`
+  scalarizers (`weights` and `reference`). These tensors are now registered as non-persistent
+  buffers, so they follow the dtype and device of the scalarizer without being added to its
+  `state_dict`.
+
 ## [0.18.1] - 2026-11-02
 
 ### Added

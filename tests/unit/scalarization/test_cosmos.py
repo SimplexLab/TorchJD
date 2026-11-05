@@ -86,3 +86,11 @@ def test_representations() -> None:
     s = COSMOS(lambda_=0.5, weights=torch.tensor([0.5, 0.5]))
     assert repr(s) == "COSMOS(lambda_=0.5, weights=tensor([0.5000, 0.5000]))"
     assert str(s) == "COSMOS"
+
+
+def test_to_moves_weights() -> None:
+    s = COSMOS(lambda_=0.5, weights=tensor_([0.5, 0.5], dtype=torch.float32)).to(torch.float64)
+
+    assert s.weights.dtype == torch.float64
+    assert any(buffer is s.weights for buffer in s.buffers())
+    assert len(s.state_dict()) == 0

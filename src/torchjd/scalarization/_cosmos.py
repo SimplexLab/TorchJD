@@ -42,6 +42,8 @@ class COSMOS(Scalarizer):
         objective.
     """
 
+    weights: Tensor
+
     def __init__(self, lambda_: float, weights: Tensor) -> None:
         if lambda_ < 0.0:
             raise ValueError(
@@ -50,7 +52,7 @@ class COSMOS(Scalarizer):
 
         super().__init__()
         self.lambda_ = lambda_
-        self.weights = weights
+        self.register_buffer("weights", weights, persistent=False)
 
     def forward(self, values: Tensor, /) -> Tensor:
         check_same_shape_as_values(self.weights, values, "weights")
