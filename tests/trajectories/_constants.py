@@ -4,6 +4,7 @@ from torchjd._linalg import QuadprogProjector
 from torchjd.aggregation import (
     IMTLG,
     MGDA,
+    Aggregator,
     AlignedMTL,
     CAGrad,
     DualProj,
@@ -18,9 +19,10 @@ from trajectories._objectives import (
     ElementWiseQuadratic,
     HomogenousQuadraticFunction,
     QuadraticFunction,
+    ValleyBowl,
 )
 
-AGGREGATORS = {
+AGGREGATORS: dict[str, Aggregator] = {
     "upgrad": UPGrad(projector=QuadprogProjector(reg_eps=1e-7, norm_eps=1e-9)),
     "mgda": MGDA(),
     "cagrad": CAGrad(c=0.5),
@@ -32,6 +34,10 @@ AGGREGATORS = {
     "pcgrad": PCGrad(),
     "random": Random(),
     "mean": Mean(),
+}
+OPTIMIZERS: dict[str, type[torch.optim.SGD] | type[torch.optim.Adam]] = {
+    "sgd": torch.optim.SGD,
+    "adam": torch.optim.Adam,
 }
 LR_MULTIPLIERS = {
     "upgrad": 1.0,
@@ -91,6 +97,8 @@ PLOT_VALUES_LIMS = {
 }
 
 OBJECTIVES = {
+    "VB": ValleyBowl(),
+    "VB01": ValleyBowl(scale=0.1),
     "EWQ": ElementWiseQuadratic(2),
     "CQF": QuadraticFunction(
         As=[torch.tensor([[1.0, 0.2], [0.2, 0.05]]), torch.tensor([[3.0, -0.6], [-0.6, 0.2]])],
@@ -103,11 +111,16 @@ OBJECTIVES = {
     ),
 }
 BASE_LEARNING_RATES = {
+    "VB": 0.001,
+    "VB01": 0.001,
     "EWQ": 0.075,
     "CQF": 0.125,
     "HQF": 0.005,
 }
+_VB_INITIAL_POINTS = [[-8.5, 7.5], [0.0, 0.0], [9.0, 9.0], [-7.5, -0.5], [9.0, -1.0]]
 INITIAL_POINTS = {
+    "VB": _VB_INITIAL_POINTS,
+    "VB01": _VB_INITIAL_POINTS,
     "EWQ": [
         [3.0, -2.0],
         [0.0, -3.0],
@@ -128,6 +141,8 @@ INITIAL_POINTS = {
     ],
 }
 N_ITERS = {
+    "VB": 35000,
+    "VB01": 35000,
     "EWQ": 50,
     "CQF": 200,
     "HQF": 100,

@@ -13,6 +13,7 @@ import json
 
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
 
 from tests.paths import TRAJECTORIES_RESULTS_DIR
 from trajectories._constants import (
@@ -22,7 +23,7 @@ from trajectories._constants import (
     LATEX_NAMES,
     OBJECTIVES,
 )
-from trajectories._objectives import ElementWiseQuadratic, WithSPSMappingMixin
+from trajectories._objectives import ElementWiseQuadratic, ValleyBowl, WithSPSMappingMixin
 from trajectories._optimization import compute_gradient_cosine_similarities
 from trajectories._pareto_utils import sample_2d_spss
 from trajectories._paths import get_param_plots_dir, get_params_dir
@@ -84,6 +85,11 @@ def main() -> None:
 
     common_plotter = SquareBoxAspectSetter()
 
+    if isinstance(objective, ValleyBowl):
+        sps_points = objective.pareto_set().numpy()
+        main_content = np.concatenate([main_content, sps_points])
+        common_plotter += SPSPlotter(sps_points)
+
     if objective.n_values == 2 and isinstance(objective, WithSPSMappingMixin):
         sps_points = sample_2d_spss(objective).numpy()
         main_content = np.concatenate([main_content, sps_points])
@@ -97,7 +103,22 @@ def main() -> None:
         adjust_plotter = ContentLimAdjuster(main_content)
         common_plotter += adjust_plotter
 
-        if objective.n_values == 2:
+        if isinstance(objective, ValleyBowl):
+            x0 = torch.linspace(adjust_plotter.xlim[0], adjust_plotter.xlim[1], 200)
+            x1 = torch.linspace(adjust_plotter.ylim[0], adjust_plotter.ylim[1], 200)
+            grid = torch.cartesian_prod(x0, x1)
+            mean_loss = torch.vmap(objective)(grid).mean(dim=1).reshape(200, 200)
+            common_plotter += HeatmapPlotter(
+                values=mean_loss.numpy(),
+                x_min=adjust_plotter.xlim[0],
+                x_max=adjust_plotter.xlim[1],
+                y_min=adjust_plotter.ylim[0],
+                y_max=adjust_plotter.ylim[1],
+                vmin=float(mean_loss.min()),
+                vmax=float(mean_loss.max()),
+                cmap="viridis",
+            )
+        elif objective.n_values == 2:
             similarities = compute_gradient_cosine_similarities(
                 objective,
                 x0_min=adjust_plotter.xlim[0],
@@ -147,6 +168,10 @@ def main() -> None:
         plotter += YAxisLabeller("$x_2$") if j == 0 else YTicksClearer()
 
         plotter(axes[i][j])
+        if isinstance(objective, ValleyBowl):
+            axes[i][j].scatter(
+                *objective.optimum.tolist(), marker="*", color="black", s=45, zorder=10
+            )
 
     fig.tight_layout(h_pad=-2.5)
     print("Saving figure")

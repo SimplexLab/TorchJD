@@ -3,7 +3,7 @@ Optimize the objective using various aggregators. Save the trajectories in the p
 spaces.
 
 Usage:
-    uv run python tests/trajectories/optimize.py <objective> <aggregator>...
+    uv run python tests/trajectories/optimize.py <objective> <aggregator>... [--optimizer sgd|adam] [--lr LR]
 
 Arguments:
     <objective>        The key of the objective function (e.g., EWQ, CQF, HQF).
@@ -28,6 +28,7 @@ from trajectories._constants import (
     LR_MULTIPLIERS,
     N_ITERS,
     OBJECTIVES,
+    OPTIMIZERS,
 )
 from trajectories._optimization import optimize
 from trajectories._paths import get_params_dir, get_values_dir
@@ -52,7 +53,19 @@ def main() -> None:
         metavar="aggregator",
         help=f"Keys of the aggregators to use. Choices: {list(AGGREGATORS)}",
     )
+    parser.add_argument(
+        "--optimizer",
+        "--optim",
+        choices=list(OPTIMIZERS),
+        default="sgd",
+        help="Optimizer (default: sgd).",
+    )
+    parser.add_argument(
+        "--lr", type=float, default=None, help="Use this learning rate for every aggregator."
+    )
     args = parser.parse_args()
+    if args.lr is not None and (not np.isfinite(args.lr) or args.lr <= 0):
+        parser.error("--lr must be finite and positive")
 
     objective_key = args.objective
     if objective_key not in OBJECTIVES:
@@ -71,8 +84,9 @@ def main() -> None:
     base_lr = BASE_LEARNING_RATES[objective_key]
     for key in LR_MULTIPLIERS:
         mult = lr_multiplier_overrides.get(key, LR_MULTIPLIERS[key])
-        learning_rates[key] = mult * base_lr
+        learning_rates[key] = args.lr if args.lr is not None else mult * base_lr
     n_iters = N_ITERS[objective_key]
+    optimizer_cls = OPTIMIZERS[args.optimizer]
 
     torch.use_deterministic_algorithms(True)
 
@@ -88,6 +102,7 @@ def main() -> None:
         "aggregator_reprs": {key: repr(AGGREGATORS[key]) for key in aggregator_keys},
         "learning_rates": learning_rates,
         "initial_points": initial_points,
+        "optimizer": args.optimizer,
     }
     with open(TRAJECTORIES_RESULTS_DIR / objective_key / "metadata.json", "w") as f:
         json.dump(metadata, f)
@@ -107,7 +122,12 @@ def main() -> None:
 
             initial_x = torch.tensor(initial_point)
             xs, ys = optimize(
-                objective, initial_x=initial_x, aggregator=aggregator, lr=lr, n_iters=n_iters
+                objective,
+                initial_x=initial_x,
+                aggregator=aggregator,
+                lr=lr,
+                n_iters=n_iters,
+                optimizer_cls=optimizer_cls,
             )
 
             xs_list.append(torch.stack(xs))

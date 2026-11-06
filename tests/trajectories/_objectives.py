@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import cast
 
 import torch
 from torch import Tensor
@@ -130,3 +131,67 @@ class ElementWiseQuadraticSPSMapping(SPSMapping):
 
     def __call__(self, w: Tensor) -> Tensor:  # noqa: ARG002
         return torch.zeros(self.n_values)
+
+
+class ValleyBowl(Objective):
+    """Two-objective toy problem from CAGrad (Liu et al., 2021), also used by Nash-MTL
+    (Navon et al., 2022).
+
+    Above :math:`x_2 = 0`, each objective is a log-shaped valley; below it, a quadratic bowl.
+
+    Reference implementations:
+
+    - CAGrad: https://github.com/Cranial-XIX/CAGrad/blob/main/toy.py
+    - Nash-MTL: https://github.com/AvivNavon/nash-mtl/tree/main/experiments/toy
+
+    :param scale: Multiplier for the first objective.
+    :param scale_both_losses: Multiplier applied to both objectives.
+    """
+
+    # Value used for the Pareto set in CAGrad's plotting code (``toy.py``, ``plot_contour``).
+    PARETO_SET_X2 = -8.3552
+
+    def __init__(self, scale: float = 1.0, scale_both_losses: float = 1.0) -> None:
+        super().__init__(n_params=2, n_values=2)
+        self.scale = scale
+        self.scale_both_losses = scale_both_losses
+
+    def __call__(self, x: Tensor) -> Tensor:
+        if x.shape != (2,):
+            raise ValueError("x must have shape (2,).")
+        x1, x2 = x.unbind()
+        valley1 = (0.5 * (-x1 - 7) - torch.tanh(-x2)).abs().clamp_min(5e-6).log() + 6
+        valley2 = (0.5 * (-x1 + 3) + torch.tanh(-x2) + 2).abs().clamp_min(5e-6).log() + 6
+        above = torch.tanh(x2 * 0.5).clamp_min(0)
+        below = torch.tanh(-x2 * 0.5).clamp_min(0)
+        bowl1 = ((-x1 + 7).square() + 0.1 * (-x2 - 8).square()) / 10 - 20
+        bowl2 = ((-x1 - 7).square() + 0.1 * (-x2 - 8).square()) / 10 - 20
+        return (
+            torch.stack(
+                ((valley1 * above + bowl1 * below) * self.scale, valley2 * above + bowl2 * below)
+            )
+            * self.scale_both_losses
+        )
+
+    def jacobian(self, x: Tensor) -> Tensor:
+        return cast(Tensor, torch.func.jacrev(self)(x))
+
+    def __repr__(self) -> str:
+        return f"ValleyBowl(scale={self.scale}, scale_both_losses={self.scale_both_losses})"
+
+    def pareto_set(self, n: int = 1000) -> Tensor:
+        """Sample the reference Pareto set used by the Valley-Bowl example.
+
+        :param n: Number of points to sample along the reference set.
+        """
+        return torch.stack(
+            (torch.linspace(-7.0, 7.0, n), torch.full((n,), self.PARETO_SET_X2)), dim=1
+        )
+
+    @property
+    def optimum(self) -> Tensor:
+        """
+        Pareto-optimal point that (approximately) minimizes the mean of the unscaled objectives. It
+        does not depend on ``scale`` or ``scale_both_losses``.
+        """
+        return torch.tensor([0.0, self.PARETO_SET_X2])
