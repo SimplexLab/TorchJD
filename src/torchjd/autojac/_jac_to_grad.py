@@ -15,6 +15,7 @@ from torchjd.aggregation import (
 from torchjd.linalg import Matrix, PSDMatrix
 
 from ._accumulation import TensorWithJac, accumulate_grads, is_tensor_with_jac
+from ._transform import OrderedSet
 from ._utils import check_consistent_first_dimension
 
 
@@ -62,7 +63,8 @@ def jac_to_grad(
     into their ``.grad`` fields.
 
     :param tensors: The tensors whose ``.jac`` fields should be aggregated. All Jacobians must
-        have the same first dimension (e.g. number of losses).
+        have the same first dimension (e.g. number of losses). Repeated tensors are only considered
+        once.
     :param aggregator: The aggregator used to reduce the Jacobians into gradients. If it uses a
         :class:`~torchjd.aggregation.Weighting` to combine the rows of the Jacobians,
         ``jac_to_grad`` will also return the computed weights.
@@ -118,7 +120,7 @@ def jac_to_grad(
     """
 
     tensors_ = list[TensorWithJac]()
-    for t in tensors:
+    for t in OrderedSet(tensors):
         if not is_tensor_with_jac(t):
             raise ValueError(
                 "Some `jac` fields were not populated. Did you use `autojac.backward` or "

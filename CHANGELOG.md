@@ -20,6 +20,9 @@ changelog does not include internal changes that do not affect the user.
   `initial_weights` and `leak`). These tensors are now registered as non-persistent buffers, so
   they follow the dtype and device of the aggregator or weighting without being added to its
   `state_dict`.
+- Fixed `jac_to_grad` failing with an `AttributeError` (or, with `retain_jac=True`, accumulating
+  a wrong gradient) when a tensor is repeated in `tensors`. Repeated tensors are now only
+  considered once.
 
 ## [0.18.1] - 2026-11-02
 

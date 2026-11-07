@@ -91,6 +91,30 @@ def test_single_tensor() -> None:
     assert_grad_close(t, g)
 
 
+@mark.parametrize("retain_jac", [True, False])
+@mark.parametrize("optimize", [True, False])
+def test_repeated_tensors(retain_jac: bool, optimize: bool) -> None:
+    """Tests that jac_to_grad considers repeated tensors only once."""
+
+    aggregator = base_agg()
+    t1 = tensor_(1.0, requires_grad=True)
+    t2 = tensor_([2.0, 3.0], requires_grad=True)
+    jac = tensor_([[-4.0, 1.0, 1.0], [6.0, 1.0, 1.0]])
+    t1.__setattr__("jac", jac[:, 0])
+    t2.__setattr__("jac", jac[:, 1:])
+    g = aggregator(jac)
+
+    jac_to_grad(
+        [t1, t2, t1],
+        aggregator,
+        retain_jac=retain_jac,
+        optimize_gramian_computation=optimize,
+    )
+
+    assert_grad_close(t1, g[0])
+    assert_grad_close(t2, g[1:])
+
+
 def test_no_jac_field() -> None:
     """Tests that jac_to_grad fails when a tensor does not have a jac field."""
 
