@@ -23,6 +23,10 @@ changelog does not include internal changes that do not affect the user.
 - Fixed `jac_to_grad` failing with an `AttributeError` (or, with `retain_jac=True`, accumulating
   a wrong gradient) when a tensor is repeated in `tensors`. Repeated tensors are now only
   considered once.
+- Fixed `backward` and `mtl_backward` storing expanded tensors in the `.jac` and `.grad` fields
+  (e.g. when a parameter is directly summed into a loss). Calling them again on the same
+  parameters, or modifying these fields in-place (e.g. with `clip_grad_norm_`), then failed with a
+  `RuntimeError`. Such tensors are now materialized before being stored.
 
 ## [0.18.1] - 2026-11-02
 

@@ -144,6 +144,28 @@ def test_single_task() -> None:
     assert_has_grad(p1)
 
 
+def test_repeated_calls_with_expanded_task_gradient() -> None:
+    """
+    Tests that mtl_backward correctly accumulates the gradients of the task-specific parameters
+    across several calls when these gradients are expanded tensors (e.g. because the task-specific
+    parameters are directly summed).
+    """
+
+    p0 = tensor_([1.0, 2.0], requires_grad=True)
+    p1 = tensor_([3.0, 4.0], requires_grad=True)
+    p2 = tensor_([5.0, 6.0], requires_grad=True)
+
+    for _ in range(2):
+        f = tensor_([-1.0, 1.0]) @ p0
+        y1 = f + p1.sum()
+        y2 = 2.0 * f + p2.sum()
+        mtl_backward([y1, y2], features=f)
+
+    assert_jac_close(p0, tensor_([[-2.0, 2.0], [-4.0, 4.0]]))
+    assert_grad_close(p1, tensor_([2.0, 2.0]))
+    assert_grad_close(p2, tensor_([2.0, 2.0]))
+
+
 def test_incoherent_task_number_fails() -> None:
     """
     Tests that mtl_backward raises an error when called with the number of tasks losses different

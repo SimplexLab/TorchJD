@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 from typing import TypeGuard
 
+import torch
 from torch import Tensor
 
 
@@ -41,7 +42,7 @@ def accumulate_jacs(params: Iterable[Tensor], jacobians: Iterable[Tensor]) -> No
             #
             # We do not detach from the computation graph because the value can have grad_fn
             # that we want to keep track of (in case it was obtained via create_graph=True).
-            param.__setattr__("jac", jac)
+            param.__setattr__("jac", _materialize_if_expanded(jac))
 
 
 def accumulate_grads(params: Iterable[Tensor], gradients: Iterable[Tensor]) -> None:
@@ -50,7 +51,15 @@ def accumulate_grads(params: Iterable[Tensor], gradients: Iterable[Tensor]) -> N
         if hasattr(param, "grad") and param.grad is not None:
             param.grad += grad
         else:
-            param.grad = grad
+            param.grad = _materialize_if_expanded(grad)
+
+
+def _materialize_if_expanded(tensor: Tensor) -> Tensor:
+    if tensor.layout == torch.strided and any(
+        stride == 0 and size > 1 for stride, size in zip(tensor.stride(), tensor.shape, strict=True)
+    ):
+        return tensor.contiguous()
+    return tensor
 
 
 def _check_expects_grad(tensor: Tensor, field_name: str) -> None:

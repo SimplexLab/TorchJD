@@ -55,6 +55,21 @@ def test_jac_is_populated() -> None:
         assert_has_jac(a)
 
 
+def test_repeated_calls_with_expanded_jacobian() -> None:
+    """
+    Tests that backward correctly accumulates the Jacobians across several calls when the Jacobian
+    of the tensor with respect to the input is an expanded tensor (e.g. because the input is
+    directly summed).
+    """
+
+    a = tensor_([1.0, 2.0], requires_grad=True)
+
+    backward(a.sum())
+    backward(2.0 * a.sum())
+
+    assert_jac_close(a, tensor_([[3.0, 3.0]]))
+
+
 @mark.parametrize("shape", [(1, 3), (2, 3), (2, 6), (5, 8), (20, 55)])
 @mark.parametrize("manually_specify_inputs", [True, False])
 @mark.parametrize("chunk_size", [1, 2, None])
