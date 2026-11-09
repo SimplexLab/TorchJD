@@ -168,10 +168,6 @@ def main() -> None:
         plotter += YAxisLabeller("$x_2$") if j == 0 else YTicksClearer()
 
         plotter(axes[i][j])
-        if isinstance(objective, ValleyBowl):
-            axes[i][j].scatter(
-                *objective.optimum.tolist(), marker="*", color="black", s=45, zorder=10
-            )
 
     fig.tight_layout(h_pad=-2.5)
     print("Saving figure")

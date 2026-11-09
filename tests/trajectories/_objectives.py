@@ -187,11 +187,3 @@ class ValleyBowl(Objective):
         return torch.stack(
             (torch.linspace(-7.0, 7.0, n), torch.full((n,), self.PARETO_SET_X2)), dim=1
         )
-
-    @property
-    def optimum(self) -> Tensor:
-        """
-        Pareto-optimal point that (approximately) minimizes the mean of the unscaled objectives. It
-        does not depend on ``scale`` or ``scale_both_losses``.
-        """
-        return torch.tensor([0.0, self.PARETO_SET_X2])
