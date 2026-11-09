@@ -28,6 +28,7 @@ from trajectories._pareto_utils import compute_normalized_2d_pf_distances, sampl
 from trajectories._paths import get_value_plots_dir, get_values_dir
 from trajectories._plotters import (
     ContentLimAdjuster,
+    FilledContourPlotter,
     HeatmapPlotter,
     LimAdjuster,
     MultiTrajPlotter,
@@ -113,15 +114,14 @@ def main() -> None:
             [torch.cdist(chunk, front).min(dim=1).values for chunk in grid.split(512)]
         )
         distances = distances.reshape(200, 200)
-        common_plotter += HeatmapPlotter(
+        common_plotter += FilledContourPlotter(
             values=distances.numpy(),
             x_min=xlim[0],
             x_max=xlim[1],
             y_min=ylim[0],
             y_max=ylim[1],
-            vmin=0,
-            vmax=float(distances.max()),
             cmap="magma_r",
+            alpha=0.5,
         )
     elif isinstance(objective, WithSPSMappingMixin):
         distances = compute_normalized_2d_pf_distances(

@@ -31,6 +31,7 @@ from trajectories._plotters import (
     AxesPlotter,
     ContentLimAdjuster,
     ContourCirclesPlotter,
+    FilledContourPlotter,
     HeatmapPlotter,
     LimAdjuster,
     MultiTrajPlotter,
@@ -108,15 +109,14 @@ def main() -> None:
             x1 = torch.linspace(adjust_plotter.ylim[0], adjust_plotter.ylim[1], 200)
             grid = torch.cartesian_prod(x0, x1)
             mean_loss = torch.vmap(objective)(grid).mean(dim=1).reshape(200, 200)
-            common_plotter += HeatmapPlotter(
+            common_plotter += FilledContourPlotter(
                 values=mean_loss.numpy(),
                 x_min=adjust_plotter.xlim[0],
                 x_max=adjust_plotter.xlim[1],
                 y_min=adjust_plotter.ylim[0],
                 y_max=adjust_plotter.ylim[1],
-                vmin=float(mean_loss.min()),
-                vmax=float(mean_loss.max()),
                 cmap="viridis",
+                alpha=0.55,
             )
         elif objective.n_values == 2:
             similarities = compute_gradient_cosine_similarities(
