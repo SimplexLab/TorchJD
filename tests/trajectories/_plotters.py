@@ -315,7 +315,7 @@ class HeatmapPlotter(Plotter):
 class FilledContourPlotter(Plotter):
     """
     Plotter that draws filled contours of the given values on a regular grid extending between the
-    provided coordinates.
+    provided coordinates, with thin contour lines at the boundaries between levels.
 
     :param values: Array of shape ``[n_x, n_y]``, where ``values[i, j]`` is the value at the i-th x
         coordinate and the j-th y coordinate.
@@ -353,6 +353,11 @@ class FilledContourPlotter(Plotter):
         ys = np.linspace(self.y_min, self.y_max, self.values.shape[1])
         ax.contourf(
             xs, ys, self.values.T, levels=self.levels, cmap=self.cmap, alpha=self.alpha, zorder=0
+        )
+        # Draw the level boundaries explicitly, since vector outputs (e.g. PDF) render adjacent
+        # filled levels without any visible seam.
+        ax.contour(
+            xs, ys, self.values.T, levels=self.levels, cmap=self.cmap, linewidths=0.3, zorder=0
         )
 
 
