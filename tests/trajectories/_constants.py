@@ -94,6 +94,26 @@ PLOT_VALUES_LIMS = {
         "xlim": (-0.125, 2.625),
         "ylim": (-0.425, 8.925),
     },
+    "VB": {
+        "xlim": (-21.0, 11.0),
+        "ylim": (-21.0, 11.0),
+    },
+    "VB01": {
+        "xlim": (-2.1, 1.1),
+        "ylim": (-21.0, 11.0),
+    },
+}
+
+# Fixed xlim and ylim of the param plot, used instead of limits fitted to the content
+PLOT_PARAMS_LIMS = {
+    "VB": {
+        "xlim": (-10.5, 10.5),
+        "ylim": (-10.5, 10.5),
+    },
+    "VB01": {
+        "xlim": (-10.5, 10.5),
+        "ylim": (-10.5, 10.5),
+    },
 }
 
 OBJECTIVES = {

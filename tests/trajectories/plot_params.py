@@ -22,6 +22,7 @@ from trajectories._constants import (
     INITIAL_POINTS,
     LATEX_NAMES,
     OBJECTIVES,
+    PLOT_PARAMS_LIMS,
 )
 from trajectories._objectives import ElementWiseQuadratic, ValleyBowl, WithSPSMappingMixin
 from trajectories._optimization import compute_gradient_cosine_similarities
@@ -29,6 +30,7 @@ from trajectories._pareto_utils import sample_2d_spss
 from trajectories._paths import get_param_plots_dir, get_params_dir
 from trajectories._plotters import (
     AxesPlotter,
+    BoxAspectSetter,
     ContentLimAdjuster,
     ContourCirclesPlotter,
     FilledContourPlotter,
@@ -36,7 +38,6 @@ from trajectories._plotters import (
     LimAdjuster,
     MultiTrajPlotter,
     SPSPlotter,
-    SquareBoxAspectSetter,
     TitleSetter,
     XAxisLabeller,
     XTicksClearer,
@@ -84,7 +85,7 @@ def main() -> None:
     initial_points_array = np.stack([np.array(point) for point in initial_points])
     main_content = initial_points_array
 
-    common_plotter = SquareBoxAspectSetter()
+    common_plotter = BoxAspectSetter()
 
     if isinstance(objective, ValleyBowl):
         sps_points = objective.pareto_set().numpy()
@@ -101,7 +102,10 @@ def main() -> None:
         common_plotter += ContourCirclesPlotter()
         common_plotter += LimAdjuster(xlim=(-5.0, 5.0), ylim=(-5.0, 5.0))
     else:
-        adjust_plotter = ContentLimAdjuster(main_content)
+        if objective_key in PLOT_PARAMS_LIMS:
+            adjust_plotter = LimAdjuster(**PLOT_PARAMS_LIMS[objective_key])
+        else:
+            adjust_plotter = ContentLimAdjuster(main_content)
         common_plotter += adjust_plotter
 
         if isinstance(objective, ValleyBowl):
@@ -144,7 +148,7 @@ def main() -> None:
     n_aggregators = len(aggregator_keys)
     n_rows, n_cols = compute_subplot_layout(n_aggregators)
     key_to_index = map_orders_to_indices(aggregator_keys, AGGREGATOR_ORDER)
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(n_cols * 2, n_rows * 2.5))
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(n_cols * 3, n_rows * 3))
     if n_rows == n_cols == 1:
         axes = np.array([[axes]])
     elif n_rows == 1:

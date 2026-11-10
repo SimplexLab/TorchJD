@@ -27,13 +27,13 @@ from trajectories._objectives import ValleyBowl, WithSPSMappingMixin
 from trajectories._pareto_utils import compute_normalized_2d_pf_distances, sample_2d_pf
 from trajectories._paths import get_value_plots_dir, get_values_dir
 from trajectories._plotters import (
+    BoxAspectSetter,
     ContentLimAdjuster,
     FilledContourPlotter,
     HeatmapPlotter,
     LimAdjuster,
     MultiTrajPlotter,
     PFPlotter,
-    SquareBoxAspectSetter,
     TitleSetter,
     XAxisLabeller,
     XTicksClearer,
@@ -77,7 +77,7 @@ def main() -> None:
     if objective.n_values != 2:
         raise ValueError("Can only plot values trajectories for objectives with 2 values.")
 
-    common_plotter = SquareBoxAspectSetter()
+    common_plotter = BoxAspectSetter()
     aggregator_keys = metadata["aggregator_keys"]
     aggregator_to_Y = {key: np.load(values_dir / f"{key}.npy") for key in aggregator_keys}
     first_agg_Y = next(iter(aggregator_to_Y.values()))
@@ -146,7 +146,7 @@ def main() -> None:
     n_aggregators = len(aggregator_keys)
     n_rows, n_cols = compute_subplot_layout(n_aggregators)
     key_to_index = map_orders_to_indices(aggregator_keys, AGGREGATOR_ORDER)
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(n_cols * 2, n_rows * 2.5))
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(n_cols * 3, n_rows * 3))
     if n_rows == n_cols == 1:
         axes = np.array([[axes]])
     elif n_rows == 1:

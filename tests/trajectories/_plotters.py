@@ -432,8 +432,8 @@ class TitleSetter(Plotter):
         ax.set_title(self.title)
 
 
-class SquareBoxAspectSetter(Plotter):
-    """Plotter that sets a square box aspect."""
+class BoxAspectSetter(Plotter):
+    """Plotter that sets a slightly wider than tall box aspect."""
 
     def __call__(self, ax: plt.Axes) -> None:
-        ax.set_box_aspect(1)
+        ax.set_box_aspect(5 / 6)
