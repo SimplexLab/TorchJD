@@ -75,7 +75,7 @@ AGGREGATOR_ORDER = {
     # No location for PCGrad as it's equivalent to UPGrad with 2 objectives
 }
 LATEX_NAMES = {
-    "upgrad": r"$\mathcal A_{\mathrm{UPGrad}}$ (ours)",
+    "upgrad": r"$\mathcal A_{\mathrm{UPGrad}}$",
     "mgda": r"$\mathcal A_{\mathrm{MGDA}}$",
     "cagrad": r"$\mathcal A_{\mathrm{CAGrad}}$",
     "nashmtl": r"$\mathcal A_{\mathrm{Nash-MTL}}$",
