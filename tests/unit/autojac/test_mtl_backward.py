@@ -13,6 +13,7 @@ from utils.asserts import (
 from utils.tensors import arange_, ones_, rand_, randn_, tensor_
 
 from torchjd.autojac import mtl_backward
+from torchjd.autojac._accumulation import is_tensor_with_jac
 from torchjd.autojac._mtl_backward import _create_grad_tensors_dict, _create_transform
 from torchjd.autojac._transform import OrderedSet
 
@@ -164,6 +165,31 @@ def test_repeated_calls_with_expanded_task_gradient() -> None:
     assert_jac_close(p0, tensor_([[-2.0, 2.0], [-4.0, 4.0]]))
     assert_grad_close(p1, tensor_([2.0, 2.0]))
     assert_grad_close(p2, tensor_([2.0, 2.0]))
+
+
+def test_expanded_jac_is_not_copied_but_expanded_grad_is() -> None:
+    """
+    Tests that mtl_backward stores an expanded Jacobian in the .jac field of the shared parameters
+    without copying it, but materializes an expanded gradient before storing it in the .grad field
+    of the task-specific parameters. Also tests that a second call accumulates correctly into both.
+    """
+
+    p0 = tensor_([1.0, 2.0], requires_grad=True)
+    p1 = tensor_([3.0, 4.0], requires_grad=True)
+
+    f = p0.sum()
+    mtl_backward([f + p1.sum()], features=f)
+
+    assert is_tensor_with_jac(p0)
+    assert 0 in p0.jac.stride()
+    assert p1.grad is not None
+    assert 0 not in p1.grad.stride()
+
+    f = p0.sum()
+    mtl_backward([f + p1.sum()], features=f)
+
+    assert_jac_close(p0, tensor_([[2.0, 2.0]]))
+    assert_grad_close(p1, tensor_([2.0, 2.0]))
 
 
 def test_incoherent_task_number_fails() -> None:

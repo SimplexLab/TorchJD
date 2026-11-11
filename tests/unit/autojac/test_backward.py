@@ -4,6 +4,7 @@ from utils.asserts import assert_has_jac, assert_has_no_jac, assert_jac_close
 from utils.tensors import eye_, randn_, tensor_
 
 from torchjd.autojac import backward
+from torchjd.autojac._accumulation import is_tensor_with_jac
 from torchjd.autojac._backward import _create_transform
 from torchjd.autojac._transform import OrderedSet
 from torchjd.autojac._utils import create_jac_dict
@@ -68,6 +69,24 @@ def test_repeated_calls_with_expanded_jacobian() -> None:
     backward(2.0 * a.sum())
 
     assert_jac_close(a, tensor_([[3.0, 3.0]]))
+
+
+def test_expanded_jacobian_is_not_copied() -> None:
+    """
+    Tests that backward stores an expanded Jacobian in the .jac field without copying it, and that
+    a second call can still accumulate into it.
+    """
+
+    a = tensor_([1.0, 2.0], requires_grad=True)
+
+    backward(a.sum())
+
+    assert is_tensor_with_jac(a)
+    assert 0 in a.jac.stride()
+
+    backward(a.sum())
+
+    assert_jac_close(a, tensor_([[2.0, 2.0]]))
 
 
 @mark.parametrize("shape", [(1, 3), (2, 3), (2, 6), (5, 8), (20, 55)])

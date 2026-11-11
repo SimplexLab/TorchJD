@@ -32,6 +32,7 @@ def accumulate_jacs(params: Iterable[Tensor], jacobians: Iterable[Tensor]) -> No
             )
 
         if is_tensor_with_jac(param):
+            param.jac = _materialize_if_expanded(param.jac)
             param.jac += jac
         else:
             # We do not clone the value to save memory and time, so subsequent modifications of
@@ -42,7 +43,7 @@ def accumulate_jacs(params: Iterable[Tensor], jacobians: Iterable[Tensor]) -> No
             #
             # We do not detach from the computation graph because the value can have grad_fn
             # that we want to keep track of (in case it was obtained via create_graph=True).
-            param.__setattr__("jac", _materialize_if_expanded(jac))
+            param.__setattr__("jac", jac)
 
 
 def accumulate_grads(params: Iterable[Tensor], gradients: Iterable[Tensor]) -> None:
