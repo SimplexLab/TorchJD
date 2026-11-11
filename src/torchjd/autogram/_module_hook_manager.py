@@ -172,8 +172,8 @@ class AutogramNode(torch.autograd.Function):
     def setup_context(
         ctx: Any,
         inputs: tuple,
-        _,
-    ) -> None:  # ty: ignore[invalid-method-override]
+        output: Any,  # noqa: ARG004
+    ) -> None:
         ctx.gramian_accumulation_phase = inputs[0]
         ctx.gramian_computer = inputs[1]
         ctx.args = inputs[2]
