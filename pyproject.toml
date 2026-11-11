@@ -69,7 +69,7 @@ Changelog = "https://github.com/SimplexLab/TorchJD/blob/main/CHANGELOG.md"
 [dependency-groups]
 check = [
     "ruff>=0.14.14",
-    "ty>=0.0.14",
+    "ty>=0.0.100",
     "pre-commit>=2.9.2",  # isort doesn't work before 2.9.2
 ]
 
@@ -200,4 +200,4 @@ exclude = ["src/torchjd/aggregation/_nash_mtl.py"]
 [tool.ty.rules]
 # nn.Module declares `forward` as a mutable `Callable[..., Any]` attribute, so every
 # `forward` override would be flagged.
-invalid-mutable-override = "ignore"
+incompatible-mutable-override = "ignore"
