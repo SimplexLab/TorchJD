@@ -13,6 +13,7 @@ import json
 
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
 
 from tests.paths import TRAJECTORIES_RESULTS_DIR
 from trajectories._constants import (
@@ -21,20 +22,22 @@ from trajectories._constants import (
     INITIAL_POINTS,
     LATEX_NAMES,
     OBJECTIVES,
+    PLOT_PARAMS_LIMS,
 )
-from trajectories._objectives import ElementWiseQuadratic, WithSPSMappingMixin
+from trajectories._objectives import ElementWiseQuadratic, ValleyBowl, WithSPSMappingMixin
 from trajectories._optimization import compute_gradient_cosine_similarities
 from trajectories._pareto_utils import sample_2d_spss
 from trajectories._paths import get_param_plots_dir, get_params_dir
 from trajectories._plotters import (
     AxesPlotter,
+    BoxAspectSetter,
     ContentLimAdjuster,
     ContourCirclesPlotter,
+    FilledContourPlotter,
     HeatmapPlotter,
     LimAdjuster,
     MultiTrajPlotter,
     SPSPlotter,
-    SquareBoxAspectSetter,
     TitleSetter,
     XAxisLabeller,
     XTicksClearer,
@@ -82,7 +85,12 @@ def main() -> None:
     initial_points_array = np.stack([np.array(point) for point in initial_points])
     main_content = initial_points_array
 
-    common_plotter = SquareBoxAspectSetter()
+    common_plotter = BoxAspectSetter()
+
+    if isinstance(objective, ValleyBowl):
+        sps_points = objective.pareto_set().numpy()
+        main_content = np.concatenate([main_content, sps_points])
+        common_plotter += SPSPlotter(sps_points)
 
     if objective.n_values == 2 and isinstance(objective, WithSPSMappingMixin):
         sps_points = sample_2d_spss(objective).numpy()
@@ -94,10 +102,27 @@ def main() -> None:
         common_plotter += ContourCirclesPlotter()
         common_plotter += LimAdjuster(xlim=(-5.0, 5.0), ylim=(-5.0, 5.0))
     else:
-        adjust_plotter = ContentLimAdjuster(main_content)
+        if objective_key in PLOT_PARAMS_LIMS:
+            adjust_plotter = LimAdjuster(**PLOT_PARAMS_LIMS[objective_key])
+        else:
+            adjust_plotter = ContentLimAdjuster(main_content)
         common_plotter += adjust_plotter
 
-        if objective.n_values == 2:
+        if isinstance(objective, ValleyBowl):
+            x0 = torch.linspace(adjust_plotter.xlim[0], adjust_plotter.xlim[1], 200)
+            x1 = torch.linspace(adjust_plotter.ylim[0], adjust_plotter.ylim[1], 200)
+            grid = torch.cartesian_prod(x0, x1)
+            mean_loss = torch.vmap(objective)(grid).mean(dim=1).reshape(200, 200)
+            common_plotter += FilledContourPlotter(
+                values=mean_loss.numpy(),
+                x_min=adjust_plotter.xlim[0],
+                x_max=adjust_plotter.xlim[1],
+                y_min=adjust_plotter.ylim[0],
+                y_max=adjust_plotter.ylim[1],
+                cmap="viridis",
+                alpha=0.55,
+            )
+        elif objective.n_values == 2:
             similarities = compute_gradient_cosine_similarities(
                 objective,
                 x0_min=adjust_plotter.xlim[0],
@@ -123,7 +148,7 @@ def main() -> None:
     n_aggregators = len(aggregator_keys)
     n_rows, n_cols = compute_subplot_layout(n_aggregators)
     key_to_index = map_orders_to_indices(aggregator_keys, AGGREGATOR_ORDER)
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(n_cols * 2, n_rows * 2.5))
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(n_cols * 3, n_rows * 3))
     if n_rows == n_cols == 1:
         axes = np.array([[axes]])
     elif n_rows == 1:

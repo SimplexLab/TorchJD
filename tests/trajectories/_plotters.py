@@ -312,6 +312,55 @@ class HeatmapPlotter(Plotter):
         )
 
 
+class FilledContourPlotter(Plotter):
+    """
+    Plotter that draws filled contours of the given values on a regular grid extending between the
+    provided coordinates, with thin contour lines at the boundaries between levels.
+
+    :param values: Array of shape ``[n_x, n_y]``, where ``values[i, j]`` is the value at the i-th x
+        coordinate and the j-th y coordinate.
+    :param x_min: Smallest x coordinate of the grid.
+    :param x_max: Largest x coordinate of the grid.
+    :param y_min: Smallest y coordinate of the grid.
+    :param y_max: Largest y coordinate of the grid.
+    :param cmap: Name of the matplotlib colormap.
+    :param alpha: Opacity of the filled contours.
+    :param levels: Number of contour levels.
+    """
+
+    def __init__(
+        self,
+        values: np.ndarray,
+        x_min: float,
+        x_max: float,
+        y_min: float,
+        y_max: float,
+        cmap: str,
+        alpha: float,
+        levels: int = 35,
+    ) -> None:
+        self.values = values
+        self.x_min = x_min
+        self.x_max = x_max
+        self.y_min = y_min
+        self.y_max = y_max
+        self.cmap = cmap
+        self.alpha = alpha
+        self.levels = levels
+
+    def __call__(self, ax: plt.Axes) -> None:
+        xs = np.linspace(self.x_min, self.x_max, self.values.shape[0])
+        ys = np.linspace(self.y_min, self.y_max, self.values.shape[1])
+        ax.contourf(
+            xs, ys, self.values.T, levels=self.levels, cmap=self.cmap, alpha=self.alpha, zorder=0
+        )
+        # Draw the level boundaries explicitly, since vector outputs (e.g. PDF) render adjacent
+        # filled levels without any visible seam.
+        ax.contour(
+            xs, ys, self.values.T, levels=self.levels, cmap=self.cmap, linewidths=0.3, zorder=0
+        )
+
+
 class LimAdjuster(Plotter):
     """Plotter that adjusts the xlim and ylim of the plot to the specified xlim and ylim."""
 
@@ -383,8 +432,8 @@ class TitleSetter(Plotter):
         ax.set_title(self.title)
 
 
-class SquareBoxAspectSetter(Plotter):
-    """Plotter that sets a square box aspect."""
+class BoxAspectSetter(Plotter):
+    """Plotter that sets a slightly wider than tall box aspect."""
 
     def __call__(self, ax: plt.Axes) -> None:
-        ax.set_box_aspect(1)
+        ax.set_box_aspect(5 / 6)

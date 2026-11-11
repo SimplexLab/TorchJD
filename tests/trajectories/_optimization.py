@@ -14,11 +14,21 @@ def optimize(
     aggregator: Aggregator,
     lr: float,
     n_iters: int,
+    optimizer_cls: type[torch.optim.SGD] | type[torch.optim.Adam] = torch.optim.SGD,
 ) -> tuple[list[Tensor], list[Tensor]]:
+    """Run an aggregator with the selected PyTorch optimizer.
+
+    :param objective: Vector-valued objective to optimize.
+    :param initial_x: Starting point in parameter space.
+    :param aggregator: Aggregator applied to the objective Jacobian.
+    :param lr: Optimizer learning rate.
+    :param n_iters: Number of optimization steps.
+    :param optimizer_cls: Optimizer class to instantiate for this trajectory.
+    """
     xs = []
     ys = []
     x = initial_x.clone().requires_grad_()
-    optimizer = torch.optim.SGD([x], lr=lr)
+    optimizer = optimizer_cls([x], lr=lr)
     for i in range(n_iters):
         print(f"{i + 1}/{n_iters}", end="\r")
         xs.append(x.detach().clone())

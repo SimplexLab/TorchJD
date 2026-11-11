@@ -20,8 +20,8 @@ from trajectories._constants import AGGREGATOR_ORDER, AGGREGATORS, LATEX_NAMES, 
 from trajectories._pareto_utils import make_2d_pf_distance_fn
 from trajectories._paths import get_distance_to_pf_plots_dir, get_values_dir
 from trajectories._plotters import (
+    BoxAspectSetter,
     MultiEvolutionPlotter,
-    SquareBoxAspectSetter,
     TitleSetter,
     XAxisLabeller,
     XTicksClearer,
@@ -65,7 +65,7 @@ def main() -> None:
     objective_key = metadata["objective_key"]
     objective = OBJECTIVES[objective_key]
 
-    common_plotter = SquareBoxAspectSetter()
+    common_plotter = BoxAspectSetter()
 
     aggregator_keys = metadata["aggregator_keys"]
     aggregator_to_Y = {key: np.load(values_dir / f"{key}.npy") for key in aggregator_keys}
