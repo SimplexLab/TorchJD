@@ -65,13 +65,15 @@ class Differentiate(Transform, ABC):
         return set(self.inputs)
 
     def _get_vjp(self, grad_outputs: Sequence[Tensor], retain_graph: bool) -> tuple[Tensor, ...]:
-        optional_grads = torch.autograd.grad(
-            self.outputs,
-            self.inputs,
-            grad_outputs=grad_outputs,
-            retain_graph=retain_graph,
-            create_graph=self.create_graph,
-            allow_unused=True,
-        )
+        # Disable autocast during backward pass as recommended by PyTorch
+        with torch.autocast(device_type=self.outputs[0].device.type, enabled=False) if self.outputs[0].device.type in ["cuda", "cpu", "xpu"] else torch.autocast(device_type="cuda", enabled=False):
+            optional_grads = torch.autograd.grad(
+                self.outputs,
+                self.inputs,
+                grad_outputs=grad_outputs,
+                retain_graph=retain_graph,
+                create_graph=self.create_graph,
+                allow_unused=True,
+            )
         grads = materialize(optional_grads, inputs=self.inputs)
         return grads
