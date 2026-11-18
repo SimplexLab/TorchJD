@@ -10,6 +10,8 @@ changelog does not include internal changes that do not affect the user.
 
 ### Fixed
 
+- Fixed `autogram.Engine.compute_gramian` overflowing or losing precision when the modules have
+  trainable parameters of different dtypes. Partial Gramians are computed in the promoted dtype.
 - Fixed `.to()` not moving the tensors given to the `Constant`, `STCH`, `PBI` and `COSMOS`
   scalarizers (`weights` and `reference`). These tensors are now registered as non-persistent
   buffers, so they follow the dtype and device of the scalarizer without being added to its

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import cast
 
-from torch import Tensor
+from torch import Tensor, dtype
 from torch.utils._pytree import PyTree
 
 from torchjd._linalg import compute_gramian
@@ -17,6 +17,7 @@ class GramianComputer(ABC):
         grad_outputs: tuple[Tensor, ...],
         args: tuple[PyTree, ...],
         kwargs: dict[str, PyTree],
+        jacobian_dtype: dtype | None,
     ) -> PSDMatrix | None:
         """Compute what we can for a module and optionally return the gramian if it's ready."""
 
@@ -67,6 +68,7 @@ class JacobianBasedGramianComputerWithCrossTerms(JacobianBasedGramianComputer):
         grad_outputs: tuple[Tensor, ...],
         args: tuple[PyTree, ...],
         kwargs: dict[str, PyTree],
+        jacobian_dtype: dtype | None,
     ) -> PSDMatrix | None:
         """Compute what we can for a module and optionally return the gramian if it's ready."""
 
@@ -80,7 +82,7 @@ class JacobianBasedGramianComputerWithCrossTerms(JacobianBasedGramianComputer):
         self.remaining_counter -= 1
 
         if self.remaining_counter == 0:
-            gramian = compute_gramian(self.summed_jacobian)
+            gramian = compute_gramian(self.summed_jacobian.to(dtype=jacobian_dtype))
             self.summed_jacobian = None
             return gramian
         return None

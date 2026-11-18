@@ -1,3 +1,4 @@
+from functools import reduce
 from typing import cast
 
 import torch
@@ -287,6 +288,16 @@ class Engine:
         self._module_hook_manager.gramian_accumulation_phase.value = True
 
         try:
+            # Match the dtype of the concatenated Jacobian before forming any partial Gramian.
+            dtypes = {
+                param.dtype
+                for module in self._gramian_computers
+                for param in module.parameters()
+                if param.requires_grad
+            }
+            self._gramian_accumulator.dtype = (
+                reduce(torch.promote_types, dtypes) if dtypes else None
+            )
             square_gramian = self._compute_square_gramian(reshaped_output, has_non_batch_dim)
         finally:
             # Reset everything that has a state, even if the previous call raised an exception
