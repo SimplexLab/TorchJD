@@ -191,6 +191,7 @@ class AutogramNode(torch.autograd.Function):
                 grad_outputs,
                 ctx.args,
                 ctx.kwargs,
+                ctx.gramian_accumulator.dtype,
             )
             if optional_gramian is not None:
                 ctx.gramian_accumulator.accumulate_gramian(optional_gramian)

@@ -1,3 +1,5 @@
+from torch import dtype
+
 from torchjd.linalg import PSDMatrix
 
 
@@ -11,9 +13,11 @@ class GramianAccumulator:
     """
 
     def __init__(self) -> None:
+        self.dtype: dtype | None = None
         self._gramian: PSDMatrix | None = None
 
     def reset(self) -> None:
+        self.dtype = None
         self._gramian = None
 
     def accumulate_gramian(self, gramian: PSDMatrix) -> None:
