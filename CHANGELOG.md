@@ -8,6 +8,8 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+## [0.18.2] - 2026-11-22
+
 ### Fixed
 
 - Fixed `.to()` not moving the tensors given to the `Constant`, `STCH`, `PBI` and `COSMOS`
