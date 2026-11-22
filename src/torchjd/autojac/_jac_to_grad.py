@@ -1,5 +1,6 @@
 from collections import deque
 from collections.abc import Iterable
+from functools import reduce
 from typing import TypeGuard, cast, overload
 
 import torch
@@ -213,7 +214,8 @@ def _gramian_based(
 
 
 def _compute_gramian_sum(jacobians: deque[Tensor]) -> PSDMatrix:
-    gramian = sum([compute_gramian(matrix) for matrix in jacobians])
+    dtype = reduce(torch.promote_types, {jacobian.dtype for jacobian in jacobians})
+    gramian = sum(compute_gramian(jacobian.to(dtype=dtype)) for jacobian in jacobians)
     return cast(PSDMatrix, gramian)
 
 

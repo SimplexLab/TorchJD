@@ -8,6 +8,12 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed overflow and precision loss when computing Gramians from mixed-dtype Jacobians in
+  `autogram.Engine.compute_gramian` and `autojac.jac_to_grad` with
+  `optimize_gramian_computation=True`. Each partial Gramian is computed in the promoted dtype.
+
 ## [0.18.2] - 2026-11-22
 
 ### Fixed

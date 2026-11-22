@@ -5,6 +5,7 @@ from math import prod
 import pytest
 import torch
 from pytest import mark, param
+from settings import DEVICE
 from torch import Tensor
 from torch.nn import BatchNorm2d, InstanceNorm2d, Linear, Module, Parameter
 from torch.optim import SGD
@@ -434,6 +435,22 @@ def test_compute_gramian_manual() -> None:
     expected_gramian = weight_gramian + bias_gramian
 
     assert_close(gramian, expected_gramian)
+
+
+@mark.parametrize("batch_dim", [None, 0])
+def test_compute_gramian_mixed_parameter_dtypes(batch_dim: int | None) -> None:
+    low = Linear(1, 1, bias=False, device=DEVICE, dtype=torch.float16)
+    high = Linear(1, 1, bias=False, device=DEVICE, dtype=torch.float64)
+    engine = Engine(low, high, batch_dim=batch_dim)
+    # The derivatives fit in float16, but their squared values overflow in that dtype.
+    inputs = ones_(2, 1, dtype=torch.float16) * 512
+    output = (low(inputs) + high(inputs.double())).flatten()
+    rows = [
+        torch.autograd.grad(value, (low.weight, high.weight), retain_graph=True) for value in output
+    ]
+    jacobian = torch.stack([torch.cat(row).flatten() for row in rows])
+
+    assert_close(engine.compute_gramian(output), jacobian @ jacobian.T)
 
 
 @mark.parametrize(
