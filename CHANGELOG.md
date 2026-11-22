@@ -8,6 +8,13 @@ changelog does not include internal changes that do not affect the user.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed `backward` and `mtl_backward` silently broadcasting a single-row Jacobian into a `.jac`
+  field that already had several rows (e.g. when calling `backward(loss)` after
+  `backward([loss1, loss2])` without clearing the `.jac` fields). Accumulating a Jacobian with a
+  different number of rows than the existing `.jac` field now raises a clear `RuntimeError`.
+
 ## [0.18.2] - 2026-11-22
 
 ### Fixed

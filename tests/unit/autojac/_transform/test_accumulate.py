@@ -179,6 +179,25 @@ def test_accumulate_jac_fails_when_shape_mismatch() -> None:
         accumulate(input)
 
 
+@mark.parametrize(["first_rows", "second_rows"], [(2, 1), (1, 2), (2, 3)])
+def test_accumulate_jac_fails_when_first_dimension_mismatch(
+    first_rows: int, second_rows: int
+) -> None:
+    """
+    Tests that the AccumulateJac transform raises an error when the jacobian to accumulate does not
+    have the same first dimension as the jacobian already stored in the .jac field.
+    """
+
+    key = zeros_([2, 3], requires_grad=True)
+    accumulate = AccumulateJac()
+    accumulate({key: ones_([first_rows, 2, 3])})
+
+    with raises(RuntimeError):
+        accumulate({key: ones_([second_rows, 2, 3])})
+
+    assert_jac_close(key, ones_([first_rows, 2, 3]))
+
+
 def test_accumulate_jac_check_keys() -> None:
     """Tests that the `check_keys` method works correctly for AccumulateJac."""
 
