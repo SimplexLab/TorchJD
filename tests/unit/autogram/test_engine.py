@@ -439,11 +439,11 @@ def test_compute_gramian_manual() -> None:
 
 @mark.parametrize("batch_dim", [None, 0])
 def test_compute_gramian_mixed_parameter_dtypes(batch_dim: int | None) -> None:
-    low = Linear(1, 1, bias=False, device=DEVICE, dtype=torch.float32)
+    low = Linear(1, 1, bias=False, device=DEVICE, dtype=torch.float16)
     high = Linear(1, 1, bias=False, device=DEVICE, dtype=torch.float64)
     engine = Engine(low, high, batch_dim=batch_dim)
-    # The individual derivatives fit in float32, but their Gramian needs float64.
-    inputs = ones_(2, 1, dtype=torch.float32) * (2.0**65)
+    # The derivatives fit in float16, but their squared values overflow in that dtype.
+    inputs = ones_(2, 1, dtype=torch.float16) * 512
     output = (low(inputs) + high(inputs.double())).flatten()
     rows = [
         torch.autograd.grad(value, (low.weight, high.weight), retain_graph=True) for value in output
