@@ -32,6 +32,12 @@ def accumulate_jacs(params: Iterable[Tensor], jacobians: Iterable[Tensor]) -> No
             )
 
         if is_tensor_with_jac(param):
+            if param.jac.shape != jac.shape:
+                raise RuntimeError(
+                    f"attempting to accumulate a jacobian of size '{list(jac.shape)}' into a .jac "
+                    f"field of size '{list(param.jac.shape)}'. Please ensure that the jacobians "
+                    "accumulated into the same tensor have the same number of rows",
+                )
             param.jac = _materialize_if_expanded(param.jac)
             param.jac += jac
         else:

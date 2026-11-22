@@ -71,6 +71,22 @@ def test_repeated_calls_with_expanded_jacobian() -> None:
     assert_jac_close(a, tensor_([[3.0, 3.0]]))
 
 
+def test_repeated_calls_with_different_number_of_rows() -> None:
+    """
+    Tests that backward raises an error when it would accumulate a Jacobian into a .jac field that
+    has a different number of rows, instead of broadcasting it.
+    """
+
+    a = tensor_([1.0, 2.0], requires_grad=True)
+
+    backward([a.sum(), (a**2).sum()])
+
+    with raises(RuntimeError):
+        backward(a.sum())
+
+    assert_jac_close(a, tensor_([[1.0, 1.0], [2.0, 4.0]]))
+
+
 def test_expanded_jacobian_is_not_copied() -> None:
     """
     Tests that backward stores an expanded Jacobian in the .jac field without copying it, and that
