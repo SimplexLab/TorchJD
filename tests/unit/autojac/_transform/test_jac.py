@@ -1,5 +1,5 @@
 import torch
-from pytest import mark, raises
+from pytest import mark, raises, warns
 from utils.dict_assertions import assert_tensor_dicts_are_close
 from utils.tensors import eye_, ones_, tensor_, zeros_
 
@@ -121,9 +121,9 @@ def test_retain_graph() -> None:
     jac_retain_graph(input)
     jac_retain_graph(input)
     jac_discard_graph(input)
-    with raises(RuntimeError):
+    with warns(UserWarning, match="torch.vmap failed"), raises(RuntimeError):
         jac_retain_graph(input)
-    with raises(RuntimeError):
+    with warns(UserWarning, match="torch.vmap failed"), raises(RuntimeError):
         jac_discard_graph(input)
 
 

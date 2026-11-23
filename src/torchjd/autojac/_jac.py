@@ -157,7 +157,12 @@ def jac(
 
     jac_outputs_dict = create_jac_dict(outputs_, jac_outputs, "outputs", "jac_outputs")
     transform = _create_transform(outputs_, inputs_, parallel_chunk_size, retain_graph)
-    result = transform(jac_outputs_dict)
+    import torch
+    device_type = list(outputs_)[0].device.type
+    if device_type not in ["cuda", "cpu", "xpu"]:
+        device_type = "cuda"
+    with torch.autocast(device_type=device_type, enabled=False):
+        result = transform(jac_outputs_dict)
     return tuple(result[input] for input in inputs_with_repetition)
 
 
